@@ -44,23 +44,14 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  await supabase.auth.getClaims()
+  const { data } = await supabase.auth.getClaims()
+  const user = data?.claims
 
-  // No auth pages exist yet, so unauthenticated traffic is left alone. Once
-  // /login and /auth routes exist, gate it here:
-  //
-  // const { data } = await supabase.auth.getClaims()
-  // const user = data?.claims
-  //
-  // if (
-  //   !user &&
-  //   !request.nextUrl.pathname.startsWith('/login') &&
-  //   !request.nextUrl.pathname.startsWith('/auth')
-  // ) {
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/login'
-  //   return NextResponse.redirect(url)
-  // }
+  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you
   // create a new response object with NextResponse.next() make sure to:
