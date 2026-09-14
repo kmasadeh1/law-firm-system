@@ -13,6 +13,12 @@ export default function OwnerDashboardPage() {
       >
         Roles &amp; permissions
       </Link>
+      <Link
+        href="/dashboard/clients"
+        className="text-sm font-medium text-black underline underline-offset-4 dark:text-zinc-50"
+      >
+        Clients
+      </Link>
       <form action={logout}>
         <button
           type="submit"
