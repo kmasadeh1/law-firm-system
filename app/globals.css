@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Visual identity: dark theme built on an ink base with burgundy as the
+ * primary accent and brass reserved for rules, small marks and hover
+ * states. This is not an inverted light theme - ink is the only
+ * background these tokens are designed against.
+ */
+@theme {
+  --color-ink: #221f1c;
+  --color-ink-raised: #2a2622;
+  --color-burgundy: #6e1e2b;
+  --color-burgundy-dim: #571724;
+  --color-brass: #b08d3f;
+  --color-warm-grey: #6a645c;
+
+  /* Not part of the given palette - a warm off-white needed so body text
+     reads on the ink background. Swap freely if a specific value is
+     preferred. */
+  --color-paper: #f3ede2;
+  --color-paper-dim: #d9d0c1;
 }
 
+/* Font variables (--font-amiri etc.) are set as CSS custom properties by
+   next/font on the <html> element in each root layout. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-heading: var(--font-amiri);
+  --font-body-en: var(--font-source-serif);
+  --font-body-ar: var(--font-plex-arabic);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-paper);
 }

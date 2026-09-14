@@ -47,7 +47,10 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
-  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+  // Only the staff dashboard requires auth. /login itself is always open
+  // (its own page redirects an already-signed-in visitor onward), and the
+  // public site is reachable without signing in at all.
+  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

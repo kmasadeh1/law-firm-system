@@ -1,0 +1,105 @@
+{
+  "layout": {
+    "firmName": "Firm Name LLP"
+  },
+  "nav": {
+    "home": "Home",
+    "practiceAreas": "Practice Areas",
+    "lawyers": "Our Lawyers",
+    "appointment": "Book an Appointment",
+    "contact": "Contact",
+    "staffSignIn": "Staff sign in"
+  },
+  "languageSwitcher": {
+    "en": "English",
+    "ar": "العربية"
+  },
+  "hero": {
+    "eyebrow": "Placeholder firm identity",
+    "title": "Firm Name LLP",
+    "tagline": "Counsel for individuals and businesses across Jordan.",
+    "body": "This is placeholder copy standing in for the firm's real introduction. It describes, in a sentence or two, who the firm serves and the kind of legal work it takes on, ahead of the actual firm profile being written.",
+    "cta": "Book a consultation"
+  },
+  "practiceAreas": {
+    "title": "Practice Areas",
+    "intro": "Placeholder list of practice areas - real descriptions to follow.",
+    "items": [
+      {
+        "name": "Corporate & Commercial",
+        "description": "Company formation, contracts, and day-to-day commercial advice for businesses of every size."
+      },
+      {
+        "name": "Litigation & Dispute Resolution",
+        "description": "Representation before the courts, along with mediation and arbitration where that route fits better."
+      },
+      {
+        "name": "Real Estate",
+        "description": "Property transactions, leases, and title matters for individual and commercial clients."
+      },
+      {
+        "name": "Family Law",
+        "description": "Advice and representation in family and personal status matters, handled with discretion."
+      },
+      {
+        "name": "Labor & Employment",
+        "description": "Guidance for employers and employees on contracts, disputes, and workplace policy."
+      }
+    ]
+  },
+  "lawyers": {
+    "title": "Our Lawyers",
+    "intro": "Placeholder profiles - real biographies to follow.",
+    "items": [
+      {
+        "name": "Lawyer Name",
+        "role": "Managing Partner",
+        "bio": "Placeholder biography. A short summary of background and areas of focus will go here."
+      },
+      {
+        "name": "Lawyer Name",
+        "role": "Senior Associate",
+        "bio": "Placeholder biography. A short summary of background and areas of focus will go here."
+      },
+      {
+        "name": "Lawyer Name",
+        "role": "Associate",
+        "bio": "Placeholder biography. A short summary of background and areas of focus will go here."
+      }
+    ]
+  },
+  "appointment": {
+    "title": "Book an Appointment",
+    "intro": "This form is a visual placeholder and does not submit yet - online booking is coming soon.",
+    "nameLabel": "Full name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "practiceAreaLabel": "Practice area",
+    "practiceAreaPlaceholder": "Select a practice area",
+    "messageLabel": "How can we help?",
+    "submit": "Request appointment",
+    "comingSoon": "Coming soon"
+  },
+  "contact": {
+    "title": "Contact & Location",
+    "intro": "This form is a visual placeholder and does not submit yet.",
+    "addressLabel": "Address",
+    "address": "Placeholder Street, Amman, Jordan",
+    "phoneLabel": "Phone",
+    "phone": "+962 0 000 0000",
+    "emailLabel": "Email",
+    "email": "info@example.com",
+    "hoursLabel": "Office hours",
+    "hours": "Sunday - Thursday, 9:00 - 17:00",
+    "mapPlaceholder": "Map placeholder",
+    "formNameLabel": "Full name",
+    "formEmailLabel": "Email",
+    "formMessageLabel": "Message",
+    "submit": "Send message",
+    "comingSoon": "Coming soon"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "placeholderNotice": "Placeholder content - not a real firm identity."
+  }
+}
