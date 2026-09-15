@@ -25,6 +25,12 @@ export default function OwnerDashboardPage() {
       >
         Cases
       </Link>
+      <Link
+        href="/dashboard/appointments"
+        className="text-sm font-medium text-black underline underline-offset-4 dark:text-zinc-50"
+      >
+        Appointments
+      </Link>
       <form action={logout}>
         <button
           type="submit"
