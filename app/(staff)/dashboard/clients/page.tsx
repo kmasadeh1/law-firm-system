@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from './back-link'
+import { BackLink } from '../back-link'
 
 export default async function ClientsListPage({ searchParams }: PageProps<'/dashboard/clients'>) {
   const { q } = (await searchParams) as { q?: string }

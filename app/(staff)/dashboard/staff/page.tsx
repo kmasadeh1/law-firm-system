@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { logout } from '../actions'
 
 export default function StaffDashboardPage() {
@@ -6,6 +7,12 @@ export default function StaffDashboardPage() {
       <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
         Staff dashboard
       </h1>
+      <Link
+        href="/dashboard/cases"
+        className="text-sm font-medium text-black underline underline-offset-4 dark:text-zinc-50"
+      >
+        Cases
+      </Link>
       <form action={logout}>
         <button
           type="submit"

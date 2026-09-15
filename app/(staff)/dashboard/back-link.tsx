@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 
 /**
  * "Back to dashboard" link, routed to /dashboard/owner or /dashboard/staff
- * depending on who's actually signed in - this area is reachable by both,
- * unlike /dashboard/owner/roles.
+ * depending on who's actually signed in - shared by every permission-gated
+ * area (Clients, Cases, ...) since each is reachable by both owner and
+ * non-owner staff.
  */
 export async function BackLink() {
   const supabase = await createClient()

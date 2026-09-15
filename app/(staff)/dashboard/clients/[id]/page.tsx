@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { ClientForm } from '../client-form'
-import { BackLink } from '../back-link'
+import { BackLink } from '../../back-link'
 
 export default async function EditClientPage({ params }: PageProps<'/dashboard/clients/[id]'>) {
   const { id } = await params
