@@ -56,6 +56,30 @@ favor of `proxy.ts`/`proxy()`. The unauthenticated-user redirect in
 `lib/supabase/proxy.ts` is intentionally commented out until `/login` and
 related auth routes exist.
 
+## Armed diagnostic: signOut tracer in lib/supabase/server.ts
+
+`lib/supabase/server.ts` wraps `supabase.auth.signOut` in a dev-only
+(`NODE_ENV !== 'production'`) tracer that logs a timestamp and full stack
+trace on every call, then forwards to the real implementation unchanged —
+pure observation, no behavior change, no-op in production.
+
+This is intentional instrumentation for an open bug, not stray debug code:
+creating a case or appointment has been observed to silently sign the user
+out (a genuine `POST /logout` reaches Supabase's Auth API a few seconds
+after the create action, confirmed via Supabase auth logs). The original
+refresh-token-race theory was disproven — there are no refresh-token
+requests in the auth logs, successful or rejected. The `login()` action's
+gated `signOut()` branches (`!staffRow`, `!staffRow.is_active`) were also
+checked directly (temporary logging on the staff-row query) and ruled out:
+across 12 reproduction attempts the query always returned a valid, active
+row and neither branch fired. As of this writing the bug has stopped
+reproducing on demand, so this tracer is left armed to catch the real call
+site (with stack trace) whenever it next recurs, rather than continuing an
+open-ended reproduction chase.
+
+**Do not remove this as unrelated cleanup.** Remove it once the bug above
+is diagnosed (via a captured trace) and fixed.
+
 ## Non-negotiable rule: no business logic in the frontend
 
 Validation, permission checks, and calculations happen in Supabase — Row

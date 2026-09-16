@@ -12,7 +12,7 @@ import type { Database } from './database.types'
 export async function createClient() {
   const cookieStore = await cookies()
 
-  return createServerClient<Database>(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
@@ -34,4 +34,26 @@ export async function createClient() {
       },
     }
   )
+
+  if (process.env.NODE_ENV !== 'production') {
+    attachSignOutTracer(supabase)
+  }
+
+  return supabase
+}
+
+// TEMPORARY diagnostic instrumentation for the "session lost on
+// create-and-navigate" investigation (see CLAUDE.md). Dev-only, pure
+// observation - logs who calls signOut() and does not alter its behavior
+// or return value. Remove once the bug is found and fixed.
+function attachSignOutTracer(supabase: ReturnType<typeof createServerClient<Database>>) {
+  const originalSignOut = supabase.auth.signOut.bind(supabase.auth)
+  supabase.auth.signOut = ((...args: Parameters<typeof originalSignOut>) => {
+    console.error(
+      '[signOut-tracer]',
+      new Date().toISOString(),
+      new Error('signOut() invoked - stack trace').stack
+    )
+    return originalSignOut(...args)
+  }) as typeof originalSignOut
 }
