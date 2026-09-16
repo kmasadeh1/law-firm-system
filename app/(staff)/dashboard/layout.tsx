@@ -1,0 +1,56 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { DashboardShell, type NavItem } from '@/components/dashboard/shell'
+import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
+import { logout } from './actions'
+
+/**
+ * Persistent shell for every /dashboard/* page. Nav visibility is computed
+ * here from the same checks already used by each area's own layout guard
+ * (has_permission / user_type) - this only decides what to SHOW, the
+ * existing per-area guards still do the actual access control.
+ */
+export default async function DashboardLayout({ children }: LayoutProps<'/dashboard'>) {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const user = data?.claims
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const [{ data: staffRow }, { data: clientsManage }, initialTheme] = await Promise.all([
+    supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
+    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+    getThemeCookie(),
+  ])
+
+  const isOwner = staffRow?.user_type === 'owner'
+  const homeHref = isOwner ? '/dashboard/owner' : '/dashboard/staff'
+
+  const navItems: NavItem[] = [{ href: homeHref, label: 'Home', icon: 'home' }]
+  if (isOwner || clientsManage) {
+    navItems.push({ href: '/dashboard/clients', label: 'Clients', icon: 'clients' })
+  }
+  navItems.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
+  navItems.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })
+  if (isOwner) {
+    navItems.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
+  }
+
+  const roleLabel = isOwner ? 'Owner' : (staffRow?.roles?.name ?? 'Staff')
+
+  return (
+    <DashboardShell
+      firmName="Firm Name LLP"
+      homeHref={homeHref}
+      navItems={navItems}
+      userName={staffRow?.full_name ?? 'Signed in'}
+      roleLabel={roleLabel}
+      logoutAction={logout}
+      initialTheme={initialTheme ?? 'light'}
+    >
+      {children}
+    </DashboardShell>
+  )
+}

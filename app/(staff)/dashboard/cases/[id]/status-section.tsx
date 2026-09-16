@@ -2,6 +2,9 @@
 
 import { useState, useTransition } from 'react'
 import { setCaseStatus } from '../actions'
+import { Panel } from '@/components/dashboard/panel'
+import { Button } from '@/components/dashboard/button'
+import { FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 
 type StatusOption = { id: string; name: string; is_terminal: boolean }
 
@@ -36,8 +39,8 @@ export function StatusSection({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <h2 className="font-semibold text-black dark:text-zinc-50">Status</h2>
+    <Panel className="flex flex-col gap-3">
+      <h2 className="font-heading text-lg text-fg">Status</h2>
       <div className="flex flex-wrap items-center gap-2">
         <select
           id="status_id"
@@ -46,7 +49,7 @@ export function StatusSection({
             setStatusId(e.target.value)
             setSaved(false)
           }}
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+          className={controlClass}
         >
           {statuses.map((s) => (
             <option key={s.id} value={s.id}>
@@ -54,17 +57,12 @@ export function StatusSection({
             </option>
           ))}
         </select>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={isPending || !changed}
-          className="rounded-full border border-black/10 px-4 py-2 text-sm text-black transition-colors hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-zinc-50 dark:hover:bg-white/10"
-        >
+        <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending || !changed}>
           {isPending ? 'Saving…' : 'Save status'}
-        </button>
-        {saved && !changed && <span className="text-sm text-green-700 dark:text-green-400">Saved</span>}
+        </Button>
+        {saved && !changed && <FieldSuccess>Saved</FieldSuccess>}
       </div>
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-    </div>
+      {error && <FieldError>{error}</FieldError>}
+    </Panel>
   )
 }

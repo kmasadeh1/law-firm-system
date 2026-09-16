@@ -3,6 +3,10 @@
 import { useMemo, useState, useTransition } from 'react'
 import { createRole, deleteRole, renameRole, setRolePermission } from './actions'
 import { PERMISSION_GROUPS } from './permission-groups'
+import { Panel } from '@/components/dashboard/panel'
+import { EmptyState } from '@/components/dashboard/empty-state'
+import { Button } from '@/components/dashboard/button'
+import { Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 
 type PermissionKeyRow = {
   key: string
@@ -88,9 +92,7 @@ export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermission
         }}
       />
 
-      {roles.length === 0 && (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No roles yet - create one above.</p>
-      )}
+      {roles.length === 0 && <EmptyState title="No roles yet" description="Create one above to get started." />}
 
       <div className="flex flex-col gap-8">
         {roles.map((role) => (
@@ -160,10 +162,8 @@ function CreateRoleForm({
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-md border border-black/10 p-4 dark:border-white/10">
-      <label htmlFor="new-role-name" className="text-sm font-medium text-black dark:text-zinc-50">
-        New role
-      </label>
+    <Panel className="flex flex-col gap-2">
+      <Label htmlFor="new-role-name">New role</Label>
       <div className="flex flex-wrap items-center gap-2">
         <input
           id="new-role-name"
@@ -173,22 +173,15 @@ function CreateRoleForm({
             setError(null)
           }}
           placeholder="e.g. Paralegal"
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+          className={controlClass}
         />
-        <button
-          type="button"
-          onClick={handleCreate}
-          disabled={isPending || !name.trim()}
-          className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
-        >
+        <Button type="button" variant="primary" onClick={handleCreate} disabled={isPending || !name.trim()}>
           {isPending ? 'Creating…' : 'Create role'}
-        </button>
+        </Button>
       </div>
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        Starts with every permission off.
-      </p>
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-    </div>
+      <p className="text-xs text-fg-muted">Starts with every permission off.</p>
+      {error && <FieldError>{error}</FieldError>}
+    </Panel>
   )
 }
 
@@ -254,10 +247,7 @@ function RoleCard({
   }
 
   return (
-    <div
-      data-testid={`role-${role.id}`}
-      className="rounded-lg border border-black/10 p-5 dark:border-white/10"
-    >
+    <Panel data-testid={`role-${role.id}`}>
       <div className="flex flex-wrap items-center gap-2">
         <input
           value={nameInput}
@@ -265,49 +255,36 @@ function RoleCard({
             setNameInput(e.target.value)
             setRenameSaved(false)
           }}
-          className="rounded-md border border-black/10 px-3 py-2 text-sm font-semibold text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+          className={`font-semibold ${controlClass}`}
         />
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={handleRename}
           disabled={isRenaming || !nameChanged || !nameInput.trim()}
-          className="rounded-full border border-black/10 px-3 py-1.5 text-sm text-black transition-colors hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-zinc-50 dark:hover:bg-white/10"
         >
           {isRenaming ? 'Saving…' : 'Save name'}
-        </button>
-        {renameSaved && !nameChanged && (
-          <span className="text-xs text-green-700 dark:text-green-400">Saved</span>
-        )}
+        </Button>
+        {renameSaved && !nameChanged && <FieldSuccess>Saved</FieldSuccess>}
 
         <div className="grow" />
 
-        <button
-          type="button"
-          onClick={handleDeleteClick}
-          disabled={isDeleting}
-          className="rounded-full border border-red-600/30 px-3 py-1.5 text-sm text-red-700 transition-colors hover:bg-red-600/10 disabled:opacity-50 dark:text-red-400"
-        >
+        <Button type="button" variant="danger" onClick={handleDeleteClick} disabled={isDeleting}>
           {isDeleting ? 'Deleting…' : confirmingDelete ? 'Confirm delete?' : 'Delete role'}
-        </button>
+        </Button>
         {confirmingDelete && !isDeleting && (
-          <button
-            type="button"
-            onClick={() => setConfirmingDelete(false)}
-            className="text-sm text-zinc-500 underline-offset-2 hover:underline dark:text-zinc-400"
-          >
+          <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
             Cancel
-          </button>
+          </Button>
         )}
       </div>
-      {renameError && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{renameError}</p>}
-      {deleteError && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{deleteError}</p>}
+      {renameError && <FieldError>{renameError}</FieldError>}
+      {deleteError && <FieldError>{deleteError}</FieldError>}
 
       <div className="mt-5 flex flex-col gap-5">
         {groups.map((group) => (
           <div key={group.title}>
-            <h3 className="text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
-              {group.title}
-            </h3>
+            <h3 className="text-sm font-semibold text-fg-muted">{group.title}</h3>
             <div className="mt-2 flex flex-col gap-2">
               {group.items.map((pk) => (
                 <PermissionCheckbox
@@ -324,27 +301,23 @@ function RoleCard({
         ))}
 
         <div>
-          <h3 className="text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
-            Administration
-          </h3>
+          <h3 className="text-sm font-semibold text-fg-muted">Administration</h3>
           <div className="mt-2 flex flex-col gap-2">
             {ownerOnlyKeys.map((pk) => (
               <div key={pk.key} className="flex items-start gap-2 opacity-60">
                 <input type="checkbox" checked={false} disabled className="mt-0.5" />
                 <div>
-                  <p className="text-sm text-black dark:text-zinc-50">
+                  <p className="text-sm text-fg">
                     {pk.label} <span className="text-xs">(Owner only)</span>
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Owner only — can&apos;t be granted to any role.
-                  </p>
+                  <p className="text-xs text-fg-muted">Owner only — can&apos;t be granted to any role.</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-    </div>
+    </Panel>
   )
 }
 
@@ -389,14 +362,12 @@ function PermissionCheckbox({
         className="mt-0.5"
       />
       <div>
-        <p className="text-sm text-black dark:text-zinc-50">
+        <p className="text-sm text-fg">
           {permissionKey.label}
-          {isPending && <span className="ml-2 text-xs text-zinc-400">Saving…</span>}
+          {isPending && <span className="ms-2 text-xs text-fg-muted">Saving…</span>}
         </p>
-        {permissionKey.description && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">{permissionKey.description}</p>
-        )}
-        {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+        {permissionKey.description && <p className="text-xs text-fg-muted">{permissionKey.description}</p>}
+        {error && <p className="text-xs text-danger-text">{error}</p>}
       </div>
     </div>
   )

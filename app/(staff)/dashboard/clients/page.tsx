@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '../back-link'
+import { PageHeader } from '@/components/dashboard/page-header'
+import { Panel } from '@/components/dashboard/panel'
+import { EmptyState } from '@/components/dashboard/empty-state'
+import { LinkButton, Button } from '@/components/dashboard/button'
+import { controlClass } from '@/components/dashboard/form'
 
 export default async function ClientsListPage({ searchParams }: PageProps<'/dashboard/clients'>) {
   const { q } = (await searchParams) as { q?: string }
@@ -27,67 +31,68 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
   const { data: clients } = await query
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-      <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <div>
-          <BackLink />
-          <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">Clients</h1>
-            <Link
-              href="/dashboard/clients/new"
-              className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-            >
-              Add client
-            </Link>
-          </div>
-        </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Clients"
+        action={
+          <LinkButton href="/dashboard/clients/new" variant="primary">
+            Add client
+          </LinkButton>
+        }
+      />
 
-        <form method="get" className="flex gap-2">
-          <input
-            type="text"
-            name="q"
-            defaultValue={term ?? ''}
-            placeholder="Search by name, phone, or national ID"
-            className="w-full max-w-sm rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-          />
-          <button
-            type="submit"
-            className="rounded-md border border-black/10 px-4 py-2 text-sm text-black transition-colors hover:bg-black/5 dark:border-white/10 dark:text-zinc-50 dark:hover:bg-white/10"
+      <form method="get" className="flex flex-wrap gap-2">
+        <input
+          type="text"
+          name="q"
+          defaultValue={term ?? ''}
+          placeholder="Search by name, phone, or national ID"
+          className={`w-full max-w-sm ${controlClass}`}
+        />
+        <Button type="submit" variant="secondary">
+          Search
+        </Button>
+        {term && (
+          <Link
+            href="/dashboard/clients"
+            className="flex items-center text-sm text-fg-muted underline-offset-2 hover:underline"
           >
-            Search
-          </button>
-          {term && (
-            <Link
-              href="/dashboard/clients"
-              className="flex items-center text-sm text-zinc-500 underline-offset-2 hover:underline dark:text-zinc-400"
-            >
-              Clear
-            </Link>
-          )}
-        </form>
+            Clear
+          </Link>
+        )}
+      </form>
 
-        {!clients || clients.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {term ? 'No clients match that search.' : 'No clients yet - add the first one above.'}
-          </p>
-        ) : (
-          <ul className="flex flex-col divide-y divide-black/10 rounded-lg border border-black/10 dark:divide-white/10 dark:border-white/10">
+      {!clients || clients.length === 0 ? (
+        <EmptyState
+          title={term ? 'No clients match that search.' : 'No clients yet'}
+          description={term ? undefined : 'Add your first client to start building case files.'}
+          action={
+            !term && (
+              <LinkButton href="/dashboard/clients/new" variant="secondary">
+                Add client
+              </LinkButton>
+            )
+          }
+        />
+      ) : (
+        <Panel className="p-0">
+          <ul className="flex flex-col divide-y divide-line">
             {clients.map((c) => (
               <li key={c.id}>
                 <Link
                   href={`/dashboard/clients/${c.id}`}
-                  className="flex flex-wrap items-center justify-between gap-1 px-4 py-3 text-sm transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                  className="flex flex-wrap items-center justify-between gap-1 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                 >
-                  <span className="font-medium text-black dark:text-zinc-50">{c.full_name}</span>
-                  <span className="text-zinc-500 dark:text-zinc-400">
+                  <span className="font-medium text-fg">{c.full_name}</span>
+                  <span className="text-fg-muted">
                     {[c.phone, c.national_id].filter(Boolean).join(' · ') || '—'}
                   </span>
                 </Link>
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </Panel>
+      )}
     </div>
   )
 }

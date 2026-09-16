@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '../../back-link'
+import { BackLink } from '@/components/dashboard/back-link'
+import { PageHeader } from '@/components/dashboard/page-header'
 import { AppointmentForm } from '../appointment-form'
 
 /**
@@ -31,24 +32,20 @@ export default async function NewAppointmentPage() {
   )
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6">
-        <div>
-          <BackLink />
-          <h1 className="mt-1 text-2xl font-semibold text-black dark:text-zinc-50">
-            New appointment
-          </h1>
-        </div>
-
-        <AppointmentForm
-          mode="create"
-          currentStaffId={user.sub as string}
-          currentStaffName={me?.full_name ?? 'You'}
-          staffOptions={staffOptions}
-          canAssignAll={Boolean(canAssignAll)}
-          canAssignCourtDates={Boolean(canAssignCourtDates)}
-        />
+    <div className="flex max-w-2xl flex-col gap-6">
+      <div>
+        <BackLink href="/dashboard/appointments" label="Appointments" />
+        <PageHeader title="New appointment" />
       </div>
+
+      <AppointmentForm
+        mode="create"
+        currentStaffId={user.sub as string}
+        currentStaffName={me?.full_name ?? 'You'}
+        staffOptions={staffOptions}
+        canAssignAll={Boolean(canAssignAll)}
+        canAssignCourtDates={Boolean(canAssignCourtDates)}
+      />
     </div>
   )
 }

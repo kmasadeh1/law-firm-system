@@ -1,6 +1,7 @@
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RolesAdmin } from './roles-admin'
+import { BackLink } from '@/components/dashboard/back-link'
+import { PageHeader } from '@/components/dashboard/page-header'
 
 export default async function RolesPage() {
   const supabase = await createClient()
@@ -12,28 +13,17 @@ export default async function RolesPage() {
   ])
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-      <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <Link
-              href="/dashboard/owner"
-              className="text-sm text-zinc-500 underline-offset-2 hover:underline dark:text-zinc-400"
-            >
-              ← Owner dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold text-black dark:text-zinc-50">
-              Roles &amp; permissions
-            </h1>
-          </div>
-        </div>
-
-        <RolesAdmin
-          roles={roles ?? []}
-          permissionKeys={permissionKeys ?? []}
-          rolePermissions={rolePermissions ?? []}
-        />
+    <div className="flex flex-col gap-6">
+      <div>
+        <BackLink href="/dashboard/owner" label="Firm overview" />
+        <PageHeader title="Roles & permissions" />
       </div>
+
+      <RolesAdmin
+        roles={roles ?? []}
+        permissionKeys={permissionKeys ?? []}
+        rolePermissions={rolePermissions ?? []}
+      />
     </div>
   )
 }

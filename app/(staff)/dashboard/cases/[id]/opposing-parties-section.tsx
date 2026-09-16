@@ -2,6 +2,10 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { addOpposingParty, type ConflictMatch } from '../actions'
+import { Panel } from '@/components/dashboard/panel'
+import { Button } from '@/components/dashboard/button'
+import { FieldError, controlClass } from '@/components/dashboard/form'
+import { ConflictWarning } from '@/components/dashboard/conflict-warning'
 
 type OpposingParty = { id: string; name: string; national_id: string | null }
 
@@ -61,19 +65,17 @@ export function OpposingPartiesSection({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <h2 className="font-semibold text-black dark:text-zinc-50">Opposing parties</h2>
+    <Panel className="flex flex-col gap-3">
+      <h2 className="font-heading text-lg text-fg">Opposing parties</h2>
 
       {parties.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">None added yet.</p>
+        <p className="text-sm text-fg-muted">None added yet.</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-black/10 rounded-md border border-black/10 dark:divide-white/10 dark:border-white/10">
+        <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {parties.map((p) => (
-            <li key={p.id} className="px-3 py-2 text-sm text-black dark:text-zinc-50">
+            <li key={p.id} className="px-3 py-2 text-sm text-fg">
               {p.name}
-              {p.national_id && (
-                <span className="text-zinc-500 dark:text-zinc-400"> · {p.national_id}</span>
-              )}
+              {p.national_id && <span className="text-fg-muted"> · {p.national_id}</span>}
             </li>
           ))}
         </ul>
@@ -81,70 +83,35 @@ export function OpposingPartiesSection({
 
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
-          <label htmlFor="op-name" className="text-sm text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="op-name" className="text-sm text-fg-muted">
             Name
           </label>
-          <input
-            id="op-name"
-            name="name"
-            required
-            className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-          />
+          <input id="op-name" name="name" required className={controlClass} />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="op-national-id" className="text-sm text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="op-national-id" className="text-sm text-fg-muted">
             National ID
           </label>
-          <input
-            id="op-national-id"
-            name="national_id"
-            className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-          />
+          <input id="op-national-id" name="national_id" className={controlClass} />
         </div>
         {!matches && (
-          <button
-            type="submit"
-            data-testid="opposing-party-add-button"
-            disabled={isPending}
-            className="rounded-full border border-black/10 px-4 py-2 text-sm text-black transition-colors hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-zinc-50 dark:hover:bg-white/10"
-          >
+          <Button type="submit" variant="secondary" data-testid="opposing-party-add-button" disabled={isPending}>
             {isPending ? 'Checking…' : 'Add'}
-          </button>
+          </Button>
         )}
       </form>
 
       {matches && matches.length > 0 && (
-        <div className="rounded-md border border-amber-500/40 bg-amber-50 p-3 text-sm dark:bg-amber-950/30">
-          <p className="font-medium text-amber-900 dark:text-amber-200">
-            Possible match{matches.length > 1 ? 'es' : ''} found - review before adding:
-          </p>
-          <ul className="mt-2 list-disc pl-5 text-amber-900 dark:text-amber-200">
-            {matches.map((m) => (
-              <li key={`${m.source}-${m.matched_id}`}>{matchLabel(m, caseId)}</li>
-            ))}
-          </ul>
-          <div className="mt-3 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleConfirmAnyway}
-              disabled={isPending}
-              className="rounded-full bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
-            >
-              {isPending ? 'Adding…' : 'Create anyway'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setMatches(null)}
-              disabled={isPending}
-              className="text-sm text-amber-900 underline-offset-2 hover:underline disabled:opacity-50 dark:text-amber-200"
-            >
-              Edit details instead
-            </button>
-          </div>
-        </div>
+        <ConflictWarning
+          labels={matches.map((m) => matchLabel(m, caseId))}
+          onConfirm={handleConfirmAnyway}
+          onEdit={() => setMatches(null)}
+          pending={isPending}
+          confirmLabel="Add anyway"
+        />
       )}
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-    </div>
+      {error && <FieldError>{error}</FieldError>}
+    </Panel>
   )
 }

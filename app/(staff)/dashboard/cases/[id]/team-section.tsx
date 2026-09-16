@@ -2,6 +2,11 @@
 
 import { useState, useTransition } from 'react'
 import { addTeamMember, removeTeamMember, setTeamMemberLead } from '../actions'
+import { Panel } from '@/components/dashboard/panel'
+import { Button } from '@/components/dashboard/button'
+import { Banner } from '@/components/dashboard/banner'
+import { FieldError, controlClass } from '@/components/dashboard/form'
+import { Badge } from '@/components/dashboard/badge'
 
 type TeamMember = { staff_id: string; full_name: string; is_lead: boolean }
 type StaffOption = { id: string; full_name: string }
@@ -32,76 +37,72 @@ export function TeamSection({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <h2 className="font-semibold text-black dark:text-zinc-50">Team</h2>
+    <Panel className="flex flex-col gap-3">
+      <h2 className="font-heading text-lg text-fg">Team</h2>
 
       {!hasLead && (
-        <p className="rounded-md border border-amber-500/40 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+        <Banner kind="warning">
           No lead lawyer assigned yet - only the owner can close this case until one is set.
-        </p>
+        </Banner>
       )}
 
       {team.length === 0 ? (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Nobody is assigned yet.</p>
+        <p className="text-sm text-fg-muted">Nobody is assigned yet.</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-black/10 rounded-md border border-black/10 dark:divide-white/10 dark:border-white/10">
+        <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {team.map((m) => (
             <li key={m.staff_id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
-              <span className="text-black dark:text-zinc-50">
+              <span className="flex items-center gap-2 text-fg">
                 {m.full_name}
-                {m.is_lead && (
-                  <span className="ml-2 rounded-full bg-black/10 px-2 py-0.5 text-xs dark:bg-white/10">
-                    Lead
-                  </span>
-                )}
+                {m.is_lead && <Badge variant="accent">Lead</Badge>}
               </span>
               <span className="flex gap-3">
                 {m.is_lead ? (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     disabled={isPending}
                     onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, false))}
-                    className="text-sm text-zinc-500 underline-offset-2 hover:underline disabled:opacity-50 dark:text-zinc-400"
                   >
                     Remove as lead
-                  </button>
+                  </Button>
                 ) : (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     disabled={isPending}
                     onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, true))}
-                    className="text-sm text-zinc-500 underline-offset-2 hover:underline disabled:opacity-50 dark:text-zinc-400"
                   >
                     Make lead
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
                   type="button"
+                  variant="danger"
                   disabled={isPending}
                   onClick={() => runAction(() => removeTeamMember(caseId, m.staff_id))}
-                  className="text-sm text-red-700 underline-offset-2 hover:underline disabled:opacity-50 dark:text-red-400"
                 >
                   Remove
-                </button>
+                </Button>
               </span>
             </li>
           ))}
         </ul>
       )}
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <FieldError>{error}</FieldError>}
 
       {candidates.length > 0 && (
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-col gap-1">
-            <label htmlFor="add-staff" className="text-sm text-zinc-500 dark:text-zinc-400">
+            <label htmlFor="add-staff" className="text-sm text-fg-muted">
               Add to team
             </label>
             <select
               id="add-staff"
               value={addStaffId}
               onChange={(e) => setAddStaffId(e.target.value)}
-              className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+              className={controlClass}
             >
               <option value="">Select staff…</option>
               {candidates.map((s) => (
@@ -111,16 +112,13 @@ export function TeamSection({
               ))}
             </select>
           </div>
-          <label className="flex items-center gap-1.5 pb-2 text-sm text-zinc-500 dark:text-zinc-400">
-            <input
-              type="checkbox"
-              checked={addAsLead}
-              onChange={(e) => setAddAsLead(e.target.checked)}
-            />
+          <label className="flex items-center gap-1.5 pb-2 text-sm text-fg-muted">
+            <input type="checkbox" checked={addAsLead} onChange={(e) => setAddAsLead(e.target.checked)} />
             as lead
           </label>
-          <button
+          <Button
             type="button"
+            variant="secondary"
             data-testid="team-add-button"
             disabled={isPending || !addStaffId}
             onClick={() =>
@@ -133,12 +131,11 @@ export function TeamSection({
                 return result
               })
             }
-            className="rounded-full border border-black/10 px-4 py-2 text-sm text-black transition-colors hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:text-zinc-50 dark:hover:bg-white/10"
           >
             Add
-          </button>
+          </Button>
         </div>
       )}
-    </div>
+    </Panel>
   )
 }

@@ -7,6 +7,8 @@ import { ClientPicker } from './client-picker'
 import { CasePicker } from './case-picker'
 import type { ClientOption } from '../cases/actions'
 import type { CaseOption } from './actions'
+import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { Button } from '@/components/dashboard/button'
 
 type StaffOption = { id: string; full_name: string }
 
@@ -88,34 +90,30 @@ export function AppointmentForm({
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="type" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Type *
-        </label>
+      <Field>
+        <Label htmlFor="type" required>
+          Type
+        </Label>
         <select
           id="type"
           name="type"
           value={type}
           onChange={(e) => setType(e.target.value as AppointmentType)}
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+          className={controlClass}
         >
           <option value="consultation">Consultation</option>
           <option value="court_date">Court date</option>
         </select>
-      </div>
+      </Field>
 
       <ClientPicker initial={initial?.client} />
 
       <CasePicker required={type === 'court_date'} initial={initial?.case ?? undefined} />
 
-      <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Assigned to</span>
+      <Field>
+        <span className="text-sm font-medium text-fg">Assigned to</span>
         {canAssignNow ? (
-          <select
-            name="staff_id"
-            defaultValue={assignedStaffId}
-            className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-          >
+          <select name="staff_id" defaultValue={assignedStaffId} className={controlClass}>
             {staffOptions.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.id === currentStaffId ? `${s.full_name} (you)` : s.full_name}
@@ -125,82 +123,63 @@ export function AppointmentForm({
         ) : (
           <>
             <input type="hidden" name="staff_id" value={currentStaffId} />
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{currentStaffName} (you)</p>
+            <p className="text-sm text-fg-muted">{currentStaffName} (you)</p>
           </>
         )}
-      </div>
+      </Field>
 
       <div className="flex flex-wrap gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="starts_at" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Starts *
-          </label>
+        <Field>
+          <Label htmlFor="starts_at" required>
+            Starts
+          </Label>
           <input
             id="starts_at"
             name="starts_at"
             type="datetime-local"
             required
             defaultValue={initial ? toLocalInputValue(initial.starts_at) : undefined}
-            className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+            className={controlClass}
           />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="ends_at" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Ends *
-          </label>
+        </Field>
+        <Field>
+          <Label htmlFor="ends_at" required>
+            Ends
+          </Label>
           <input
             id="ends_at"
             name="ends_at"
             type="datetime-local"
             required
             defaultValue={initial ? toLocalInputValue(initial.ends_at) : undefined}
-            className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
+            className={controlClass}
           />
-        </div>
+        </Field>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="notes" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Notes
-        </label>
-        <textarea
-          id="notes"
-          name="notes"
-          rows={3}
-          defaultValue={initial?.notes ?? ''}
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-        />
-      </div>
+      <Field>
+        <Label htmlFor="notes">Notes</Label>
+        <textarea id="notes" name="notes" rows={3} defaultValue={initial?.notes ?? ''} className={controlClass} />
+      </Field>
 
       {mode === 'edit' && (
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="status" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            defaultValue={initial?.status}
-            className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-          >
+        <Field>
+          <Label htmlFor="status">Status</Label>
+          <select id="status" name="status" defaultValue={initial?.status} className={controlClass}>
             <option value="scheduled">Scheduled</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
             <option value="no_show">No-show</option>
           </select>
-        </div>
+        </Field>
       )}
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-      {saved && <p className="text-sm text-green-700 dark:text-green-400">Saved.</p>}
+      {error && <FieldError>{error}</FieldError>}
+      {saved && <FieldSuccess>Saved.</FieldSuccess>}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="mt-2 self-start rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
-      >
+      <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
         {isPending ? 'Saving…' : mode === 'create' ? 'Create appointment' : 'Save changes'}
-      </button>
+      </Button>
     </form>
   )
 }

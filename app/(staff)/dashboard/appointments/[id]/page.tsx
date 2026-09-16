@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '../../back-link'
+import { BackLink } from '@/components/dashboard/back-link'
+import { PageHeader } from '@/components/dashboard/page-header'
 import { AppointmentForm } from '../appointment-form'
 
 export default async function AppointmentDetailPage({
@@ -27,13 +28,11 @@ export default async function AppointmentDetailPage({
 
   if (!appt) {
     return (
-      <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-        <div className="mx-auto flex max-w-2xl flex-col gap-6">
-          <BackLink />
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            This appointment doesn&apos;t exist, or you don&apos;t have access to it.
-          </p>
-        </div>
+      <div className="flex flex-col gap-6">
+        <BackLink href="/dashboard/appointments" label="Appointments" />
+        <p className="text-sm text-fg-muted">
+          This appointment doesn&apos;t exist, or you don&apos;t have access to it.
+        </p>
       </div>
     )
   }
@@ -52,53 +51,45 @@ export default async function AppointmentDetailPage({
 
   if (!appt.clients) {
     return (
-      <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-        <div className="mx-auto flex max-w-2xl flex-col gap-6">
-          <BackLink />
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            This appointment&apos;s client record is missing.
-          </p>
-        </div>
+      <div className="flex flex-col gap-6">
+        <BackLink href="/dashboard/appointments" label="Appointments" />
+        <p className="text-sm text-fg-muted">This appointment&apos;s client record is missing.</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-      <div className="mx-auto flex max-w-2xl flex-col gap-6">
-        <div>
-          <BackLink />
-          <h1 className="mt-1 text-2xl font-semibold text-black dark:text-zinc-50">
-            {appt.type === 'court_date' ? 'Court date' : 'Consultation'}
-          </h1>
-        </div>
-
-        <AppointmentForm
-          mode="edit"
-          appointmentId={appt.id}
-          initial={{
-            type: appt.type,
-            client: {
-              id: appt.clients.id,
-              full_name: appt.clients.full_name,
-              national_id: appt.clients.national_id,
-            },
-            case: appt.cases
-              ? { id: appt.cases.id, case_number: appt.cases.case_number, title: appt.cases.title }
-              : null,
-            staff_id: appt.staff_id,
-            starts_at: appt.starts_at,
-            ends_at: appt.ends_at,
-            notes: appt.notes,
-            status: appt.status,
-          }}
-          currentStaffId={user.sub as string}
-          currentStaffName={me?.full_name ?? 'You'}
-          staffOptions={staffOptions}
-          canAssignAll={Boolean(canAssignAll)}
-          canAssignCourtDates={Boolean(canAssignCourtDates)}
-        />
+    <div className="flex max-w-2xl flex-col gap-6">
+      <div>
+        <BackLink href="/dashboard/appointments" label="Appointments" />
+        <PageHeader title={appt.type === 'court_date' ? 'Court date' : 'Consultation'} />
       </div>
+
+      <AppointmentForm
+        mode="edit"
+        appointmentId={appt.id}
+        initial={{
+          type: appt.type,
+          client: {
+            id: appt.clients.id,
+            full_name: appt.clients.full_name,
+            national_id: appt.clients.national_id,
+          },
+          case: appt.cases
+            ? { id: appt.cases.id, case_number: appt.cases.case_number, title: appt.cases.title }
+            : null,
+          staff_id: appt.staff_id,
+          starts_at: appt.starts_at,
+          ends_at: appt.ends_at,
+          notes: appt.notes,
+          status: appt.status,
+        }}
+        currentStaffId={user.sub as string}
+        currentStaffName={me?.full_name ?? 'You'}
+        staffOptions={staffOptions}
+        canAssignAll={Boolean(canAssignAll)}
+        canAssignCourtDates={Boolean(canAssignCourtDates)}
+      />
     </div>
   )
 }

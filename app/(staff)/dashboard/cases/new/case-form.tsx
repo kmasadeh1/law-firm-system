@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import { createCase } from '../actions'
 import { ClientPicker } from '../client-picker'
+import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
+import { Button } from '@/components/dashboard/button'
 
 export function CaseForm() {
   const router = useRouter()
@@ -32,54 +34,31 @@ export function CaseForm() {
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
       <ClientPicker />
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Title *
-        </label>
-        <input
-          id="title"
-          name="title"
-          required
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-        />
-      </div>
+      <Field>
+        <Label htmlFor="title" required>
+          Title
+        </Label>
+        <input id="title" name="title" required className={controlClass} />
+      </Field>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="case_number" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Case number *
-        </label>
-        <input
-          id="case_number"
-          name="case_number"
-          required
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-        />
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Entered manually - no numbering convention is enforced yet.
-        </p>
-      </div>
+      <Field>
+        <Label htmlFor="case_number" required>
+          Case number
+        </Label>
+        <input id="case_number" name="case_number" required className={controlClass} />
+        <HelpText>Entered manually - no numbering convention is enforced yet.</HelpText>
+      </Field>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="case_type" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Case type
-        </label>
-        <input
-          id="case_type"
-          name="case_type"
-          placeholder="e.g. Litigation, Real Estate"
-          className="rounded-md border border-black/10 px-3 py-2 text-sm text-black dark:border-white/10 dark:bg-black dark:text-zinc-50"
-        />
-      </div>
+      <Field>
+        <Label htmlFor="case_type">Case type</Label>
+        <input id="case_type" name="case_type" placeholder="e.g. Litigation, Real Estate" className={controlClass} />
+      </Field>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <FieldError>{error}</FieldError>}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="mt-2 self-start rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
-      >
+      <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
         {isPending ? 'Creating…' : 'Create case'}
-      </button>
+      </Button>
     </form>
   )
 }

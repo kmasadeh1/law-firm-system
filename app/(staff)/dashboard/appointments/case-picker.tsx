@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { searchCases, type CaseOption } from './actions'
+import { Label, FieldSuccess, HelpText, controlClass } from '@/components/dashboard/form'
 
 /**
  * Search-and-select for an existing case, required only when the
@@ -38,9 +39,9 @@ export function CasePicker({
 
   return (
     <div className="relative flex flex-col gap-1.5">
-      <label htmlFor="case_search" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-        Case {required && '*'}
-      </label>
+      <Label htmlFor="case_search" required={required}>
+        Case
+      </Label>
       <input
         id="case_search"
         value={term}
@@ -54,12 +55,12 @@ export function CasePicker({
         placeholder="Search cases by number or title"
         autoComplete="off"
         disabled={!required}
-        className="rounded-md border border-black/10 px-3 py-2 text-sm text-black disabled:opacity-50 dark:border-white/10 dark:bg-black dark:text-zinc-50"
+        className={controlClass}
       />
       <input type="hidden" name="case_id" value={selected?.id ?? ''} />
 
       {required && open && results.length > 0 && (
-        <ul className="absolute top-full z-10 mt-1 w-full rounded-md border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-zinc-950">
+        <ul className="absolute top-full z-10 mt-1 w-full rounded-md border border-line bg-surface shadow-sm">
           {results.map((c) => (
             <li key={c.id}>
               <button
@@ -71,7 +72,7 @@ export function CasePicker({
                   setResults([])
                   setOpen(false)
                 }}
-                className="block w-full px-3 py-2 text-left text-sm text-black hover:bg-black/5 dark:text-zinc-50 dark:hover:bg-white/10"
+                className="block w-full px-3 py-2 text-left text-sm text-fg hover:bg-line/40"
               >
                 {c.case_number} — {c.title}
               </button>
@@ -81,16 +82,14 @@ export function CasePicker({
       )}
 
       {required && open && term.trim() && !selected && results.length === 0 && (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">No matching case.</p>
+        <p className="text-xs text-fg-muted">No matching case.</p>
       )}
       {required && selected && (
-        <p className="text-xs text-green-700 dark:text-green-400">
+        <FieldSuccess>
           Selected: {selected.case_number} — {selected.title}
-        </p>
+        </FieldSuccess>
       )}
-      {!required && (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">Only used for court dates.</p>
-      )}
+      {!required && <HelpText>Only used for court dates.</HelpText>}
     </div>
   )
 }

@@ -33,3 +33,90 @@ body {
   background: var(--color-ink);
   color: var(--color-paper);
 }
+
+/*
+ * Dashboard theme tokens - separate from the public site's fixed ink
+ * identity above. Login and the public site use --color-ink/paper/burgundy
+ * directly and never reference these, so they're unaffected by the toggle
+ * below. Light is the default register (a tool used all day, not a
+ * marketing moment); dark mirrors the public site's ink identity but only
+ * where the contrast math still works - see the accent-fill/accent-text
+ * split below.
+ */
+:root {
+  --dash-canvas: #faf7f2;
+  --dash-surface: #ffffff;
+  --dash-line: #e4ddd0;
+  --dash-control-border: #8f8267;
+  --dash-fg: #221f1c;
+  --dash-fg-muted: #6a645c;
+  --dash-accent: #6e1e2b;
+  --dash-accent-fg: #f3ede2;
+  --dash-accent-border: #571724;
+  --dash-danger-text: #6e1e2b;
+  --dash-success-text: #2f6b4f;
+  --dash-focus: #6e1e2b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --dash-canvas: #221f1c;
+    --dash-surface: #2a2622;
+    --dash-line: #3a3530;
+    --dash-control-border: #847a68;
+    --dash-fg: #f3ede2;
+    --dash-fg-muted: #d9d0c1;
+    --dash-accent: #6e1e2b;
+    --dash-accent-fg: #f3ede2;
+    --dash-accent-border: #b08d3f;
+    --dash-danger-text: #d9738a;
+    --dash-success-text: #5aab80;
+    --dash-focus: #b08d3f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --dash-canvas: #221f1c;
+  --dash-surface: #2a2622;
+  --dash-line: #3a3530;
+  --dash-control-border: #847a68;
+  --dash-fg: #f3ede2;
+  --dash-fg-muted: #d9d0c1;
+  --dash-accent: #6e1e2b;
+  --dash-accent-fg: #f3ede2;
+  --dash-accent-border: #b08d3f;
+  --dash-danger-text: #d9738a;
+  --dash-success-text: #5aab80;
+  --dash-focus: #b08d3f;
+}
+
+@theme inline {
+  --color-canvas: var(--dash-canvas);
+  --color-surface: var(--dash-surface);
+  --color-line: var(--dash-line);
+  --color-control-border: var(--dash-control-border);
+  --color-fg: var(--dash-fg);
+  --color-fg-muted: var(--dash-fg-muted);
+  --color-accent: var(--dash-accent);
+  --color-accent-fg: var(--dash-accent-fg);
+  --color-accent-border: var(--dash-accent-border);
+  --color-danger-text: var(--dash-danger-text);
+  --color-success-text: var(--dash-success-text);
+  --color-focus: var(--dash-focus);
+}
+
+.dashboard {
+  background: var(--color-canvas);
+  color: var(--color-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

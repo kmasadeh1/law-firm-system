@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '../../back-link'
+import { BackLink } from '@/components/dashboard/back-link'
+import { PageHeader } from '@/components/dashboard/page-header'
 import { StatusSection } from './status-section'
 import { TeamSection } from './team-section'
 import { OpposingPartiesSection } from './opposing-parties-section'
@@ -20,13 +21,11 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
   if (!caseRow) {
     return (
-      <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-        <div className="mx-auto flex max-w-3xl flex-col gap-6">
-          <BackLink />
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            This case doesn&apos;t exist, or you don&apos;t have access to it.
-          </p>
-        </div>
+      <div className="flex flex-col gap-6">
+        <BackLink href="/dashboard/cases" label="Cases" />
+        <p className="text-sm text-fg-muted">
+          This case doesn&apos;t exist, or you don&apos;t have access to it.
+        </p>
       </div>
     )
   }
@@ -53,25 +52,20 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
   }))
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-black sm:px-8">
-      <div className="mx-auto flex max-w-2xl flex-col gap-8">
-        <div>
-          <BackLink />
-          <h1 className="mt-1 text-2xl font-semibold text-black dark:text-zinc-50">
-            {caseRow.case_number} — {caseRow.title}
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Client: {caseRow.clients?.full_name ?? '—'}
-            {caseRow.case_type && <> · {caseRow.case_type}</>}
-          </p>
-        </div>
-
-        <StatusSection caseId={caseRow.id} currentStatusId={caseRow.status_id} statuses={statuses ?? []} />
-
-        <TeamSection caseId={caseRow.id} team={team} availableStaff={activeStaff} />
-
-        <OpposingPartiesSection caseId={caseRow.id} parties={opposingParties ?? []} />
+    <div className="flex flex-col gap-8">
+      <div>
+        <BackLink href="/dashboard/cases" label="Cases" />
+        <PageHeader
+          title={`${caseRow.case_number} — ${caseRow.title}`}
+          description={`Client: ${caseRow.clients?.full_name ?? '—'}${caseRow.case_type ? ` · ${caseRow.case_type}` : ''}`}
+        />
       </div>
+
+      <StatusSection caseId={caseRow.id} currentStatusId={caseRow.status_id} statuses={statuses ?? []} />
+
+      <TeamSection caseId={caseRow.id} team={team} availableStaff={activeStaff} />
+
+      <OpposingPartiesSection caseId={caseRow.id} parties={opposingParties ?? []} />
     </div>
   )
 }
