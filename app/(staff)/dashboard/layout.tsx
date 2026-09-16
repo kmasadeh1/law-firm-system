@@ -19,9 +19,10 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     redirect('/login')
   }
 
-  const [{ data: staffRow }, { data: clientsManage }, initialTheme] = await Promise.all([
+  const [{ data: staffRow }, { data: clientsManage }, { data: feesView }, initialTheme] = await Promise.all([
     supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
     supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+    supabase.rpc('has_permission', { p_key: 'fees_view' }),
     getThemeCookie(),
   ])
 
@@ -34,6 +35,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   }
   navItems.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
   navItems.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })
+  if (isOwner || feesView) {
+    navItems.push({ href: '/dashboard/fees', label: 'Fees & payments', icon: 'fees' })
+  }
   if (isOwner) {
     navItems.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
   }

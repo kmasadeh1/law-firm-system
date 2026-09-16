@@ -605,6 +605,13 @@ export type Database = {
             foreignKeyName: "engagement_cases_engagement_id_fkey"
             columns: ["engagement_id"]
             isOneToOne: false
+            referencedRelation: "engagement_balances"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "engagement_cases_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
             referencedRelation: "engagements"
             referencedColumns: ["id"]
           },
@@ -639,6 +646,13 @@ export type Database = {
           payer_name?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "engagement_installments_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_balances"
+            referencedColumns: ["engagement_id"]
+          },
           {
             foreignKeyName: "engagement_installments_engagement_id_fkey"
             columns: ["engagement_id"]
@@ -1105,6 +1119,24 @@ export type Database = {
           },
         ]
       }
+      engagement_balances: {
+        Row: {
+          client_id: string | null
+          engagement_id: string | null
+          total_agreed: number | null
+          total_outstanding: number | null
+          total_paid: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       installment_balances: {
         Row: {
           balance_due: number | null
@@ -1114,6 +1146,13 @@ export type Database = {
           paid_amount: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "engagement_installments_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_balances"
+            referencedColumns: ["engagement_id"]
+          },
           {
             foreignKeyName: "engagement_installments_engagement_id_fkey"
             columns: ["engagement_id"]
@@ -1155,6 +1194,7 @@ export type Database = {
       current_role_id: { Args: never; Returns: string }
       has_permission: { Args: { p_key: string }; Returns: boolean }
       is_active_staff: { Args: never; Returns: boolean }
+      is_on_case: { Args: { p_case_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
     }
     Enums: {
