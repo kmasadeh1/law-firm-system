@@ -17,9 +17,9 @@ export default async function FeesListPage() {
 
   const { data: balances } = await supabase
     .from('engagement_balances')
-    .select('engagement_id, total_outstanding')
+    .select('engagement_id, scheduled_outstanding')
 
-  const outstandingById = new Map((balances ?? []).map((b) => [b.engagement_id, b.total_outstanding]))
+  const outstandingById = new Map((balances ?? []).map((b) => [b.engagement_id, b.scheduled_outstanding]))
 
   return (
     <div className="flex flex-col gap-6">
@@ -62,7 +62,7 @@ export default async function FeesListPage() {
                     </span>
                     <span className="flex items-center gap-2">
                       {outstanding !== null && outstanding > 0 ? (
-                        <Badge variant="accent">Outstanding: {formatAmount(outstanding)}</Badge>
+                        <Badge variant="accent">Outstanding (scheduled): {formatAmount(outstanding)}</Badge>
                       ) : (
                         <Badge variant="muted">Settled</Badge>
                       )}

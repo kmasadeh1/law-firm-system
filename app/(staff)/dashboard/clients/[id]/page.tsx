@@ -12,7 +12,7 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
     supabase.from('clients').select('id, full_name, national_id, phone, email, notes').eq('id', id).maybeSingle(),
     supabase
       .from('client_balances')
-      .select('total_agreed, total_paid, total_outstanding')
+      .select('agreed_fixed_fee_total, percentage_engagement_count, scheduled_total, paid_total, scheduled_outstanding')
       .eq('client_id', id)
       .maybeSingle(),
   ])

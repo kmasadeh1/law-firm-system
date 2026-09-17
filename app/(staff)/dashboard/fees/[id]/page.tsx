@@ -38,7 +38,7 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
   ] = await Promise.all([
     supabase
       .from('engagement_balances')
-      .select('total_agreed, total_paid, total_outstanding')
+      .select('agreed_fixed_fee, agreed_percentage, scheduled_total, paid_total, scheduled_outstanding, unscheduled_amount')
       .eq('engagement_id', id)
       .maybeSingle(),
     supabase.from('engagement_cases').select('cases(id, case_number, title)').eq('engagement_id', id),
@@ -90,12 +90,29 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
         />
       </div>
 
-      <Panel className="flex flex-wrap items-center gap-3">
-        <Badge variant="neutral">Agreed: {formatAmount(balance?.total_agreed ?? 0)}</Badge>
-        <Badge variant="neutral">Paid: {formatAmount(balance?.total_paid ?? 0)}</Badge>
-        <Badge variant={(balance?.total_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
-          Outstanding: {formatAmount(balance?.total_outstanding ?? 0)}
-        </Badge>
+      <Panel className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {engagement.fee_type === 'fixed' ? (
+            <Badge variant="neutral">Agreed: {formatAmount(balance?.agreed_fixed_fee ?? null)}</Badge>
+          ) : (
+            <Badge variant="neutral">Agreed: {balance?.agreed_percentage ?? engagement.percentage ?? '—'}% of award</Badge>
+          )}
+          <Badge variant="neutral">Scheduled: {formatAmount(balance?.scheduled_total ?? 0)}</Badge>
+          <Badge variant="neutral">Paid: {formatAmount(balance?.paid_total ?? 0)}</Badge>
+          <Badge variant={(balance?.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
+            Outstanding (scheduled): {formatAmount(balance?.scheduled_outstanding ?? 0)}
+          </Badge>
+        </div>
+        {engagement.fee_type === 'fixed' &&
+          balance?.unscheduled_amount !== null &&
+          balance?.unscheduled_amount !== undefined &&
+          balance.unscheduled_amount !== 0 && (
+            <p className="text-sm text-fg-muted">
+              {balance.unscheduled_amount > 0
+                ? `${formatAmount(balance.unscheduled_amount)} of the agreed fee is not scheduled yet.`
+                : `The schedule exceeds the agreed fee by ${formatAmount(Math.abs(balance.unscheduled_amount))}.`}
+            </p>
+          )}
       </Panel>
 
       <CasesSection

@@ -1107,10 +1107,12 @@ export type Database = {
     Views: {
       client_balances: {
         Row: {
+          agreed_fixed_fee_total: number | null
           client_id: string | null
-          total_agreed: number | null
-          total_outstanding: number | null
-          total_paid: number | null
+          paid_total: number | null
+          percentage_engagement_count: number | null
+          scheduled_outstanding: number | null
+          scheduled_total: number | null
         }
         Relationships: [
           {
@@ -1124,11 +1126,15 @@ export type Database = {
       }
       engagement_balances: {
         Row: {
+          agreed_fixed_fee: number | null
+          agreed_percentage: number | null
           client_id: string | null
           engagement_id: string | null
-          total_agreed: number | null
-          total_outstanding: number | null
-          total_paid: number | null
+          fee_type: Database["public"]["Enums"]["fee_type"] | null
+          paid_total: number | null
+          scheduled_outstanding: number | null
+          scheduled_total: number | null
+          unscheduled_amount: number | null
         }
         Relationships: [
           {

@@ -2,10 +2,19 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { formatAmount } from '../../fees/format'
 
-type Balance = { total_agreed: number | null; total_paid: number | null; total_outstanding: number | null }
+type Balance = {
+  agreed_fixed_fee_total: number | null
+  percentage_engagement_count: number | null
+  scheduled_total: number | null
+  paid_total: number | null
+  scheduled_outstanding: number | null
+}
 
 export function BalanceSection({ balance }: { balance: Balance | null }) {
-  if (!balance || balance.total_agreed === null) {
+  // No row at all means no engagements for this client - not the same
+  // thing as agreed_fixed_fee_total being null, which is the normal,
+  // expected state for a client whose only engagement is percentage-based.
+  if (!balance) {
     return (
       <Panel className="flex flex-col gap-2">
         <h2 className="font-heading text-lg text-fg">Fees position</h2>
@@ -14,16 +23,28 @@ export function BalanceSection({ balance }: { balance: Balance | null }) {
     )
   }
 
+  const hasPercentageEngagements = (balance.percentage_engagement_count ?? 0) > 0
+
   return (
     <Panel className="flex flex-col gap-3">
       <h2 className="font-heading text-lg text-fg">Fees position</h2>
       <div className="flex flex-wrap gap-2">
-        <Badge variant="neutral">Agreed: {formatAmount(balance.total_agreed)}</Badge>
-        <Badge variant="neutral">Paid: {formatAmount(balance.total_paid)}</Badge>
-        <Badge variant={(balance.total_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
-          Outstanding: {formatAmount(balance.total_outstanding)}
+        {balance.agreed_fixed_fee_total !== null && (
+          <Badge variant="neutral">Agreed (fixed fees): {formatAmount(balance.agreed_fixed_fee_total)}</Badge>
+        )}
+        <Badge variant="neutral">Scheduled: {formatAmount(balance.scheduled_total)}</Badge>
+        <Badge variant="neutral">Paid: {formatAmount(balance.paid_total)}</Badge>
+        <Badge variant={(balance.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
+          Outstanding (scheduled): {formatAmount(balance.scheduled_outstanding)}
         </Badge>
       </div>
+      {hasPercentageEngagements && (
+        <p className="text-xs text-fg-muted">
+          Also has {balance.percentage_engagement_count} percentage-fee agreement
+          {balance.percentage_engagement_count === 1 ? '' : 's'} — the agreed total above covers
+          fixed-fee agreements only.
+        </p>
+      )}
     </Panel>
   )
 }
