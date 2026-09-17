@@ -6,9 +6,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Law firm management system. Currently a fresh Next.js scaffold — no application
-pages, components, or database schema exist yet beyond framework defaults and
-the Supabase client setup described below.
+Law firm management system. Phase 1 and beyond are built and styled:
+
+- Public bilingual site at `/en` and `/ar` (`app/[locale]/`) — next-intl,
+  RTL/LTR via the `dir` attribute, locale-prefixed URLs (`ar` is default,
+  both locales always prefixed).
+- Login, logout, and route protection for the staff area (`app/(staff)/`,
+  `lib/supabase/proxy.ts`).
+- Owner-only roles and permissions admin (`dashboard/owner/roles`).
+- Clients, including two-way conflict checks — the `check_conflict` RPC
+  checks both the client list and recorded opposing parties.
+- Cases, with co-counsel (`case_lawyers`), opposing parties, and
+  lead-lawyer-only closing.
+- Appointments and court dates.
+- Fees and payments — engagements, instalments, payments
+  (`dashboard/fees`).
+- Deadlines, with an owner-only period-types admin screen
+  (`dashboard/owner/deadline-period-types`).
+- Dashboard shell with the visual identity pass and light/dark theming
+  (`components/dashboard/`).
+- A Supabase schema of 23 tables with RLS enabled on all of them, plus 4
+  views.
+
+Two conventions worth knowing, since both have caused real bugs when
+violated:
+
+- Permission-gated routes live outside `/dashboard/owner|staff` and check
+  their permission explicitly server-side, e.g. `/dashboard/clients` calls
+  `has_permission('clients_manage')`. Never use "the query came back empty"
+  as a proxy for "no access."
+- Case statuses and roles are firm-defined rows in the database, not
+  hardcoded lists. Read them from `case_statuses` (ordered by
+  `sort_order`) and `roles`.
 
 ## Commands
 
