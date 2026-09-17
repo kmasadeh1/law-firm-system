@@ -82,8 +82,9 @@ contexts — using the wrong one breaks auth or throws at runtime:
 `proxy.ts` at the repo root is the request-interception entry point, not
 `middleware.ts` — Next.js 16 deprecated `middleware.ts`/`middleware()` in
 favor of `proxy.ts`/`proxy()`. The unauthenticated-user redirect in
-`lib/supabase/proxy.ts` is intentionally commented out until `/login` and
-related auth routes exist.
+`lib/supabase/proxy.ts` is active: any `/dashboard/*` request without a
+signed-in user is redirected to `/login`. `/login` itself stays open, and
+the public bilingual site is reachable without signing in at all.
 
 ## Armed diagnostic: signOut tracer in lib/supabase/server.ts
 
