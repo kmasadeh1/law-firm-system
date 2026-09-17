@@ -35,11 +35,21 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   }
   navItems.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
   navItems.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })
+  // Deadlines has no single gating permission (owner, cases_manage,
+  // court_dates_manage, or just being on the case's team all qualify), so
+  // - like Cases and Appointments - it's always shown and RLS scopes what's
+  // actually visible.
+  navItems.push({ href: '/dashboard/deadlines', label: 'Deadlines', icon: 'deadlines' })
   if (isOwner || feesView) {
     navItems.push({ href: '/dashboard/fees', label: 'Fees & payments', icon: 'fees' })
   }
   if (isOwner) {
     navItems.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
+    navItems.push({
+      href: '/dashboard/owner/deadline-period-types',
+      label: 'Deadline period types',
+      icon: 'period-types',
+    })
   }
 
   const roleLabel = isOwner ? 'Owner' : (staffRow?.roles?.name ?? 'Staff')

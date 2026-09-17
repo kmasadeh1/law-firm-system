@@ -59,6 +59,25 @@ export function RolesIcon({ className }: IconProps) {
   )
 }
 
+export function DeadlinesIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <circle cx="10" cy="10.5" r="7" />
+      <path d="M10 6.5V10.5L12.5 12.5" />
+      <path d="M7 2.5h6" />
+    </svg>
+  )
+}
+
+export function PeriodTypesIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M5 3h10v3.2c0 1.6-1.2 2.7-2.5 3.3 1.3.6 2.5 1.7 2.5 3.3V17H5v-3.2c0-1.6 1.2-2.7 2.5-3.3C6.2 9.9 5 8.8 5 7.2V3Z" />
+      <path d="M5 3h10M5 17h10" />
+    </svg>
+  )
+}
+
 export function FeesIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

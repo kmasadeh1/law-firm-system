@@ -455,6 +455,7 @@ export type Database = {
           id: string
           period_type_id: string
           trigger_date: string
+          unadjusted_due_date: string | null
         }
         Insert: {
           case_id: string
@@ -470,6 +471,7 @@ export type Database = {
           id?: string
           period_type_id: string
           trigger_date: string
+          unadjusted_due_date?: string | null
         }
         Update: {
           case_id?: string
@@ -485,6 +487,7 @@ export type Database = {
           id?: string
           period_type_id?: string
           trigger_date?: string
+          unadjusted_due_date?: string | null
         }
         Relationships: [
           {

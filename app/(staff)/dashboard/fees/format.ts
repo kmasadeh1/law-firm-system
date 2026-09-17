@@ -1,9 +1,9 @@
-// No currency is defined anywhere in the schema, so amounts are formatted
-// as plain numbers (thousands separator, 2 decimals) rather than guessing
-// a currency symbol.
+// No currency column exists in the schema; the firm operates in Jordanian
+// dinars, so amounts are labeled "JD" for display only - nothing stored is
+// a currency-typed value.
 export function formatAmount(value: number | null | undefined) {
   if (value === null || value === undefined) return '—'
-  return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} JD`
 }
 
 export function formatFeeType(feeType: 'fixed' | 'percentage', fixedAmount: number | null, percentage: number | null) {
