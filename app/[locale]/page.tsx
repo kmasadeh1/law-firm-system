@@ -21,7 +21,7 @@ export default function PublicHomePage() {
     <div className="flex min-h-screen flex-col">
       {/* Header */}
       <header className="border-b border-warm-grey/25">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-5">
+        <div className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-5 sm:px-10 lg:px-16">
           <Link href="/" className="flex items-center gap-2.5 text-paper">
             <Crest className="h-7 w-7 text-brass" />
             <span className="font-heading text-lg">{t('layout.firmName')}</span>
@@ -53,7 +53,7 @@ export default function PublicHomePage() {
 
       <main className="flex-1">
         {/* 2.1 Firm introduction */}
-        <section className="mx-auto max-w-7xl px-6 py-20 sm:py-28">
+        <section className="w-full px-6 py-20 sm:px-10 sm:py-28 lg:px-16">
           <p className="text-sm text-brass">{t('hero.eyebrow')}</p>
           <h1 className="mt-3 max-w-2xl font-heading text-4xl leading-tight text-paper sm:text-5xl">
             {t('hero.tagline')}
@@ -71,7 +71,7 @@ export default function PublicHomePage() {
 
         {/* 2.2 Practice areas */}
         <section id="practice-areas" className="border-t border-warm-grey/25">
-          <div className="mx-auto max-w-7xl px-6 py-20">
+          <div className="w-full px-6 py-20 sm:px-10 lg:px-16">
             <h2 className="font-heading text-3xl text-paper">{t('practiceAreas.title')}</h2>
             <p className="mt-3 max-w-xl text-sm text-paper-dim">{t('practiceAreas.intro')}</p>
 
@@ -88,7 +88,7 @@ export default function PublicHomePage() {
 
         {/* 2.3 Lawyer profiles */}
         <section id="lawyers" className="border-t border-warm-grey/25">
-          <div className="mx-auto max-w-7xl px-6 py-20">
+          <div className="w-full px-6 py-20 sm:px-10 lg:px-16">
             <h2 className="font-heading text-3xl text-paper">{t('lawyers.title')}</h2>
             <p className="mt-3 max-w-xl text-sm text-paper-dim">{t('lawyers.intro')}</p>
 
@@ -111,7 +111,7 @@ export default function PublicHomePage() {
           id="appointment"
           className="border-t border-warm-grey/25 bg-ink-raised/40"
         >
-          <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-2">
+          <div className="grid w-full gap-12 px-6 py-20 sm:px-10 lg:grid-cols-2 lg:px-16">
             <div>
               <h2 className="font-heading text-3xl text-paper">{t('appointment.title')}</h2>
               <p className="mt-3 text-sm text-paper-dim">{t('appointment.intro')}</p>
@@ -218,7 +218,7 @@ export default function PublicHomePage() {
       </main>
 
       <footer className="border-t border-warm-grey/25">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-8 text-sm text-warm-grey sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex w-full flex-col gap-2 px-6 py-8 text-sm text-warm-grey sm:flex-row sm:items-center sm:justify-between sm:px-10 lg:px-16">
           <p>
             {t('layout.firmName')} &middot; {t('footer.rights')}
           </p>
