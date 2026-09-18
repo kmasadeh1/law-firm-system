@@ -10,34 +10,25 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
   const { q } = (await searchParams) as { q?: string }
   const supabase = await createClient()
 
-  let query = supabase
-    .from('clients')
-    .select('id, full_name, phone, national_id')
-    .order('full_name')
-
   const term = q?.trim()
-  if (term) {
-    // Strip characters that are structurally significant to PostgREST's
-    // .or() filter syntax before interpolating - this is a plain search
-    // box, not a query language.
-    const safe = term.replace(/[,()]/g, '')
-    if (safe) {
-      query = query.or(
-        `full_name.ilike.%${safe}%,phone.ilike.%${safe}%,national_id.ilike.%${safe}%`
-      )
-    }
-  }
 
-  const { data: clients } = await query
+  const { data: clients } = await supabase
+    .rpc('search_clients', { p_query: term })
+    .select('id, full_name, phone, national_id')
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Clients"
         action={
-          <LinkButton href="/dashboard/clients/new" variant="primary">
-            Add client
-          </LinkButton>
+          <div className="flex flex-wrap gap-2">
+            <LinkButton href="/dashboard/clients/conflict-checks" variant="secondary">
+              Conflict-check history
+            </LinkButton>
+            <LinkButton href="/dashboard/clients/new" variant="primary">
+              Add client
+            </LinkButton>
+          </div>
         }
       />
 

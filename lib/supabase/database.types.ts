@@ -419,6 +419,51 @@ export type Database = {
           },
         ]
       }
+      conflict_checks: {
+        Row: {
+          id: string
+          match_count: number
+          ran_at: string
+          ran_by: string | null
+          results: Json
+          searched_name: string
+          searched_national_id: string | null
+        }
+        Insert: {
+          id?: string
+          match_count: number
+          ran_at?: string
+          ran_by?: string | null
+          results: Json
+          searched_name: string
+          searched_national_id?: string | null
+        }
+        Update: {
+          id?: string
+          match_count?: number
+          ran_at?: string
+          ran_by?: string | null
+          results?: Json
+          searched_name?: string
+          searched_national_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conflict_checks_ran_by_fkey"
+            columns: ["ran_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conflict_checks_ran_by_fkey"
+            columns: ["ran_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deadline_period_types: {
         Row: {
           description: string | null
@@ -1094,13 +1139,6 @@ export type Database = {
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "working_hours_staff_id_fkey"
-            columns: ["staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff_directory"
-            referencedColumns: ["id"]
-          },
         ]
       }
     }
@@ -1205,6 +1243,30 @@ export type Database = {
       is_active_staff: { Args: never; Returns: boolean }
       is_on_case: { Args: { p_case_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
+      name_matches: {
+        Args: { p_search: string; p_target: string }
+        Returns: boolean
+      }
+      normalize_name: { Args: { p_input: string }; Returns: string }
+      search_clients: {
+        Args: { p_query?: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          email: string | null
+          full_name: string
+          id: string
+          national_id: string | null
+          notes: string | null
+          phone: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "clients"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       activity_action: "insert" | "update" | "delete"

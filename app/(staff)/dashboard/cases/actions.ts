@@ -25,12 +25,9 @@ export async function searchClients(term: string): Promise<ClientOption[]> {
   if (!trimmed) return []
 
   const supabase = await createClient()
-  const safe = trimmed.replace(/[,()]/g, '')
   const { data } = await supabase
-    .from('clients')
+    .rpc('search_clients', { p_query: trimmed })
     .select('id, full_name, national_id')
-    .or(`full_name.ilike.%${safe}%,national_id.ilike.%${safe}%`)
-    .order('full_name')
     .limit(10)
 
   return data ?? []
