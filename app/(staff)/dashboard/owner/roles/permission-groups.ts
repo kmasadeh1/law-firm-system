@@ -6,7 +6,15 @@
 export const PERMISSION_GROUPS: { title: string; keys: string[] }[] = [
   {
     title: 'Clients & Cases',
-    keys: ['clients_manage', 'cases_manage', 'case_notes_access', 'documents_access'],
+    keys: [
+      'clients_manage',
+      'cases_manage',
+      'cases_view_all',
+      'case_notes_access',
+      'case_notes_view_all',
+      'documents_access',
+      'documents_view_all',
+    ],
   },
   {
     title: 'Scheduling',
