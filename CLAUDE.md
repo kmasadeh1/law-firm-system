@@ -76,8 +76,8 @@ contexts — using the wrong one breaks auth or throws at runtime:
   request in Server Components, Server Actions, and Route Handlers — never
   hoist it to module scope.
 - `lib/supabase/proxy.ts` — `updateSession()`, invoked from the root
-  `proxy.ts` on every matched request to refresh the auth session and rotate
-  cookies.
+  `proxy.ts` for `/login` and `/dashboard/*` requests only, to refresh the
+  auth session and rotate cookies.
 
 `proxy.ts` at the repo root is the request-interception entry point, not
 `middleware.ts` — Next.js 16 deprecated `middleware.ts`/`middleware()` in
