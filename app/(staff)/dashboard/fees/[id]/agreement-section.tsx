@@ -1,0 +1,230 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+import { setSignedAgreement, getSignedAgreementUrl } from '../actions'
+import { Panel } from '@/components/dashboard/panel'
+import { Badge } from '@/components/dashboard/badge'
+import { Button } from '@/components/dashboard/button'
+import { FieldError, controlClass } from '@/components/dashboard/form'
+
+type AttachedDocument = { id: string; filename: string; deleted_at: string | null } | null
+
+export type SignableDocument = { id: string; filename: string; case_id: string | null }
+
+function AttachPicker({
+  engagementId,
+  candidates,
+  onDone,
+  onCancel,
+  isReplacing,
+}: {
+  engagementId: string
+  candidates: SignableDocument[]
+  onDone: () => void
+  onCancel?: () => void
+  isReplacing: boolean
+}) {
+  const [documentId, setDocumentId] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleAttach() {
+    if (!documentId) {
+      setError('Choose a document.')
+      return
+    }
+    setError(null)
+    startTransition(async () => {
+      const result = await setSignedAgreement(engagementId, documentId)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+      onDone()
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="agreement-document" className="text-sm text-fg-muted">
+            {isReplacing ? 'Replace with' : 'Attach'}
+          </label>
+          <select
+            id="agreement-document"
+            value={documentId}
+            onChange={(e) => setDocumentId(e.target.value)}
+            className={controlClass}
+          >
+            <option value="">Select a document…</option>
+            {candidates.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.filename}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button type="button" variant="secondary" disabled={isPending || !documentId} onClick={handleAttach}>
+          {isPending ? 'Saving…' : isReplacing ? 'Replace' : 'Attach'}
+        </Button>
+        {onCancel && (
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isPending}>
+            Cancel
+          </Button>
+        )}
+      </div>
+      {error && <FieldError>{error}</FieldError>}
+    </div>
+  )
+}
+
+function DetachButton({ engagementId, onDone }: { engagementId: string; onDone: () => void }) {
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleClick() {
+    setError(null)
+    startTransition(async () => {
+      const result = await setSignedAgreement(engagementId, null)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+      onDone()
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Button type="button" variant="ghost" onClick={handleClick} disabled={isPending}>
+        {isPending ? 'Detaching…' : 'Detach'}
+      </Button>
+      {error && <FieldError>{error}</FieldError>}
+    </div>
+  )
+}
+
+export function AgreementSection({
+  engagementId,
+  hasAttached,
+  attachedDocument,
+  hasLinkedCases,
+  candidates,
+}: {
+  engagementId: string
+  hasAttached: boolean
+  attachedDocument: AttachedDocument
+  hasLinkedCases: boolean
+  candidates: SignableDocument[]
+}) {
+  const [replacing, setReplacing] = useState(false)
+  const [viewError, setViewError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleView() {
+    if (!attachedDocument) return
+    setViewError(null)
+    const tab = window.open('', '_blank')
+    startTransition(async () => {
+      const result = await getSignedAgreementUrl(engagementId, attachedDocument.id)
+      if (result.error || !result.url) {
+        tab?.close()
+        setViewError(result.error ?? 'Could not open that file.')
+        return
+      }
+      if (tab) tab.location.href = result.url
+    })
+  }
+
+  return (
+    <Panel className="flex flex-col gap-3">
+      <div>
+        <h2 className="font-heading text-lg text-fg">Signed agreement</h2>
+        <p className="text-sm text-fg-muted">
+          The fee agreement the client actually signed - the document that matters most in a
+          dispute over the amount.
+        </p>
+      </div>
+
+      {hasAttached && attachedDocument && !attachedDocument.deleted_at && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm">
+          <span className="font-medium text-fg">{attachedDocument.filename}</span>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="secondary" onClick={handleView} disabled={isPending}>
+              {isPending ? 'Opening…' : 'View'}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => setReplacing((r) => !r)}>
+              {replacing ? 'Cancel' : 'Replace'}
+            </Button>
+            <DetachButton engagementId={engagementId} onDone={() => setReplacing(false)} />
+          </div>
+        </div>
+      )}
+      {viewError && <FieldError>{viewError}</FieldError>}
+
+      {hasAttached && attachedDocument && attachedDocument.deleted_at && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-medium text-fg">{attachedDocument.filename}</span>
+              <Badge variant="muted">Removed from its case</Badge>
+            </div>
+            <p className="mt-0.5 text-xs text-fg-muted">
+              The attached file was removed from its case. Attach a replacement, or leave this as
+              a record of what was signed.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" onClick={() => setReplacing((r) => !r)}>
+              {replacing ? 'Cancel' : 'Replace'}
+            </Button>
+            <DetachButton engagementId={engagementId} onDone={() => setReplacing(false)} />
+          </div>
+        </div>
+      )}
+
+      {hasAttached && !attachedDocument && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm">
+          <p className="text-fg-muted">
+            A signed agreement is attached, but you don&apos;t have permission to view it.
+          </p>
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" onClick={() => setReplacing((r) => !r)}>
+              {replacing ? 'Cancel' : 'Replace'}
+            </Button>
+            <DetachButton engagementId={engagementId} onDone={() => setReplacing(false)} />
+          </div>
+        </div>
+      )}
+
+      {!hasAttached && !hasLinkedCases && (
+        <p className="text-sm text-fg-muted">
+          This engagement has no linked cases yet, so there&apos;s nowhere to attach a signed
+          agreement from. Link a case above first.
+        </p>
+      )}
+
+      {!hasAttached && hasLinkedCases && candidates.length === 0 && (
+        <p className="text-sm text-fg-muted">No documents found on the linked case(s) yet.</p>
+      )}
+
+      {!hasAttached && hasLinkedCases && candidates.length > 0 && (
+        <AttachPicker engagementId={engagementId} candidates={candidates} onDone={() => {}} isReplacing={false} />
+      )}
+
+      {hasAttached && replacing && candidates.length > 0 && (
+        <AttachPicker
+          engagementId={engagementId}
+          candidates={candidates}
+          onDone={() => setReplacing(false)}
+          onCancel={() => setReplacing(false)}
+          isReplacing
+        />
+      )}
+      {hasAttached && replacing && candidates.length === 0 && (
+        <p className="text-sm text-fg-muted">No other documents found on the linked case(s).</p>
+      )}
+    </Panel>
+  )
+}

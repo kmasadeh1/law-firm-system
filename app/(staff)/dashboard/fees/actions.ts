@@ -176,6 +176,89 @@ export async function unlinkCase(engagementId: string, caseId: string): Promise<
   return {}
 }
 
+// --- Signed agreement ----------------------------------------------------
+
+// An engagement can span several cases (engagement_cases), while a document
+// always belongs to exactly one. There's no single "right" case to file the
+// agreement under, so the picker (built in the page from the engagement's
+// already-fetched linked cases) draws from documents on any of them - the
+// agreement was realistically uploaded to one. RLS on `documents`
+// (documents_access/documents_view_all plus case membership) already limits
+// what the caller sees, same as everywhere else documents are listed.
+
+export async function setSignedAgreement(
+  engagementId: string,
+  documentId: string | null
+): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  if (documentId) {
+    // Guard against attaching a document from outside the engagement's
+    // linked cases, the same way linkCase guards the client match - a
+    // client-side picker built from the right list is a UX nicety, not a
+    // security boundary, so this is re-checked server-side.
+    const { data: doc } = await supabase.from('documents').select('case_id').eq('id', documentId).maybeSingle()
+    if (!doc || !doc.case_id) {
+      return { error: "Could not find that document, or you don't have permission to view it." }
+    }
+    const { data: linkedCase } = await supabase
+      .from('engagement_cases')
+      .select('case_id')
+      .eq('engagement_id', engagementId)
+      .eq('case_id', doc.case_id)
+      .maybeSingle()
+    if (!linkedCase) {
+      return { error: "That document isn't on a case linked to this engagement." }
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('engagements')
+    .update({ signed_agreement_document_id: documentId })
+    .eq('id', engagementId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not save the change. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to change this engagement." }
+  }
+
+  revalidatePath(engagementPath(engagementId))
+  return {}
+}
+
+export async function getSignedAgreementUrl(
+  engagementId: string,
+  documentId: string
+): Promise<{ url?: string; error?: string }> {
+  const supabase = await createClient()
+
+  // Confirm it's still actually this engagement's attached agreement before
+  // handing out a signed URL, rather than trusting the id the client sent.
+  const { data: engagement } = await supabase
+    .from('engagements')
+    .select('signed_agreement_document_id')
+    .eq('id', engagementId)
+    .maybeSingle()
+  if (!engagement || engagement.signed_agreement_document_id !== documentId) {
+    return { error: "Could not find that document, or you don't have permission to view it." }
+  }
+
+  const { data: doc } = await supabase.from('documents').select('storage_path').eq('id', documentId).maybeSingle()
+  if (!doc) {
+    return { error: "Could not find that document, or you don't have permission to view it." }
+  }
+
+  const { data, error } = await supabase.storage.from('case-documents').createSignedUrl(doc.storage_path, 300)
+  if (error || !data) {
+    return { error: 'Could not generate a link to that file. Please try again.' }
+  }
+
+  return { url: data.signedUrl }
+}
+
 // --- Instalments --------------------------------------------------------
 
 type InstallmentFields = {

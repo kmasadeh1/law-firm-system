@@ -5,6 +5,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { formatAmount, formatFeeType } from '../format'
 import { CasesSection } from './cases-section'
+import { AgreementSection } from './agreement-section'
 import { InstallmentsSection } from './installments-section'
 
 export default async function EngagementDetailPage({ params }: PageProps<'/dashboard/fees/[id]'>) {
@@ -13,7 +14,9 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
 
   const { data: engagement } = await supabase
     .from('engagements')
-    .select('id, fee_type, fixed_amount, percentage, created_at, client_id, clients(full_name)')
+    .select(
+      'id, fee_type, fixed_amount, percentage, created_at, client_id, signed_agreement_document_id, clients(full_name)'
+    )
     .eq('id', id)
     .maybeSingle()
 
@@ -70,6 +73,29 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
     .map((r) => r.cases)
     .filter((c): c is { id: string; case_number: string; title: string } => c !== null)
 
+  // Fetched separately from the engagement row (rather than joined) so an
+  // attached-but-invisible-to-me document is distinguishable: the FK on
+  // `engagements` is non-null but this comes back empty because RLS hid the
+  // document row, versus genuinely nothing attached.
+  const { data: attachedDocument } = engagement.signed_agreement_document_id
+    ? await supabase
+        .from('documents')
+        .select('id, filename, deleted_at')
+        .eq('id', engagement.signed_agreement_document_id)
+        .maybeSingle()
+    : { data: null }
+
+  const linkedCaseIds = linkedCases.map((c) => c.id)
+  const { data: signableDocuments } =
+    linkedCaseIds.length > 0
+      ? await supabase
+          .from('documents')
+          .select('id, filename, case_id')
+          .in('case_id', linkedCaseIds)
+          .is('deleted_at', null)
+          .order('filename')
+      : { data: [] }
+
   const balanceByInstallment = new Map(
     (installmentBalances ?? []).map((b) => [b.installment_id, b])
   )
@@ -120,6 +146,14 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
         clientId={engagement.client_id}
         linkedCases={linkedCases}
         clientCases={clientCases ?? []}
+      />
+
+      <AgreementSection
+        engagementId={engagement.id}
+        hasAttached={Boolean(engagement.signed_agreement_document_id)}
+        attachedDocument={attachedDocument ?? null}
+        hasLinkedCases={linkedCases.length > 0}
+        candidates={signableDocuments ?? []}
       />
 
       <InstallmentsSection
