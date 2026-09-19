@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { DashboardShell, type NavItem } from '@/components/dashboard/shell'
+import { DashboardShell, type NavGroup, type NavItem } from '@/components/dashboard/shell'
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
 import { logout } from './actions'
 
@@ -29,29 +29,44 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   const isOwner = staffRow?.user_type === 'owner'
   const homeHref = isOwner ? '/dashboard/owner' : '/dashboard/staff'
 
-  const navItems: NavItem[] = [{ href: homeHref, label: 'Home', icon: 'home' }]
+  const dailyWork: NavItem[] = [{ href: homeHref, label: 'Home', icon: 'home' }]
   if (isOwner || clientsManage) {
-    navItems.push({ href: '/dashboard/clients', label: 'Clients', icon: 'clients' })
+    dailyWork.push({ href: '/dashboard/clients', label: 'Clients', icon: 'clients' })
   }
-  navItems.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
-  navItems.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })
+  dailyWork.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
+  dailyWork.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })
   // Deadlines has no single gating permission (owner, cases_manage,
   // court_dates_manage, or just being on the case's team all qualify), so
   // - like Cases and Appointments - it's always shown and RLS scopes what's
   // actually visible.
-  navItems.push({ href: '/dashboard/deadlines', label: 'Deadlines', icon: 'deadlines' })
+  dailyWork.push({ href: '/dashboard/deadlines', label: 'Deadlines', icon: 'deadlines' })
+
+  const money: NavItem[] = []
   if (isOwner || feesView) {
-    navItems.push({ href: '/dashboard/fees', label: 'Fees & payments', icon: 'fees' })
+    money.push({ href: '/dashboard/fees', label: 'Fees & payments', icon: 'fees' })
   }
+
+  const administration: NavItem[] = []
   if (isOwner) {
-    navItems.push({ href: '/dashboard/owner/staff', label: 'Staff accounts', icon: 'staff' })
-    navItems.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
-    navItems.push({
+    administration.push({ href: '/dashboard/owner/staff', label: 'Staff accounts', icon: 'staff' })
+    administration.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
+    administration.push({
       href: '/dashboard/owner/deadline-period-types',
       label: 'Deadline period types',
       icon: 'period-types',
     })
   }
+
+  // A group with no visible items must not render at all - no empty
+  // section header left dangling for a role (e.g. Lawyer, with no fees
+  // permission and no owner-only screens) that can't see anything in it.
+  // NavLinks also filters defensively, but building the list already-clean
+  // keeps this the single source of truth for what a role sees.
+  const navGroups: NavGroup[] = [
+    { title: 'Daily work', items: dailyWork },
+    { title: 'Money', items: money },
+    { title: 'Administration', items: administration },
+  ].filter((group) => group.items.length > 0)
 
   const roleLabel = isOwner ? 'Owner' : (staffRow?.roles?.name ?? 'Staff')
 
@@ -59,7 +74,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     <DashboardShell
       firmName="Ahmad Al-Masadeh & Associates"
       homeHref={homeHref}
-      navItems={navItems}
+      navGroups={navGroups}
       userName={staffRow?.full_name ?? 'Signed in'}
       roleLabel={roleLabel}
       logoutAction={logout}

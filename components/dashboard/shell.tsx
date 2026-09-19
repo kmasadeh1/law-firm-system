@@ -44,6 +44,11 @@ export type NavItem = {
   icon: IconKey
 }
 
+export type NavGroup = {
+  title: string
+  items: NavItem[]
+}
+
 function isActive(pathname: string, href: string) {
   if (href === '/dashboard/owner' || href === '/dashboard/staff') {
     return pathname === href
@@ -51,30 +56,37 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + '/')
 }
 
-function NavLinks({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
+function NavLinks({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () => void }) {
   const pathname = usePathname()
   return (
-    <nav className="flex flex-col gap-1">
-      {items.map((item) => {
-        const active = isActive(pathname, item.href)
-        const Icon = iconByKey[item.icon]
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            aria-current={active ? 'page' : undefined}
-            className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
-              active
-                ? 'bg-accent text-accent-fg'
-                : 'text-fg-muted hover:bg-line/40 hover:text-fg'
-            }`}
-          >
-            <Icon className="h-4 w-4 shrink-0" />
-            {item.label}
-          </Link>
-        )
-      })}
+    <nav className="flex flex-col gap-5">
+      {groups
+        .filter((group) => group.items.length > 0)
+        .map((group) => (
+          <div key={group.title} className="flex flex-col gap-1">
+            <p className="px-3 text-xs font-medium text-fg-muted/80">{group.title}</p>
+            {group.items.map((item) => {
+              const active = isActive(pathname, item.href)
+              const Icon = iconByKey[item.icon]
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onNavigate}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                    active
+                      ? 'bg-accent text-accent-fg'
+                      : 'text-fg-muted hover:bg-line/40 hover:text-fg'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
+        ))}
     </nav>
   )
 }
@@ -82,7 +94,7 @@ function NavLinks({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => 
 export function DashboardShell({
   firmName,
   homeHref,
-  navItems,
+  navGroups,
   userName,
   roleLabel,
   logoutAction,
@@ -91,7 +103,7 @@ export function DashboardShell({
 }: {
   firmName: string
   homeHref: string
-  navItems: NavItem[]
+  navGroups: NavGroup[]
   userName: string
   roleLabel: string
   logoutAction: () => Promise<void>
@@ -108,7 +120,7 @@ export function DashboardShell({
       </Link>
 
       <div className="mt-6 flex-1 overflow-y-auto">
-        <NavLinks items={navItems} onNavigate={() => setDrawerOpen(false)} />
+        <NavLinks groups={navGroups} onNavigate={() => setDrawerOpen(false)} />
       </div>
 
       <div className="flex flex-col gap-3 border-t border-line pt-4">
