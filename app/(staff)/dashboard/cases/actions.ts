@@ -273,6 +273,34 @@ export async function createShareLink(
   return { token: data }
 }
 
+// --- Notes ---------------------------------------------------------------
+
+export async function addCaseNote(caseId: string, formData: FormData): Promise<ActionResult> {
+  const note = formData.get('note')
+  if (typeof note !== 'string' || !note.trim()) {
+    return { error: 'Write something before adding the note.' }
+  }
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getClaims()
+
+  const { error } = await supabase.from('case_notes').insert({
+    case_id: caseId,
+    staff_id: userData?.claims?.sub,
+    note: note.trim(),
+  })
+
+  if (error) {
+    if (error.code === '42501') {
+      return { error: "You don't have permission to add notes to this case." }
+    }
+    return { error: 'Could not add the note. Please try again.' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
 // --- Documents ---------------------------------------------------------
 
 const MAX_DOCUMENT_BYTES = 25 * 1024 * 1024

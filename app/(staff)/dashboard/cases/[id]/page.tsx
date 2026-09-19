@@ -7,6 +7,7 @@ import { OpposingPartiesSection } from './opposing-parties-section'
 import { DeadlinesSection } from './deadlines-section'
 import { ShareLinksSection } from './share-links-section'
 import { DocumentsSection, type DocumentRow } from './documents-section'
+import { NotesSection, type CaseNote } from './notes-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
@@ -43,6 +44,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: periodTypes },
     { data: shareLinks },
     { data: documentRows },
+    { data: noteRows },
+    { data: allStaffDirectory },
     { data: timelineRows, error: timelineError },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
@@ -67,6 +70,15 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .select('id, filename, uploaded_at, uploaded_by')
       .eq('case_id', id)
       .order('uploaded_at', { ascending: false }),
+    supabase
+      .from('case_notes')
+      .select('id, note, created_at, staff_id')
+      .eq('case_id', id)
+      .order('created_at', { ascending: false }),
+    // Unfiltered, unlike activeStaff below - a note's author should still
+    // show their name after they've left the firm, same reasoning as the
+    // conflict-check history page.
+    supabase.from('staff_directory').select('id, full_name'),
     supabase.rpc('case_timeline', { p_case_id: id }),
   ])
 
@@ -97,6 +109,19 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     description: d.description,
     period_type_name: d.deadline_period_types?.name ?? 'Unknown period',
     period_days: d.deadline_period_types?.period_days ?? 0,
+  }))
+
+  const allNameById = new Map(
+    (allStaffDirectory ?? [])
+      .filter((s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null)
+      .map((s) => [s.id, s.full_name])
+  )
+
+  const notes: CaseNote[] = (noteRows ?? []).map((n) => ({
+    id: n.id,
+    note: n.note,
+    created_at: n.created_at,
+    author_name: n.staff_id ? (allNameById.get(n.staff_id) ?? 'Unknown staff') : 'Unknown staff',
   }))
 
   const documents: DocumentRow[] = (documentRows ?? []).map((d) => ({
@@ -137,6 +162,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} />
 
       <DocumentsSection caseId={caseRow.id} documents={documents} />
+
+      <NotesSection caseId={caseRow.id} notes={notes} />
 
       {timelineError ? (
         <p className="text-sm text-fg-muted">Timeline unavailable: {timelineError.message}</p>
