@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl'
 import NextLink from 'next/link'
+import Image from 'next/image'
 import { Crest } from '@/components/crest'
 import { Link } from '@/i18n/navigation'
 import { LanguageSwitcher } from './components/language-switcher'
@@ -57,7 +58,15 @@ export default function PublicHomePage() {
       <main className="flex-1">
         {/* 2.1 Firm introduction */}
         <section className="w-full px-6 py-20 sm:px-10 sm:py-28 lg:px-16">
-          <p className="text-sm text-brass">{t('hero.eyebrow')}</p>
+          <Image
+            src="/brand/logo_lockup.png"
+            alt={t('layout.firmName')}
+            width={599}
+            height={434}
+            className="h-auto w-48 sm:w-64"
+            priority
+          />
+          <p className="mt-8 text-sm text-brass">{t('hero.eyebrow')}</p>
           <h1 className="mt-3 max-w-2xl font-heading text-4xl leading-tight text-paper sm:text-5xl">
             {t('hero.tagline')}
           </h1>
