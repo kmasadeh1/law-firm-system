@@ -44,6 +44,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     navItems.push({ href: '/dashboard/fees', label: 'Fees & payments', icon: 'fees' })
   }
   if (isOwner) {
+    navItems.push({ href: '/dashboard/owner/staff', label: 'Staff accounts', icon: 'staff' })
     navItems.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
     navItems.push({
       href: '/dashboard/owner/deadline-period-types',

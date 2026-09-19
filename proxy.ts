@@ -10,7 +10,7 @@ export async function proxy(request: NextRequest) {
 
   // Staff area: refresh the Supabase session and (inside updateSession) gate
   // /dashboard/* for unauthenticated visitors. Not localized.
-  if (pathname === '/login' || pathname.startsWith('/dashboard')) {
+  if (pathname === '/login' || pathname === '/change-password' || pathname.startsWith('/dashboard')) {
     return updateSession(request)
   }
 

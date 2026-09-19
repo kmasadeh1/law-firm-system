@@ -1241,8 +1241,11 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          must_change_password: boolean
           phone: string | null
           role_id: string | null
+          temp_password_expires_at: string | null
+          temp_password_set_at: string | null
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
@@ -1250,8 +1253,11 @@ export type Database = {
           full_name: string
           id: string
           is_active?: boolean
+          must_change_password?: boolean
           phone?: string | null
           role_id?: string | null
+          temp_password_expires_at?: string | null
+          temp_password_set_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
         }
         Update: {
@@ -1259,8 +1265,11 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          must_change_password?: boolean
           phone?: string | null
           role_id?: string | null
+          temp_password_expires_at?: string | null
+          temp_password_set_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: [
@@ -1434,6 +1443,7 @@ export type Database = {
           source: string
         }[]
       }
+      complete_password_change: { Args: never; Returns: undefined }
       create_case_share_link: {
         Args: { p_case_id: string; p_expires_days?: number; p_label?: string }
         Returns: string
@@ -1449,6 +1459,7 @@ export type Database = {
         Returns: boolean
       }
       normalize_name: { Args: { p_input: string }; Returns: string }
+      password_change_pending: { Args: never; Returns: boolean }
       safe_uuid: { Args: { p: string }; Returns: string }
       search_clients: {
         Args: { p_query?: string }

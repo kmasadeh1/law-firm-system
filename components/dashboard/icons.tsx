@@ -87,6 +87,17 @@ export function FeesIcon({ className }: IconProps) {
   )
 }
 
+export function StaffIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <circle cx="7.5" cy="6" r="2.5" />
+      <path d="M2.5 17c0-3 2.2-5 5-5s5 2 5 5" />
+      <path d="M13 3.3c1.2.4 2 1.5 2 2.7s-.8 2.3-2 2.7" />
+      <path d="M13.5 12.2c2.2.5 3.5 2.3 3.5 4.8" />
+    </svg>
+  )
+}
+
 export function MenuIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

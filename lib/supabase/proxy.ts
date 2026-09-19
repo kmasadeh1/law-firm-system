@@ -46,14 +46,41 @@ export async function updateSession(request: NextRequest) {
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
+  const pathname = request.nextUrl.pathname
 
-  // Only the staff dashboard requires auth. /login itself is always open
-  // (its own page redirects an already-signed-in visitor onward), and the
-  // public site is reachable without signing in at all.
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+  // Only the staff dashboard (and the forced password-change screen) require
+  // auth. /login itself is always open (its own page redirects an
+  // already-signed-in visitor onward), and the public site is reachable
+  // without signing in at all.
+  if (!user && (pathname.startsWith('/dashboard') || pathname === '/change-password')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
+  }
+
+  // This redirect is UX only - the real gate is that must_change_password
+  // makes is_owner()/has_permission()/is_active_staff()/is_on_case() all
+  // return false at the database layer, so a signed-in-but-gated account
+  // can't read or write anything beyond its own staff row regardless of
+  // what routing does. Don't treat this block as the enforcement.
+  if (user) {
+    const { data: staffRow } = await supabase
+      .from('staff')
+      .select('must_change_password, user_type')
+      .eq('id', user.sub as string)
+      .maybeSingle()
+
+    if (staffRow?.must_change_password && pathname.startsWith('/dashboard')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/change-password'
+      return NextResponse.redirect(url)
+    }
+
+    if (!staffRow?.must_change_password && pathname === '/change-password') {
+      const url = request.nextUrl.clone()
+      url.pathname = staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
+      return NextResponse.redirect(url)
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you

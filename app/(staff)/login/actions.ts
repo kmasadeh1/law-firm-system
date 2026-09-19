@@ -30,7 +30,7 @@ export async function login(formData: FormData) {
   // account" branch below.
   const { data: staffRow } = await supabase
     .from('staff')
-    .select('user_type, is_active')
+    .select('user_type, is_active, must_change_password')
     .eq('id', signInData.user.id)
     .maybeSingle()
 
@@ -42,6 +42,17 @@ export async function login(formData: FormData) {
   if (!staffRow.is_active) {
     await supabase.auth.signOut()
     loginError('This account has been deactivated.')
+  }
+
+  // Redirect straight here rather than to the dashboard and relying on
+  // proxy.ts to bounce them a second time - a Server Action's own redirect()
+  // and a proxy-level redirect on the page it lands on don't compose cleanly
+  // through Next's client router (the address bar can end up showing the
+  // first hop). The dashboard is unusable anyway while this is true (see
+  // the forced-password-change gate at the database layer); this just makes
+  // the UX match that in one hop instead of two.
+  if (staffRow.must_change_password) {
+    redirect('/change-password')
   }
 
   redirect(staffRow.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff')

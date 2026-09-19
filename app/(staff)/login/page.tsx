@@ -13,9 +13,13 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   if (user) {
     const { data: staffRow } = await supabase
       .from('staff')
-      .select('user_type')
+      .select('user_type, must_change_password')
       .eq('id', user.sub)
       .maybeSingle()
+
+    if (staffRow?.must_change_password) {
+      redirect('/change-password')
+    }
 
     redirect(staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff')
   }
