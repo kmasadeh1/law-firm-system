@@ -67,12 +67,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .order('created_at', { ascending: false }),
     supabase
       .from('documents')
-      .select('id, filename, uploaded_at, uploaded_by')
+      .select('id, filename, uploaded_at, uploaded_by, deleted_at, deleted_by')
       .eq('case_id', id)
       .order('uploaded_at', { ascending: false }),
     supabase
       .from('case_notes')
-      .select('id, note, created_at, staff_id')
+      .select('id, note, created_at, staff_id, edited_at, deleted_at, deleted_by')
       .eq('case_id', id)
       .order('created_at', { ascending: false }),
     // Unfiltered, unlike activeStaff below - a note's author should still
@@ -121,7 +121,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     id: n.id,
     note: n.note,
     created_at: n.created_at,
+    edited_at: n.edited_at,
     author_name: n.staff_id ? (allNameById.get(n.staff_id) ?? 'Unknown staff') : 'Unknown staff',
+    deleted_at: n.deleted_at,
+    deleted_by_name: n.deleted_by ? (allNameById.get(n.deleted_by) ?? 'Unknown staff') : null,
   }))
 
   const documents: DocumentRow[] = (documentRows ?? []).map((d) => ({
@@ -129,6 +132,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     filename: d.filename,
     uploaded_at: d.uploaded_at,
     uploaded_by_name: d.uploaded_by ? (nameById.get(d.uploaded_by) ?? 'Unknown staff') : 'Unknown staff',
+    deleted_at: d.deleted_at,
+    deleted_by_name: d.deleted_by ? (allNameById.get(d.deleted_by) ?? 'Unknown staff') : null,
   }))
 
   const timeline: TimelineRow[] = (timelineRows ?? []).map((row) => ({

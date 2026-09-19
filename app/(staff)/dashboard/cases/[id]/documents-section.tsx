@@ -1,8 +1,14 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { uploadDocument, getDocumentSignedUrl } from '../actions'
+import {
+  uploadDocument,
+  getDocumentSignedUrl,
+  deleteDocument,
+  restoreDocument,
+} from '../actions'
 import { Panel } from '@/components/dashboard/panel'
+import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { FieldError } from '@/components/dashboard/form'
 
@@ -11,6 +17,8 @@ export type DocumentRow = {
   filename: string
   uploaded_at: string
   uploaded_by_name: string
+  deleted_at: string | null
+  deleted_by_name: string | null
 }
 
 // Client-side mirror of the case-documents bucket's limits, purely so a
@@ -47,8 +55,42 @@ function validateFile(file: File): string | null {
   return null
 }
 
+function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow }) {
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleRestore() {
+    setError(null)
+    startTransition(async () => {
+      const result = await restoreDocument(caseId, doc.id)
+      if (result.error) setError(result.error)
+    })
+  }
+
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm opacity-70">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-medium text-fg">{doc.filename}</p>
+          <Badge variant="muted">
+            Removed by {doc.deleted_by_name} · {formatDateTime(doc.deleted_at!)}
+          </Badge>
+        </div>
+        <p className="mt-0.5 text-xs text-fg-muted">
+          Uploaded by {doc.uploaded_by_name} · {formatDateTime(doc.uploaded_at)}
+        </p>
+        {error && <FieldError>{error}</FieldError>}
+      </div>
+      <Button type="button" variant="ghost" onClick={handleRestore} disabled={isPending}>
+        {isPending ? 'Restoring…' : 'Restore'}
+      </Button>
+    </li>
+  )
+}
+
 function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) {
   const [error, setError] = useState<string | null>(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   function handleView() {
@@ -68,6 +110,21 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
     })
   }
 
+  function handleDelete() {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true)
+      return
+    }
+    setError(null)
+    startTransition(async () => {
+      const result = await deleteDocument(caseId, doc.id)
+      if (result.error) {
+        setError(result.error)
+        setConfirmingDelete(false)
+      }
+    })
+  }
+
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm">
       <div>
@@ -77,9 +134,19 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>
-      <Button type="button" variant="secondary" onClick={handleView} disabled={isPending}>
-        {isPending ? 'Opening…' : 'View'}
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button type="button" variant="secondary" onClick={handleView} disabled={isPending}>
+          {isPending ? 'Opening…' : 'View'}
+        </Button>
+        <Button type="button" variant="danger" onClick={handleDelete} disabled={isPending}>
+          {isPending ? 'Removing…' : confirmingDelete ? 'Confirm remove?' : 'Remove'}
+        </Button>
+        {confirmingDelete && !isPending && (
+          <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
+            Cancel
+          </Button>
+        )}
+      </div>
     </li>
   )
 }
@@ -114,15 +181,18 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
     })
   }
 
+  const activeDocuments = documents.filter((d) => !d.deleted_at)
+  const deletedDocuments = documents.filter((d) => d.deleted_at)
+
   return (
     <Panel className="flex flex-col gap-3">
       <h2 className="font-heading text-lg text-fg">Documents</h2>
 
-      {documents.length === 0 ? (
+      {activeDocuments.length === 0 ? (
         <p className="text-sm text-fg-muted">No documents uploaded yet.</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
-          {documents.map((doc) => (
+          {activeDocuments.map((doc) => (
             <DocumentRowItem key={doc.id} caseId={caseId} doc={doc} />
           ))}
         </ul>
@@ -140,6 +210,20 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
         </Button>
       </form>
       {error && <FieldError>{error}</FieldError>}
+
+      {/* Only ever populated for the owner - RLS hides removed documents
+          from everyone else, so their presence here is itself the access
+          check. */}
+      {deletedDocuments.length > 0 && (
+        <div className="flex flex-col gap-2 border-t border-line pt-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Removed documents</p>
+          <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
+            {deletedDocuments.map((doc) => (
+              <DeletedDocumentRow key={doc.id} caseId={caseId} doc={doc} />
+            ))}
+          </ul>
+        </div>
+      )}
     </Panel>
   )
 }

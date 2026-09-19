@@ -194,6 +194,9 @@ export type Database = {
         Row: {
           case_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          edited_at: string | null
           id: string
           note: string
           staff_id: string | null
@@ -201,6 +204,9 @@ export type Database = {
         Insert: {
           case_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
           id?: string
           note: string
           staff_id?: string | null
@@ -208,6 +214,9 @@ export type Database = {
         Update: {
           case_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
           id?: string
           note?: string
           staff_id?: string | null
@@ -218,6 +227,20 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_notes_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_notes_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
             referencedColumns: ["id"]
           },
           {
@@ -643,6 +666,8 @@ export type Database = {
       documents: {
         Row: {
           case_id: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           filename: string
           id: string
           storage_path: string
@@ -651,6 +676,8 @@ export type Database = {
         }
         Insert: {
           case_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           filename: string
           id?: string
           storage_path: string
@@ -659,6 +686,8 @@ export type Database = {
         }
         Update: {
           case_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           filename?: string
           id?: string
           storage_path?: string
@@ -671,6 +700,20 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
             referencedColumns: ["id"]
           },
           {
@@ -1334,6 +1377,7 @@ export type Database = {
         Returns: boolean
       }
       normalize_name: { Args: { p_input: string }; Returns: string }
+      safe_uuid: { Args: { p: string }; Returns: string }
       search_clients: {
         Args: { p_query?: string }
         Returns: {

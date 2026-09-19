@@ -301,6 +301,77 @@ export async function addCaseNote(caseId: string, formData: FormData): Promise<A
   return {}
 }
 
+export async function editCaseNote(
+  caseId: string,
+  noteId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const note = formData.get('note')
+  if (typeof note !== 'string' || !note.trim()) {
+    return { error: 'A note cannot be empty.' }
+  }
+
+  const supabase = await createClient()
+  // case_id, staff_id, and created_at are trigger-guarded against change -
+  // only ever send the field being edited.
+  const { data, error } = await supabase
+    .from('case_notes')
+    .update({ note: note.trim() })
+    .eq('id', noteId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not save the note. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to edit this note." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function deleteCaseNote(caseId: string, noteId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('case_notes')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', noteId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not delete the note. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to delete this note." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function restoreCaseNote(caseId: string, noteId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('case_notes')
+    .update({ deleted_at: null })
+    .eq('id', noteId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not restore the note. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to restore this note." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
 // --- Documents ---------------------------------------------------------
 
 const MAX_DOCUMENT_BYTES = 25 * 1024 * 1024
@@ -420,6 +491,48 @@ export async function getDocumentSignedUrl(
   }
 
   return { url: data.signedUrl }
+}
+
+export async function deleteDocument(caseId: string, documentId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  // Soft delete only - the storage object is deliberately left in place.
+  // Only the metadata row is hidden (RLS), same reasoning as case notes.
+  const { data, error } = await supabase
+    .from('documents')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', documentId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not remove the document. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to remove this document." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function restoreDocument(caseId: string, documentId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('documents')
+    .update({ deleted_at: null })
+    .eq('id', documentId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not restore the document. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to restore this document." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
 }
 
 export async function revokeShareLink(caseId: string, linkId: string): Promise<ActionResult> {
