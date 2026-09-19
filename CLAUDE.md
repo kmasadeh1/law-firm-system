@@ -107,8 +107,50 @@ reproducing on demand, so this tracer is left armed to catch the real call
 site (with stack trace) whenever it next recurs, rather than continuing an
 open-ended reproduction chase.
 
-**Do not remove this as unrelated cleanup.** Remove it once the bug above
-is diagnosed (via a captured trace) and fixed.
+**Update — likely resolved as a test-automation artifact, not an app bug.**
+The tracer finally caught a captured stack trace under `npm run dev`,
+reproducing 4/4 via Playwright on client creation. The trace named the
+caller precisely: the app's own `logout` Server Action
+(`app/(staff)/dashboard/actions.ts`), invoked directly — not anything
+inside `@supabase/auth-js`, not a refresh-token race, not the login
+branches. Next's own request log confirmed it: `POST /dashboard/clients/new`
+was answered by `└─ ƒ logout()`, not by the create action.
+
+That pointed at a real bug at first, but it wasn't one. Every dashboard
+page renders **two** `<button type="submit">` elements: the page's own
+submit button, and the dashboard shell's persistent "Log out" button
+(`components/dashboard/shell.tsx`), which sits in the `<aside>` sidebar
+*before* `<main>{children}</main>` in DOM order. **`page.click('button[type="submit"]')`
+is ambiguous on every single dashboard page** and resolves to the first
+match — the sidebar's Log out button, not the page's own submit button.
+It does not throw the way a strict `locator().click()` would.
+
+Proof this is the whole story: the compiled Turbopack client bundle wires
+`createClientRecord`/`createCase`/`createAppointment` each to their own
+correct, distinct Server Action ID (verified against
+`.next/dev/server/app/.../server-reference-manifest.json` for each route —
+none of them collide with `logout`'s ID). Re-running all three creation
+flows with a properly scoped selector (`page.locator('main button[type="submit"]').click()`)
+sent the correct action ID every time and completed cleanly — new record
+created, still signed in, no `/logout` call. The historical diagnostic
+script that first isolated this bug's timing
+(`test-f-timing.js` in the investigation's scratchpad) contains the exact
+same `page.click('button[type="submit"]')` pattern on `/dashboard/cases/new`,
+so the original discovery and later reproduction attempts are consistent
+with the same artifact throughout.
+
+**Not explained:** an earlier session ran 12 reproduction attempts that
+came back clean (no sign-out) while testing the `login()` branches — if
+that script used the same ambiguous selector, all 12 should have failed
+the same way. It apparently didn't, for reasons not established (probably
+a differently-written script). Recorded here rather than smoothed over.
+
+**Do not remove this as unrelated cleanup — not yet.** A human is going to
+click through client creation manually in the browser first. Once that's
+confirmed clean, remove this tracer and this entire section, and when
+writing Playwright against this app's dashboard, always scope submit-button
+selectors to the page content (e.g. `main button[type="submit"]`, or a
+`data-testid`) rather than using a bare `button[type="submit"]` selector.
 
 ## Non-negotiable rule: no business logic in the frontend
 
