@@ -273,6 +273,127 @@ export async function createShareLink(
   return { token: data }
 }
 
+// --- Documents ---------------------------------------------------------
+
+const MAX_DOCUMENT_BYTES = 25 * 1024 * 1024
+
+// Mirrors the case-documents bucket's allowed_mime_types exactly - this is
+// user feedback so a rejected upload gets a clear reason instead of an
+// opaque storage error. The real enforcement is the bucket config itself.
+const ALLOWED_MIME_TYPES = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+  'image/tiff',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/plain',
+])
+
+const EXTENSION_MIME_TYPES: Record<string, string> = {
+  pdf: 'application/pdf',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  txt: 'text/plain',
+}
+
+// Some browsers (notably HEIC uploads from an Android share sheet) report an
+// empty or generic file.type despite the file being a supported format -
+// fall back to the extension so those aren't rejected on a technicality.
+function resolveContentType(file: File): string | undefined {
+  if (file.type) return file.type
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  return ext ? EXTENSION_MIME_TYPES[ext] : undefined
+}
+
+export async function uploadDocument(caseId: string, formData: FormData): Promise<ActionResult> {
+  const file = formData.get('file')
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: 'Choose a file to upload.' }
+  }
+  if (file.size > MAX_DOCUMENT_BYTES) {
+    return { error: 'That file is larger than the 25 MB limit.' }
+  }
+  const contentType = resolveContentType(file)
+  if (!contentType || !ALLOWED_MIME_TYPES.has(contentType)) {
+    return {
+      error:
+        "That file type isn't supported. Allowed: PDF, Word, Excel, plain text, or common image formats (including HEIC).",
+    }
+  }
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getClaims()
+  const path = `${caseId}/${crypto.randomUUID()}-${file.name}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('case-documents')
+    .upload(path, file, { contentType })
+
+  if (uploadError) {
+    return { error: "Could not upload the file - you may not have permission to add documents to this case." }
+  }
+
+  const { error: insertError } = await supabase.from('documents').insert({
+    case_id: caseId,
+    storage_path: path,
+    filename: file.name,
+    uploaded_by: userData?.claims?.sub,
+  })
+
+  if (insertError) {
+    // A storage object with no metadata row is invisible and orphaned -
+    // clean it up rather than leaving it behind.
+    await supabase.storage.from('case-documents').remove([path])
+    return { error: 'Could not save the document record. Please try again.' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function getDocumentSignedUrl(
+  caseId: string,
+  documentId: string
+): Promise<{ url?: string; error?: string }> {
+  const supabase = await createClient()
+  const { data: doc, error: fetchError } = await supabase
+    .from('documents')
+    .select('storage_path')
+    .eq('id', documentId)
+    .eq('case_id', caseId)
+    .maybeSingle()
+
+  if (fetchError || !doc) {
+    return { error: "Could not find that document, or you don't have permission to view it." }
+  }
+
+  const { data, error } = await supabase.storage
+    .from('case-documents')
+    .createSignedUrl(doc.storage_path, 300)
+
+  if (error || !data) {
+    return { error: 'Could not generate a link to that file. Please try again.' }
+  }
+
+  return { url: data.signedUrl }
+}
+
 export async function revokeShareLink(caseId: string, linkId: string): Promise<ActionResult> {
   const supabase = await createClient()
   const { data, error } = await supabase

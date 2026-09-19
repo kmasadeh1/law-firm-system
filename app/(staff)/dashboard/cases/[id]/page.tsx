@@ -6,6 +6,7 @@ import { TeamSection } from './team-section'
 import { OpposingPartiesSection } from './opposing-parties-section'
 import { DeadlinesSection } from './deadlines-section'
 import { ShareLinksSection } from './share-links-section'
+import { DocumentsSection, type DocumentRow } from './documents-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
@@ -41,6 +42,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: deadlineRows },
     { data: periodTypes },
     { data: shareLinks },
+    { data: documentRows },
     { data: timelineRows, error: timelineError },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
@@ -60,6 +62,11 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .select('id, label, created_at, expires_at, revoked_at, last_accessed_at, access_count')
       .eq('case_id', id)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('documents')
+      .select('id, filename, uploaded_at, uploaded_by')
+      .eq('case_id', id)
+      .order('uploaded_at', { ascending: false }),
     supabase.rpc('case_timeline', { p_case_id: id }),
   ])
 
@@ -92,6 +99,13 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     period_days: d.deadline_period_types?.period_days ?? 0,
   }))
 
+  const documents: DocumentRow[] = (documentRows ?? []).map((d) => ({
+    id: d.id,
+    filename: d.filename,
+    uploaded_at: d.uploaded_at,
+    uploaded_by_name: d.uploaded_by ? (nameById.get(d.uploaded_by) ?? 'Unknown staff') : 'Unknown staff',
+  }))
+
   const timeline: TimelineRow[] = (timelineRows ?? []).map((row) => ({
     id: row.id,
     occurred_at: row.occurred_at,
@@ -121,6 +135,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <DeadlinesSection caseId={caseRow.id} deadlines={deadlines} periodTypes={periodTypes ?? []} />
 
       <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} />
+
+      <DocumentsSection caseId={caseRow.id} documents={documents} />
 
       {timelineError ? (
         <p className="text-sm text-fg-muted">Timeline unavailable: {timelineError.message}</p>
