@@ -56,7 +56,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
 
   return (
     <DashboardShell
-      firmName="Firm Name LLP"
+      firmName="Ahmad Al-Masadeh & Associates"
       homeHref={homeHref}
       navItems={navItems}
       userName={staffRow?.full_name ?? 'Signed in'}

@@ -15,7 +15,7 @@ const sourceSerif = Source_Serif_4({
 })
 
 export const metadata: Metadata = {
-  title: 'Firm Name LLP - Staff sign in',
+  title: 'Ahmad Al-Masadeh & Associates - Staff sign in',
   description: 'Staff sign in',
 }
 

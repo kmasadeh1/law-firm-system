@@ -23,7 +23,7 @@ const plexArabic = IBM_Plex_Sans_Arabic({
 })
 
 export const metadata: Metadata = {
-  title: 'Firm Name LLP',
+  title: 'Ahmad Al-Masadeh & Associates',
   description: 'Placeholder firm site',
 }
 

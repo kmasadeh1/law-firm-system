@@ -265,6 +265,67 @@ export type Database = {
           },
         ]
       }
+      case_share_links: {
+        Row: {
+          access_count: number
+          case_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          label: string | null
+          last_accessed_at: string | null
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          access_count?: number
+          case_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          access_count?: number
+          case_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_share_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_share_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_share_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_statuses: {
         Row: {
           id: string
@@ -1238,7 +1299,12 @@ export type Database = {
           source: string
         }[]
       }
+      create_case_share_link: {
+        Args: { p_case_id: string; p_expires_days?: number; p_label?: string }
+        Returns: string
+      }
       current_role_id: { Args: never; Returns: string }
+      get_shared_case: { Args: { p_token: string }; Returns: Json }
       has_permission: { Args: { p_key: string }; Returns: boolean }
       is_active_staff: { Args: never; Returns: boolean }
       is_on_case: { Args: { p_case_id: string }; Returns: boolean }

@@ -247,3 +247,51 @@ export async function addOpposingParty(
   revalidatePath(casePath(caseId))
   return {}
 }
+
+// --- Share links -------------------------------------------------------
+
+export async function createShareLink(
+  caseId: string,
+  expiresDays: number,
+  label: string | null
+): Promise<ActionResult & { token?: string }> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.rpc('create_case_share_link', {
+    p_case_id: caseId,
+    p_expires_days: expiresDays,
+    p_label: label ?? undefined,
+  })
+
+  if (error) {
+    if (error.code === '42501') {
+      return { error: "You don't have permission to share this case." }
+    }
+    return { error: 'Could not generate a share link. Please try again.' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return { token: data }
+}
+
+export async function revokeShareLink(caseId: string, linkId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('case_share_links')
+    .update({ revoked_at: new Date().toISOString() })
+    .eq('id', linkId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not revoke the link. Please try again.' }
+  }
+
+  // UPDATE blocked by RLS matches zero rows rather than erroring - treat
+  // that the same as a denial rather than silently doing nothing.
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to revoke this link." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}

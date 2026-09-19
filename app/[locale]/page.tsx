@@ -24,7 +24,10 @@ export default function PublicHomePage() {
         <div className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-5 sm:px-10 lg:px-16">
           <Link href="/" className="flex items-center gap-2.5 text-paper">
             <Crest className="h-7 w-7 text-brass" />
-            <span className="font-heading text-lg">{t('layout.firmName')}</span>
+            <span className="flex flex-col">
+              <span className="font-heading text-lg leading-tight">{t('layout.firmName')}</span>
+              <span className="text-xs text-paper-dim">{t('layout.firmTagline')}</span>
+            </span>
           </Link>
 
           <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-paper-dim">

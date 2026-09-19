@@ -1,6 +1,7 @@
 {
   "layout": {
-    "firmName": "Firm Name LLP"
+    "firmName": "Ahmad Al-Masadeh & Associates",
+    "firmTagline": "Law Firm | Advocates & Legal Consultants"
   },
   "nav": {
     "home": "Home",
@@ -16,7 +17,7 @@
   },
   "hero": {
     "eyebrow": "Placeholder firm identity",
-    "title": "Firm Name LLP",
+    "title": "Ahmad Al-Masadeh & Associates",
     "tagline": "Counsel for individuals and businesses across Jordan.",
     "body": "This is placeholder copy standing in for the firm's real introduction. It describes, in a sentence or two, who the firm serves and the kind of legal work it takes on, ahead of the actual firm profile being written.",
     "cta": "Book a consultation"
@@ -101,5 +102,15 @@
   "footer": {
     "rights": "All rights reserved.",
     "placeholderNotice": "Placeholder content - not a real firm identity."
+  },
+  "track": {
+    "title": "Case Tracking",
+    "caseNumberLabel": "Case number",
+    "statusLabel": "Status",
+    "openedLabel": "Opened",
+    "nextHearingLabel": "Next hearing",
+    "noNextHearing": "No hearing currently scheduled",
+    "invalidTitle": "Link not valid",
+    "invalidMessage": "This link is no longer valid — please contact the office."
   }
 }

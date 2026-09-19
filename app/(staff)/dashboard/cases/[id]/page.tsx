@@ -5,6 +5,7 @@ import { StatusSection } from './status-section'
 import { TeamSection } from './team-section'
 import { OpposingPartiesSection } from './opposing-parties-section'
 import { DeadlinesSection } from './deadlines-section'
+import { ShareLinksSection } from './share-links-section'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
   const { id } = await params
@@ -38,6 +39,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: opposingParties },
     { data: deadlineRows },
     { data: periodTypes },
+    { data: shareLinks },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
@@ -51,6 +53,11 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .eq('case_id', id)
       .order('effective_due_date', { ascending: true, nullsFirst: false }),
     supabase.from('deadline_period_types').select('id, name, period_days, description').order('name'),
+    supabase
+      .from('case_share_links')
+      .select('id, label, created_at, expires_at, revoked_at, last_accessed_at, access_count')
+      .eq('case_id', id)
+      .order('created_at', { ascending: false }),
   ])
 
   // staff_directory is a view, so its columns come back nullable in the
@@ -98,6 +105,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <OpposingPartiesSection caseId={caseRow.id} parties={opposingParties ?? []} />
 
       <DeadlinesSection caseId={caseRow.id} deadlines={deadlines} periodTypes={periodTypes ?? []} />
+
+      <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} />
     </div>
   )
 }

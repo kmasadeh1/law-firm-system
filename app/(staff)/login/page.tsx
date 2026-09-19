@@ -26,7 +26,12 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
       <div className="relative flex flex-col justify-between overflow-hidden bg-burgundy px-8 py-10 text-paper sm:px-12 md:py-16">
         <div className="flex items-center gap-3">
           <Crest className="h-9 w-9 text-brass" />
-          <span className="font-heading text-lg tracking-wide">Firm Name LLP</span>
+          <span className="flex flex-col">
+            <span className="font-heading text-lg leading-tight tracking-wide">
+              Ahmad Al-Masadeh &amp; Associates
+            </span>
+            <span className="text-xs text-paper-dim">Law Firm | Advocates &amp; Legal Consultants</span>
+          </span>
         </div>
 
         <div className="max-w-sm">
@@ -51,7 +56,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
           <div className="mb-2 md:hidden">
             <div className="flex items-center gap-2 text-brass">
               <Crest className="h-6 w-6" />
-              <span className="font-heading text-base text-paper">Firm Name LLP</span>
+              <span className="font-heading text-base text-paper">Ahmad Al-Masadeh &amp; Associates</span>
             </div>
           </div>
 
