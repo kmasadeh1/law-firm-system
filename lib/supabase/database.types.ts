@@ -1200,6 +1200,13 @@ export type Database = {
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "working_hours_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -1290,6 +1297,19 @@ export type Database = {
       }
     }
     Functions: {
+      case_timeline: {
+        Args: { p_case_id: string }
+        Returns: {
+          action: Database["public"]["Enums"]["activity_action"]
+          actor_id: string
+          actor_name: string
+          detail: Json
+          detail_redacted: boolean
+          entity: string
+          id: number
+          occurred_at: string
+        }[]
+      }
       check_conflict: {
         Args: { p_name: string; p_national_id?: string }
         Returns: {

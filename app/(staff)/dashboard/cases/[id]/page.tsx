@@ -6,6 +6,7 @@ import { TeamSection } from './team-section'
 import { OpposingPartiesSection } from './opposing-parties-section'
 import { DeadlinesSection } from './deadlines-section'
 import { ShareLinksSection } from './share-links-section'
+import { TimelineSection, type TimelineRow } from './timeline-section'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
   const { id } = await params
@@ -40,6 +41,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: deadlineRows },
     { data: periodTypes },
     { data: shareLinks },
+    { data: timelineRows, error: timelineError },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
@@ -58,6 +60,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .select('id, label, created_at, expires_at, revoked_at, last_accessed_at, access_count')
       .eq('case_id', id)
       .order('created_at', { ascending: false }),
+    supabase.rpc('case_timeline', { p_case_id: id }),
   ])
 
   // staff_directory is a view, so its columns come back nullable in the
@@ -67,6 +70,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     (s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null
   )
   const nameById = new Map(activeStaff.map((s) => [s.id, s.full_name]))
+  const staffNameById = Object.fromEntries(nameById)
   const team = (teamRows ?? []).map((t) => ({
     staff_id: t.staff_id,
     is_lead: t.is_lead,
@@ -88,6 +92,16 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     period_days: d.deadline_period_types?.period_days ?? 0,
   }))
 
+  const timeline: TimelineRow[] = (timelineRows ?? []).map((row) => ({
+    id: row.id,
+    occurred_at: row.occurred_at,
+    action: row.action,
+    entity: row.entity,
+    actor_name: row.actor_name,
+    detail: (row.detail as Record<string, unknown> | null) ?? null,
+    detail_redacted: row.detail_redacted,
+  }))
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -107,6 +121,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <DeadlinesSection caseId={caseRow.id} deadlines={deadlines} periodTypes={periodTypes ?? []} />
 
       <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} />
+
+      {timelineError ? (
+        <p className="text-sm text-fg-muted">Timeline unavailable: {timelineError.message}</p>
+      ) : (
+        <TimelineSection rows={timeline} staffNameById={staffNameById} />
+      )}
     </div>
   )
 }
