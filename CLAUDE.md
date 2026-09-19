@@ -86,71 +86,60 @@ favor of `proxy.ts`/`proxy()`. The unauthenticated-user redirect in
 signed-in user is redirected to `/login`. `/login` itself stays open, and
 the public bilingual site is reachable without signing in at all.
 
-## Armed diagnostic: signOut tracer in lib/supabase/server.ts
+## Investigation history: the "session lost on create" bug (resolved)
 
-`lib/supabase/server.ts` wraps `supabase.auth.signOut` in a dev-only
-(`NODE_ENV !== 'production'`) tracer that logs a timestamp and full stack
-trace on every call, then forwards to the real implementation unchanged —
-pure observation, no behavior change, no-op in production.
+Creating a case or appointment was once observed to silently sign the user
+out (a genuine `POST /logout` reaching Supabase's Auth API a few seconds
+after the create action, confirmed via Supabase auth logs). Two theories
+were disproven early: a refresh-token race (no refresh-token requests in the
+auth logs, successful or rejected) and the `login()` action's gated
+`signOut()` branches (`!staffRow`, `!staffRow.is_active`) — checked directly
+via temporary logging on the staff-row query, ruled out across 12
+reproduction attempts where the query always returned a valid, active row.
 
-This is intentional instrumentation for an open bug, not stray debug code:
-creating a case or appointment has been observed to silently sign the user
-out (a genuine `POST /logout` reaches Supabase's Auth API a few seconds
-after the create action, confirmed via Supabase auth logs). The original
-refresh-token-race theory was disproven — there are no refresh-token
-requests in the auth logs, successful or rejected. The `login()` action's
-gated `signOut()` branches (`!staffRow`, `!staffRow.is_active`) were also
-checked directly (temporary logging on the staff-row query) and ruled out:
-across 12 reproduction attempts the query always returned a valid, active
-row and neither branch fired. As of this writing the bug has stopped
-reproducing on demand, so this tracer is left armed to catch the real call
-site (with stack trace) whenever it next recurs, rather than continuing an
-open-ended reproduction chase.
+It was finally caught with a stack-trace tracer temporarily attached to
+`supabase.auth.signOut` in `lib/supabase/server.ts` (since removed),
+reproducing 4/4 via Playwright on client creation under `npm run dev`. The
+trace named the caller precisely: the app's own `logout` Server Action
+(`app/(staff)/dashboard/actions.ts`), invoked directly — not anything inside
+`@supabase/auth-js`. Next's own request log confirmed it: `POST
+/dashboard/clients/new` was answered by `└─ ƒ logout()`, not by the create
+action.
 
-**Update — likely resolved as a test-automation artifact, not an app bug.**
-The tracer finally caught a captured stack trace under `npm run dev`,
-reproducing 4/4 via Playwright on client creation. The trace named the
-caller precisely: the app's own `logout` Server Action
-(`app/(staff)/dashboard/actions.ts`), invoked directly — not anything
-inside `@supabase/auth-js`, not a refresh-token race, not the login
-branches. Next's own request log confirmed it: `POST /dashboard/clients/new`
-was answered by `└─ ƒ logout()`, not by the create action.
-
-That pointed at a real bug at first, but it wasn't one. Every dashboard
-page renders **two** `<button type="submit">` elements: the page's own
-submit button, and the dashboard shell's persistent "Log out" button
+That pointed at a real bug at first, but it wasn't one. Every dashboard page
+renders **two** `<button type="submit">` elements: the page's own submit
+button, and the dashboard shell's persistent "Log out" button
 (`components/dashboard/shell.tsx`), which sits in the `<aside>` sidebar
 *before* `<main>{children}</main>` in DOM order. **`page.click('button[type="submit"]')`
 is ambiguous on every single dashboard page** and resolves to the first
-match — the sidebar's Log out button, not the page's own submit button.
-It does not throw the way a strict `locator().click()` would.
+match — the sidebar's Log out button, not the page's own submit button. It
+does not throw the way a strict `locator().click()` would.
 
-Proof this is the whole story: the compiled Turbopack client bundle wires
+Proof this was the whole story: the compiled Turbopack client bundle wired
 `createClientRecord`/`createCase`/`createAppointment` each to their own
 correct, distinct Server Action ID (verified against
 `.next/dev/server/app/.../server-reference-manifest.json` for each route —
-none of them collide with `logout`'s ID). Re-running all three creation
+none of them collided with `logout`'s ID). Re-running all three creation
 flows with a properly scoped selector (`page.locator('main button[type="submit"]').click()`)
 sent the correct action ID every time and completed cleanly — new record
 created, still signed in, no `/logout` call. The historical diagnostic
-script that first isolated this bug's timing
-(`test-f-timing.js` in the investigation's scratchpad) contains the exact
-same `page.click('button[type="submit"]')` pattern on `/dashboard/cases/new`,
-so the original discovery and later reproduction attempts are consistent
-with the same artifact throughout.
+script that first isolated this bug's timing (`test-f-timing.js` in the
+investigation's scratchpad) contains the exact same
+`page.click('button[type="submit"]')` pattern on `/dashboard/cases/new`, so
+the original discovery and later reproduction attempts are consistent with
+the same artifact throughout. A manual click-through in the browser
+afterward confirmed client creation is clean, closing this out.
 
-**Not explained:** an earlier session ran 12 reproduction attempts that
-came back clean (no sign-out) while testing the `login()` branches — if
-that script used the same ambiguous selector, all 12 should have failed
-the same way. It apparently didn't, for reasons not established (probably
-a differently-written script). Recorded here rather than smoothed over.
+**Not explained:** an earlier session ran 12 reproduction attempts that came
+back clean (no sign-out) while testing the `login()` branches — if that
+script used the same ambiguous selector, all 12 should have failed the same
+way. It apparently didn't, for reasons not established (probably a
+differently-written script). Recorded here rather than smoothed over.
 
-**Do not remove this as unrelated cleanup — not yet.** A human is going to
-click through client creation manually in the browser first. Once that's
-confirmed clean, remove this tracer and this entire section, and when
-writing Playwright against this app's dashboard, always scope submit-button
-selectors to the page content (e.g. `main button[type="submit"]`, or a
-`data-testid`) rather than using a bare `button[type="submit"]` selector.
+**Takeaway for future Playwright work against this app's dashboard:** always
+scope submit-button selectors to the page content (e.g. `main button[type="submit"]`,
+or a `data-testid`) rather than a bare `button[type="submit"]` selector —
+every dashboard page has the shell's Log out button as a second match.
 
 ## Non-negotiable rule: no business logic in the frontend
 
