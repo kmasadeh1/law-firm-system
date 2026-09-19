@@ -73,27 +73,29 @@ body {
  *
  * Dark theme's canvas/surface/line (below) were retuned from an early
  * #221f1c ink base - warm enough to read as brown against the gold logo -
- * to a near-neutral #16130f. Not pure black: light text on true black
- * causes halation and is fatiguing over a working day, which is what this
- * dashboard is for, so a faint warm bias is kept (R slightly ahead of G/B)
- * to tie back to the gold without tipping brown again. surface and line
- * keep the same relative step-up from canvas the original values used
- * (roughly +8/+7/+6 and a further +16/+15/+14), just against the new,
- * darker base - the panel/canvas and line/surface separation ratios land
- * within 0.02:1 of the old theme's (~1.07-1.09:1 and ~1.20-1.24:1), so
- * this isn't a new visual relationship, only a darker, less brown one.
- * Light theme is untouched.
+ * first to a near-neutral #16130f with a faint warm bias, then to a fully
+ * neutral #141414 after a direct side-by-side check against the crest: the
+ * warm version still visibly read as a different, browner surface next to
+ * the logo, not "black with a hint." Not pure black either way: light text
+ * on true black causes halation and is fatiguing over a working day, which
+ * is what this dashboard is for. surface and line keep the same relative
+ * step-up from canvas the original values used (roughly +7 and a further
+ * +15, applied evenly across channels this time rather than with a warm
+ * skew) - the panel/canvas and line/surface separation ratios land within
+ * 0.02:1 of the old theme's (~1.07-1.09:1 and ~1.20-1.24:1), so this isn't
+ * a new visual relationship, only a darker, neutral one. Light theme is
+ * untouched.
  *
- * Contrast, re-measured against the new dark values:
- *   fg #f3ede2 on canvas #16130f          = 15.89:1 (was 14.07:1 on #221f1c)
- *   fg-muted #d9d0c1 on canvas            = 12.12:1
- *   gold #b08d3f on canvas (text links)   = 5.93:1  (was 5.25:1 - improved, as expected of a darker base)
- *   fg on surface #1e1a15                 = 14.85:1
- *   fg-muted on surface                   = 11.32:1
- *   gold accent-border on surface         = 5.54:1
- *   control-border #847a68 on surface     = 4.09:1 (non-text UI, needs 3:1)
- *   danger-text #d9738a on canvas/surface = 5.97:1 / 5.58:1
- *   success-text #5aab80 on canvas/surface= 6.68:1 / 6.24:1
+ * Contrast, re-measured against the neutral dark values:
+ *   fg #f3ede2 on canvas #141414          = 15.81:1 (was 14.07:1 on #221f1c)
+ *   fg-muted #d9d0c1 on canvas            = 12.06:1
+ *   gold #b08d3f on canvas (text links)   = 5.90:1  (was 5.25:1 - improved, as expected of a darker base)
+ *   fg on surface #1b1b1b                 = 14.78:1
+ *   fg-muted on surface                   = 11.27:1
+ *   gold accent-border on surface         = 5.52:1
+ *   control-border #847a68 on surface     = 4.07:1 (non-text UI, needs 3:1)
+ *   danger-text #d9738a on canvas/surface = 5.94:1 / 5.55:1
+ *   success-text #5aab80 on canvas/surface= 6.64:1 / 6.21:1
  */
 :root {
   --dash-canvas: #faf7f2;
@@ -112,9 +114,9 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --dash-canvas: #16130f;
-    --dash-surface: #1e1a15;
-    --dash-line: #2e2923;
+    --dash-canvas: #141414;
+    --dash-surface: #1b1b1b;
+    --dash-line: #2a2a2a;
     --dash-control-border: #847a68;
     --dash-fg: #f3ede2;
     --dash-fg-muted: #d9d0c1;
@@ -128,9 +130,9 @@ body {
 }
 
 :root[data-theme="dark"] {
-  --dash-canvas: #16130f;
-  --dash-surface: #1e1a15;
-  --dash-line: #2e2923;
+  --dash-canvas: #141414;
+  --dash-surface: #1b1b1b;
+  --dash-line: #2a2a2a;
   --dash-control-border: #847a68;
   --dash-fg: #f3ede2;
   --dash-fg-muted: #d9d0c1;
