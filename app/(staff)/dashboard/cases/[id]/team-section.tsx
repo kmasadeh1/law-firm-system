@@ -37,7 +37,7 @@ export function TeamSection({
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-team-section">
       <h2 className="font-heading text-lg text-fg">Team</h2>
 
       {!hasLead && (

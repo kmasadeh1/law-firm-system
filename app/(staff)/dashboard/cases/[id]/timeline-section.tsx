@@ -195,7 +195,7 @@ export function TimelineSection({
 
   if (rows.length === 0) {
     return (
-      <Panel className="flex flex-col gap-3">
+      <Panel className="flex flex-col gap-3" data-testid="case-timeline-section">
         <h2 className="font-heading text-lg text-fg">Timeline</h2>
         <EmptyState
           title="No history yet"
@@ -210,7 +210,7 @@ export function TimelineSection({
   const hiddenCount = rows.length - visibleRows.length
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-timeline-section">
       <h2 className="font-heading text-lg text-fg">Timeline</h2>
 
       <div className="flex flex-col divide-y divide-line">

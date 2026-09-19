@@ -158,7 +158,7 @@ export function DeadlinesSection({
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-deadlines-section">
       <h2 className="font-heading text-lg text-fg">Deadlines</h2>
 
       {deadlines.length === 0 ? (

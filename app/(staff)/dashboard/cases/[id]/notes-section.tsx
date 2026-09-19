@@ -163,7 +163,7 @@ export function NotesSection({ caseId, notes }: { caseId: string; notes: CaseNot
   const deletedNotes = notes.filter((n) => n.deleted_at)
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-notes-section">
       <h2 className="font-heading text-lg text-fg">Notes</h2>
 
       {activeNotes.length === 0 ? (

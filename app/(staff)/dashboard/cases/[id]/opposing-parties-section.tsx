@@ -65,7 +65,7 @@ export function OpposingPartiesSection({
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-opposing-parties-section">
       <h2 className="font-heading text-lg text-fg">Opposing parties</h2>
 
       {parties.length === 0 ? (

@@ -185,7 +185,7 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
   const deletedDocuments = documents.filter((d) => d.deleted_at)
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-documents-section">
       <h2 className="font-heading text-lg text-fg">Documents</h2>
 
       {activeDocuments.length === 0 ? (

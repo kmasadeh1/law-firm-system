@@ -39,7 +39,7 @@ export function StatusSection({
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-status-section">
       <h2 className="font-heading text-lg text-fg">Status</h2>
       <div className="flex flex-wrap items-center gap-2">
         <select

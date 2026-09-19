@@ -141,6 +141,24 @@ scope submit-button selectors to the page content (e.g. `main button[type="submi
 or a `data-testid`) rather than a bare `button[type="submit"]` selector —
 every dashboard page has the shell's Log out button as a second match.
 
+**This happened again.** During the notes/documents soft-delete work, a
+verification script used `getByRole('button', { name: 'Remove', exact: true })`
+scoped only to `main` on the case detail page - "Remove" is also the label on
+the Team section's remove-member button, which sits earlier in the DOM than
+Documents. The click landed on Team instead and deleted a real case-lawyer
+assignment (caught via the timeline, recovered from the activity log's
+`old_data`, since it's an append-only audit table - see the case-timeline
+section above). Writing "remember to scope selectors" a second time into
+this file wouldn't fix anything; a rule that has to be recalled at the
+moment of writing every selector isn't a control. Instead: every section
+Panel on the case detail page (`app/(staff)/dashboard/cases/[id]/*.tsx`) now
+carries a `data-testid` (`case-status-section`, `case-team-section`,
+`case-opposing-parties-section`, `case-deadlines-section`,
+`case-share-links-section`, `case-documents-section`, `case-notes-section`,
+`case-timeline-section`). Scope future Playwright work on this page to one
+of these first, e.g. `page.getByTestId('case-documents-section').getByRole('button', { name: 'Remove' })`,
+rather than `main` plus a label that isn't guaranteed unique across sections.
+
 ## Non-negotiable rule: no business logic in the frontend
 
 Validation, permission checks, and calculations happen in Supabase — Row

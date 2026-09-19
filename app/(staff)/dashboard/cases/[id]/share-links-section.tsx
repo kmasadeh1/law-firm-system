@@ -190,7 +190,7 @@ export function ShareLinksSection({ caseId, links }: { caseId: string; links: Sh
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="case-share-links-section">
       <h2 className="font-heading text-lg text-fg">Share with client</h2>
       <p className="text-sm text-fg-muted">
         Generate a link the client can open to track this case&apos;s status — no account
