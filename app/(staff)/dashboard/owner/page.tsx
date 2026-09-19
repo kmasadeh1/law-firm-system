@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
+import { activityEventTitle } from '@/lib/activity-labels'
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString(undefined, { timeStyle: 'short' })
@@ -17,22 +18,6 @@ function formatRelative(iso: string) {
   if (hours < 24) return `${hours}h ago`
   const days = Math.round(hours / 24)
   return `${days}d ago`
-}
-
-const actionVerb: Record<string, string> = {
-  insert: 'Created',
-  update: 'Updated',
-  delete: 'Deleted',
-}
-
-const tableLabel: Record<string, string> = {
-  clients: 'a client',
-  cases: 'a case',
-  case_lawyers: 'a case team assignment',
-  case_opposing_parties: 'an opposing party',
-  appointments: 'an appointment',
-  roles: 'a role',
-  role_permissions: 'a permission',
 }
 
 export default async function OwnerDashboardPage() {
@@ -60,7 +45,7 @@ export default async function OwnerDashboardPage() {
       .order('starts_at', { ascending: true }),
     supabase
       .from('activity_log')
-      .select('id, action, table_name, created_at, actor_id')
+      .select('id, action, table_name, created_at, actor_id, new_data, old_data')
       .order('created_at', { ascending: false })
       .limit(8),
     supabase.from('staff_directory').select('id, full_name').eq('is_active', true),
@@ -169,18 +154,20 @@ export default async function OwnerDashboardPage() {
         ) : (
           <Panel className="p-0">
             <ul className="flex flex-col divide-y divide-line">
-              {activity.map((entry) => (
-                <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
-                  <span className="text-fg">
-                    {(actionVerb[entry.action] ?? entry.action)}{' '}
-                    {tableLabel[entry.table_name] ?? entry.table_name}
-                    {entry.actor_id && (
-                      <span className="text-fg-muted"> · {nameById.get(entry.actor_id) ?? 'Unknown staff'}</span>
-                    )}
-                  </span>
-                  <span className="text-fg-muted">{formatRelative(entry.created_at)}</span>
-                </li>
-              ))}
+              {activity.map((entry) => {
+                const detail = (entry.new_data ?? entry.old_data) as Record<string, unknown> | null
+                return (
+                  <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
+                    <span className="text-fg">
+                      {activityEventTitle(entry.table_name, entry.action, detail)}
+                      {entry.actor_id && (
+                        <span className="text-fg-muted"> · {nameById.get(entry.actor_id) ?? 'Unknown staff'}</span>
+                      )}
+                    </span>
+                    <span className="text-fg-muted">{formatRelative(entry.created_at)}</span>
+                  </li>
+                )
+              })}
             </ul>
           </Panel>
         )}

@@ -7,6 +7,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { Switch } from '@/components/dashboard/switch'
 
 type PermissionKeyRow = {
   key: string
@@ -287,7 +288,7 @@ function RoleCard({
             <h3 className="text-sm font-semibold text-fg-muted">{group.title}</h3>
             <div className="mt-2 flex flex-col gap-2">
               {group.items.map((pk) => (
-                <PermissionCheckbox
+                <PermissionToggle
                   key={pk.key}
                   roleId={role.id}
                   permissionKey={pk}
@@ -305,7 +306,7 @@ function RoleCard({
           <div className="mt-2 flex flex-col gap-2">
             {ownerOnlyKeys.map((pk) => (
               <div key={pk.key} className="flex items-start gap-2 opacity-60">
-                <input type="checkbox" checked={false} disabled className="mt-0.5" />
+                <Switch checked={false} disabled label={`${pk.label} (owner only, locked)`} />
                 <div>
                   <p className="text-sm text-fg">
                     {pk.label} <span className="text-xs">(Owner only)</span>
@@ -321,7 +322,7 @@ function RoleCard({
   )
 }
 
-function PermissionCheckbox({
+function PermissionToggle({
   roleId,
   permissionKey,
   enabled,
@@ -354,13 +355,7 @@ function PermissionCheckbox({
 
   return (
     <div className="flex items-start gap-2">
-      <input
-        type="checkbox"
-        checked={enabled}
-        disabled={isPending}
-        onChange={(e) => handleChange(e.target.checked)}
-        className="mt-0.5"
-      />
+      <Switch checked={enabled} disabled={isPending} onChange={handleChange} label={permissionKey.label} />
       <div>
         <p className="text-sm text-fg">
           {permissionKey.label}

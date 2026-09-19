@@ -4,67 +4,16 @@ import { useState } from 'react'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount, formatFeeType } from '../../fees/format'
+import { activityEventTitle, type ActivityAction } from '@/lib/activity-labels'
 
 export type TimelineRow = {
   id: number
   occurred_at: string
-  action: 'insert' | 'update' | 'delete'
+  action: ActivityAction
   entity: string
   actor_name: string | null
   detail: Record<string, unknown> | null
   detail_redacted: boolean
-}
-
-const ENTITY_LABELS: Record<string, { insert: string; update: string; delete: string }> = {
-  cases: { insert: 'Case opened', update: 'Case updated', delete: 'Case deleted' },
-  case_lawyers: {
-    insert: 'Lawyer assigned',
-    update: 'Lawyer assignment updated',
-    delete: 'Lawyer removed from case',
-  },
-  deadlines: { insert: 'Deadline added', update: 'Deadline updated', delete: 'Deadline removed' },
-  case_notes: { insert: 'Note added', update: 'Note edited', delete: 'Note deleted' },
-  documents: { insert: 'Document uploaded', update: 'Document updated', delete: 'Document removed' },
-  engagements: { insert: 'Engagement created', update: 'Engagement updated', delete: 'Engagement deleted' },
-  engagement_installments: {
-    insert: 'Instalment scheduled',
-    update: 'Instalment updated',
-    delete: 'Instalment removed',
-  },
-  engagement_cases: {
-    insert: 'Linked to a fee engagement',
-    update: 'Engagement link updated',
-    delete: 'Unlinked from a fee engagement',
-  },
-  payments: { insert: 'Payment recorded', update: 'Payment updated', delete: 'Payment removed' },
-  expenses: { insert: 'Expense recorded', update: 'Expense updated', delete: 'Expense removed' },
-  case_opposing_parties: {
-    insert: 'Opposing party added',
-    update: 'Opposing party updated',
-    delete: 'Opposing party removed',
-  },
-}
-
-function humanizeEntity(entity: string) {
-  return entity.replace(/_/g, ' ')
-}
-
-// case_notes and documents have no hard DELETE - "deleted" is a soft flag
-// set via UPDATE, so it shows up here as action 'update' like any other
-// edit. Detect it from the row snapshot rather than mislabeling a removal
-// as a plain edit, which would hide it from the one place meant to surface
-// it.
-function eventTitle(entity: string, action: TimelineRow['action'], detail: Record<string, unknown> | null) {
-  if (
-    (entity === 'case_notes' || entity === 'documents') &&
-    action === 'update' &&
-    detail &&
-    typeof detail.deleted_at === 'string' &&
-    detail.deleted_at
-  ) {
-    return entity === 'case_notes' ? 'Note deleted' : 'Document removed'
-  }
-  return ENTITY_LABELS[entity]?.[action] ?? `${humanizeEntity(entity)} ${action}d`
 }
 
 function truncate(text: string, max: number) {
@@ -169,7 +118,7 @@ function TimelineEntry({ row, staffNameById }: { row: TimelineRow; staffNameById
       <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">{formatTime(row.occurred_at)}</span>
       <div className="min-w-0">
         <p className="text-fg">
-          {eventTitle(row.entity, row.action, row.detail)}
+          {activityEventTitle(row.entity, row.action, row.detail)}
           <span className="text-fg-muted"> · {row.actor_name ?? 'System'}</span>
         </p>
         {row.detail_redacted ? (
