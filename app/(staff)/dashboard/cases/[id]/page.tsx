@@ -8,6 +8,7 @@ import { DeadlinesSection } from './deadlines-section'
 import { ShareLinksSection } from './share-links-section'
 import { DocumentsSection, type DocumentRow } from './documents-section'
 import { NotesSection, type CaseNote } from './notes-section'
+import { ExpensesSection, type Expense } from './expenses-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
@@ -46,6 +47,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: documentRows },
     { data: noteRows },
     { data: allStaffDirectory },
+    { data: canManageExpenses },
+    { data: expenseRows },
     { data: timelineRows, error: timelineError },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
@@ -79,6 +82,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     // show their name after they've left the firm, same reasoning as the
     // conflict-check history page.
     supabase.from('staff_directory').select('id, full_name'),
+    supabase.rpc('has_permission', { p_key: 'expenses_manage' }),
+    supabase
+      .from('expenses')
+      .select('id, description, amount, incurred_at, reimbursed, reimbursed_at, recorded_by')
+      .eq('case_id', id)
+      .order('incurred_at', { ascending: false }),
     supabase.rpc('case_timeline', { p_case_id: id }),
   ])
 
@@ -136,6 +145,16 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     deleted_by_name: d.deleted_by ? (allNameById.get(d.deleted_by) ?? 'Unknown staff') : null,
   }))
 
+  const expenses: Expense[] = (expenseRows ?? []).map((e) => ({
+    id: e.id,
+    description: e.description,
+    amount: e.amount,
+    incurred_at: e.incurred_at,
+    reimbursed: e.reimbursed,
+    reimbursed_at: e.reimbursed_at,
+    recorded_by_name: e.recorded_by ? (allNameById.get(e.recorded_by) ?? 'Unknown staff') : 'Unknown staff',
+  }))
+
   const timeline: TimelineRow[] = (timelineRows ?? []).map((row) => ({
     id: row.id,
     occurred_at: row.occurred_at,
@@ -169,6 +188,11 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <DocumentsSection caseId={caseRow.id} documents={documents} />
 
       <NotesSection caseId={caseRow.id} notes={notes} />
+
+      {/* Not gated on "the query came back empty" - lawyers don't hold
+          expenses_manage in the seeded roles, so this checks the permission
+          explicitly rather than inferring access from an empty result. */}
+      {canManageExpenses && <ExpensesSection caseId={caseRow.id} expenses={expenses} />}
 
       {timelineError ? (
         <p className="text-sm text-fg-muted">Timeline unavailable: {timelineError.message}</p>

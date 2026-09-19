@@ -535,6 +535,139 @@ export async function restoreDocument(caseId: string, documentId: string): Promi
   return {}
 }
 
+// --- Expenses ------------------------------------------------------------
+
+function parseAmount(formData: FormData): number | { error: string } {
+  const raw = formData.get('amount')
+  if (typeof raw !== 'string' || !raw.trim()) return { error: 'Amount is required.' }
+  const amount = Number(raw)
+  if (!Number.isFinite(amount) || amount <= 0) return { error: 'Enter a valid amount greater than zero.' }
+  return amount
+}
+
+export async function addExpense(caseId: string, formData: FormData): Promise<ActionResult> {
+  const description = formData.get('description')
+  const incurredAt = formData.get('incurred_at')
+
+  if (typeof description !== 'string' || !description.trim()) {
+    return { error: 'Description is required.' }
+  }
+  if (typeof incurredAt !== 'string' || !incurredAt) {
+    return { error: 'Date incurred is required.' }
+  }
+  const amount = parseAmount(formData)
+  if (typeof amount !== 'number') return amount
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getClaims()
+
+  const { error } = await supabase.from('expenses').insert({
+    case_id: caseId,
+    description: description.trim(),
+    amount,
+    incurred_at: incurredAt,
+    recorded_by: userData?.claims?.sub,
+  })
+
+  if (error) {
+    if (error.code === '42501') {
+      return { error: "You don't have permission to record expenses on this case." }
+    }
+    return { error: 'Could not record the expense. Please try again.' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function editExpense(
+  caseId: string,
+  expenseId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const description = formData.get('description')
+  const incurredAt = formData.get('incurred_at')
+
+  if (typeof description !== 'string' || !description.trim()) {
+    return { error: 'Description is required.' }
+  }
+  if (typeof incurredAt !== 'string' || !incurredAt) {
+    return { error: 'Date incurred is required.' }
+  }
+  const amount = parseAmount(formData)
+  if (typeof amount !== 'number') return amount
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('expenses')
+    .update({ description: description.trim(), amount, incurred_at: incurredAt })
+    .eq('id', expenseId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not save the expense. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to edit this expense." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function setExpenseReimbursed(
+  caseId: string,
+  expenseId: string,
+  reimbursed: boolean
+): Promise<ActionResult> {
+  const supabase = await createClient()
+  // reimbursed and reimbursed_at are set together so they can never
+  // disagree - there's no database constraint enforcing that pairing, so
+  // this is the only place either field is ever written.
+  const { data, error } = await supabase
+    .from('expenses')
+    .update({
+      reimbursed,
+      reimbursed_at: reimbursed ? new Date().toISOString().slice(0, 10) : null,
+    })
+    .eq('id', expenseId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not update the reimbursement status. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to update this expense." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function deleteExpense(caseId: string, expenseId: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  // Expenses allow a real DELETE (unlike case_notes/documents) - existing
+  // schema, not something to soften into a soft delete here.
+  const { data, error } = await supabase
+    .from('expenses')
+    .delete()
+    .eq('id', expenseId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'Could not delete the expense. Please try again.' }
+  }
+  if (!data || data.length === 0) {
+    return { error: "You don't have permission to delete this expense." }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
 export async function revokeShareLink(caseId: string, linkId: string): Promise<ActionResult> {
   const supabase = await createClient()
   const { data, error } = await supabase
