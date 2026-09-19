@@ -87,6 +87,14 @@ export function FeesIcon({ className }: IconProps) {
   )
 }
 
+export function ChevronLeftIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M12.5 4.5 7 10l5.5 5.5" />
+    </svg>
+  )
+}
+
 export function StaffIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>
