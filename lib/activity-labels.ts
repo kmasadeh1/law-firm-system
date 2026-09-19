@@ -41,6 +41,7 @@ const ENTITY_LABELS: Record<string, { insert: string; update: string; delete: st
     delete: 'Permission revoked',
   },
   appointments: { insert: 'Appointment booked', update: 'Appointment updated', delete: 'Appointment deleted' },
+  staff: { insert: 'Staff member added', update: 'Staff account updated', delete: 'Staff account deleted' },
 }
 
 // case_notes and documents have no hard DELETE - "deleted" is a soft flag
@@ -51,10 +52,6 @@ const ENTITY_LABELS: Record<string, { insert: string; update: string; delete: st
 const SOFT_DELETE_LABELS: Record<string, string> = {
   case_notes: 'Note deleted',
   documents: 'Document removed',
-}
-
-function humanizeEntity(entity: string) {
-  return entity.replace(/_/g, ' ')
 }
 
 export function activityEventTitle(
@@ -72,5 +69,9 @@ export function activityEventTitle(
   ) {
     return softDeleteLabel
   }
-  return ENTITY_LABELS[entity]?.[action] ?? `${humanizeEntity(entity)} ${action}d`
+  // Every entity with a logging trigger has an explicit label above. This
+  // fallback only exists for a table that gets one later and hasn't been
+  // added here yet - it should read as an obvious gap to fill in, not as
+  // broken grammar mistaken for the real label.
+  return ENTITY_LABELS[entity]?.[action] ?? 'Activity recorded'
 }
