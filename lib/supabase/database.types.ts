@@ -111,6 +111,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
             foreignKeyName: "appointments_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
@@ -175,6 +182,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "case_lawyers_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
             foreignKeyName: "case_lawyers_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
@@ -228,6 +242,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
           },
           {
             foreignKeyName: "case_notes_deleted_by_fkey"
@@ -286,6 +307,13 @@ export type Database = {
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "case_opposing_parties_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
         ]
       }
       case_share_links: {
@@ -332,6 +360,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_share_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
           },
           {
             foreignKeyName: "case_share_links_created_by_fkey"
@@ -627,6 +662,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "deadlines_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
             foreignKeyName: "deadlines_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -703,6 +745,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
             foreignKeyName: "documents_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
@@ -752,6 +801,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagement_cases_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
           },
           {
             foreignKeyName: "engagement_cases_engagement_id_fkey"
@@ -965,6 +1021,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
           },
           {
             foreignKeyName: "expenses_recorded_by_fkey"
@@ -1294,6 +1357,15 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      expense_totals: {
+        Row: {
+          case_id: string | null
+          total_incurred: number | null
+          total_outstanding: number | null
+          total_reimbursed: number | null
+        }
+        Relationships: []
       }
       installment_balances: {
         Row: {

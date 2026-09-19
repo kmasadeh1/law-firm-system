@@ -4,8 +4,15 @@ import { useRef, useState, useTransition } from 'react'
 import { addExpense, editExpense, setExpenseReimbursed, deleteExpense } from '../actions'
 import { formatAmount } from '../../fees/format'
 import { Panel } from '@/components/dashboard/panel'
+import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+
+export type ExpenseTotals = {
+  incurred: number
+  reimbursed: number
+  outstanding: number
+}
 
 export type Expense = {
   id: string
@@ -162,7 +169,15 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
   )
 }
 
-export function ExpensesSection({ caseId, expenses }: { caseId: string; expenses: Expense[] }) {
+export function ExpensesSection({
+  caseId,
+  expenses,
+  totals,
+}: {
+  caseId: string
+  expenses: Expense[]
+  totals: ExpenseTotals
+}) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -189,6 +204,14 @@ export function ExpensesSection({ caseId, expenses }: { caseId: string; expenses
           Costs the firm has paid out on this case - court fees, translation, expert fees - tracked
           separately from the agreed fee and marked when the client reimburses them.
         </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="neutral">Incurred: {formatAmount(totals.incurred)}</Badge>
+        <Badge variant="neutral">Reimbursed: {formatAmount(totals.reimbursed)}</Badge>
+        <Badge variant={totals.outstanding > 0 ? 'accent' : 'muted'}>
+          Outstanding: {formatAmount(totals.outstanding)}
+        </Badge>
       </div>
 
       {expenses.length === 0 ? (

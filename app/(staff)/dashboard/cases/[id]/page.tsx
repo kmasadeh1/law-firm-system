@@ -49,6 +49,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: allStaffDirectory },
     { data: canManageExpenses },
     { data: expenseRows },
+    { data: expenseTotalsRow },
     { data: timelineRows, error: timelineError },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
@@ -88,6 +89,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .select('id, description, amount, incurred_at, reimbursed, reimbursed_at, recorded_by')
       .eq('case_id', id)
       .order('incurred_at', { ascending: false }),
+    // Totals come from expense_totals, never summed here - it LEFT JOINs
+    // from cases so a case with none still returns a zeroed row, and is
+    // security_invoker so it respects the same RLS as expenses itself.
+    supabase.from('expense_totals').select('total_incurred, total_reimbursed, total_outstanding').eq('case_id', id).maybeSingle(),
     supabase.rpc('case_timeline', { p_case_id: id }),
   ])
 
@@ -192,7 +197,17 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       {/* Not gated on "the query came back empty" - lawyers don't hold
           expenses_manage in the seeded roles, so this checks the permission
           explicitly rather than inferring access from an empty result. */}
-      {canManageExpenses && <ExpensesSection caseId={caseRow.id} expenses={expenses} />}
+      {canManageExpenses && (
+        <ExpensesSection
+          caseId={caseRow.id}
+          expenses={expenses}
+          totals={{
+            incurred: expenseTotalsRow?.total_incurred ?? 0,
+            reimbursed: expenseTotalsRow?.total_reimbursed ?? 0,
+            outstanding: expenseTotalsRow?.total_outstanding ?? 0,
+          }}
+        />
+      )}
 
       {timelineError ? (
         <p className="text-sm text-fg-muted">Timeline unavailable: {timelineError.message}</p>
