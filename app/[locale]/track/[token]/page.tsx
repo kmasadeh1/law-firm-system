@@ -24,7 +24,7 @@ export default async function TrackCasePage({ params }: PageProps<'/[locale]/tra
   return (
     <div className="flex min-h-screen flex-col bg-ink text-paper">
       <header className="flex items-center gap-2.5 px-6 py-6 sm:px-10">
-        <Crest className="h-7 w-7 text-brass" />
+        <Crest className="h-9 w-9" />
         <span className="font-heading text-lg">{t('layout.firmName')}</span>
       </header>
 

@@ -23,7 +23,7 @@ export default function PublicHomePage() {
       <header className="border-b border-warm-grey/25">
         <div className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-5 sm:px-10 lg:px-16">
           <Link href="/" className="flex items-center gap-2.5 text-paper">
-            <Crest className="h-7 w-7 text-brass" />
+            <Crest className="h-9 w-9" />
             <span className="flex flex-col">
               <span className="font-heading text-lg leading-tight">{t('layout.firmName')}</span>
               <span className="text-xs text-paper-dim">{t('layout.firmTagline')}</span>
@@ -66,7 +66,7 @@ export default function PublicHomePage() {
           </p>
           <a
             href="#appointment"
-            className="mt-8 inline-block rounded-sm bg-burgundy px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-burgundy-dim"
+            className="mt-8 inline-block rounded-sm bg-brass px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-brass-hover"
           >
             {t('hero.cta')}
           </a>
@@ -159,7 +159,7 @@ export default function PublicHomePage() {
                   type="button"
                   disabled
                   title={t('appointment.comingSoon')}
-                  className="mt-2 cursor-not-allowed rounded-sm bg-burgundy/50 px-5 py-2.5 text-start text-sm font-medium text-paper-dim"
+                  className="mt-2 cursor-not-allowed rounded-sm border border-warm-grey/40 px-5 py-2.5 text-start text-sm font-medium text-warm-grey"
                 >
                   {t('appointment.submit')} ({t('appointment.comingSoon')})
                 </button>

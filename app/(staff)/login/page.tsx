@@ -23,9 +23,9 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   return (
     <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
       {/* Branding panel */}
-      <div className="relative flex flex-col justify-between overflow-hidden bg-burgundy px-8 py-10 text-paper sm:px-12 md:py-16">
+      <div className="relative flex flex-col justify-between overflow-hidden bg-ink-raised px-8 py-10 text-paper sm:px-12 md:py-16">
         <div className="flex items-center gap-3">
-          <Crest className="h-9 w-9 text-brass" />
+          <Crest className="h-9 w-9" />
           <span className="flex flex-col">
             <span className="font-heading text-lg leading-tight tracking-wide">
               Ahmad Al-Masadeh &amp; Associates
@@ -54,7 +54,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
           className="flex w-full max-w-sm flex-col gap-5"
         >
           <div className="mb-2 md:hidden">
-            <div className="flex items-center gap-2 text-brass">
+            <div className="flex items-center gap-2">
               <Crest className="h-6 w-6" />
               <span className="font-heading text-base text-paper">Ahmad Al-Masadeh &amp; Associates</span>
             </div>
@@ -63,7 +63,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
           <h1 className="font-heading text-2xl text-paper">Sign in</h1>
 
           {error && (
-            <p className="rounded-sm border border-burgundy bg-burgundy/20 px-3 py-2 text-sm text-paper">
+            <p className="rounded-sm border border-danger bg-danger/20 px-3 py-2 text-sm text-paper">
               {error}
             </p>
           )}
@@ -98,7 +98,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
 
           <button
             type="submit"
-            className="mt-2 rounded-sm bg-burgundy px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-burgundy-dim"
+            className="mt-2 rounded-sm bg-brass px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-brass-hover"
           >
             Log in
           </button>

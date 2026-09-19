@@ -1,18 +1,33 @@
 @import "tailwindcss";
 
 /*
- * Visual identity: dark theme built on an ink base with burgundy as the
- * primary accent and brass reserved for rules, small marks and hover
- * states. This is not an inverted light theme - ink is the only
- * background these tokens are designed against.
+ * Visual identity: dark theme built on an ink base with gold (the firm's
+ * real brand colour, sampled from the logo) as the accent - for text,
+ * buttons and rules alike. Burgundy is gone entirely; it was an invented
+ * placeholder and never part of the actual identity. This is not an
+ * inverted light theme - ink is the only background these tokens are
+ * designed against.
+ *
+ * Contrast, measured (WCAG relative luminance):
+ *   gold #b08d3f on ink #221f1c        = 5.25:1 (passes AA for normal text)
+ *   ink #221f1c on gold #b08d3f        = 5.25:1 (dark text on filled gold buttons)
+ *   paper #f3ede2 on ink #221f1c       = 14.07:1
+ * Gold does NOT go on paper/light fills here - see brass-hover below and
+ * the light dashboard theme further down for why.
  */
 @theme {
   --color-ink: #221f1c;
   --color-ink-raised: #2a2622;
-  --color-burgundy: #6e1e2b;
-  --color-burgundy-dim: #571724;
   --color-brass: #b08d3f;
+  /* Lighter, not darker, on purpose: brass's text pairing is dark ink, and
+     darkening a gold fill pulls it toward ink and erodes that contrast.
+     Lightening it (ink-on-this = 6.52:1) is a safe hover/pressed state. */
+  --color-brass-hover: #c19f52;
   --color-warm-grey: #6a645c;
+  /* Replaces burgundy for error/alert framing - a semantic state colour,
+     not a brand colour, so it doesn't come from the gold family. Matches
+     the dashboard dark theme's danger-text for one danger red app-wide. */
+  --color-danger: #d9738a;
 
   /* Not part of the given palette - a warm off-white needed so body text
      reads on the ink background. Swap freely if a specific value is
@@ -36,12 +51,25 @@ body {
 
 /*
  * Dashboard theme tokens - separate from the public site's fixed ink
- * identity above. Login and the public site use --color-ink/paper/burgundy
+ * identity above. Login and the public site use --color-ink/paper/brass
  * directly and never reference these, so they're unaffected by the toggle
  * below. Light is the default register (a tool used all day, not a
- * marketing moment); dark mirrors the public site's ink identity but only
- * where the contrast math still works - see the accent-fill/accent-text
- * split below.
+ * marketing moment); dark mirrors the public site's ink identity.
+ *
+ * Gold is not symmetric across these two themes - measured contrast:
+ *   gold #b08d3f on light canvas #faf7f2  = 2.92:1 (fails even 3:1 non-text)
+ *   gold #b08d3f on white #ffffff         = 3.12:1 (fails 4.5:1 text)
+ *   gold #b08d3f on ink #221f1c           = 5.25:1 (passes AA text)
+ * So dark theme uses gold itself as the accent (buttons, focus, active
+ * nav). Light theme cannot: gold there is decorative only (crest/logo
+ * images, never a CSS token), and ink itself carries emphasis instead -
+ *   ink #221f1c on canvas #faf7f2 = 15.34:1, on white = 16.40:1
+ * The one place light theme still gets a gold-family hue in a semantic
+ * token is accent-border (badge/warning-box outlines), using a darkened
+ * antique-bronze rather than raw gold so it still clears AA on its own:
+ *   bronze #7a5f28 on canvas #faf7f2 = 5.62:1, on white = 6.01:1
+ * Light theme's danger-text also moves off burgundy to a standalone red,
+ * verified independently: #b3261e on canvas = 6.12:1, on white = 6.54:1.
  */
 :root {
   --dash-canvas: #faf7f2;
@@ -50,12 +78,12 @@ body {
   --dash-control-border: #8f8267;
   --dash-fg: #221f1c;
   --dash-fg-muted: #6a645c;
-  --dash-accent: #6e1e2b;
+  --dash-accent: #221f1c;
   --dash-accent-fg: #f3ede2;
-  --dash-accent-border: #571724;
-  --dash-danger-text: #6e1e2b;
+  --dash-accent-border: #7a5f28;
+  --dash-danger-text: #b3261e;
   --dash-success-text: #2f6b4f;
-  --dash-focus: #6e1e2b;
+  --dash-focus: #221f1c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -66,8 +94,8 @@ body {
     --dash-control-border: #847a68;
     --dash-fg: #f3ede2;
     --dash-fg-muted: #d9d0c1;
-    --dash-accent: #6e1e2b;
-    --dash-accent-fg: #f3ede2;
+    --dash-accent: #b08d3f;
+    --dash-accent-fg: #221f1c;
     --dash-accent-border: #b08d3f;
     --dash-danger-text: #d9738a;
     --dash-success-text: #5aab80;
@@ -82,8 +110,8 @@ body {
   --dash-control-border: #847a68;
   --dash-fg: #f3ede2;
   --dash-fg-muted: #d9d0c1;
-  --dash-accent: #6e1e2b;
-  --dash-accent-fg: #f3ede2;
+  --dash-accent: #b08d3f;
+  --dash-accent-fg: #221f1c;
   --dash-accent-border: #b08d3f;
   --dash-danger-text: #d9738a;
   --dash-success-text: #5aab80;

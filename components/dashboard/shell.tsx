@@ -101,7 +101,7 @@ export function DashboardShell({
   const sidebarContent = (
     <>
       <Link href={homeHref} className="flex items-center gap-2.5 px-1 py-1">
-        <Crest className="h-7 w-7 text-accent" />
+        <Crest className="h-8 w-8" />
         <span className="font-heading text-base text-fg">{firmName}</span>
       </Link>
 
@@ -138,7 +138,7 @@ export function DashboardShell({
       {/* Mobile top bar */}
       <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 md:hidden">
         <Link href={homeHref} className="flex items-center gap-2">
-          <Crest className="h-6 w-6 text-accent" />
+          <Crest className="h-7 w-7" />
           <span className="font-heading text-base text-fg">{firmName}</span>
         </Link>
         <div className="flex items-center gap-1">
