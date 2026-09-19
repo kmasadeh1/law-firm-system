@@ -49,7 +49,21 @@ function humanizeEntity(entity: string) {
   return entity.replace(/_/g, ' ')
 }
 
-function eventTitle(entity: string, action: TimelineRow['action']) {
+// case_notes and documents have no hard DELETE - "deleted" is a soft flag
+// set via UPDATE, so it shows up here as action 'update' like any other
+// edit. Detect it from the row snapshot rather than mislabeling a removal
+// as a plain edit, which would hide it from the one place meant to surface
+// it.
+function eventTitle(entity: string, action: TimelineRow['action'], detail: Record<string, unknown> | null) {
+  if (
+    (entity === 'case_notes' || entity === 'documents') &&
+    action === 'update' &&
+    detail &&
+    typeof detail.deleted_at === 'string' &&
+    detail.deleted_at
+  ) {
+    return entity === 'case_notes' ? 'Note deleted' : 'Document removed'
+  }
   return ENTITY_LABELS[entity]?.[action] ?? `${humanizeEntity(entity)} ${action}d`
 }
 
@@ -155,7 +169,7 @@ function TimelineEntry({ row, staffNameById }: { row: TimelineRow; staffNameById
       <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">{formatTime(row.occurred_at)}</span>
       <div className="min-w-0">
         <p className="text-fg">
-          {eventTitle(row.entity, row.action)}
+          {eventTitle(row.entity, row.action, row.detail)}
           <span className="text-fg-muted"> · {row.actor_name ?? 'System'}</span>
         </p>
         {row.detail_redacted ? (
