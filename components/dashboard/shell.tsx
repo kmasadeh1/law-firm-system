@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Crest } from '@/components/crest'
 import { ThemeToggle } from './theme-toggle'
 import type { Theme } from './theme-store'
@@ -116,6 +117,7 @@ export function DashboardShell({
   initialTheme: Theme
   children: React.ReactNode
 }) {
+  const t = useTranslations('dashboard')
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const sidebarContent = (
@@ -141,7 +143,7 @@ export function DashboardShell({
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <LogoutIcon className="h-4 w-4" />
-            Log out
+            {t('logOut')}
           </button>
         </form>
       </div>
@@ -166,7 +168,7 @@ export function DashboardShell({
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
+            aria-label={t('openMenu')}
             className="flex h-9 w-9 items-center justify-center rounded-md text-fg transition-colors hover:bg-line/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <MenuIcon className="h-5 w-5" />
@@ -179,7 +181,7 @@ export function DashboardShell({
         <div className="fixed inset-0 z-50 md:hidden">
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t('closeMenu')}
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/40"
           />
@@ -188,7 +190,7 @@ export function DashboardShell({
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                aria-label="Close menu"
+                aria-label={t('closeMenu')}
                 className="flex h-9 w-9 items-center justify-center rounded-md text-fg-muted hover:bg-line/40 hover:text-fg"
               >
                 <CloseIcon className="h-5 w-5" />

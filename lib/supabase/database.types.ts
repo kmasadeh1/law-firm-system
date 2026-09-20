@@ -1253,6 +1253,7 @@ export type Database = {
           full_name: string
           id: string
           is_active: boolean
+          locale: string
           must_change_password: boolean
           phone: string | null
           role_id: string | null
@@ -1265,6 +1266,7 @@ export type Database = {
           full_name: string
           id: string
           is_active?: boolean
+          locale?: string
           must_change_password?: boolean
           phone?: string | null
           role_id?: string | null
@@ -1277,6 +1279,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_active?: boolean
+          locale?: string
           must_change_password?: boolean
           phone?: string | null
           role_id?: string | null

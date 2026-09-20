@@ -1,6 +1,7 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import { useTranslations } from 'next-intl'
 import { getSnapshot, subscribe, setTheme, type Theme } from './theme-store'
 
 function SunIcon() {
@@ -31,17 +32,20 @@ export function ThemeToggle({
   compact?: boolean
 }) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, () => initialTheme)
+  const t = useTranslations('dashboard')
 
   function toggle() {
     setTheme(theme === 'dark' ? 'light' : 'dark')
   }
 
+  const switchLabel = theme === 'dark' ? t('switchToLightTheme') : t('switchToDarkTheme')
+
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-      title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+      aria-label={switchLabel}
+      title={switchLabel}
       className={
         compact
           ? 'flex h-8 w-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-line/60 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus'
@@ -49,7 +53,7 @@ export function ThemeToggle({
       }
     >
       {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-      {!compact && <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>}
+      {!compact && <span>{theme === 'dark' ? t('lightMode') : t('darkMode')}</span>}
     </button>
   )
 }

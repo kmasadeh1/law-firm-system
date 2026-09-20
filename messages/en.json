@@ -120,5 +120,14 @@
     "noNextHearing": "No hearing currently scheduled",
     "invalidTitle": "Link not valid",
     "invalidMessage": "This link is no longer valid — please contact the office."
+  },
+  "dashboard": {
+    "logOut": "Log out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "switchToLightTheme": "Switch to light theme",
+    "switchToDarkTheme": "Switch to dark theme",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode"
   }
 }
