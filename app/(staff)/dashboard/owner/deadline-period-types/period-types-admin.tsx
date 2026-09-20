@@ -7,7 +7,14 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 
-type PeriodType = { id: string; name: string; period_days: number; description: string | null }
+type PeriodType = {
+  id: string
+  name: string
+  name_ar: string | null
+  period_days: number
+  description: string | null
+  description_ar: string | null
+}
 
 export function PeriodTypesAdmin({ periodTypes: initial }: { periodTypes: PeriodType[] }) {
   const [periodTypes, setPeriodTypes] = useState(initial)
@@ -64,12 +71,18 @@ function CreateForm({ onCreated }: { onCreated: (pt: PeriodType) => void }) {
     <Panel className="flex flex-col gap-3">
       <h2 className="font-heading text-lg text-fg">New period type</h2>
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <Field>
-          <Label htmlFor="new-pt-name" required>
-            Name
-          </Label>
-          <input id="new-pt-name" name="name" required className={controlClass} />
-        </Field>
+        <div className="flex flex-wrap gap-3">
+          <Field>
+            <Label htmlFor="new-pt-name" required>
+              Name
+            </Label>
+            <input id="new-pt-name" name="name" required className={controlClass} />
+          </Field>
+          <Field>
+            <Label htmlFor="new-pt-name-ar">Name (Arabic)</Label>
+            <input id="new-pt-name-ar" name="name_ar" dir="rtl" lang="ar" className={controlClass} />
+          </Field>
+        </div>
         <Field>
           <Label htmlFor="new-pt-days" required>
             Period (days)
@@ -83,6 +96,17 @@ function CreateForm({ onCreated }: { onCreated: (pt: PeriodType) => void }) {
             name="description"
             rows={2}
             placeholder='e.g. "DRAFT — unverified. Source: ..."'
+            className={controlClass}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="new-pt-description-ar">Description (Arabic)</Label>
+          <textarea
+            id="new-pt-description-ar"
+            name="description_ar"
+            rows={2}
+            dir="rtl"
+            lang="ar"
             className={controlClass}
           />
         </Field>
@@ -106,8 +130,10 @@ function PeriodTypeCard({
 }) {
   const formRef = useRef<HTMLFormElement>(null)
   const [name, setName] = useState(periodType.name)
+  const [nameAr, setNameAr] = useState(periodType.name_ar ?? '')
   const [days, setDays] = useState(String(periodType.period_days))
   const [description, setDescription] = useState(periodType.description ?? '')
+  const [descriptionAr, setDescriptionAr] = useState(periodType.description_ar ?? '')
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, startSave] = useTransition()
@@ -118,8 +144,10 @@ function PeriodTypeCard({
 
   const changed =
     name.trim() !== periodType.name ||
+    nameAr !== (periodType.name_ar ?? '') ||
     days !== String(periodType.period_days) ||
-    (description.trim() || null) !== periodType.description
+    (description.trim() || null) !== periodType.description ||
+    descriptionAr !== (periodType.description_ar ?? '')
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -135,8 +163,10 @@ function PeriodTypeCard({
       onUpdated({
         id: periodType.id,
         name: name.trim(),
+        name_ar: nameAr.trim() ? nameAr : null,
         period_days: Number(days),
         description: description.trim() || null,
+        description_ar: descriptionAr.trim() ? descriptionAr : null,
       })
       setSaved(true)
     })
@@ -185,6 +215,19 @@ function PeriodTypeCard({
             className={`w-28 ${controlClass}`}
           />
         </div>
+        <input
+          name="name_ar"
+          value={nameAr}
+          onChange={(e) => {
+            setNameAr(e.target.value)
+            setSaved(false)
+          }}
+          dir="rtl"
+          lang="ar"
+          placeholder="Name (Arabic)"
+          aria-label="Name (Arabic)"
+          className={controlClass}
+        />
         <textarea
           name="description"
           rows={2}
@@ -193,6 +236,20 @@ function PeriodTypeCard({
             setDescription(e.target.value)
             setSaved(false)
           }}
+          className={controlClass}
+        />
+        <textarea
+          name="description_ar"
+          rows={2}
+          value={descriptionAr}
+          onChange={(e) => {
+            setDescriptionAr(e.target.value)
+            setSaved(false)
+          }}
+          dir="rtl"
+          lang="ar"
+          placeholder="Description (Arabic)"
+          aria-label="Description (Arabic)"
           className={controlClass}
         />
         {error && <FieldError>{error}</FieldError>}

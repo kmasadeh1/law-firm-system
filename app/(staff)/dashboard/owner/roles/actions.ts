@@ -15,18 +15,22 @@ const UNIQUE_VIOLATION = '23505'
 const FOREIGN_KEY_VIOLATION = '23503'
 
 export async function createRole(
-  name: string
-): Promise<ActionResult & { role?: { id: string; name: string } }> {
+  name: string,
+  nameAr: string
+): Promise<ActionResult & { role?: { id: string; name: string; name_ar: string | null } }> {
   const trimmed = name.trim()
   if (!trimmed) {
     return { error: 'Role name is required.' }
   }
 
   const supabase = await createClient()
+  // name_ar is sent as-is, untrimmed - a database trigger converts '' and
+  // whitespace-only input to NULL on insert, so there's no need to
+  // duplicate that here.
   const { data, error } = await supabase
     .from('roles')
-    .insert({ name: trimmed })
-    .select('id, name')
+    .insert({ name: trimmed, name_ar: nameAr })
+    .select('id, name, name_ar')
     .single()
 
   if (error) {
@@ -40,14 +44,14 @@ export async function createRole(
   return { role: data }
 }
 
-export async function renameRole(roleId: string, name: string): Promise<ActionResult> {
+export async function renameRole(roleId: string, name: string, nameAr: string): Promise<ActionResult> {
   const trimmed = name.trim()
   if (!trimmed) {
     return { error: 'Role name is required.' }
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.from('roles').update({ name: trimmed }).eq('id', roleId)
+  const { error } = await supabase.from('roles').update({ name: trimmed, name_ar: nameAr }).eq('id', roleId)
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {

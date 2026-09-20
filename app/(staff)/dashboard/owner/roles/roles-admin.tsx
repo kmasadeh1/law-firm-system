@@ -6,7 +6,7 @@ import { PERMISSION_GROUPS } from './permission-groups'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
-import { Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { Switch } from '@/components/dashboard/switch'
 
 type PermissionKeyRow = {
@@ -19,6 +19,7 @@ type PermissionKeyRow = {
 type RoleRow = {
   id: string
   name: string
+  name_ar: string | null
 }
 
 type RolePermissionRow = {
@@ -107,10 +108,10 @@ export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermission
               setEnabledMap((prev) => ({ ...prev, [cellId(role.id, key)]: enabled }))
             }
             onPermissionSaved={bumpRevision}
-            onRenamed={(name) => {
+            onRenamed={(name, nameAr) => {
               setRoles((prev) =>
                 prev
-                  .map((r) => (r.id === role.id ? { ...r, name } : r))
+                  .map((r) => (r.id === role.id ? { ...r, name, name_ar: nameAr } : r))
                   .sort((a, b) => a.name.localeCompare(b.name))
               )
               bumpRevision()
@@ -134,6 +135,7 @@ function CreateRoleForm({
   onCreated: (role: RoleRow) => void
 }) {
   const [name, setName] = useState('')
+  const [nameAr, setNameAr] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -150,7 +152,7 @@ function CreateRoleForm({
   function handleCreate() {
     setError(null)
     startTransition(async () => {
-      const result = await createRole(name)
+      const result = await createRole(name, nameAr)
       if (result.error) {
         setError(result.error)
         return
@@ -158,24 +160,40 @@ function CreateRoleForm({
       if (result.role) {
         onCreated(result.role)
         setName('')
+        setNameAr('')
       }
     })
   }
 
   return (
     <Panel className="flex flex-col gap-2">
-      <Label htmlFor="new-role-name">New role</Label>
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          id="new-role-name"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value)
-            setError(null)
-          }}
-          placeholder="e.g. Paralegal"
-          className={controlClass}
-        />
+      <div className="flex flex-wrap gap-3">
+        <Field>
+          <Label htmlFor="new-role-name">Name</Label>
+          <input
+            id="new-role-name"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value)
+              setError(null)
+            }}
+            placeholder="e.g. Paralegal"
+            className={controlClass}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="new-role-name-ar">Name (Arabic)</Label>
+          <input
+            id="new-role-name-ar"
+            value={nameAr}
+            onChange={(e) => setNameAr(e.target.value)}
+            dir="rtl"
+            lang="ar"
+            className={controlClass}
+          />
+        </Field>
+      </div>
+      <div>
         <Button type="button" variant="primary" onClick={handleCreate} disabled={isPending || !name.trim()}>
           {isPending ? 'Creating…' : 'Create role'}
         </Button>
@@ -202,10 +220,11 @@ function RoleCard({
   enabledMap: Record<string, boolean>
   onToggle: (key: string, enabled: boolean) => void
   onPermissionSaved: () => void
-  onRenamed: (name: string) => void
+  onRenamed: (name: string, nameAr: string | null) => void
   onDeleted: () => void
 }) {
   const [nameInput, setNameInput] = useState(role.name)
+  const [nameArInput, setNameArInput] = useState(role.name_ar ?? '')
   const [renameError, setRenameError] = useState<string | null>(null)
   const [renameSaved, setRenameSaved] = useState(false)
   const [isRenaming, startRename] = useTransition()
@@ -214,18 +233,18 @@ function RoleCard({
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [isDeleting, startDelete] = useTransition()
 
-  const nameChanged = nameInput.trim() !== role.name
+  const nameChanged = nameInput.trim() !== role.name || nameArInput !== (role.name_ar ?? '')
 
   function handleRename() {
     setRenameError(null)
     setRenameSaved(false)
     startRename(async () => {
-      const result = await renameRole(role.id, nameInput)
+      const result = await renameRole(role.id, nameInput, nameArInput)
       if (result.error) {
         setRenameError(result.error)
         return
       }
-      onRenamed(nameInput.trim())
+      onRenamed(nameInput.trim(), nameArInput.trim() ? nameArInput : null)
       setRenameSaved(true)
     })
   }
@@ -257,6 +276,18 @@ function RoleCard({
             setRenameSaved(false)
           }}
           className={`font-semibold ${controlClass}`}
+        />
+        <input
+          value={nameArInput}
+          onChange={(e) => {
+            setNameArInput(e.target.value)
+            setRenameSaved(false)
+          }}
+          dir="rtl"
+          lang="ar"
+          placeholder="Name (Arabic)"
+          aria-label="Name (Arabic)"
+          className={controlClass}
         />
         <Button
           type="button"
