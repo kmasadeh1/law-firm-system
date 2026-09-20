@@ -95,6 +95,15 @@ export function ChevronLeftIcon({ className }: IconProps) {
   )
 }
 
+export function EnquiriesIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="2.5" y="4.5" width="15" height="11" rx="1.5" />
+      <path d="M2.5 5.5 10 11l7.5-5.5" />
+    </svg>
+  )
+}
+
 export function ActivityIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

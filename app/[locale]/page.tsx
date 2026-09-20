@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Crest } from '@/components/crest'
 import { Link } from '@/i18n/navigation'
 import { LanguageSwitcher } from './components/language-switcher'
+import { ContactForm } from './contact-form'
 
 export default function PublicHomePage() {
   const t = useTranslations()
@@ -202,28 +203,7 @@ export default function PublicHomePage() {
                 {t('contact.mapPlaceholder')}
               </div>
 
-              <form className="mt-8 flex flex-col gap-4">
-                <Field label={t('contact.formNameLabel')} id="contact-name" />
-                <Field label={t('contact.formEmailLabel')} id="contact-email" type="email" />
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="contact-message" className="text-sm text-paper-dim">
-                    {t('contact.formMessageLabel')}
-                  </label>
-                  <textarea
-                    id="contact-message"
-                    rows={3}
-                    className="rounded-sm border border-warm-grey/40 bg-ink px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
-                  />
-                </div>
-                <button
-                  type="button"
-                  disabled
-                  title={t('contact.comingSoon')}
-                  className="mt-2 cursor-not-allowed rounded-sm border border-warm-grey/40 px-5 py-2.5 text-start text-sm font-medium text-warm-grey"
-                >
-                  {t('contact.submit')} ({t('contact.comingSoon')})
-                </button>
-              </form>
+              <ContactForm />
             </div>
           </div>
         </section>

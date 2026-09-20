@@ -19,12 +19,14 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     redirect('/login')
   }
 
-  const [{ data: staffRow }, { data: clientsManage }, { data: feesView }, initialTheme] = await Promise.all([
-    supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
-    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
-    supabase.rpc('has_permission', { p_key: 'fees_view' }),
-    getThemeCookie(),
-  ])
+  const [{ data: staffRow }, { data: clientsManage }, { data: feesView }, { data: enquiriesManage }, initialTheme] =
+    await Promise.all([
+      supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
+      supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+      supabase.rpc('has_permission', { p_key: 'fees_view' }),
+      supabase.rpc('has_permission', { p_key: 'enquiries_manage' }),
+      getThemeCookie(),
+    ])
 
   const isOwner = staffRow?.user_type === 'owner'
   const homeHref = isOwner ? '/dashboard/owner' : '/dashboard/staff'
@@ -32,6 +34,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   const dailyWork: NavItem[] = [{ href: homeHref, label: 'Home', icon: 'home' }]
   if (isOwner || clientsManage) {
     dailyWork.push({ href: '/dashboard/clients', label: 'Clients', icon: 'clients' })
+  }
+  if (isOwner || enquiriesManage) {
+    dailyWork.push({ href: '/dashboard/enquiries', label: 'Enquiries', icon: 'enquiries' })
   }
   dailyWork.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
   dailyWork.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })

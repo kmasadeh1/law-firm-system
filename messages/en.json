@@ -83,7 +83,7 @@
   },
   "contact": {
     "title": "Contact & Location",
-    "intro": "This form is a visual placeholder and does not submit yet.",
+    "intro": "Send us a message and we'll get back to you.",
     "addressLabel": "Address",
     "address": "Placeholder Street, Amman, Jordan",
     "phoneLabel": "Phone",
@@ -94,10 +94,18 @@
     "hours": "Sunday - Thursday, 9:00 - 17:00",
     "mapPlaceholder": "Map placeholder",
     "formNameLabel": "Full name",
+    "formPhoneLabel": "Phone",
     "formEmailLabel": "Email",
     "formMessageLabel": "Message",
+    "formContactHint": "Provide a phone number, an email address, or both, so we can reply.",
     "submit": "Send message",
-    "comingSoon": "Coming soon"
+    "sending": "Sending…",
+    "successTitle": "Message sent",
+    "successMessage": "Thank you - we've received your message and will be in touch. This form doesn't create an account, so there's no way to check its status here; if you need to follow up sooner, please call or email us directly using the details above.",
+    "errorNameRequired": "Please enter your name.",
+    "errorMessageRequired": "Please enter a message.",
+    "errorContactRequired": "Please provide a phone number or an email address.",
+    "errorGeneric": "Something went wrong sending your message. Please try again, or reach us by phone or email above."
   },
   "footer": {
     "rights": "All rights reserved.",
