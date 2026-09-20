@@ -5,8 +5,11 @@ import { routing } from '@/i18n/routing'
 /**
  * Switches the whole site to the other locale from the current page, at the
  * same path. A plain server-rendered link pair - no client JS required.
+ * `href` defaults to the homepage; pass the current page's path (e.g. a
+ * tracking link's token) to switch locale in place instead of navigating
+ * away.
  */
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ href = '/' }: { href?: string }) {
   const locale = useLocale()
   const t = useTranslations('languageSwitcher')
 
@@ -16,7 +19,7 @@ export function LanguageSwitcher() {
         <span key={loc} className="flex items-center gap-1">
           {i > 0 && <span className="text-warm-grey">/</span>}
           <Link
-            href="/"
+            href={href}
             locale={loc}
             aria-current={loc === locale ? 'true' : undefined}
             className={

@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Crest } from '@/components/crest'
+import { LanguageSwitcher } from '../../components/language-switcher'
 
 type SharedCase = {
   case_number: string
@@ -23,9 +24,12 @@ export default async function TrackCasePage({ params }: PageProps<'/[locale]/tra
 
   return (
     <div className="flex min-h-screen flex-col bg-ink text-paper">
-      <header className="flex items-center gap-2.5 px-6 py-6 sm:px-10">
-        <Crest className="h-9 w-9" />
-        <span className="font-heading text-lg">{t('layout.firmName')}</span>
+      <header className="flex items-center justify-between gap-2.5 px-6 py-6 sm:px-10">
+        <div className="flex items-center gap-2.5">
+          <Crest className="h-9 w-9" />
+          <span className="font-heading text-lg">{t('layout.firmName')}</span>
+        </div>
+        <LanguageSwitcher href={`/track/${token}`} />
       </header>
 
       <main className="flex flex-1 items-start justify-center px-6 py-10 sm:py-16">
