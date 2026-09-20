@@ -50,6 +50,14 @@ violated:
 No test framework is set up yet — there is no test script and no test runner
 in `package.json`.
 
+**Never start, restart, or stop the dev server, and never kill a node
+process or anything by port.** The user runs `npm run dev` themselves in
+their own terminal on port 3000. On Windows, killing "the process on port
+3000" kills that terminal's server too — there's no way to distinguish it
+from one Claude Code started. For any task that needs a running app to test
+against, assume port 3000 is already up; if it isn't, say so and let the
+user start it rather than starting one yourself.
+
 ## Environment
 
 Copy `.env.local.example` to `.env.local` and fill in values from the Supabase
