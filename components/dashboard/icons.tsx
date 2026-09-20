@@ -139,6 +139,15 @@ export function CloseIcon({ className }: IconProps) {
   )
 }
 
+export function ReportsIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4 3.5h9l3 3v10a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 .5-.5Z" />
+      <path d="M7 12.5v2M10 10v4.5M13 8v6.5" />
+    </svg>
+  )
+}
+
 export function LogoutIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

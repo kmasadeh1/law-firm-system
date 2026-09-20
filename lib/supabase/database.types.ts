@@ -1345,6 +1345,15 @@ export type Database = {
           },
         ]
       }
+      collection_summary: {
+        Row: {
+          collection_rate_percent: number | null
+          total_outstanding: number | null
+          total_paid: number | null
+          total_scheduled: number | null
+        }
+        Relationships: []
+      }
       engagement_balances: {
         Row: {
           agreed_fixed_fee: number | null
@@ -1400,6 +1409,35 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lawyer_workload: {
+        Row: {
+          full_name: string | null
+          is_active: boolean | null
+          lead_cases: number | null
+          next_deadline: string | null
+          open_cases: number | null
+          overdue_deadlines: number | null
+          staff_id: string | null
+          upcoming_deadlines: number | null
+        }
+        Relationships: []
+      }
+      overdue_installments: {
+        Row: {
+          balance_due: number | null
+          client_id: string | null
+          client_name: string | null
+          days_overdue: number | null
+          description: string | null
+          due_date: string | null
+          engagement_id: string | null
+          installment_amount: number | null
+          installment_id: string | null
+          paid_amount: number | null
+          payer_name: string | null
+        }
+        Relationships: []
       }
       staff_directory: {
         Row: {

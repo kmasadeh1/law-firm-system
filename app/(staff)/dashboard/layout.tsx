@@ -19,14 +19,21 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     redirect('/login')
   }
 
-  const [{ data: staffRow }, { data: clientsManage }, { data: feesView }, { data: enquiriesManage }, initialTheme] =
-    await Promise.all([
-      supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
-      supabase.rpc('has_permission', { p_key: 'clients_manage' }),
-      supabase.rpc('has_permission', { p_key: 'fees_view' }),
-      supabase.rpc('has_permission', { p_key: 'enquiries_manage' }),
-      getThemeCookie(),
-    ])
+  const [
+    { data: staffRow },
+    { data: clientsManage },
+    { data: feesView },
+    { data: enquiriesManage },
+    { data: reportsView },
+    initialTheme,
+  ] = await Promise.all([
+    supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
+    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+    supabase.rpc('has_permission', { p_key: 'fees_view' }),
+    supabase.rpc('has_permission', { p_key: 'enquiries_manage' }),
+    supabase.rpc('has_permission', { p_key: 'reports_view' }),
+    getThemeCookie(),
+  ])
 
   const isOwner = staffRow?.user_type === 'owner'
   const homeHref = isOwner ? '/dashboard/owner' : '/dashboard/staff'
@@ -61,6 +68,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       icon: 'period-types',
     })
     administration.push({ href: '/dashboard/owner/activity', label: 'Activity log', icon: 'activity' })
+  }
+  if (isOwner || reportsView) {
+    administration.push({ href: '/dashboard/reports', label: 'Reports', icon: 'reports' })
   }
 
   // A group with no visible items must not render at all - no empty
