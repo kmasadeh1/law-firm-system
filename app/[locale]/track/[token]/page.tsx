@@ -2,11 +2,13 @@ import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { Crest } from '@/components/crest'
 import { LanguageSwitcher } from '../../components/language-switcher'
+import { localizedName } from '@/lib/localized-name'
 
 type SharedCase = {
   case_number: string
   title: string
   status: string
+  status_ar?: string | null
   opened_at: string
   next_hearing: string | null
 }
@@ -47,7 +49,9 @@ export default async function TrackCasePage({ params }: PageProps<'/[locale]/tra
               </div>
               <div>
                 <dt className="text-paper-dim">{t('track.statusLabel')}</dt>
-                <dd className="mt-0.5 text-paper">{sharedCase.status}</dd>
+                <dd className="mt-0.5 text-paper">
+                  {localizedName({ name: sharedCase.status, name_ar: sharedCase.status_ar }, locale)}
+                </dd>
               </div>
               <div>
                 <dt className="text-paper-dim">{t('track.openedLabel')}</dt>

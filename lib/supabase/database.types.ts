@@ -389,18 +389,21 @@ export type Database = {
           id: string
           is_terminal: boolean
           name: string
+          name_ar: string | null
           sort_order: number
         }
         Insert: {
           id?: string
           is_terminal?: boolean
           name: string
+          name_ar?: string | null
           sort_order?: number
         }
         Update: {
           id?: string
           is_terminal?: boolean
           name?: string
+          name_ar?: string | null
           sort_order?: number
         }
         Relationships: []
@@ -586,20 +589,26 @@ export type Database = {
       deadline_period_types: {
         Row: {
           description: string | null
+          description_ar: string | null
           id: string
           name: string
+          name_ar: string | null
           period_days: number
         }
         Insert: {
           description?: string | null
+          description_ar?: string | null
           id?: string
           name: string
+          name_ar?: string | null
           period_days: number
         }
         Update: {
           description?: string | null
+          description_ar?: string | null
           id?: string
           name?: string
+          name_ar?: string | null
           period_days?: number
         }
         Relationships: []
@@ -1222,16 +1231,19 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          name_ar: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          name_ar?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          name_ar?: string | null
         }
         Relationships: []
       }
