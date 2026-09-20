@@ -55,6 +55,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       label: 'Deadline period types',
       icon: 'period-types',
     })
+    administration.push({ href: '/dashboard/owner/activity', label: 'Activity log', icon: 'activity' })
   }
 
   // A group with no visible items must not render at all - no empty

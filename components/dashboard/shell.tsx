@@ -19,6 +19,7 @@ import {
   DeadlinesIcon,
   PeriodTypesIcon,
   StaffIcon,
+  ActivityIcon,
 } from './icons'
 
 // A component reference can't cross the server->client prop boundary (the
@@ -34,6 +35,7 @@ const iconByKey = {
   deadlines: DeadlinesIcon,
   'period-types': PeriodTypesIcon,
   staff: StaffIcon,
+  activity: ActivityIcon,
 } as const
 
 export type IconKey = keyof typeof iconByKey

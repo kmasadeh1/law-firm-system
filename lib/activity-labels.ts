@@ -44,6 +44,11 @@ const ENTITY_LABELS: Record<string, { insert: string; update: string; delete: st
   staff: { insert: 'Staff member added', update: 'Staff account updated', delete: 'Staff account deleted' },
 }
 
+// The set of entities that actually have a logging trigger - single source
+// for both "what to call an event" (above) and "what entities exist to
+// filter by" (the owner-wide activity log), so the two can't drift apart.
+export const ENTITY_NAMES = Object.keys(ENTITY_LABELS).sort()
+
 // case_notes and documents have no hard DELETE - "deleted" is a soft flag
 // set via UPDATE, so it shows up in the log as action 'update' like any
 // other edit. Detect it from the row snapshot rather than mislabeling a
