@@ -283,9 +283,11 @@ export async function createShareLink(
 // --- Notes ---------------------------------------------------------------
 
 export async function addCaseNote(caseId: string, formData: FormData): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.notes.errors' })
   const note = formData.get('note')
   if (typeof note !== 'string' || !note.trim()) {
-    return { error: 'Write something before adding the note.' }
+    return { error: t('writeSomething') }
   }
 
   const supabase = await createClient()
@@ -299,9 +301,9 @@ export async function addCaseNote(caseId: string, formData: FormData): Promise<A
 
   if (error) {
     if (error.code === '42501') {
-      return { error: "You don't have permission to add notes to this case." }
+      return { error: t('noPermissionAdd') }
     }
-    return { error: 'Could not add the note. Please try again.' }
+    return { error: t('addFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -313,9 +315,11 @@ export async function editCaseNote(
   noteId: string,
   formData: FormData
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.notes.errors' })
   const note = formData.get('note')
   if (typeof note !== 'string' || !note.trim()) {
-    return { error: 'A note cannot be empty.' }
+    return { error: t('cannotBeEmpty') }
   }
 
   const supabase = await createClient()
@@ -329,10 +333,10 @@ export async function editCaseNote(
     .select('id')
 
   if (error) {
-    return { error: 'Could not save the note. Please try again.' }
+    return { error: t('saveFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to edit this note." }
+    return { error: t('noPermissionEdit') }
   }
 
   revalidatePath(casePath(caseId))
@@ -340,6 +344,8 @@ export async function editCaseNote(
 }
 
 export async function deleteCaseNote(caseId: string, noteId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.notes.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_notes')
@@ -349,10 +355,10 @@ export async function deleteCaseNote(caseId: string, noteId: string): Promise<Ac
     .select('id')
 
   if (error) {
-    return { error: 'Could not delete the note. Please try again.' }
+    return { error: t('deleteFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to delete this note." }
+    return { error: t('noPermissionDelete') }
   }
 
   revalidatePath(casePath(caseId))
@@ -360,6 +366,8 @@ export async function deleteCaseNote(caseId: string, noteId: string): Promise<Ac
 }
 
 export async function restoreCaseNote(caseId: string, noteId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.notes.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_notes')
@@ -369,10 +377,10 @@ export async function restoreCaseNote(caseId: string, noteId: string): Promise<A
     .select('id')
 
   if (error) {
-    return { error: 'Could not restore the note. Please try again.' }
+    return { error: t('restoreFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to restore this note." }
+    return { error: t('noPermissionRestore') }
   }
 
   revalidatePath(casePath(caseId))
@@ -428,19 +436,18 @@ function resolveContentType(file: File): string | undefined {
 }
 
 export async function uploadDocument(caseId: string, formData: FormData): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.documents.errors' })
   const file = formData.get('file')
   if (!(file instanceof File) || file.size === 0) {
-    return { error: 'Choose a file to upload.' }
+    return { error: t('chooseFile') }
   }
   if (file.size > MAX_DOCUMENT_BYTES) {
-    return { error: 'That file is larger than the 25 MB limit.' }
+    return { error: t('fileTooLarge') }
   }
   const contentType = resolveContentType(file)
   if (!contentType || !ALLOWED_MIME_TYPES.has(contentType)) {
-    return {
-      error:
-        "That file type isn't supported. Allowed: PDF, Word, Excel, plain text, or common image formats (including HEIC).",
-    }
+    return { error: t('fileTypeNotSupported') }
   }
 
   const supabase = await createClient()
@@ -452,7 +459,7 @@ export async function uploadDocument(caseId: string, formData: FormData): Promis
     .upload(path, file, { contentType })
 
   if (uploadError) {
-    return { error: "Could not upload the file - you may not have permission to add documents to this case." }
+    return { error: t('uploadFailed') }
   }
 
   const { error: insertError } = await supabase.from('documents').insert({
@@ -466,7 +473,7 @@ export async function uploadDocument(caseId: string, formData: FormData): Promis
     // A storage object with no metadata row is invisible and orphaned -
     // clean it up rather than leaving it behind.
     await supabase.storage.from('case-documents').remove([path])
-    return { error: 'Could not save the document record. Please try again.' }
+    return { error: t('saveRecordFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -477,6 +484,8 @@ export async function getDocumentSignedUrl(
   caseId: string,
   documentId: string
 ): Promise<{ url?: string; error?: string }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.documents.errors' })
   const supabase = await createClient()
   const { data: doc, error: fetchError } = await supabase
     .from('documents')
@@ -486,7 +495,7 @@ export async function getDocumentSignedUrl(
     .maybeSingle()
 
   if (fetchError || !doc) {
-    return { error: "Could not find that document, or you don't have permission to view it." }
+    return { error: t('notFound') }
   }
 
   const { data, error } = await supabase.storage
@@ -494,13 +503,15 @@ export async function getDocumentSignedUrl(
     .createSignedUrl(doc.storage_path, 300)
 
   if (error || !data) {
-    return { error: 'Could not generate a link to that file. Please try again.' }
+    return { error: t('linkGenerationFailed') }
   }
 
   return { url: data.signedUrl }
 }
 
 export async function deleteDocument(caseId: string, documentId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.documents.errors' })
   const supabase = await createClient()
   // Soft delete only - the storage object is deliberately left in place.
   // Only the metadata row is hidden (RLS), same reasoning as case notes.
@@ -512,10 +523,10 @@ export async function deleteDocument(caseId: string, documentId: string): Promis
     .select('id')
 
   if (error) {
-    return { error: 'Could not remove the document. Please try again.' }
+    return { error: t('removeFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to remove this document." }
+    return { error: t('noPermissionRemove') }
   }
 
   revalidatePath(casePath(caseId))
@@ -523,6 +534,8 @@ export async function deleteDocument(caseId: string, documentId: string): Promis
 }
 
 export async function restoreDocument(caseId: string, documentId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.documents.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('documents')
@@ -532,10 +545,10 @@ export async function restoreDocument(caseId: string, documentId: string): Promi
     .select('id')
 
   if (error) {
-    return { error: 'Could not restore the document. Please try again.' }
+    return { error: t('restoreFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to restore this document." }
+    return { error: t('noPermissionRestore') }
   }
 
   revalidatePath(casePath(caseId))

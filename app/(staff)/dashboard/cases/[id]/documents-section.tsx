@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   uploadDocument,
   getDocumentSignedUrl,
@@ -44,11 +44,14 @@ const ALLOWED_EXTENSIONS = [
   'txt',
 ]
 
-function validateFile(file: File): string | null {
-  if (file.size > MAX_FILE_BYTES) return 'That file is larger than the 25 MB limit.'
+// Shares its message keys with uploadDocument's server-side re-check
+// (cases/actions.ts) - one English string per condition, not two
+// near-identical copies a translator would have to reconcile.
+function validateFile(file: File, t: ReturnType<typeof useTranslations>): string | null {
+  if (file.size > MAX_FILE_BYTES) return t('errors.fileTooLarge')
   const ext = file.name.split('.').pop()?.toLowerCase()
   if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
-    return "That file type isn't supported. Allowed: PDF, Word, Excel, plain text, or common image formats (including HEIC)."
+    return t('errors.fileTypeNotSupported')
   }
   return null
 }
@@ -57,6 +60,7 @@ function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow 
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.documents')
 
   function handleRestore() {
     setError(null)
@@ -72,16 +76,24 @@ function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow 
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-fg">{doc.filename}</p>
           <Badge variant="muted">
-            Removed by {doc.deleted_by_name} · <bdi>{formatDateTime(doc.deleted_at!, locale)}</bdi>
+            {t.rich('removedByLine', {
+              name: doc.deleted_by_name ?? '',
+              date: formatDateTime(doc.deleted_at!, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </Badge>
         </div>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at, locale)}</bdi>
+          {t.rich('uploadedLine', {
+            name: doc.uploaded_by_name,
+            date: formatDateTime(doc.uploaded_at, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>
       <Button type="button" variant="ghost" onClick={handleRestore} disabled={isPending}>
-        {isPending ? 'Restoring…' : 'Restore'}
+        {isPending ? t('restoring') : t('restore')}
       </Button>
     </li>
   )
@@ -92,6 +104,7 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.documents')
 
   function handleView() {
     setError(null)
@@ -103,7 +116,7 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
       const result = await getDocumentSignedUrl(caseId, doc.id)
       if (result.error || !result.url) {
         tab?.close()
-        setError(result.error ?? 'Could not open that file.')
+        setError(result.error ?? t('errors.couldNotOpenFile'))
         return
       }
       if (tab) tab.location.href = result.url
@@ -130,20 +143,24 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
       <div>
         <p className="font-medium text-fg">{doc.filename}</p>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at, locale)}</bdi>
+          {t.rich('uploadedLine', {
+            name: doc.uploaded_by_name,
+            date: formatDateTime(doc.uploaded_at, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>
       <div className="flex items-center gap-2">
         <Button type="button" variant="secondary" onClick={handleView} disabled={isPending}>
-          {isPending ? 'Opening…' : 'View'}
+          {isPending ? t('opening') : t('view')}
         </Button>
         <Button type="button" variant="danger" onClick={handleDelete} disabled={isPending}>
-          {isPending ? 'Removing…' : confirmingDelete ? 'Confirm remove?' : 'Remove'}
+          {isPending ? t('removing') : confirmingDelete ? t('confirmRemove') : t('remove')}
         </Button>
         {confirmingDelete && !isPending && (
           <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
-            Cancel
+            {t('cancel')}
           </Button>
         )}
       </div>
@@ -156,16 +173,17 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const t = useTranslations('dashboard.cases.detail.documents')
 
   function handleUpload(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     const file = inputRef.current?.files?.[0]
     if (!file) {
-      setError('Choose a file to upload.')
+      setError(t('errors.chooseFile'))
       return
     }
-    const validationError = validateFile(file)
+    const validationError = validateFile(file, t)
     if (validationError) {
       setError(validationError)
       return
@@ -186,10 +204,10 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-documents-section">
-      <h2 className="font-heading text-lg text-fg">Documents</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
       {activeDocuments.length === 0 ? (
-        <p className="text-sm text-fg-muted">No documents uploaded yet.</p>
+        <p className="text-sm text-fg-muted">{t('noDocumentsYet')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {activeDocuments.map((doc) => (
@@ -206,7 +224,7 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
           className="text-sm text-fg-muted file:mr-3 file:rounded-md file:border file:border-line file:bg-surface file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-fg hover:file:bg-line/40"
         />
         <Button type="submit" variant="secondary" disabled={isPending}>
-          {isPending ? 'Uploading…' : 'Upload'}
+          {isPending ? t('uploading') : t('upload')}
         </Button>
       </form>
       {error && <FieldError>{error}</FieldError>}
@@ -216,7 +234,7 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
           check. */}
       {deletedDocuments.length > 0 && (
         <div className="flex flex-col gap-2 border-t border-line pt-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Removed documents</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">{t('removedDocumentsHeading')}</p>
           <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
             {deletedDocuments.map((doc) => (
               <DeletedDocumentRow key={doc.id} caseId={caseId} doc={doc} />

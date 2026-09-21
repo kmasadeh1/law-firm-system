@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { addCaseNote, editCaseNote, deleteCaseNote, restoreCaseNote } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
@@ -23,6 +23,7 @@ function DeletedNote({ caseId, note }: { caseId: string; note: CaseNote }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.notes')
 
   function handleRestore() {
     setError(null)
@@ -36,16 +37,24 @@ function DeletedNote({ caseId, note }: { caseId: string; note: CaseNote }) {
     <li className="flex flex-col gap-1 px-3 py-3 text-sm opacity-70">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-xs text-fg-muted">
-          {note.author_name} · <bdi>{formatDateTime(note.created_at, locale)}</bdi>
+          {t.rich('authorLine', {
+            author: note.author_name,
+            date: formatDateTime(note.created_at, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </p>
         <Badge variant="muted">
-          Deleted by {note.deleted_by_name} · <bdi>{formatDateTime(note.deleted_at!, locale)}</bdi>
+          {t.rich('deletedByLine', {
+            name: note.deleted_by_name ?? '',
+            date: formatDateTime(note.deleted_at!, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </Badge>
       </div>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
       <div>
         <Button type="button" variant="ghost" onClick={handleRestore} disabled={isPending}>
-          {isPending ? 'Restoring…' : 'Restore'}
+          {isPending ? t('restoring') : t('restore')}
         </Button>
       </div>
       {error && <FieldError>{error}</FieldError>}
@@ -60,6 +69,7 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.notes')
 
   function handleSaveEdit(e: React.FormEvent) {
     e.preventDefault()
@@ -103,10 +113,10 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
           />
           <div className="flex items-center gap-2">
             <Button type="submit" variant="secondary" disabled={isPending}>
-              {isPending ? 'Saving…' : 'Save'}
+              {isPending ? t('saving') : t('save')}
             </Button>
             <Button type="button" variant="ghost" onClick={() => setIsEditing(false)} disabled={isPending}>
-              Cancel
+              {t('cancel')}
             </Button>
           </div>
           {error && <FieldError>{error}</FieldError>}
@@ -118,25 +128,32 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
   return (
     <li className="flex flex-col gap-1 px-3 py-3 text-sm">
       <p className="text-xs text-fg-muted">
-        {note.author_name} · <bdi>{formatDateTime(note.created_at, locale)}</bdi>
+        {t.rich('authorLine', {
+          author: note.author_name,
+          date: formatDateTime(note.created_at, locale),
+          bdi: (chunks) => <bdi>{chunks}</bdi>,
+        })}
         {note.edited_at && (
           <span>
             {' '}
-            · edited <bdi>{formatDateTime(note.edited_at, locale)}</bdi>
+            {t.rich('editedSuffix', {
+              date: formatDateTime(note.edited_at, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </span>
         )}
       </p>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
       <div className="flex items-center gap-2">
         <Button type="button" variant="ghost" onClick={() => setIsEditing(true)}>
-          Edit
+          {t('edit')}
         </Button>
         <Button type="button" variant="danger" onClick={handleDelete} disabled={isPending}>
-          {isPending ? 'Deleting…' : confirmingDelete ? 'Confirm delete?' : 'Delete'}
+          {isPending ? t('deleting') : confirmingDelete ? t('confirmDelete') : t('delete')}
         </Button>
         {confirmingDelete && !isPending && (
           <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
-            Cancel
+            {t('cancel')}
           </Button>
         )}
       </div>
@@ -149,6 +166,7 @@ export function NotesSection({ caseId, notes }: { caseId: string; notes: CaseNot
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
+  const t = useTranslations('dashboard.cases.detail.notes')
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -169,10 +187,10 @@ export function NotesSection({ caseId, notes }: { caseId: string; notes: CaseNot
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-notes-section">
-      <h2 className="font-heading text-lg text-fg">Notes</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
       {activeNotes.length === 0 ? (
-        <p className="text-sm text-fg-muted">No notes yet.</p>
+        <p className="text-sm text-fg-muted">{t('noNotesYet')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {activeNotes.map((note) => (
@@ -185,12 +203,12 @@ export function NotesSection({ caseId, notes }: { caseId: string; notes: CaseNot
         <textarea
           name="note"
           rows={3}
-          placeholder="Add a note for the case file…"
+          placeholder={t('addNotePlaceholder')}
           className={`${controlClass} resize-y`}
         />
         <div className="flex justify-end">
           <Button type="submit" variant="secondary" disabled={isPending}>
-            {isPending ? 'Adding…' : 'Add note'}
+            {isPending ? t('adding') : t('addNote')}
           </Button>
         </div>
       </form>
@@ -200,7 +218,7 @@ export function NotesSection({ caseId, notes }: { caseId: string; notes: CaseNot
           everyone else, so their presence here is itself the access check. */}
       {deletedNotes.length > 0 && (
         <div className="flex flex-col gap-2 border-t border-line pt-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Deleted notes</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">{t('deletedNotesHeading')}</p>
           <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
             {deletedNotes.map((note) => (
               <DeletedNote key={note.id} caseId={caseId} note={note} />

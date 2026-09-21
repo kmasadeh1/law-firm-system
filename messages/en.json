@@ -283,6 +283,69 @@
             "deleteFailed": "Could not delete the expense. Please try again.",
             "noPermissionDelete": "You don't have permission to delete this expense."
           }
+        },
+        "notes": {
+          "heading": "Notes",
+          "noNotesYet": "No notes yet.",
+          "addNotePlaceholder": "Add a note for the case file…",
+          "adding": "Adding…",
+          "addNote": "Add note",
+          "deletedNotesHeading": "Deleted notes",
+          "edit": "Edit",
+          "saving": "Saving…",
+          "save": "Save",
+          "cancel": "Cancel",
+          "deleting": "Deleting…",
+          "delete": "Delete",
+          "confirmDelete": "Confirm delete?",
+          "restoring": "Restoring…",
+          "restore": "Restore",
+          "authorLine": "{author} · <bdi>{date}</bdi>",
+          "editedSuffix": "· edited <bdi>{date}</bdi>",
+          "deletedByLine": "Deleted by {name} · <bdi>{date}</bdi>",
+          "errors": {
+            "writeSomething": "Write something before adding the note.",
+            "noPermissionAdd": "You don't have permission to add notes to this case.",
+            "addFailed": "Could not add the note. Please try again.",
+            "cannotBeEmpty": "A note cannot be empty.",
+            "saveFailed": "Could not save the note. Please try again.",
+            "noPermissionEdit": "You don't have permission to edit this note.",
+            "deleteFailed": "Could not delete the note. Please try again.",
+            "noPermissionDelete": "You don't have permission to delete this note.",
+            "restoreFailed": "Could not restore the note. Please try again.",
+            "noPermissionRestore": "You don't have permission to restore this note."
+          }
+        },
+        "documents": {
+          "heading": "Documents",
+          "noDocumentsYet": "No documents uploaded yet.",
+          "uploading": "Uploading…",
+          "upload": "Upload",
+          "removedDocumentsHeading": "Removed documents",
+          "view": "View",
+          "opening": "Opening…",
+          "remove": "Remove",
+          "removing": "Removing…",
+          "confirmRemove": "Confirm remove?",
+          "cancel": "Cancel",
+          "restoring": "Restoring…",
+          "restore": "Restore",
+          "uploadedLine": "Uploaded by {name} · <bdi>{date}</bdi>",
+          "removedByLine": "Removed by {name} · <bdi>{date}</bdi>",
+          "errors": {
+            "chooseFile": "Choose a file to upload.",
+            "fileTooLarge": "That file is larger than the 25 MB limit.",
+            "fileTypeNotSupported": "That file type isn't supported. Allowed: PDF, Word, Excel, plain text, or common image formats (including HEIC).",
+            "couldNotOpenFile": "Could not open that file.",
+            "uploadFailed": "Could not upload the file - you may not have permission to add documents to this case.",
+            "saveRecordFailed": "Could not save the document record. Please try again.",
+            "notFound": "Could not find that document, or you don't have permission to view it.",
+            "linkGenerationFailed": "Could not generate a link to that file. Please try again.",
+            "removeFailed": "Could not remove the document. Please try again.",
+            "noPermissionRemove": "You don't have permission to remove this document.",
+            "restoreFailed": "Could not restore the document. Please try again.",
+            "noPermissionRestore": "You don't have permission to restore this document."
+          }
         }
       }
     }
