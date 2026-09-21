@@ -161,7 +161,7 @@
       "needingAttention": "Needing attention",
       "nothingNeedsAttention": "Nothing needs attention right now",
       "openCasesNoLead": "{count, plural, one {# open case with no lead lawyer} other {# open cases with no lead lawyer}}",
-      "appointmentsPastTime": "{count, plural, one {# appointment past their time, still marked scheduled} other {# appointments past their time, still marked scheduled}}",
+      "appointmentsPastTime": "{count, plural, one {# appointment past its time, still marked scheduled} other {# appointments past their time, still marked scheduled}}",
       "unknownClient": "Unknown client",
       "recentActivity": "Recent activity",
       "noActivityYet": "No activity recorded yet",
