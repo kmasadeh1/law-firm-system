@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { formatRelativeTime } from '@/lib/format-relative-time'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
@@ -9,17 +10,6 @@ import { activityEventTitle } from '@/lib/activity-labels'
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString(undefined, { timeStyle: 'short' })
-}
-
-function formatRelative(iso: string) {
-  const diffMs = Date.now() - new Date(iso).getTime()
-  const mins = Math.round(diffMs / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.round(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.round(hours / 24)
-  return `${days}d ago`
 }
 
 export default async function OwnerDashboardPage() {
@@ -169,7 +159,9 @@ export default async function OwnerDashboardPage() {
                         <span className="text-fg-muted"> · {nameById.get(entry.actor_id) ?? t('unknownStaff')}</span>
                       )}
                     </span>
-                    <span className="text-fg-muted">{formatRelative(entry.created_at)}</span>
+                    <span className="text-fg-muted">
+                      <bdi>{formatRelativeTime(entry.created_at, locale)}</bdi>
+                    </span>
                   </li>
                 )
               })}
