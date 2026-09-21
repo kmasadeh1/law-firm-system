@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { activityEventTitle, type ActivityAction } from '@/lib/activity-labels'
+import { ChevronLeftIcon } from '@/components/dashboard/icons'
 import { diffFields, formatFieldValue } from './diff'
 
 export type ActivityLogRow = {
@@ -48,9 +49,18 @@ export function ActivityRow({ row, actorName }: { row: ActivityLogRow; actorName
           {diffs.map((d) => (
             <li key={d.field} className="text-fg-muted">
               <span className="font-medium text-fg">{d.field.replace(/_/g, ' ')}</span>:{' '}
-              {row.action === 'update'
-                ? `${formatFieldValue(d.before)} → ${formatFieldValue(d.after)}`
-                : formatFieldValue(d.after ?? d.before)}
+              {row.action === 'update' ? (
+                <span className="inline-flex items-center gap-1">
+                  <bdi>{formatFieldValue(d.before)}</bdi>
+                  {/* Forward/progression, same direction as the "Older"
+                      pagination chevron - rotated by default (points right
+                      under ltr) and unrotated under rtl (points left). */}
+                  <ChevronLeftIcon className="h-3 w-3 rotate-180 rtl:rotate-0" />
+                  <bdi>{formatFieldValue(d.after)}</bdi>
+                </span>
+              ) : (
+                formatFieldValue(d.after ?? d.before)
+              )}
             </li>
           ))}
         </ul>

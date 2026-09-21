@@ -29,7 +29,7 @@ export function Switch({
       <span
         aria-hidden="true"
         className={`inline-block h-3.5 w-3.5 rounded-full transition-transform ${
-          checked ? 'translate-x-4 bg-accent-fg' : 'translate-x-0.5 bg-fg-muted'
+          checked ? 'translate-x-4 rtl:-translate-x-4 bg-accent-fg' : 'translate-x-0.5 rtl:-translate-x-0.5 bg-fg-muted'
         }`}
       />
     </button>

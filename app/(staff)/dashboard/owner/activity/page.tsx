@@ -6,6 +6,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
+import { ChevronLeftIcon } from '@/components/dashboard/icons'
 import { ENTITY_NAMES } from '@/lib/activity-labels'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
 
@@ -175,9 +176,10 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
             {page > 1 ? (
               <Link
                 href={pageHref(page - 1)}
-                className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
+                className="flex items-center gap-1 text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
               >
-                ← Newer
+                <ChevronLeftIcon className="h-3.5 w-3.5 rtl:rotate-180" />
+                Newer
               </Link>
             ) : (
               <span />
@@ -186,9 +188,14 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
             {hasNext ? (
               <Link
                 href={pageHref(page + 1)}
-                className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
+                className="flex items-center gap-1 text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
               >
-                Older →
+                Older
+                {/* Points the opposite way from the "back" chevron above -
+                    forward/next, so it's rotated 180deg by default (right
+                    under ltr) and unrotated under rtl (left), rather than
+                    reusing rtl:rotate-180 on top of no base rotation. */}
+                <ChevronLeftIcon className="h-3.5 w-3.5 rotate-180 rtl:rotate-0" />
               </Link>
             ) : (
               <span />

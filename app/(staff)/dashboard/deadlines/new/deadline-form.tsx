@@ -8,6 +8,7 @@ import { Field, Label, HelpText, FieldError, controlClass } from '@/components/d
 import { Button } from '@/components/dashboard/button'
 import { Banner } from '@/components/dashboard/banner'
 import { Panel } from '@/components/dashboard/panel'
+import { ChevronLeftIcon } from '@/components/dashboard/icons'
 
 export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] }) {
   const formRef = useRef<HTMLFormElement>(null)
@@ -47,8 +48,13 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
     return (
       <Panel className="flex flex-col gap-3">
         <h2 className="font-heading text-lg text-fg">Deadline added</h2>
-        <p className="text-sm text-fg">
-          Trigger date {result.trigger_date} → due <strong>{result.due_date}</strong>
+        <p className="flex flex-wrap items-center gap-1 text-sm text-fg">
+          Trigger date <bdi>{result.trigger_date}</bdi>
+          {/* Forward/progression, same direction as the "Older" pagination
+              chevron - rotated by default (points right under ltr) and
+              unrotated under rtl (points left). */}
+          <ChevronLeftIcon className="h-3 w-3 rotate-180 rtl:rotate-0" />
+          due <bdi><strong>{result.due_date}</strong></bdi>
         </p>
         {rolledForward && (
           <Banner kind="warning">
