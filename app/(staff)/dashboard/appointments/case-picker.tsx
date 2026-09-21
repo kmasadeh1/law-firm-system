@@ -72,7 +72,7 @@ export function CasePicker({
                   setResults([])
                   setOpen(false)
                 }}
-                className="block w-full px-3 py-2 text-left text-sm text-fg hover:bg-line/40"
+                className="block w-full px-3 py-2 text-start text-sm text-fg hover:bg-line/40"
               >
                 {c.case_number} — {c.title}
               </button>

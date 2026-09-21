@@ -111,7 +111,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
             type="button"
             disabled
             title="Not implemented yet"
-            className="cursor-not-allowed text-left text-sm text-warm-grey"
+            className="cursor-not-allowed text-start text-sm text-warm-grey"
           >
             Forgot password? (coming soon)
           </button>

@@ -69,32 +69,32 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
           <EmptyState title="No overdue instalments" description="Every scheduled instalment is either not yet due or fully paid." />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="border-b border-line text-xs text-fg-muted">
-                  <th className="py-2 pr-4 font-medium">Client</th>
-                  <th className="py-2 pr-4 font-medium">Description</th>
-                  <th className="py-2 pr-4 font-medium">Payer</th>
-                  <th className="py-2 pr-4 font-medium">Due date</th>
-                  <th className="py-2 pr-4 font-medium">Amount</th>
-                  <th className="py-2 pr-4 font-medium">Paid</th>
-                  <th className="py-2 pr-4 font-medium">Balance due</th>
-                  <th className="py-2 pr-4 font-medium">Days overdue</th>
+                  <th className="py-2 pe-4 font-medium">Client</th>
+                  <th className="py-2 pe-4 font-medium">Description</th>
+                  <th className="py-2 pe-4 font-medium">Payer</th>
+                  <th className="py-2 pe-4 font-medium">Due date</th>
+                  <th className="py-2 pe-4 font-medium">Amount</th>
+                  <th className="py-2 pe-4 font-medium">Paid</th>
+                  <th className="py-2 pe-4 font-medium">Balance due</th>
+                  <th className="py-2 pe-4 font-medium">Days overdue</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {overdue.map((row) => (
                   <tr key={row.installment_id}>
-                    <td className="py-2 pr-4 text-fg">
+                    <td className="py-2 pe-4 text-fg">
                       {row.client_name ?? <span className="text-fg-muted italic">Client name not visible</span>}
                     </td>
-                    <td className="py-2 pr-4 text-fg-muted">{row.description ?? '—'}</td>
-                    <td className="py-2 pr-4 text-fg-muted">{row.payer_name ?? '—'}</td>
-                    <td className="py-2 pr-4 text-fg-muted">{formatDate(row.due_date)}</td>
-                    <td className="py-2 pr-4 text-fg">{formatAmount(row.installment_amount)}</td>
-                    <td className="py-2 pr-4 text-fg">{formatAmount(row.paid_amount)}</td>
-                    <td className="py-2 pr-4 font-medium text-fg">{formatAmount(row.balance_due)}</td>
-                    <td className="py-2 pr-4 text-fg">{row.days_overdue ?? '—'}</td>
+                    <td className="py-2 pe-4 text-fg-muted">{row.description ?? '—'}</td>
+                    <td className="py-2 pe-4 text-fg-muted">{row.payer_name ?? '—'}</td>
+                    <td className="py-2 pe-4 text-fg-muted">{formatDate(row.due_date)}</td>
+                    <td className="py-2 pe-4 text-fg">{formatAmount(row.installment_amount)}</td>
+                    <td className="py-2 pe-4 text-fg">{formatAmount(row.paid_amount)}</td>
+                    <td className="py-2 pe-4 font-medium text-fg">{formatAmount(row.balance_due)}</td>
+                    <td className="py-2 pe-4 text-fg">{row.days_overdue ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -117,30 +117,30 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
           <EmptyState title="No staff to show" description="No lawyers match the current filter." />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-start text-sm">
               <thead>
                 <tr className="border-b border-line text-xs text-fg-muted">
-                  <th className="py-2 pr-4 font-medium">Lawyer</th>
-                  <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 pr-4 font-medium">Open cases</th>
-                  <th className="py-2 pr-4 font-medium">Lead cases</th>
-                  <th className="py-2 pr-4 font-medium">Upcoming deadlines</th>
-                  <th className="py-2 pr-4 font-medium">Overdue deadlines</th>
-                  <th className="py-2 pr-4 font-medium">Next deadline</th>
+                  <th className="py-2 pe-4 font-medium">Lawyer</th>
+                  <th className="py-2 pe-4 font-medium">Status</th>
+                  <th className="py-2 pe-4 font-medium">Open cases</th>
+                  <th className="py-2 pe-4 font-medium">Lead cases</th>
+                  <th className="py-2 pe-4 font-medium">Upcoming deadlines</th>
+                  <th className="py-2 pe-4 font-medium">Overdue deadlines</th>
+                  <th className="py-2 pe-4 font-medium">Next deadline</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {workload.map((row) => (
                   <tr key={row.staff_id}>
-                    <td className="py-2 pr-4 text-fg">{row.full_name ?? '—'}</td>
-                    <td className="py-2 pr-4">
+                    <td className="py-2 pe-4 text-fg">{row.full_name ?? '—'}</td>
+                    <td className="py-2 pe-4">
                       <Badge variant={row.is_active ? 'neutral' : 'muted'}>{row.is_active ? 'Active' : 'Deactivated'}</Badge>
                     </td>
-                    <td className="py-2 pr-4 text-fg">{row.open_cases ?? 0}</td>
-                    <td className="py-2 pr-4 text-fg">{row.lead_cases ?? 0}</td>
-                    <td className="py-2 pr-4 text-fg">{row.upcoming_deadlines ?? 0}</td>
-                    <td className="py-2 pr-4 text-fg">{row.overdue_deadlines ?? 0}</td>
-                    <td className="py-2 pr-4 text-fg-muted">{formatDate(row.next_deadline)}</td>
+                    <td className="py-2 pe-4 text-fg">{row.open_cases ?? 0}</td>
+                    <td className="py-2 pe-4 text-fg">{row.lead_cases ?? 0}</td>
+                    <td className="py-2 pe-4 text-fg">{row.upcoming_deadlines ?? 0}</td>
+                    <td className="py-2 pe-4 text-fg">{row.overdue_deadlines ?? 0}</td>
+                    <td className="py-2 pe-4 text-fg-muted">{formatDate(row.next_deadline)}</td>
                   </tr>
                 ))}
               </tbody>

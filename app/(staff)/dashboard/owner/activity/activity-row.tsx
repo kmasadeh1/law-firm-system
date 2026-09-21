@@ -30,7 +30,7 @@ export function ActivityRow({ row, actorName }: { row: ActivityLogRow; actorName
         type="button"
         onClick={() => hasDetail && setExpanded((e) => !e)}
         disabled={!hasDetail}
-        className="flex w-full items-start gap-3 text-left disabled:cursor-default"
+        className="flex w-full items-start gap-3 text-start disabled:cursor-default"
       >
         <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">{formatTime(row.created_at)}</span>
         <span className="min-w-0 flex-1 text-fg">

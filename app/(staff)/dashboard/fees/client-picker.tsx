@@ -77,7 +77,7 @@ export function ClientPicker({
                   setResults([])
                   setOpen(false)
                 }}
-                className="block w-full px-3 py-2 text-left text-sm text-fg hover:bg-line/40"
+                className="block w-full px-3 py-2 text-start text-sm text-fg hover:bg-line/40"
               >
                 {c.full_name}
                 {c.national_id && <span className="text-fg-muted"> · {c.national_id}</span>}
