@@ -153,10 +153,21 @@ function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
           <Badge variant={statusBadgeVariant[status]}>{statusLabel[status]}</Badge>
         </div>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Created {formatDate(link.created_at)}
-          {link.expires_at && status === 'active' && ` · expires ${formatDate(link.expires_at)}`}
+          Created <bdi>{formatDate(link.created_at)}</bdi>
+          {link.expires_at && status === 'active' && (
+            <>
+              {' '}
+              · expires <bdi>{formatDate(link.expires_at)}</bdi>
+            </>
+          )}
           {' · '}
-          {link.last_accessed_at ? `last opened ${formatDateTime(link.last_accessed_at)}` : 'Never opened'}
+          {link.last_accessed_at ? (
+            <>
+              last opened <bdi>{formatDateTime(link.last_accessed_at)}</bdi>
+            </>
+          ) : (
+            'Never opened'
+          )}
           {' · '}
           {link.access_count} {link.access_count === 1 ? 'view' : 'views'}
         </p>

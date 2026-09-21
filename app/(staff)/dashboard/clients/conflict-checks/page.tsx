@@ -80,11 +80,14 @@ export default async function ConflictCheckHistoryPage() {
                     <p className="font-medium text-fg">
                       {check.searched_name}
                       {check.searched_national_id && (
-                        <span className="text-fg-muted"> · {check.searched_national_id}</span>
+                        <span className="text-fg-muted">
+                          {' '}
+                          · <bdi>{check.searched_national_id}</bdi>
+                        </span>
                       )}
                     </p>
                     <p className="text-xs text-fg-muted">
-                      {formatDateTime(check.ran_at)} ·{' '}
+                      <bdi>{formatDateTime(check.ran_at)}</bdi> ·{' '}
                       {(check.ran_by && nameById.get(check.ran_by)) ?? 'Unknown staff'}
                     </p>
                   </div>
@@ -110,7 +113,7 @@ export default async function ConflictCheckHistoryPage() {
                             href={`/dashboard/cases/${match.case_id}`}
                             className="text-fg-muted underline-offset-2 hover:underline"
                           >
-                            {caseById.get(match.case_id)!.case_number}
+                            <bdi>{caseById.get(match.case_id)!.case_number}</bdi>
                           </Link>
                         )}
                       </li>

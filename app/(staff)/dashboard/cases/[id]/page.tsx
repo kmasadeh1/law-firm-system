@@ -178,7 +178,11 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <div>
         <BackLink href="/dashboard/cases" label="Cases" />
         <PageHeader
-          title={`${caseRow.case_number} — ${caseRow.title}`}
+          title={
+            <>
+              <bdi>{caseRow.case_number}</bdi> — {caseRow.title}
+            </>
+          }
           description={`Client: ${caseRow.clients?.full_name ?? '—'}${caseRow.case_type ? ` · ${caseRow.case_type}` : ''}`}
         />
       </div>

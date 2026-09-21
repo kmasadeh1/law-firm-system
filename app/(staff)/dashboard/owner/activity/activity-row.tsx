@@ -32,7 +32,9 @@ export function ActivityRow({ row, actorName }: { row: ActivityLogRow; actorName
         disabled={!hasDetail}
         className="flex w-full items-start gap-3 text-start disabled:cursor-default"
       >
-        <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">{formatTime(row.created_at)}</span>
+        <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">
+          <bdi>{formatTime(row.created_at)}</bdi>
+        </span>
         <span className="min-w-0 flex-1 text-fg">
           {activityEventTitle(row.table_name, row.action, row.new_data ?? row.old_data)}
           <span className="text-fg-muted"> · {actorName}</span>

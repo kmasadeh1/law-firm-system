@@ -134,15 +134,22 @@ function InstallmentRow({
           <span className="font-medium text-fg">{installment.description}</span>
           <span className="text-fg-muted">
             {' '}
-            · {formatAmount(installment.amount)}
-            {installment.due_date && ` · due ${installment.due_date}`}
+            · <bdi>{formatAmount(installment.amount)}</bdi>
+            {installment.due_date && (
+              <>
+                {' '}
+                · due <bdi>{installment.due_date}</bdi>
+              </>
+            )}
             {installment.payer_name && ` · payer: ${installment.payer_name}`}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="muted">Paid: {formatAmount(installment.paid_amount)}</Badge>
+          <Badge variant="muted">
+            Paid: <bdi>{formatAmount(installment.paid_amount)}</bdi>
+          </Badge>
           <Badge variant={installment.balance_due > 0 ? 'accent' : 'muted'}>
-            Balance: {formatAmount(installment.balance_due)}
+            Balance: <bdi>{formatAmount(installment.balance_due)}</bdi>
           </Badge>
           <Button type="button" variant="ghost" onClick={() => setExpanded((v) => !v)}>
             {expanded ? 'Hide payments' : 'Payments'}
@@ -166,9 +173,11 @@ function InstallmentRow({
             <ul className="flex flex-col divide-y divide-line">
               {installment.payments.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1.5 text-sm">
-                  <span className="text-fg">{formatAmount(p.amount)}</span>
+                  <span className="text-fg">
+                    <bdi>{formatAmount(p.amount)}</bdi>
+                  </span>
                   <span className="text-fg-muted">
-                    {p.paid_at}
+                    <bdi>{p.paid_at}</bdi>
                     {p.method && ` · ${p.method}`}
                   </span>
                 </li>

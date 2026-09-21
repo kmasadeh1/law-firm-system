@@ -30,12 +30,18 @@ export function BalanceSection({ balance }: { balance: Balance | null }) {
       <h2 className="font-heading text-lg text-fg">Fees position</h2>
       <div className="flex flex-wrap gap-2">
         {balance.agreed_fixed_fee_total !== null && (
-          <Badge variant="neutral">Agreed (fixed fees): {formatAmount(balance.agreed_fixed_fee_total)}</Badge>
+          <Badge variant="neutral">
+            Agreed (fixed fees): <bdi>{formatAmount(balance.agreed_fixed_fee_total)}</bdi>
+          </Badge>
         )}
-        <Badge variant="neutral">Scheduled: {formatAmount(balance.scheduled_total)}</Badge>
-        <Badge variant="neutral">Paid: {formatAmount(balance.paid_total)}</Badge>
+        <Badge variant="neutral">
+          Scheduled: <bdi>{formatAmount(balance.scheduled_total)}</bdi>
+        </Badge>
+        <Badge variant="neutral">
+          Paid: <bdi>{formatAmount(balance.paid_total)}</bdi>
+        </Badge>
         <Badge variant={(balance.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
-          Outstanding (scheduled): {formatAmount(balance.scheduled_outstanding)}
+          Outstanding (scheduled): <bdi>{formatAmount(balance.scheduled_outstanding)}</bdi>
         </Badge>
       </div>
       {hasPercentageEngagements && (

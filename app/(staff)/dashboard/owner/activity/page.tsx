@@ -158,7 +158,9 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
           <div className="flex flex-col divide-y divide-line">
             {groups.map((group) => (
               <div key={group.day} className="py-2 first:pt-0">
-                <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">{group.day}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+                  <bdi>{group.day}</bdi>
+                </p>
                 <ul className="flex flex-col divide-y divide-line/60">
                   {group.rows.map((row) => (
                     <ActivityRow

@@ -106,12 +106,19 @@ export default async function AppointmentsListPage({
                   className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                 >
                   <span>
-                    <span className="font-medium text-fg">{formatDateTime(a.starts_at)}</span>
+                    <span className="font-medium text-fg">
+                      <bdi>{formatDateTime(a.starts_at)}</bdi>
+                    </span>
                     <span className="text-fg-muted"> — {a.type === 'court_date' ? 'Court date' : 'Consultation'}</span>
                   </span>
                   <span className="flex items-center gap-2 text-fg-muted">
                     {a.clients?.full_name ?? '—'}
-                    {a.cases?.case_number && <> · {a.cases.case_number}</>}
+                    {a.cases?.case_number && (
+                      <>
+                        {' '}
+                        · <bdi>{a.cases.case_number}</bdi>
+                      </>
+                    )}
                     <Badge variant={a.status === 'scheduled' ? 'neutral' : 'muted'}>{a.status}</Badge>
                   </span>
                 </Link>

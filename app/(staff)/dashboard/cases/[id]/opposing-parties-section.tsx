@@ -75,7 +75,7 @@ export function OpposingPartiesSection({
           {parties.map((p) => (
             <li key={p.id} className="px-3 py-2 text-sm text-fg">
               {p.name}
-              {p.national_id && <span className="text-fg-muted"> · {p.national_id}</span>}
+              {p.national_id && <span className="text-fg-muted"> · <bdi>{p.national_id}</bdi></span>}
             </li>
           ))}
         </ul>

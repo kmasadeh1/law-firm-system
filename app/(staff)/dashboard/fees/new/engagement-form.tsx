@@ -127,7 +127,7 @@ export function EngagementForm() {
                       )
                     }
                   />
-                  {c.case_number} — {c.title}
+                  <bdi>{c.case_number}</bdi> — {c.title}
                 </label>
               </li>
             ))}

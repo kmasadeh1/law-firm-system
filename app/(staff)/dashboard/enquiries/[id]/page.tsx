@@ -46,7 +46,14 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
     <div className="flex flex-col gap-8">
       <div>
         <BackLink href="/dashboard/enquiries" label="Enquiries" />
-        <PageHeader title={enquiry.name} description={`Received ${formatDateTime(enquiry.created_at)}`} />
+        <PageHeader
+          title={enquiry.name}
+          description={
+            <>
+              Received <bdi>{formatDateTime(enquiry.created_at)}</bdi>
+            </>
+          }
+        />
       </div>
 
       <Panel className="flex flex-col gap-3">

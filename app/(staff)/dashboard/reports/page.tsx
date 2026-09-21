@@ -46,19 +46,27 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <dt className="text-xs text-fg-muted">Total scheduled</dt>
-            <dd className="mt-1 text-xl font-medium text-fg">{formatAmount(summary?.total_scheduled ?? null)}</dd>
+            <dd className="mt-1 text-xl font-medium text-fg">
+              <bdi>{formatAmount(summary?.total_scheduled ?? null)}</bdi>
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-fg-muted">Total paid</dt>
-            <dd className="mt-1 text-xl font-medium text-fg">{formatAmount(summary?.total_paid ?? null)}</dd>
+            <dd className="mt-1 text-xl font-medium text-fg">
+              <bdi>{formatAmount(summary?.total_paid ?? null)}</bdi>
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-fg-muted">Total outstanding</dt>
-            <dd className="mt-1 text-xl font-medium text-fg">{formatAmount(summary?.total_outstanding ?? null)}</dd>
+            <dd className="mt-1 text-xl font-medium text-fg">
+              <bdi>{formatAmount(summary?.total_outstanding ?? null)}</bdi>
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-fg-muted">Collection rate</dt>
-            <dd className="mt-1 text-xl font-medium text-fg">{formatPercent(summary?.collection_rate_percent ?? null)}</dd>
+            <dd className="mt-1 text-xl font-medium text-fg">
+              <bdi>{formatPercent(summary?.collection_rate_percent ?? null)}</bdi>
+            </dd>
           </div>
         </dl>
       </Panel>
@@ -90,11 +98,21 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
                     </td>
                     <td className="py-2 pe-4 text-fg-muted">{row.description ?? '—'}</td>
                     <td className="py-2 pe-4 text-fg-muted">{row.payer_name ?? '—'}</td>
-                    <td className="py-2 pe-4 text-fg-muted">{formatDate(row.due_date)}</td>
-                    <td className="py-2 pe-4 text-fg">{formatAmount(row.installment_amount)}</td>
-                    <td className="py-2 pe-4 text-fg">{formatAmount(row.paid_amount)}</td>
-                    <td className="py-2 pe-4 font-medium text-fg">{formatAmount(row.balance_due)}</td>
-                    <td className="py-2 pe-4 text-fg">{row.days_overdue ?? '—'}</td>
+                    <td className="py-2 pe-4 text-fg-muted">
+                      <bdi>{formatDate(row.due_date)}</bdi>
+                    </td>
+                    <td className="py-2 pe-4 text-fg">
+                      <bdi>{formatAmount(row.installment_amount)}</bdi>
+                    </td>
+                    <td className="py-2 pe-4 text-fg">
+                      <bdi>{formatAmount(row.paid_amount)}</bdi>
+                    </td>
+                    <td className="py-2 pe-4 font-medium text-fg">
+                      <bdi>{formatAmount(row.balance_due)}</bdi>
+                    </td>
+                    <td className="py-2 pe-4 text-fg">
+                      <bdi>{row.days_overdue ?? '—'}</bdi>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -140,7 +158,9 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
                     <td className="py-2 pe-4 text-fg">{row.lead_cases ?? 0}</td>
                     <td className="py-2 pe-4 text-fg">{row.upcoming_deadlines ?? 0}</td>
                     <td className="py-2 pe-4 text-fg">{row.overdue_deadlines ?? 0}</td>
-                    <td className="py-2 pe-4 text-fg-muted">{formatDate(row.next_deadline)}</td>
+                    <td className="py-2 pe-4 text-fg-muted">
+                      <bdi>{formatDate(row.next_deadline)}</bdi>
+                    </td>
                   </tr>
                 ))}
               </tbody>

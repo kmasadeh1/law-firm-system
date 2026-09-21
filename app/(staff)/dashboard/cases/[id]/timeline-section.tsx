@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount, formatFeeType } from '../../fees/format'
@@ -27,12 +27,14 @@ function formatDueDate(value: unknown) {
 
 // The couple of fields that actually matter per entity, not the raw jsonb -
 // resolved from the row snapshot the RPC already redacts server-side. This
-// only ever runs on rows the caller is allowed to see the detail of.
+// only ever runs on rows the caller is allowed to see the detail of. Money
+// and date values are individually <bdi>-wrapped rather than baked into a
+// joined string, so each stays LTR inside an RTL line.
 function eventDetail(
   entity: string,
   detail: Record<string, unknown>,
   staffNameById: Record<string, string>
-): string | null {
+): ReactNode {
   switch (entity) {
     case 'case_lawyers': {
       const staffId = typeof detail.staff_id === 'string' ? detail.staff_id : null
@@ -48,28 +50,59 @@ function eventDetail(
       const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
       const method = typeof detail.method === 'string' ? detail.method : null
       if (!amount) return null
-      return method ? `${amount} via ${method}` : amount
+      return method ? (
+        <>
+          <bdi>{amount}</bdi> via {method}
+        </>
+      ) : (
+        <bdi>{amount}</bdi>
+      )
     }
     case 'expenses': {
       const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
       const description = typeof detail.description === 'string' ? detail.description : null
-      if (description && amount) return `${description} — ${amount}`
-      return description ?? amount
+      if (description && amount) {
+        return (
+          <>
+            {description} — <bdi>{amount}</bdi>
+          </>
+        )
+      }
+      return description ?? (amount ? <bdi>{amount}</bdi> : null)
     }
     case 'engagement_installments': {
       const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
       const description = typeof detail.description === 'string' ? detail.description : null
       const due = formatDueDate(detail.due_date)
-      const parts = [description, amount, due ? `due ${due}` : null].filter(Boolean)
-      return parts.length > 0 ? parts.join(' — ') : null
+      const parts: ReactNode[] = []
+      if (description) parts.push(description)
+      if (amount) parts.push(<bdi key="amount">{amount}</bdi>)
+      if (due) {
+        parts.push(
+          <Fragment key="due">
+            due <bdi>{due}</bdi>
+          </Fragment>
+        )
+      }
+      if (parts.length === 0) return null
+      return parts.map((part, i) => (
+        <Fragment key={i}>
+          {i > 0 && ' — '}
+          {part}
+        </Fragment>
+      ))
     }
     case 'engagements': {
       const feeType = detail.fee_type
       if (feeType !== 'fixed' && feeType !== 'percentage') return null
-      return formatFeeType(
-        feeType,
-        typeof detail.fixed_amount === 'number' ? detail.fixed_amount : null,
-        typeof detail.percentage === 'number' ? detail.percentage : null
+      return (
+        <bdi>
+          {formatFeeType(
+            feeType,
+            typeof detail.fixed_amount === 'number' ? detail.fixed_amount : null,
+            typeof detail.percentage === 'number' ? detail.percentage : null
+          )}
+        </bdi>
       )
     }
     case 'case_opposing_parties':
@@ -77,8 +110,14 @@ function eventDetail(
     case 'deadlines': {
       const description = typeof detail.description === 'string' ? detail.description : null
       const due = formatDueDate(detail.effective_due_date ?? detail.due_date)
-      if (description && due) return `${description} — due ${due}`
-      return description ?? (due ? `Due ${due}` : null)
+      if (description && due) {
+        return (
+          <>
+            {description} — due <bdi>{due}</bdi>
+          </>
+        )
+      }
+      return description ?? (due ? <>Due <bdi>{due}</bdi></> : null)
     }
     case 'cases':
       return typeof detail.closed_at === 'string' && detail.closed_at ? 'Case marked closed' : null
@@ -115,7 +154,9 @@ function TimelineEntry({ row, staffNameById }: { row: TimelineRow; staffNameById
 
   return (
     <li className="flex gap-3 py-2.5 text-sm">
-      <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">{formatTime(row.occurred_at)}</span>
+      <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">
+        <bdi>{formatTime(row.occurred_at)}</bdi>
+      </span>
       <div className="min-w-0">
         <p className="text-fg">
           {activityEventTitle(row.entity, row.action, row.detail)}
@@ -165,7 +206,9 @@ export function TimelineSection({
       <div className="flex flex-col divide-y divide-line">
         {groups.map((group) => (
           <div key={group.day} className="py-2 first:pt-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">{group.day}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+              <bdi>{group.day}</bdi>
+            </p>
             <ul className="flex flex-col divide-y divide-line/60">
               {group.rows.map((row) => (
                 <TimelineEntry key={row.id} row={row} staffNameById={staffNameById} />

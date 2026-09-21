@@ -112,21 +112,34 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
         <BackLink href="/dashboard/fees" label="Fees & payments" />
         <PageHeader
           title={engagement.clients?.full_name ?? 'Engagement'}
-          description={`${engagement.fee_type === 'fixed' ? 'Fixed fee' : 'Percentage fee'}: ${formatFeeType(engagement.fee_type, engagement.fixed_amount, engagement.percentage)}`}
+          description={
+            <>
+              {engagement.fee_type === 'fixed' ? 'Fixed fee' : 'Percentage fee'}:{' '}
+              <bdi>{formatFeeType(engagement.fee_type, engagement.fixed_amount, engagement.percentage)}</bdi>
+            </>
+          }
         />
       </div>
 
       <Panel className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
           {engagement.fee_type === 'fixed' ? (
-            <Badge variant="neutral">Agreed: {formatAmount(balance?.agreed_fixed_fee ?? null)}</Badge>
+            <Badge variant="neutral">
+              Agreed: <bdi>{formatAmount(balance?.agreed_fixed_fee ?? null)}</bdi>
+            </Badge>
           ) : (
-            <Badge variant="neutral">Agreed: {balance?.agreed_percentage ?? engagement.percentage ?? '—'}% of award</Badge>
+            <Badge variant="neutral">
+              Agreed: <bdi>{balance?.agreed_percentage ?? engagement.percentage ?? '—'}%</bdi> of award
+            </Badge>
           )}
-          <Badge variant="neutral">Scheduled: {formatAmount(balance?.scheduled_total ?? 0)}</Badge>
-          <Badge variant="neutral">Paid: {formatAmount(balance?.paid_total ?? 0)}</Badge>
+          <Badge variant="neutral">
+            Scheduled: <bdi>{formatAmount(balance?.scheduled_total ?? 0)}</bdi>
+          </Badge>
+          <Badge variant="neutral">
+            Paid: <bdi>{formatAmount(balance?.paid_total ?? 0)}</bdi>
+          </Badge>
           <Badge variant={(balance?.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
-            Outstanding (scheduled): {formatAmount(balance?.scheduled_outstanding ?? 0)}
+            Outstanding (scheduled): <bdi>{formatAmount(balance?.scheduled_outstanding ?? 0)}</bdi>
           </Badge>
         </div>
         {engagement.fee_type === 'fixed' &&
@@ -134,9 +147,15 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
           balance?.unscheduled_amount !== undefined &&
           balance.unscheduled_amount !== 0 && (
             <p className="text-sm text-fg-muted">
-              {balance.unscheduled_amount > 0
-                ? `${formatAmount(balance.unscheduled_amount)} of the agreed fee is not scheduled yet.`
-                : `The schedule exceeds the agreed fee by ${formatAmount(Math.abs(balance.unscheduled_amount))}.`}
+              {balance.unscheduled_amount > 0 ? (
+                <>
+                  <bdi>{formatAmount(balance.unscheduled_amount)}</bdi> of the agreed fee is not scheduled yet.
+                </>
+              ) : (
+                <>
+                  The schedule exceeds the agreed fee by <bdi>{formatAmount(Math.abs(balance.unscheduled_amount))}</bdi>.
+                </>
+              )}
             </p>
           )}
       </Panel>

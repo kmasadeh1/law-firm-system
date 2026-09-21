@@ -62,11 +62,18 @@ export default async function StaffDashboardPage() {
                     href={`/dashboard/appointments/${a.id}`}
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
-                    <span className="font-medium text-fg">{formatDateTime(a.starts_at)}</span>
+                    <span className="font-medium text-fg">
+                      <bdi>{formatDateTime(a.starts_at)}</bdi>
+                    </span>
                     <span className="text-fg-muted">
                       {a.type === 'court_date' ? 'Court date' : 'Consultation'}
                       {a.clients?.full_name && <> · {a.clients.full_name}</>}
-                      {a.cases?.case_number && <> · {a.cases.case_number}</>}
+                      {a.cases?.case_number && (
+                        <>
+                          {' '}
+                          · <bdi>{a.cases.case_number}</bdi>
+                        </>
+                      )}
                     </span>
                   </Link>
                 </li>
@@ -95,7 +102,9 @@ export default async function StaffDashboardPage() {
                       className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                     >
                       <span>
-                        <span className="font-medium text-fg">{a.cases!.case_number}</span>
+                        <span className="font-medium text-fg">
+                          <bdi>{a.cases!.case_number}</bdi>
+                        </span>
                         <span className="text-fg-muted"> — {a.cases!.title}</span>
                       </span>
                       <span className="flex items-center gap-2">

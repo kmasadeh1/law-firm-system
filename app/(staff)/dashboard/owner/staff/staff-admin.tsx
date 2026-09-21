@@ -232,7 +232,8 @@ function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (passwor
         </div>
         {row.must_change_password && row.temp_password_expires_at && (
           <p className="mt-0.5 text-xs text-fg-muted">
-            Temporary password {expired ? 'expired' : 'expires'} {formatDateTime(row.temp_password_expires_at)}
+            Temporary password {expired ? 'expired' : 'expires'}{' '}
+            <bdi>{formatDateTime(row.temp_password_expires_at)}</bdi>
           </p>
         )}
       </div>

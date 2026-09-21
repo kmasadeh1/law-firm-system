@@ -61,11 +61,19 @@ export default async function EnquiriesListPage() {
                     <Badge variant={statusVariant[e.status]}>{statusLabel[e.status]}</Badge>
                   </span>
                   <span className="text-fg-muted">
-                    {[e.phone, e.email].filter(Boolean).join(' · ') || '—'}
+                    {e.phone || e.email ? (
+                      <>
+                        {e.phone && <bdi>{e.phone}</bdi>}
+                        {e.phone && e.email && ' · '}
+                        {e.email && <bdi>{e.email}</bdi>}
+                      </>
+                    ) : (
+                      '—'
+                    )}
                     {' · '}
                     {e.assigned_to ? (nameById.get(e.assigned_to) ?? 'Unknown staff') : 'Unassigned'}
                     {' · '}
-                    {formatDateTime(e.created_at)}
+                    <bdi>{formatDateTime(e.created_at)}</bdi>
                   </span>
                 </Link>
               </li>

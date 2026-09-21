@@ -57,12 +57,15 @@ export default async function FeesListPage() {
                       <span className="font-medium text-fg">{e.clients?.full_name ?? '—'}</span>
                       <span className="text-fg-muted">
                         {' '}
-                        — {e.fee_type === 'fixed' ? 'Fixed' : 'Percentage'}: {formatFeeType(e.fee_type, e.fixed_amount, e.percentage)}
+                        — {e.fee_type === 'fixed' ? 'Fixed' : 'Percentage'}:{' '}
+                        <bdi>{formatFeeType(e.fee_type, e.fixed_amount, e.percentage)}</bdi>
                       </span>
                     </span>
                     <span className="flex items-center gap-2">
                       {outstanding !== null && outstanding > 0 ? (
-                        <Badge variant="accent">Outstanding (scheduled): {formatAmount(outstanding)}</Badge>
+                        <Badge variant="accent">
+                          Outstanding (scheduled): <bdi>{formatAmount(outstanding)}</bdi>
+                        </Badge>
                       ) : (
                         <Badge variant="muted">Settled</Badge>
                       )}

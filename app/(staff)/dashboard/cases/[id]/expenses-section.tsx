@@ -133,15 +133,18 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
     <li className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm">
       <div>
         <p className="font-medium text-fg">
-          {expense.description} <span className="text-fg-muted">· {formatAmount(expense.amount)}</span>
+          {expense.description}{' '}
+          <span className="text-fg-muted">
+            · <bdi>{formatAmount(expense.amount)}</bdi>
+          </span>
         </p>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Incurred {formatDate(expense.incurred_at)} · recorded by {expense.recorded_by_name}
+          Incurred <bdi>{formatDate(expense.incurred_at)}</bdi> · recorded by {expense.recorded_by_name}
         </p>
         <p className="mt-0.5 text-xs">
           {expense.reimbursed ? (
             <span className="text-success-text">
-              Reimbursed {expense.reimbursed_at && formatDate(expense.reimbursed_at)}
+              Reimbursed {expense.reimbursed_at && <bdi>{formatDate(expense.reimbursed_at)}</bdi>}
             </span>
           ) : (
             <span className="text-fg-muted">Not yet reimbursed</span>
@@ -207,10 +210,14 @@ export function ExpensesSection({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Badge variant="neutral">Incurred: {formatAmount(totals.incurred)}</Badge>
-        <Badge variant="neutral">Reimbursed: {formatAmount(totals.reimbursed)}</Badge>
+        <Badge variant="neutral">
+          Incurred: <bdi>{formatAmount(totals.incurred)}</bdi>
+        </Badge>
+        <Badge variant="neutral">
+          Reimbursed: <bdi>{formatAmount(totals.reimbursed)}</bdi>
+        </Badge>
         <Badge variant={totals.outstanding > 0 ? 'accent' : 'muted'}>
-          Outstanding: {formatAmount(totals.outstanding)}
+          Outstanding: <bdi>{formatAmount(totals.outstanding)}</bdi>
         </Badge>
       </div>
 

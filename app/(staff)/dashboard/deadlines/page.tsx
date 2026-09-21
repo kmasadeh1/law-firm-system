@@ -60,11 +60,13 @@ export default async function DeadlinesListPage() {
                       </span>
                       <span className="text-fg-muted">
                         {' '}
-                        — {d.cases?.case_number} · {d.cases?.title}
+                        — <bdi>{d.cases?.case_number}</bdi> · {d.cases?.title}
                       </span>
                     </span>
                     <span className="flex items-center gap-2">
-                      <span className="text-fg-muted">{d.effective_due_date ?? '—'}</span>
+                      <span className="text-fg-muted">
+                        {d.effective_due_date ? <bdi>{d.effective_due_date}</bdi> : '—'}
+                      </span>
                       {d.extended_due_date && (
                         <span className="text-xs text-fg-muted">(extended)</span>
                       )}

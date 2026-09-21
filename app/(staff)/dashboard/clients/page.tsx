@@ -76,7 +76,15 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
                 >
                   <span className="font-medium text-fg">{c.full_name}</span>
                   <span className="text-fg-muted">
-                    {[c.phone, c.national_id].filter(Boolean).join(' · ') || '—'}
+                    {c.phone || c.national_id ? (
+                      <>
+                        {c.phone && <bdi>{c.phone}</bdi>}
+                        {c.phone && c.national_id && ' · '}
+                        {c.national_id && <bdi>{c.national_id}</bdi>}
+                      </>
+                    ) : (
+                      '—'
+                    )}
                   </span>
                 </Link>
               </li>

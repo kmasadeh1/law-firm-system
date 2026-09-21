@@ -57,10 +57,15 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <span className="font-medium text-fg">{deadline.period_type_name}</span>
-          <span className="text-fg-muted"> ({deadline.period_days} days) · trigger {deadline.trigger_date}</span>
+          <span className="text-fg-muted">
+            {' '}
+            ({deadline.period_days} days) · trigger <bdi>{deadline.trigger_date}</bdi>
+          </span>
         </div>
         <span className="flex items-center gap-2">
-          <span className="text-fg-muted">{deadline.effective_due_date ?? '—'}</span>
+          <span className="text-fg-muted">
+            {deadline.effective_due_date ? <bdi>{deadline.effective_due_date}</bdi> : '—'}
+          </span>
           <span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${urgencyClass[urgency]}`}
           >
@@ -71,7 +76,8 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
 
       {rolledForward && (
         <p className="text-xs text-fg-muted">
-          Falls on a weekend ({deadline.unadjusted_due_date}) — moved to {deadline.due_date}.
+          Falls on a weekend (<bdi>{deadline.unadjusted_due_date}</bdi>) — moved to{' '}
+          <bdi>{deadline.due_date}</bdi>.
         </p>
       )}
 
@@ -80,12 +86,21 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
       {deadline.extended_due_date ? (
         <div className="rounded-md border border-accent-border/50 bg-accent-border/10 p-2 text-xs text-fg">
           <p>
-            Extended to <strong>{deadline.extended_due_date}</strong> (originally {deadline.due_date})
+            Extended to{' '}
+            <strong>
+              <bdi>{deadline.extended_due_date}</bdi>
+            </strong>{' '}
+            (originally <bdi>{deadline.due_date}</bdi>)
           </p>
           <p className="mt-1 text-fg-muted">
             Reason: {deadline.extension_reason}
-            {deadline.extended_by_name && ` · granted by ${deadline.extended_by_name}`}
-            {deadline.extended_at && ` on ${deadline.extended_at.slice(0, 10)}`}
+            {deadline.extended_by_name && <> · granted by {deadline.extended_by_name}</>}
+            {deadline.extended_at && (
+              <>
+                {' '}
+                on <bdi>{deadline.extended_at.slice(0, 10)}</bdi>
+              </>
+            )}
           </p>
         </div>
       ) : null}

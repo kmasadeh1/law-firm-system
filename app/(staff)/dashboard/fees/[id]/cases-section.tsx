@@ -44,7 +44,7 @@ export function CasesSection({
           {linkedCases.map((c) => (
             <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
               <span className="text-fg">
-                {c.case_number} — {c.title}
+                <bdi>{c.case_number}</bdi> — {c.title}
               </span>
               <Button
                 type="button"

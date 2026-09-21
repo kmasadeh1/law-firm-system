@@ -101,7 +101,9 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
                   className="flex flex-wrap items-center justify-between gap-1 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                 >
                   <span>
-                    <span className="font-medium text-fg">{c.case_number}</span>
+                    <span className="font-medium text-fg">
+                      <bdi>{c.case_number}</bdi>
+                    </span>
                     <span className="text-fg-muted"> — {c.title}</span>
                   </span>
                   <span className="text-fg-muted">

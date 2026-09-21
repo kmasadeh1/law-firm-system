@@ -37,10 +37,10 @@ function DeletedNote({ caseId, note }: { caseId: string; note: CaseNote }) {
     <li className="flex flex-col gap-1 px-3 py-3 text-sm opacity-70">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-xs text-fg-muted">
-          {note.author_name} · {formatDateTime(note.created_at)}
+          {note.author_name} · <bdi>{formatDateTime(note.created_at)}</bdi>
         </p>
         <Badge variant="muted">
-          Deleted by {note.deleted_by_name} · {formatDateTime(note.deleted_at!)}
+          Deleted by {note.deleted_by_name} · <bdi>{formatDateTime(note.deleted_at!)}</bdi>
         </Badge>
       </div>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
@@ -118,8 +118,13 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
   return (
     <li className="flex flex-col gap-1 px-3 py-3 text-sm">
       <p className="text-xs text-fg-muted">
-        {note.author_name} · {formatDateTime(note.created_at)}
-        {note.edited_at && <span> · edited {formatDateTime(note.edited_at)}</span>}
+        {note.author_name} · <bdi>{formatDateTime(note.created_at)}</bdi>
+        {note.edited_at && (
+          <span>
+            {' '}
+            · edited <bdi>{formatDateTime(note.edited_at)}</bdi>
+          </span>
+        )}
       </p>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
       <div className="flex items-center gap-2">

@@ -73,11 +73,11 @@ function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow 
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-fg">{doc.filename}</p>
           <Badge variant="muted">
-            Removed by {doc.deleted_by_name} · {formatDateTime(doc.deleted_at!)}
+            Removed by {doc.deleted_by_name} · <bdi>{formatDateTime(doc.deleted_at!)}</bdi>
           </Badge>
         </div>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Uploaded by {doc.uploaded_by_name} · {formatDateTime(doc.uploaded_at)}
+          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at)}</bdi>
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>
@@ -130,7 +130,7 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
       <div>
         <p className="font-medium text-fg">{doc.filename}</p>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Uploaded by {doc.uploaded_by_name} · {formatDateTime(doc.uploaded_at)}
+          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at)}</bdi>
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>

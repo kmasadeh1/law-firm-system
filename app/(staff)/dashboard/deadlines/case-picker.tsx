@@ -68,7 +68,7 @@ export function CasePicker({ initial }: { initial?: CaseOption }) {
                 }}
                 className="block w-full px-3 py-2 text-start text-sm text-fg hover:bg-line/40"
               >
-                {c.case_number} — {c.title}
+                <bdi>{c.case_number}</bdi> — {c.title}
               </button>
             </li>
           ))}
@@ -80,7 +80,7 @@ export function CasePicker({ initial }: { initial?: CaseOption }) {
       )}
       {selected && (
         <FieldSuccess>
-          Selected: {selected.case_number} — {selected.title}
+          Selected: <bdi>{selected.case_number}</bdi> — {selected.title}
         </FieldSuccess>
       )}
     </div>

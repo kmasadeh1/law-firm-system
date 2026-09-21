@@ -83,7 +83,9 @@ export default async function OwnerDashboardPage() {
                     href={`/dashboard/appointments/${a.id}`}
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
-                    <span className="font-medium text-fg">{formatTime(a.starts_at)}</span>
+                    <span className="font-medium text-fg">
+                      <bdi>{formatTime(a.starts_at)}</bdi>
+                    </span>
                     <span className="text-fg-muted">
                       {a.type === 'court_date' ? 'Court date' : 'Consultation'}
                       {a.clients?.full_name && <> · {a.clients.full_name}</>}
@@ -116,7 +118,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/cases/${c.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        {c.case_number} — {c.title}
+                        <bdi>{c.case_number}</bdi> — {c.title}
                       </Link>
                     </li>
                   ))}
@@ -136,7 +138,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/appointments/${a.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        {formatTime(a.starts_at)} · {a.clients?.full_name ?? 'Unknown client'}
+                        <bdi>{formatTime(a.starts_at)}</bdi> · {a.clients?.full_name ?? 'Unknown client'}
                       </Link>
                     </li>
                   ))}
