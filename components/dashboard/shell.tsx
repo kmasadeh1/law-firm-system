@@ -131,30 +131,6 @@ export function DashboardShell({
       <div className="mt-6 flex-1 overflow-y-auto">
         <NavLinks groups={navGroups} onNavigate={() => setDrawerOpen(false)} />
       </div>
-
-      <div className="flex flex-col gap-3 border-t border-line pt-4">
-        <div className="px-1">
-          <p className="truncate text-sm font-medium text-fg">{userName}</p>
-          <p className="text-xs text-fg-muted">{roleLabel}</p>
-        </div>
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <ThemeToggle initialTheme={initialTheme} />
-          </div>
-          <div className="flex-1">
-            <LocaleToggle />
-          </div>
-        </div>
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <LogoutIcon className="h-4 w-4" />
-            {t('logOut')}
-          </button>
-        </form>
-      </div>
     </>
   )
 
@@ -164,26 +140,6 @@ export function DashboardShell({
       <aside className="fixed inset-y-0 start-0 hidden w-64 flex-col border-e border-line bg-surface p-4 md:flex">
         {sidebarContent}
       </aside>
-
-      {/* Mobile top bar */}
-      <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 md:hidden">
-        <Link href={homeHref} className="flex items-center gap-2">
-          <Crest className="h-7 w-7" />
-          <span className="font-heading text-base text-fg">{firmName}</span>
-        </Link>
-        <div className="flex items-center gap-1">
-          <ThemeToggle initialTheme={initialTheme} compact />
-          <LocaleToggle compact />
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            aria-label={t('openMenu')}
-            className="flex h-9 w-9 items-center justify-center rounded-md text-fg transition-colors hover:bg-line/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <MenuIcon className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
 
       {/* Mobile drawer */}
       {drawerOpen && (
@@ -210,9 +166,52 @@ export function DashboardShell({
         </div>
       )}
 
-      <main className="min-h-screen px-4 py-8 sm:px-6 md:ms-64 md:px-8 md:py-10">
-        <div className="mx-auto max-w-4xl">{children}</div>
-      </main>
+      <div className="min-h-screen md:ms-64">
+        {/* Content header: spans the main content area, above the page's own
+            title (PageHeader, rendered by each page inside children - this
+            bar is shell-level chrome, the two are deliberately not merged).
+            Sticky so the controls stay reachable scrolling a long list.
+            Inline-start holds the mobile nav trigger (the aside it opens is
+            hidden below md, so this is its only home); everything else is
+            pushed to inline-end via ms-auto, in reading order theme,
+            language, account, log out - a plain flex row, so it mirrors
+            under dir="rtl" the same way the rest of the app already relies
+            on for start/end layout. */}
+        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-3 sm:px-6 md:px-8">
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            aria-label={t('openMenu')}
+            className="flex h-9 w-9 items-center justify-center rounded-md text-fg transition-colors hover:bg-line/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:hidden"
+          >
+            <MenuIcon className="h-5 w-5" />
+          </button>
+
+          <div className="flex items-center gap-1 ms-auto sm:gap-2">
+            <ThemeToggle initialTheme={initialTheme} />
+            <LocaleToggle />
+            <div className="text-end">
+              <p className="max-w-[7rem] truncate text-sm font-medium text-fg sm:max-w-[10rem]">{userName}</p>
+              <p className="hidden text-xs text-fg-muted sm:block">{roleLabel}</p>
+            </div>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                aria-label={t('logOut')}
+                title={t('logOut')}
+                className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >
+                <LogoutIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('logOut')}</span>
+              </button>
+            </form>
+          </div>
+        </header>
+
+        <main className="px-4 py-8 sm:px-6 md:px-8 md:py-10">
+          <div className="mx-auto max-w-4xl">{children}</div>
+        </main>
+      </div>
     </div>
   )
 }

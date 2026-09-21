@@ -23,7 +23,7 @@ const targetLanguageLabel: Record<'en' | 'ar', string> = {
   ar: 'English',
 }
 
-export function LocaleToggle({ compact = false }: { compact?: boolean }) {
+export function LocaleToggle() {
   const locale = useLocale()
   const t = useTranslations('dashboard.shell')
   const [isPending, startTransition] = useTransition()
@@ -44,14 +44,10 @@ export function LocaleToggle({ compact = false }: { compact?: boolean }) {
       disabled={isPending}
       aria-label={switchLabel}
       title={switchLabel}
-      className={
-        compact
-          ? 'flex h-8 w-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-line/60 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60'
-          : 'flex w-full items-center gap-2 rounded-md border border-line px-3 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60'
-      }
+      className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-60"
     >
       <GlobeIcon />
-      {!compact && <span>{targetLanguageLabel[target]}</span>}
+      <span className="hidden sm:inline">{targetLanguageLabel[target]}</span>
     </button>
   )
 }

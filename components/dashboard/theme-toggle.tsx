@@ -24,13 +24,7 @@ function MoonIcon() {
   )
 }
 
-export function ThemeToggle({
-  initialTheme,
-  compact = false,
-}: {
-  initialTheme: Theme
-  compact?: boolean
-}) {
+export function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, () => initialTheme)
   const t = useTranslations('dashboard.shell')
 
@@ -46,14 +40,10 @@ export function ThemeToggle({
       onClick={toggle}
       aria-label={switchLabel}
       title={switchLabel}
-      className={
-        compact
-          ? 'flex h-8 w-8 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-line/60 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus'
-          : 'flex w-full items-center gap-2 rounded-md border border-line px-3 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus'
-      }
+      className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-      {!compact && <span>{theme === 'dark' ? t('lightMode') : t('darkMode')}</span>}
+      <span className="hidden sm:inline">{theme === 'dark' ? t('lightMode') : t('darkMode')}</span>
     </button>
   )
 }
