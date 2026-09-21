@@ -4,14 +4,13 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { AssignSection } from './assign-section'
 import { StatusSection } from './status-section'
-
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
+import { formatDateTime } from '@/lib/format-date-time'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 export default async function EnquiryDetailPage({ params }: PageProps<'/dashboard/enquiries/[id]'>) {
   const { id } = await params
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   const { data: enquiry } = await supabase
     .from('enquiries')
@@ -50,7 +49,7 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
           title={enquiry.name}
           description={
             <>
-              Received <bdi>{formatDateTime(enquiry.created_at)}</bdi>
+              Received <bdi>{formatDateTime(enquiry.created_at, locale)}</bdi>
             </>
           }
         />

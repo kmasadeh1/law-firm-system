@@ -8,6 +8,8 @@ import { Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
 import { ENTITY_NAMES } from '@/lib/activity-labels'
+import { formatFullDate } from '@/lib/format-date-time'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
 
 const PAGE_SIZE = 50
@@ -17,14 +19,10 @@ function humanizeEntity(entity: string) {
   return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }
 
-function dayKey(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'full' })
-}
-
-function groupByDay(rows: ActivityLogRow[]) {
+function groupByDay(rows: ActivityLogRow[], locale: string) {
   const groups: { day: string; rows: ActivityLogRow[] }[] = []
   for (const row of rows) {
-    const key = dayKey(row.created_at)
+    const key = formatFullDate(row.created_at, locale)
     const last = groups[groups.length - 1]
     if (last && last.day === key) {
       last.rows.push(row)
@@ -48,6 +46,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   const offset = (page - 1) * PAGE_SIZE
 
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   // Unfiltered, unlike active-staff pickers elsewhere - someone who's left
   // the firm should still be filterable by name in a firm-wide audit log,
@@ -75,7 +74,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
 
   const hasNext = (rows ?? []).length > PAGE_SIZE
   const pageRows = (rows ?? []).slice(0, PAGE_SIZE) as ActivityLogRow[]
-  const groups = groupByDay(pageRows)
+  const groups = groupByDay(pageRows, locale)
 
   const filterParams = new URLSearchParams()
   if (entity) filterParams.set('entity', entity)
@@ -167,6 +166,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
                       key={row.id}
                       row={row}
                       actorName={row.actor_id ? (nameById.get(row.actor_id) ?? 'Unknown staff') : 'System'}
+                      locale={locale}
                     />
                   ))}
                 </ul>

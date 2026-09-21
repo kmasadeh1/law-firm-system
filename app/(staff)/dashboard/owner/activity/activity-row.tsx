@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { activityEventTitle, type ActivityAction } from '@/lib/activity-labels'
+import { formatTime } from '@/lib/format-date-time'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
 import { diffFields, formatFieldValue } from './diff'
 
@@ -15,11 +16,15 @@ export type ActivityLogRow = {
   new_data: Record<string, unknown> | null
 }
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString(undefined, { timeStyle: 'short' })
-}
-
-export function ActivityRow({ row, actorName }: { row: ActivityLogRow; actorName: string }) {
+export function ActivityRow({
+  row,
+  actorName,
+  locale,
+}: {
+  row: ActivityLogRow
+  actorName: string
+  locale: string
+}) {
   const [expanded, setExpanded] = useState(false)
   const diffs = diffFields(row.action, row.old_data, row.new_data)
   const hasDetail = diffs.length > 0
@@ -33,7 +38,7 @@ export function ActivityRow({ row, actorName }: { row: ActivityLogRow; actorName
         className="flex w-full items-start gap-3 text-start disabled:cursor-default"
       >
         <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">
-          <bdi>{formatTime(row.created_at)}</bdi>
+          <bdi>{formatTime(row.created_at, locale)}</bdi>
         </span>
         <span className="min-w-0 flex-1 text-fg">
           {activityEventTitle(row.table_name, row.action, row.new_data ?? row.old_data)}
@@ -53,15 +58,15 @@ export function ActivityRow({ row, actorName }: { row: ActivityLogRow; actorName
               <span className="font-medium text-fg">{d.field.replace(/_/g, ' ')}</span>:{' '}
               {row.action === 'update' ? (
                 <span className="inline-flex items-center gap-1">
-                  <bdi>{formatFieldValue(d.before)}</bdi>
+                  <bdi>{formatFieldValue(d.before, locale)}</bdi>
                   {/* Forward/progression, same direction as the "Older"
                       pagination chevron - rotated by default (points right
                       under ltr) and unrotated under rtl (points left). */}
                   <ChevronLeftIcon className="h-3 w-3 rotate-180 rtl:rotate-0" />
-                  <bdi>{formatFieldValue(d.after)}</bdi>
+                  <bdi>{formatFieldValue(d.after, locale)}</bdi>
                 </span>
               ) : (
-                formatFieldValue(d.after ?? d.before)
+                formatFieldValue(d.after ?? d.before, locale)
               )}
             </li>
           ))}

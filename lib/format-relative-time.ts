@@ -1,6 +1,6 @@
 const rtfByLocale = new Map<string, Intl.RelativeTimeFormat>()
 
-function getRtf(locale: 'en' | 'ar') {
+function getRtf(locale: string) {
   let rtf = rtfByLocale.get(locale)
   if (!rtf) {
     rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
@@ -15,7 +15,7 @@ function getRtf(locale: 'en' | 'ar') {
  * including Arabic's plural forms - is handled natively instead of by a
  * hand-rolled English string.
  */
-export function formatRelativeTime(iso: string, locale: 'en' | 'ar') {
+export function formatRelativeTime(iso: string, locale: string) {
   const diffMs = Date.now() - new Date(iso).getTime()
   const mins = Math.round(diffMs / 60000)
   const rtf = getRtf(locale)

@@ -1,11 +1,13 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useLocale } from 'next-intl'
 import { addCaseNote, editCaseNote, deleteCaseNote, restoreCaseNote } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { FieldError, controlClass } from '@/components/dashboard/form'
+import { formatDateTime } from '@/lib/format-date-time'
 
 export type CaseNote = {
   id: string
@@ -17,13 +19,10 @@ export type CaseNote = {
   deleted_by_name: string | null
 }
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
-
 function DeletedNote({ caseId, note }: { caseId: string; note: CaseNote }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const locale = useLocale()
 
   function handleRestore() {
     setError(null)
@@ -37,10 +36,10 @@ function DeletedNote({ caseId, note }: { caseId: string; note: CaseNote }) {
     <li className="flex flex-col gap-1 px-3 py-3 text-sm opacity-70">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-xs text-fg-muted">
-          {note.author_name} · <bdi>{formatDateTime(note.created_at)}</bdi>
+          {note.author_name} · <bdi>{formatDateTime(note.created_at, locale)}</bdi>
         </p>
         <Badge variant="muted">
-          Deleted by {note.deleted_by_name} · <bdi>{formatDateTime(note.deleted_at!)}</bdi>
+          Deleted by {note.deleted_by_name} · <bdi>{formatDateTime(note.deleted_at!, locale)}</bdi>
         </Badge>
       </div>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
@@ -60,6 +59,7 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
+  const locale = useLocale()
 
   function handleSaveEdit(e: React.FormEvent) {
     e.preventDefault()
@@ -118,11 +118,11 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
   return (
     <li className="flex flex-col gap-1 px-3 py-3 text-sm">
       <p className="text-xs text-fg-muted">
-        {note.author_name} · <bdi>{formatDateTime(note.created_at)}</bdi>
+        {note.author_name} · <bdi>{formatDateTime(note.created_at, locale)}</bdi>
         {note.edited_at && (
           <span>
             {' '}
-            · edited <bdi>{formatDateTime(note.edited_at)}</bdi>
+            · edited <bdi>{formatDateTime(note.edited_at, locale)}</bdi>
           </span>
         )}
       </p>

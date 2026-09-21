@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useLocale } from 'next-intl'
 import {
   uploadDocument,
   getDocumentSignedUrl,
@@ -11,6 +12,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { FieldError } from '@/components/dashboard/form'
+import { formatDateTime } from '@/lib/format-date-time'
 
 export type DocumentRow = {
   id: string
@@ -42,10 +44,6 @@ const ALLOWED_EXTENSIONS = [
   'txt',
 ]
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
-
 function validateFile(file: File): string | null {
   if (file.size > MAX_FILE_BYTES) return 'That file is larger than the 25 MB limit.'
   const ext = file.name.split('.').pop()?.toLowerCase()
@@ -58,6 +56,7 @@ function validateFile(file: File): string | null {
 function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const locale = useLocale()
 
   function handleRestore() {
     setError(null)
@@ -73,11 +72,11 @@ function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow 
         <div className="flex flex-wrap items-center gap-2">
           <p className="font-medium text-fg">{doc.filename}</p>
           <Badge variant="muted">
-            Removed by {doc.deleted_by_name} · <bdi>{formatDateTime(doc.deleted_at!)}</bdi>
+            Removed by {doc.deleted_by_name} · <bdi>{formatDateTime(doc.deleted_at!, locale)}</bdi>
           </Badge>
         </div>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at)}</bdi>
+          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at, locale)}</bdi>
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>
@@ -92,6 +91,7 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
   const [error, setError] = useState<string | null>(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const locale = useLocale()
 
   function handleView() {
     setError(null)
@@ -130,7 +130,7 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
       <div>
         <p className="font-medium text-fg">{doc.filename}</p>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at)}</bdi>
+          Uploaded by {doc.uploaded_by_name} · <bdi>{formatDateTime(doc.uploaded_at, locale)}</bdi>
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>

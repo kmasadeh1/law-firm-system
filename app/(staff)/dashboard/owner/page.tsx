@@ -3,14 +3,11 @@ import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { formatRelativeTime } from '@/lib/format-relative-time'
+import { formatTime } from '@/lib/format-date-time'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { activityEventTitle } from '@/lib/activity-labels'
-
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString(undefined, { timeStyle: 'short' })
-}
 
 export default async function OwnerDashboardPage() {
   const supabase = await createClient()
@@ -78,7 +75,7 @@ export default async function OwnerDashboardPage() {
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span className="font-medium text-fg">
-                      <bdi>{formatTime(a.starts_at)}</bdi>
+                      <bdi>{formatTime(a.starts_at, locale)}</bdi>
                     </span>
                     <span className="text-fg-muted">
                       {a.type === 'court_date' ? t('courtDate') : t('consultation')}
@@ -131,7 +128,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/appointments/${a.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        <bdi>{formatTime(a.starts_at)}</bdi> · {a.clients?.full_name ?? t('unknownClient')}
+                        <bdi>{formatTime(a.starts_at, locale)}</bdi> · {a.clients?.full_name ?? t('unknownClient')}
                       </Link>
                     </li>
                   ))}

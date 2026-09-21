@@ -1,10 +1,12 @@
 'use client'
 
 import { Fragment, useState, type ReactNode } from 'react'
+import { useLocale } from 'next-intl'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount, formatFeeType } from '../../fees/format'
 import { activityEventTitle, type ActivityAction } from '@/lib/activity-labels'
+import { formatTime, formatFullDate, formatDate } from '@/lib/format-date-time'
 
 export type TimelineRow = {
   id: number
@@ -20,9 +22,9 @@ function truncate(text: string, max: number) {
   return text.length > max ? `${text.slice(0, max).trimEnd()}…` : text
 }
 
-function formatDueDate(value: unknown) {
+function formatDueDate(value: unknown, locale: string) {
   if (typeof value !== 'string') return null
-  return new Date(value).toLocaleDateString(undefined, { dateStyle: 'medium' })
+  return formatDate(value, locale)
 }
 
 // The couple of fields that actually matter per entity, not the raw jsonb -
@@ -33,7 +35,8 @@ function formatDueDate(value: unknown) {
 function eventDetail(
   entity: string,
   detail: Record<string, unknown>,
-  staffNameById: Record<string, string>
+  staffNameById: Record<string, string>,
+  locale: string
 ): ReactNode {
   switch (entity) {
     case 'case_lawyers': {
@@ -73,7 +76,7 @@ function eventDetail(
     case 'engagement_installments': {
       const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
       const description = typeof detail.description === 'string' ? detail.description : null
-      const due = formatDueDate(detail.due_date)
+      const due = formatDueDate(detail.due_date, locale)
       const parts: ReactNode[] = []
       if (description) parts.push(description)
       if (amount) parts.push(<bdi key="amount">{amount}</bdi>)
@@ -109,7 +112,7 @@ function eventDetail(
       return typeof detail.name === 'string' ? detail.name : null
     case 'deadlines': {
       const description = typeof detail.description === 'string' ? detail.description : null
-      const due = formatDueDate(detail.effective_due_date ?? detail.due_date)
+      const due = formatDueDate(detail.effective_due_date ?? detail.due_date, locale)
       if (description && due) {
         return (
           <>
@@ -126,18 +129,10 @@ function eventDetail(
   }
 }
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString(undefined, { timeStyle: 'short' })
-}
-
-function dayKey(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'full' })
-}
-
-function groupByDay(rows: TimelineRow[]) {
+function groupByDay(rows: TimelineRow[], locale: string) {
   const groups: { day: string; rows: TimelineRow[] }[] = []
   for (const row of rows) {
-    const key = dayKey(row.occurred_at)
+    const key = formatFullDate(row.occurred_at, locale)
     const last = groups[groups.length - 1]
     if (last && last.day === key) {
       last.rows.push(row)
@@ -148,14 +143,22 @@ function groupByDay(rows: TimelineRow[]) {
   return groups
 }
 
-function TimelineEntry({ row, staffNameById }: { row: TimelineRow; staffNameById: Record<string, string> }) {
+function TimelineEntry({
+  row,
+  staffNameById,
+  locale,
+}: {
+  row: TimelineRow
+  staffNameById: Record<string, string>
+  locale: string
+}) {
   const detail =
-    row.detail && !row.detail_redacted ? eventDetail(row.entity, row.detail, staffNameById) : null
+    row.detail && !row.detail_redacted ? eventDetail(row.entity, row.detail, staffNameById, locale) : null
 
   return (
     <li className="flex gap-3 py-2.5 text-sm">
       <span className="w-14 shrink-0 pt-0.5 text-xs text-fg-muted">
-        <bdi>{formatTime(row.occurred_at)}</bdi>
+        <bdi>{formatTime(row.occurred_at, locale)}</bdi>
       </span>
       <div className="min-w-0">
         <p className="text-fg">
@@ -182,6 +185,7 @@ export function TimelineSection({
   staffNameById: Record<string, string>
 }) {
   const [expanded, setExpanded] = useState(false)
+  const locale = useLocale()
 
   if (rows.length === 0) {
     return (
@@ -196,7 +200,7 @@ export function TimelineSection({
   }
 
   const visibleRows = expanded ? rows : rows.slice(0, INITIAL_COUNT)
-  const groups = groupByDay(visibleRows)
+  const groups = groupByDay(visibleRows, locale)
   const hiddenCount = rows.length - visibleRows.length
 
   return (
@@ -211,7 +215,7 @@ export function TimelineSection({
             </p>
             <ul className="flex flex-col divide-y divide-line/60">
               {group.rows.map((row) => (
-                <TimelineEntry key={row.id} row={row} staffNameById={staffNameById} />
+                <TimelineEntry key={row.id} row={row} staffNameById={staffNameById} locale={locale} />
               ))}
             </ul>
           </div>

@@ -5,6 +5,8 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Badge } from '@/components/dashboard/badge'
+import { formatDateTime } from '@/lib/format-date-time'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 type ConflictMatch = {
   source: string
@@ -13,12 +15,9 @@ type ConflictMatch = {
   case_id: string | null
 }
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
-
 export default async function ConflictCheckHistoryPage() {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   const [{ data: checks }, { data: staffDirectory }] = await Promise.all([
     supabase
@@ -87,7 +86,7 @@ export default async function ConflictCheckHistoryPage() {
                       )}
                     </p>
                     <p className="text-xs text-fg-muted">
-                      <bdi>{formatDateTime(check.ran_at)}</bdi> ·{' '}
+                      <bdi>{formatDateTime(check.ran_at, locale)}</bdi> ·{' '}
                       {(check.ran_by && nameById.get(check.ran_by)) ?? 'Unknown staff'}
                     </p>
                   </div>

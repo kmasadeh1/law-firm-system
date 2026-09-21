@@ -6,19 +6,15 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { Badge } from '@/components/dashboard/badge'
-
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
-}
+import { formatDateTime } from '@/lib/format-date-time'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 export default async function AppointmentsListPage({
   searchParams,
 }: PageProps<'/dashboard/appointments'>) {
   const { from, to, type } = (await searchParams) as { from?: string; to?: string; type?: string }
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   // No access gate here - this just renders whatever RLS returns for the
   // signed-in user (owner, appointments_view_all, court_dates_manage for
@@ -107,7 +103,7 @@ export default async function AppointmentsListPage({
                 >
                   <span>
                     <span className="font-medium text-fg">
-                      <bdi>{formatDateTime(a.starts_at)}</bdi>
+                      <bdi>{formatDateTime(a.starts_at, locale)}</bdi>
                     </span>
                     <span className="text-fg-muted"> — {a.type === 'court_date' ? 'Court date' : 'Consultation'}</span>
                   </span>

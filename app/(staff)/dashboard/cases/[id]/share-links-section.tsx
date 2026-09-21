@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useLocale } from 'next-intl'
 import { createShareLink, revokeShareLink } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { formatDateTime, formatDate } from '@/lib/format-date-time'
 
 type ShareLink = {
   id: string
@@ -39,14 +41,6 @@ const statusLabel: Record<LinkStatus, string> = {
   active: 'Active',
   expired: 'Expired',
   revoked: 'Revoked',
-}
-
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' })
 }
 
 // The full URL is built client-side purely for display/sharing - the token
@@ -144,6 +138,7 @@ function RevokeButton({ caseId, linkId }: { caseId: string; linkId: string }) {
 
 function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
   const status = linkStatus(link)
+  const locale = useLocale()
 
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm">
@@ -153,17 +148,17 @@ function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
           <Badge variant={statusBadgeVariant[status]}>{statusLabel[status]}</Badge>
         </div>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Created <bdi>{formatDate(link.created_at)}</bdi>
+          Created <bdi>{formatDate(link.created_at, locale)}</bdi>
           {link.expires_at && status === 'active' && (
             <>
               {' '}
-              · expires <bdi>{formatDate(link.expires_at)}</bdi>
+              · expires <bdi>{formatDate(link.expires_at, locale)}</bdi>
             </>
           )}
           {' · '}
           {link.last_accessed_at ? (
             <>
-              last opened <bdi>{formatDateTime(link.last_accessed_at)}</bdi>
+              last opened <bdi>{formatDateTime(link.last_accessed_at, locale)}</bdi>
             </>
           ) : (
             'Never opened'

@@ -6,15 +6,12 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount } from '@/app/(staff)/dashboard/fees/format'
+import { formatDate as formatDateWithLocale } from '@/lib/format-date-time'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 function formatPercent(value: number | null) {
   if (value === null) return 'Not yet available'
   return `${value.toFixed(1)}%`
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' })
 }
 
 export default async function ReportsPage({ searchParams }: PageProps<'/dashboard/reports'>) {
@@ -22,6 +19,8 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
   const includeInactive = showInactive === '1'
 
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const formatDate = (iso: string | null) => (iso ? formatDateWithLocale(iso, locale) : '—')
 
   let workloadQuery = supabase.from('lawyer_workload').select('*').order('full_name')
   if (!includeInactive) {

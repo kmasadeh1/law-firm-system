@@ -5,6 +5,8 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Badge } from '@/components/dashboard/badge'
 import type { Database } from '@/lib/supabase/database.types'
+import { formatDateTime } from '@/lib/format-date-time'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 type EnquiryStatus = Database['public']['Enums']['enquiry_status']
 
@@ -20,12 +22,9 @@ const statusLabel: Record<EnquiryStatus, string> = {
   resolved: 'Resolved',
 }
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
-
 export default async function EnquiriesListPage() {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   const [{ data: enquiries }, { data: staffDirectory }] = await Promise.all([
     supabase
@@ -73,7 +72,7 @@ export default async function EnquiriesListPage() {
                     {' · '}
                     {e.assigned_to ? (nameById.get(e.assigned_to) ?? 'Unknown staff') : 'Unassigned'}
                     {' · '}
-                    <bdi>{formatDateTime(e.created_at)}</bdi>
+                    <bdi>{formatDateTime(e.created_at, locale)}</bdi>
                   </span>
                 </Link>
               </li>

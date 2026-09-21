@@ -2,6 +2,8 @@
 // entity-specific "what does this mean" sentences are the shared labels'
 // job (lib/activity-labels.ts); this only answers "what fields changed."
 
+import { formatDateTime } from '@/lib/format-date-time'
+
 export type FieldDiff = { field: string; before: unknown; after: unknown }
 
 function isEqual(a: unknown, b: unknown) {
@@ -37,14 +39,14 @@ export function diffFields(
   return diffs
 }
 
-export function formatFieldValue(value: unknown): string {
+export function formatFieldValue(value: unknown, locale: string): string {
   if (value === null || value === undefined) return '—'
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
   if (typeof value === 'string') {
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
       const parsed = new Date(value)
       if (!Number.isNaN(parsed.getTime())) {
-        return parsed.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+        return formatDateTime(parsed.toISOString(), locale)
       }
     }
     return value

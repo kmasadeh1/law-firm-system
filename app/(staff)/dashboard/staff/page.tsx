@@ -6,10 +6,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Badge } from '@/components/dashboard/badge'
 import { LinkButton } from '@/components/dashboard/button'
 import { localizedName } from '@/lib/localized-name'
-
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
+import { formatDateTime } from '@/lib/format-date-time'
 
 export default async function StaffDashboardPage() {
   const supabase = await createClient()
@@ -63,7 +60,7 @@ export default async function StaffDashboardPage() {
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span className="font-medium text-fg">
-                      <bdi>{formatDateTime(a.starts_at)}</bdi>
+                      <bdi>{formatDateTime(a.starts_at, locale)}</bdi>
                     </span>
                     <span className="text-fg-muted">
                       {a.type === 'court_date' ? 'Court date' : 'Consultation'}

@@ -1,12 +1,14 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useLocale } from 'next-intl'
 import { addExpense, editExpense, setExpenseReimbursed, deleteExpense } from '../actions'
 import { formatAmount } from '../../fees/format'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { formatDate } from '@/lib/format-date-time'
 
 export type ExpenseTotals = {
   incurred: number
@@ -24,16 +26,13 @@ export type Expense = {
   recorded_by_name: string
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' })
-}
-
 function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
   const [isEditing, setIsEditing] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
+  const locale = useLocale()
 
   function handleSaveEdit(e: React.FormEvent) {
     e.preventDefault()
@@ -139,12 +138,12 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
           </span>
         </p>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Incurred <bdi>{formatDate(expense.incurred_at)}</bdi> · recorded by {expense.recorded_by_name}
+          Incurred <bdi>{formatDate(expense.incurred_at, locale)}</bdi> · recorded by {expense.recorded_by_name}
         </p>
         <p className="mt-0.5 text-xs">
           {expense.reimbursed ? (
             <span className="text-success-text">
-              Reimbursed {expense.reimbursed_at && <bdi>{formatDate(expense.reimbursed_at)}</bdi>}
+              Reimbursed {expense.reimbursed_at && <bdi>{formatDate(expense.reimbursed_at, locale)}</bdi>}
             </span>
           ) : (
             <span className="text-fg-muted">Not yet reimbursed</span>

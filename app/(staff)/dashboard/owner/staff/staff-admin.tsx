@@ -9,6 +9,7 @@ import { Button } from '@/components/dashboard/button'
 import { Switch } from '@/components/dashboard/switch'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { localizedName } from '@/lib/localized-name'
+import { formatDateTime } from '@/lib/format-date-time'
 
 type StaffRow = {
   id: string
@@ -22,10 +23,6 @@ type StaffRow = {
 }
 
 type RoleOption = { id: string; name: string; name_ar: string | null }
-
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-}
 
 function isExpired(iso: string | null) {
   return Boolean(iso && new Date(iso) < new Date())
@@ -233,7 +230,7 @@ function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (passwor
         {row.must_change_password && row.temp_password_expires_at && (
           <p className="mt-0.5 text-xs text-fg-muted">
             Temporary password {expired ? 'expired' : 'expires'}{' '}
-            <bdi>{formatDateTime(row.temp_password_expires_at)}</bdi>
+            <bdi>{formatDateTime(row.temp_password_expires_at, locale)}</bdi>
           </p>
         )}
       </div>
