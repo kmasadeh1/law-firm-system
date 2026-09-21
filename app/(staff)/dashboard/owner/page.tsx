@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
@@ -22,6 +24,8 @@ function formatRelative(iso: string) {
 
 export default async function OwnerDashboardPage() {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.overview' })
 
   const startOfDay = new Date()
   startOfDay.setHours(0, 0, 0, 0)
@@ -68,12 +72,12 @@ export default async function OwnerDashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Firm overview" description="Today across the firm, recent activity, and anything needing attention." />
+      <PageHeader title={t('title')} description={t('description')} />
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Today&apos;s schedule</h2>
+        <h2 className="font-heading text-lg text-fg">{t('todaysSchedule')}</h2>
         {!todayAppointments || todayAppointments.length === 0 ? (
-          <EmptyState title="Nothing on the calendar today" />
+          <EmptyState title={t('nothingToday')} />
         ) : (
           <Panel className="p-0">
             <ul className="flex flex-col divide-y divide-line">
@@ -87,10 +91,10 @@ export default async function OwnerDashboardPage() {
                       <bdi>{formatTime(a.starts_at)}</bdi>
                     </span>
                     <span className="text-fg-muted">
-                      {a.type === 'court_date' ? 'Court date' : 'Consultation'}
+                      {a.type === 'court_date' ? t('courtDate') : t('consultation')}
                       {a.clients?.full_name && <> · {a.clients.full_name}</>}
                       {' · '}
-                      {a.staff_id ? (nameById.get(a.staff_id) ?? 'Unassigned') : 'Unassigned'}
+                      {a.staff_id ? (nameById.get(a.staff_id) ?? t('unassigned')) : t('unassigned')}
                     </span>
                   </Link>
                 </li>
@@ -101,15 +105,15 @@ export default async function OwnerDashboardPage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Needing attention</h2>
+        <h2 className="font-heading text-lg text-fg">{t('needingAttention')}</h2>
         {casesNeedingLead.length === 0 && (!overdueAppointments || overdueAppointments.length === 0) ? (
-          <EmptyState title="Nothing needs attention right now" />
+          <EmptyState title={t('nothingNeedsAttention')} />
         ) : (
           <Panel className="flex flex-col gap-4">
             {casesNeedingLead.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-fg">
-                  {casesNeedingLead.length} open case{casesNeedingLead.length === 1 ? '' : 's'} with no lead lawyer
+                  {t('openCasesNoLead', { count: casesNeedingLead.length })}
                 </p>
                 <ul className="mt-2 flex flex-col gap-1">
                   {casesNeedingLead.slice(0, 5).map((c) => (
@@ -128,8 +132,7 @@ export default async function OwnerDashboardPage() {
             {overdueAppointments && overdueAppointments.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-fg">
-                  {overdueAppointments.length} appointment{overdueAppointments.length === 1 ? '' : 's'} past their
-                  time, still marked scheduled
+                  {t('appointmentsPastTime', { count: overdueAppointments.length })}
                 </p>
                 <ul className="mt-2 flex flex-col gap-1">
                   {overdueAppointments.map((a) => (
@@ -138,7 +141,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/appointments/${a.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        <bdi>{formatTime(a.starts_at)}</bdi> · {a.clients?.full_name ?? 'Unknown client'}
+                        <bdi>{formatTime(a.starts_at)}</bdi> · {a.clients?.full_name ?? t('unknownClient')}
                       </Link>
                     </li>
                   ))}
@@ -150,9 +153,9 @@ export default async function OwnerDashboardPage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Recent activity</h2>
+        <h2 className="font-heading text-lg text-fg">{t('recentActivity')}</h2>
         {!activity || activity.length === 0 ? (
-          <EmptyState title="No activity recorded yet" />
+          <EmptyState title={t('noActivityYet')} />
         ) : (
           <Panel className="p-0">
             <ul className="flex flex-col divide-y divide-line">
@@ -163,7 +166,7 @@ export default async function OwnerDashboardPage() {
                     <span className="text-fg">
                       {activityEventTitle(entry.table_name, entry.action, detail)}
                       {entry.actor_id && (
-                        <span className="text-fg-muted"> · {nameById.get(entry.actor_id) ?? 'Unknown staff'}</span>
+                        <span className="text-fg-muted"> · {nameById.get(entry.actor_id) ?? t('unknownStaff')}</span>
                       )}
                     </span>
                     <span className="text-fg-muted">{formatRelative(entry.created_at)}</span>
