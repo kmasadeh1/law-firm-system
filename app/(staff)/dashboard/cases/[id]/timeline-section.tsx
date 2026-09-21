@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useState, type ReactNode } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount, formatFeeType } from '../../fees/format'
@@ -32,18 +32,25 @@ function formatDueDate(value: unknown, locale: string) {
 // only ever runs on rows the caller is allowed to see the detail of. Money
 // and date values are individually <bdi>-wrapped rather than baked into a
 // joined string, so each stays LTR inside an RTL line.
+//
+// Each branch resolves to its own complete message, never a fragment glued
+// to the next - "a payment was recorded" and "a deadline was added" are
+// different sentences in Arabic, not the same template with a swapped noun,
+// so there is deliberately no generic "{entity} detail" message here.
 function eventDetail(
   entity: string,
   detail: Record<string, unknown>,
   staffNameById: Record<string, string>,
-  locale: string
+  locale: string,
+  t: ReturnType<typeof useTranslations>
 ): ReactNode {
+  const bdi = (chunks: ReactNode) => <bdi>{chunks}</bdi>
   switch (entity) {
     case 'case_lawyers': {
       const staffId = typeof detail.staff_id === 'string' ? detail.staff_id : null
-      const name = staffId ? (staffNameById[staffId] ?? 'a staff member') : null
+      const name = staffId ? (staffNameById[staffId] ?? t('unknownStaffMember')) : null
       if (!name) return null
-      return detail.is_lead ? `${name} — lead lawyer` : name
+      return detail.is_lead ? t('caseLawyerLead', { name }) : name
     }
     case 'case_notes':
       return typeof detail.note === 'string' ? truncate(detail.note, 120) : null
@@ -53,23 +60,13 @@ function eventDetail(
       const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
       const method = typeof detail.method === 'string' ? detail.method : null
       if (!amount) return null
-      return method ? (
-        <>
-          <bdi>{amount}</bdi> via {method}
-        </>
-      ) : (
-        <bdi>{amount}</bdi>
-      )
+      return method ? t.rich('paymentWithMethod', { amount, method, bdi }) : <bdi>{amount}</bdi>
     }
     case 'expenses': {
       const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
       const description = typeof detail.description === 'string' ? detail.description : null
       if (description && amount) {
-        return (
-          <>
-            {description} — <bdi>{amount}</bdi>
-          </>
-        )
+        return t.rich('expenseWithAmount', { description, amount, bdi })
       }
       return description ?? (amount ? <bdi>{amount}</bdi> : null)
     }
@@ -81,11 +78,7 @@ function eventDetail(
       if (description) parts.push(description)
       if (amount) parts.push(<bdi key="amount">{amount}</bdi>)
       if (due) {
-        parts.push(
-          <Fragment key="due">
-            due <bdi>{due}</bdi>
-          </Fragment>
-        )
+        parts.push(<Fragment key="due">{t.rich('dueDate', { date: due, bdi })}</Fragment>)
       }
       if (parts.length === 0) return null
       return parts.map((part, i) => (
@@ -114,16 +107,12 @@ function eventDetail(
       const description = typeof detail.description === 'string' ? detail.description : null
       const due = formatDueDate(detail.effective_due_date ?? detail.due_date, locale)
       if (description && due) {
-        return (
-          <>
-            {description} — due <bdi>{due}</bdi>
-          </>
-        )
+        return t.rich('descriptionDueDate', { description, date: due, bdi })
       }
-      return description ?? (due ? <>Due <bdi>{due}</bdi></> : null)
+      return description ?? (due ? t.rich('dueDate', { date: due, bdi }) : null)
     }
     case 'cases':
-      return typeof detail.closed_at === 'string' && detail.closed_at ? 'Case marked closed' : null
+      return typeof detail.closed_at === 'string' && detail.closed_at ? t('caseMarkedClosed') : null
     default:
       return null
   }
@@ -152,8 +141,9 @@ function TimelineEntry({
   staffNameById: Record<string, string>
   locale: string
 }) {
+  const t = useTranslations('dashboard.cases.detail.timeline')
   const detail =
-    row.detail && !row.detail_redacted ? eventDetail(row.entity, row.detail, staffNameById, locale) : null
+    row.detail && !row.detail_redacted ? eventDetail(row.entity, row.detail, staffNameById, locale, t) : null
 
   return (
     <li className="flex gap-3 py-2.5 text-sm">
@@ -163,10 +153,10 @@ function TimelineEntry({
       <div className="min-w-0">
         <p className="text-fg">
           {activityEventTitle(row.entity, row.action, row.detail)}
-          <span className="text-fg-muted"> · {row.actor_name ?? 'System'}</span>
+          <span className="text-fg-muted"> · {row.actor_name ?? t('systemFallback')}</span>
         </p>
         {row.detail_redacted ? (
-          <p className="mt-0.5 text-xs italic text-fg-muted">Details hidden — you don&apos;t have permission to view this</p>
+          <p className="mt-0.5 text-xs italic text-fg-muted">{t('detailsHidden')}</p>
         ) : (
           detail && <p className="mt-0.5 truncate text-xs text-fg-muted">{detail}</p>
         )}
@@ -186,15 +176,13 @@ export function TimelineSection({
 }) {
   const [expanded, setExpanded] = useState(false)
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.timeline')
 
   if (rows.length === 0) {
     return (
       <Panel className="flex flex-col gap-3" data-testid="case-timeline-section">
-        <h2 className="font-heading text-lg text-fg">Timeline</h2>
-        <EmptyState
-          title="No history yet"
-          description="Activity on this case will show up here as it happens."
-        />
+        <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
+        <EmptyState title={t('noHistoryTitle')} description={t('noHistoryDescription')} />
       </Panel>
     )
   }
@@ -205,7 +193,7 @@ export function TimelineSection({
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-timeline-section">
-      <h2 className="font-heading text-lg text-fg">Timeline</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
       <div className="flex flex-col divide-y divide-line">
         {groups.map((group) => (
@@ -228,7 +216,7 @@ export function TimelineSection({
           onClick={() => setExpanded(true)}
           className="self-start text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
         >
-          Show {hiddenCount} more
+          {t('showMore', { count: hiddenCount })}
         </button>
       )}
     </Panel>

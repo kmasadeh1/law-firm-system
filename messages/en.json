@@ -346,6 +346,76 @@
             "restoreFailed": "Could not restore the document. Please try again.",
             "noPermissionRestore": "You don't have permission to restore this document."
           }
+        },
+        "opposingParties": {
+          "heading": "Opposing parties",
+          "noneAddedYet": "None added yet.",
+          "nameLabel": "Name",
+          "nationalIdLabel": "National ID",
+          "checking": "Checking…",
+          "add": "Add",
+          "addAnyway": "Add anyway",
+          "matchSameCase": "{name} — already an opposing party on this case",
+          "matchOtherCase": "{name} — already an opposing party on another case",
+          "matchExistingClient": "{name} — existing client",
+          "errors": {
+            "nameRequired": "Name is required.",
+            "conflictCheckFailed": "Could not run the conflict check. Please try again.",
+            "addFailed": "Could not add the opposing party. Please try again."
+          }
+        },
+        "timeline": {
+          "heading": "Timeline",
+          "noHistoryTitle": "No history yet",
+          "noHistoryDescription": "Activity on this case will show up here as it happens.",
+          "systemFallback": "System",
+          "detailsHidden": "Details hidden — you don't have permission to view this",
+          "showMore": "{count, plural, one {Show # more} other {Show # more}}",
+          "caseLawyerLead": "{name} — lead lawyer",
+          "unknownStaffMember": "a staff member",
+          "paymentWithMethod": "<bdi>{amount}</bdi> via {method}",
+          "expenseWithAmount": "{description} — <bdi>{amount}</bdi>",
+          "dueDate": "Due <bdi>{date}</bdi>",
+          "descriptionDueDate": "{description} — due <bdi>{date}</bdi>",
+          "caseMarkedClosed": "Case marked closed"
+        },
+        "shareLinks": {
+          "heading": "Share with client",
+          "intro": "Generate a link the client can open to track this case's status — no account needed. Send it over WhatsApp or however you reach them.",
+          "noShareLinksYet": "No share links yet.",
+          "labelFieldLabel": "Label (optional)",
+          "labelPlaceholder": "e.g. Sent to client's father",
+          "expiresAfterLabel": "Expires after",
+          "expiry30": "30 days",
+          "expiry90": "90 days",
+          "expiry180": "180 days",
+          "expiry365": "365 days",
+          "generating": "Generating…",
+          "generateLink": "Generate link",
+          "untitledLink": "Untitled link",
+          "statusActive": "Active",
+          "statusExpired": "Expired",
+          "statusRevoked": "Revoked",
+          "createdOn": "Created <bdi>{date}</bdi>",
+          "expiresOn": "expires <bdi>{date}</bdi>",
+          "lastOpenedOn": "last opened <bdi>{date}</bdi>",
+          "neverOpened": "Never opened",
+          "viewCount": "{count, plural, one {# view} other {# views}}",
+          "onceWarningTitle": "This link will only be shown once — save it now",
+          "onceWarningBody": "It isn't stored anywhere you can retrieve it later. If you leave this page without copying or sending it, it's gone — you'd have to generate a new one, which won't restore this one.",
+          "copied": "Copied!",
+          "copyLink": "Copy link",
+          "sendViaWhatsapp": "Send via WhatsApp",
+          "revoking": "Revoking…",
+          "confirmRevoke": "Confirm revoke?",
+          "revoke": "Revoke",
+          "cancel": "Cancel",
+          "errors": {
+            "noPermissionShare": "You don't have permission to share this case.",
+            "generateFailed": "Could not generate a share link. Please try again.",
+            "revokeFailed": "Could not revoke the link. Please try again.",
+            "noPermissionRevoke": "You don't have permission to revoke this link."
+          }
         }
       }
     }

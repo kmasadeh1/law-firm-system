@@ -217,11 +217,13 @@ export async function addOpposingParty(
   formData: FormData,
   confirmed: boolean
 ): Promise<ActionResult & { matches?: ConflictMatch[] }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.opposingParties.errors' })
   const name = formData.get('name')
   const national_id = formData.get('national_id')
 
   if (typeof name !== 'string' || !name.trim()) {
-    return { error: 'Name is required.' }
+    return { error: t('nameRequired') }
   }
   const trimmedName = name.trim()
   const trimmedNationalId =
@@ -236,7 +238,7 @@ export async function addOpposingParty(
     })
 
     if (conflictError) {
-      return { error: 'Could not run the conflict check. Please try again.' }
+      return { error: t('conflictCheckFailed') }
     }
     if (matches && matches.length > 0) {
       return { matches }
@@ -248,7 +250,7 @@ export async function addOpposingParty(
     .insert({ case_id: caseId, name: trimmedName, national_id: trimmedNationalId })
 
   if (error) {
-    return { error: 'Could not add the opposing party. Please try again.' }
+    return { error: t('addFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -262,6 +264,8 @@ export async function createShareLink(
   expiresDays: number,
   label: string | null
 ): Promise<ActionResult & { token?: string }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.shareLinks.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase.rpc('create_case_share_link', {
     p_case_id: caseId,
@@ -271,9 +275,9 @@ export async function createShareLink(
 
   if (error) {
     if (error.code === '42501') {
-      return { error: "You don't have permission to share this case." }
+      return { error: t('noPermissionShare') }
     }
-    return { error: 'Could not generate a share link. Please try again.' }
+    return { error: t('generateFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -700,6 +704,8 @@ export async function deleteExpense(caseId: string, expenseId: string): Promise<
 }
 
 export async function revokeShareLink(caseId: string, linkId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.shareLinks.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_share_links')
@@ -709,13 +715,13 @@ export async function revokeShareLink(caseId: string, linkId: string): Promise<A
     .select('id')
 
   if (error) {
-    return { error: 'Could not revoke the link. Please try again.' }
+    return { error: t('revokeFailed') }
   }
 
   // UPDATE blocked by RLS matches zero rows rather than erroring - treat
   // that the same as a denial rather than silently doing nothing.
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to revoke this link." }
+    return { error: t('noPermissionRevoke') }
   }
 
   revalidatePath(casePath(caseId))

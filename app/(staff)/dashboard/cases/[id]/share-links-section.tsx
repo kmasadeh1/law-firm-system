@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { createShareLink, revokeShareLink } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
@@ -37,12 +37,6 @@ const statusBadgeVariant: Record<LinkStatus, 'accent' | 'muted'> = {
   revoked: 'muted',
 }
 
-const statusLabel: Record<LinkStatus, string> = {
-  active: 'Active',
-  expired: 'Expired',
-  revoked: 'Revoked',
-}
-
 // The full URL is built client-side purely for display/sharing - the token
 // itself, and everything about its validity, comes from the server action.
 // Client-facing tracking links default to Arabic, the site's default locale.
@@ -51,6 +45,7 @@ function buildTrackingUrl(token: string) {
 }
 
 function GeneratedLinkPanel({ url }: { url: string }) {
+  const t = useTranslations('dashboard.cases.detail.shareLinks')
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -72,14 +67,8 @@ function GeneratedLinkPanel({ url }: { url: string }) {
       className="flex flex-col gap-3 rounded-md border-2 border-accent bg-accent-border/15 p-4"
     >
       <div>
-        <p className="font-heading text-base text-fg">
-          This link will only be shown once — save it now
-        </p>
-        <p className="mt-1 text-sm text-fg-muted">
-          It isn&apos;t stored anywhere you can retrieve it later. If you leave this page
-          without copying or sending it, it&apos;s gone — you&apos;d have to generate a new
-          one, which won&apos;t restore this one.
-        </p>
+        <p className="font-heading text-base text-fg">{t('onceWarningTitle')}</p>
+        <p className="mt-1 text-sm text-fg-muted">{t('onceWarningBody')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <input
@@ -89,11 +78,11 @@ function GeneratedLinkPanel({ url }: { url: string }) {
           className={`min-w-0 flex-1 font-mono text-xs ${controlClass}`}
         />
         <Button type="button" variant="secondary" onClick={handleCopy}>
-          {copied ? 'Copied!' : 'Copy link'}
+          {copied ? t('copied') : t('copyLink')}
         </Button>
         <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
           <Button type="button" variant="primary">
-            Send via WhatsApp
+            {t('sendViaWhatsapp')}
           </Button>
         </a>
       </div>
@@ -102,6 +91,7 @@ function GeneratedLinkPanel({ url }: { url: string }) {
 }
 
 function RevokeButton({ caseId, linkId }: { caseId: string; linkId: string }) {
+  const t = useTranslations('dashboard.cases.detail.shareLinks')
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -124,11 +114,11 @@ function RevokeButton({ caseId, linkId }: { caseId: string; linkId: string }) {
   return (
     <div className="flex items-center gap-2">
       <Button type="button" variant="danger" onClick={handleClick} disabled={isPending}>
-        {isPending ? 'Revoking…' : confirming ? 'Confirm revoke?' : 'Revoke'}
+        {isPending ? t('revoking') : confirming ? t('confirmRevoke') : t('revoke')}
       </Button>
       {confirming && !isPending && (
         <Button type="button" variant="ghost" onClick={() => setConfirming(false)}>
-          Cancel
+          {t('cancel')}
         </Button>
       )}
       {error && <FieldError>{error}</FieldError>}
@@ -139,32 +129,40 @@ function RevokeButton({ caseId, linkId }: { caseId: string; linkId: string }) {
 function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
   const status = linkStatus(link)
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.shareLinks')
+  const statusLabelKey: Record<LinkStatus, 'statusActive' | 'statusExpired' | 'statusRevoked'> = {
+    active: 'statusActive',
+    expired: 'statusExpired',
+    revoked: 'statusRevoked',
+  }
 
   return (
     <li className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm">
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-medium text-fg">{link.label || 'Untitled link'}</span>
-          <Badge variant={statusBadgeVariant[status]}>{statusLabel[status]}</Badge>
+          <span className="font-medium text-fg">{link.label || t('untitledLink')}</span>
+          <Badge variant={statusBadgeVariant[status]}>{t(statusLabelKey[status])}</Badge>
         </div>
         <p className="mt-0.5 text-xs text-fg-muted">
-          Created <bdi>{formatDate(link.created_at, locale)}</bdi>
+          {t.rich('createdOn', { date: formatDate(link.created_at, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           {link.expires_at && status === 'active' && (
             <>
               {' '}
-              · expires <bdi>{formatDate(link.expires_at, locale)}</bdi>
+              {t.rich('expiresOn', {
+                date: formatDate(link.expires_at, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })}
             </>
           )}
           {' · '}
-          {link.last_accessed_at ? (
-            <>
-              last opened <bdi>{formatDateTime(link.last_accessed_at, locale)}</bdi>
-            </>
-          ) : (
-            'Never opened'
-          )}
+          {link.last_accessed_at
+            ? t.rich('lastOpenedOn', {
+                date: formatDateTime(link.last_accessed_at, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })
+            : t('neverOpened')}
           {' · '}
-          {link.access_count} {link.access_count === 1 ? 'view' : 'views'}
+          {t('viewCount', { count: link.access_count })}
         </p>
       </div>
       {status === 'active' && <RevokeButton caseId={caseId} linkId={link.id} />}
@@ -173,6 +171,7 @@ function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
 }
 
 export function ShareLinksSection({ caseId, links }: { caseId: string; links: ShareLink[] }) {
+  const t = useTranslations('dashboard.cases.detail.shareLinks')
   const [expiresDays, setExpiresDays] = useState('90')
   const [label, setLabel] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -197,16 +196,13 @@ export function ShareLinksSection({ caseId, links }: { caseId: string; links: Sh
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-share-links-section">
-      <h2 className="font-heading text-lg text-fg">Share with client</h2>
-      <p className="text-sm text-fg-muted">
-        Generate a link the client can open to track this case&apos;s status — no account
-        needed. Send it over WhatsApp or however you reach them.
-      </p>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
+      <p className="text-sm text-fg-muted">{t('intro')}</p>
 
       {generatedUrl && <GeneratedLinkPanel url={generatedUrl} />}
 
       {links.length === 0 ? (
-        <p className="text-sm text-fg-muted">No share links yet.</p>
+        <p className="text-sm text-fg-muted">{t('noShareLinksYet')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {links.map((l) => (
@@ -217,31 +213,31 @@ export function ShareLinksSection({ caseId, links }: { caseId: string; links: Sh
 
       <form onSubmit={handleGenerate} className="flex flex-wrap items-end gap-2">
         <Field>
-          <Label htmlFor="share-label">Label (optional)</Label>
+          <Label htmlFor="share-label">{t('labelFieldLabel')}</Label>
           <input
             id="share-label"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
-            placeholder="e.g. Sent to client's father"
+            placeholder={t('labelPlaceholder')}
             className={controlClass}
           />
         </Field>
         <Field>
-          <Label htmlFor="share-expiry">Expires after</Label>
+          <Label htmlFor="share-expiry">{t('expiresAfterLabel')}</Label>
           <select
             id="share-expiry"
             value={expiresDays}
             onChange={(e) => setExpiresDays(e.target.value)}
             className={controlClass}
           >
-            <option value="30">30 days</option>
-            <option value="90">90 days</option>
-            <option value="180">180 days</option>
-            <option value="365">365 days</option>
+            <option value="30">{t('expiry30')}</option>
+            <option value="90">{t('expiry90')}</option>
+            <option value="180">{t('expiry180')}</option>
+            <option value="365">{t('expiry365')}</option>
           </select>
         </Field>
         <Button type="submit" variant="secondary" disabled={isPending}>
-          {isPending ? 'Generating…' : 'Generate link'}
+          {isPending ? t('generating') : t('generateLink')}
         </Button>
       </form>
 
