@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -8,11 +9,17 @@ import { createClient } from '@/lib/supabase/server'
  * here instead of re-implementing the lookup. Defaults to 'en' when
  * unauthenticated or unset.
  *
+ * Wrapped in React's cache() so the layout and every page that calls this
+ * in the same request share one query instead of each issuing their own -
+ * takes no arguments, so every call in a render pass hits the same cache
+ * key and there's nothing per-call (like a Supabase client instance) that
+ * could break the dedup.
+ *
  * If a component already queries `staff` for other columns, add `locale`
  * to that existing select instead of calling this - it's a second round
  * trip otherwise.
  */
-export async function getStaffLocale(): Promise<'en' | 'ar'> {
+export const getStaffLocale = cache(async (): Promise<'en' | 'ar'> => {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
@@ -25,4 +32,4 @@ export async function getStaffLocale(): Promise<'en' | 'ar'> {
     .maybeSingle()
 
   return staffRow?.locale === 'ar' ? 'ar' : 'en'
-}
+})
