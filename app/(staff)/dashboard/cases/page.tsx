@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
@@ -12,6 +13,7 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   const { q, status } = (await searchParams) as { q?: string; status?: string }
   const supabase = await createClient()
   const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.list' })
 
   const { data: statuses } = await supabase
     .from('case_statuses')
@@ -42,10 +44,10 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Cases"
+        title={t('title')}
         action={
           <LinkButton href="/dashboard/cases/new" variant="primary">
-            New case
+            {t('newCase')}
           </LinkButton>
         }
       />
@@ -55,11 +57,11 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
           type="text"
           name="q"
           defaultValue={term ?? ''}
-          placeholder="Search by case number or title"
+          placeholder={t('searchPlaceholder')}
           className={`w-full max-w-sm ${controlClass}`}
         />
         <select name="status" defaultValue={status ?? ''} className={controlClass}>
-          <option value="">All statuses</option>
+          <option value="">{t('allStatuses')}</option>
           {(statuses ?? []).map((s) => (
             <option key={s.id} value={s.id}>
               {localizedName(s, locale)}
@@ -67,26 +69,26 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
           ))}
         </select>
         <Button type="submit" variant="secondary">
-          Filter
+          {t('filter')}
         </Button>
         {(term || status) && (
           <Link
             href="/dashboard/cases"
             className="flex items-center text-sm text-fg-muted underline-offset-2 hover:underline"
           >
-            Clear
+            {t('clear')}
           </Link>
         )}
       </form>
 
       {!cases || cases.length === 0 ? (
         <EmptyState
-          title={term || status ? 'No cases match those filters.' : 'No cases yet'}
-          description={term || status ? undefined : 'Open your first case to start tracking it.'}
+          title={term || status ? t('noCasesFiltered') : t('noCasesYet')}
+          description={term || status ? undefined : t('noCasesYetDescription')}
           action={
             !term && !status && (
               <LinkButton href="/dashboard/cases/new" variant="secondary">
-                New case
+                {t('newCase')}
               </LinkButton>
             )
           }

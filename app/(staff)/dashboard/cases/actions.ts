@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 export type ConflictMatch = {
   source: string
@@ -43,14 +45,17 @@ export async function createCase(
   const case_number = formData.get('case_number')
   const case_type = formData.get('case_type')
 
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.new.errors' })
+
   if (typeof client_id !== 'string' || !client_id) {
-    return { error: 'Select a client.' }
+    return { error: t('selectClient') }
   }
   if (typeof title !== 'string' || !title.trim()) {
-    return { error: 'Title is required.' }
+    return { error: t('titleRequired') }
   }
   if (typeof case_number !== 'string' || !case_number.trim()) {
-    return { error: 'Case number is required.' }
+    return { error: t('caseNumberRequired') }
   }
 
   const supabase = await createClient()
@@ -66,7 +71,7 @@ export async function createCase(
     .single()
 
   if (statusError || !firstStatus) {
-    return { error: 'Could not determine the starting status. Please try again.' }
+    return { error: t('statusLookupFailed') }
   }
 
   const { data: user } = await supabase.auth.getClaims()
@@ -86,9 +91,9 @@ export async function createCase(
 
   if (error) {
     if (error.code === '23505') {
-      return { error: 'That case number is already in use.' }
+      return { error: t('caseNumberInUse') }
     }
-    return { error: 'Could not create the case. Please try again.' }
+    return { error: t('createFailed') }
   }
 
   revalidatePath('/dashboard/cases')

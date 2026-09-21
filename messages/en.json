@@ -166,6 +166,42 @@
       "recentActivity": "Recent activity",
       "noActivityYet": "No activity recorded yet",
       "unknownStaff": "Unknown staff"
+    },
+    "cases": {
+      "list": {
+        "title": "Cases",
+        "newCase": "New case",
+        "searchPlaceholder": "Search by case number or title",
+        "allStatuses": "All statuses",
+        "filter": "Filter",
+        "clear": "Clear",
+        "noCasesFiltered": "No cases match those filters.",
+        "noCasesYet": "No cases yet",
+        "noCasesYetDescription": "Open your first case to start tracking it."
+      },
+      "new": {
+        "backToCases": "Cases",
+        "title": "New case",
+        "clientLabel": "Client",
+        "clientSearchPlaceholder": "Search existing clients by name or national ID",
+        "noMatchingClient": "No matching client. Add them in Clients first.",
+        "selectedClient": "Selected: <bdi>{name}</bdi>",
+        "titleLabel": "Title",
+        "caseNumberLabel": "Case number",
+        "caseNumberHelp": "Entered manually - no numbering convention is enforced yet.",
+        "caseTypeLabel": "Case type",
+        "caseTypePlaceholder": "e.g. Litigation, Real Estate",
+        "creating": "Creating…",
+        "submit": "Create case",
+        "errors": {
+          "selectClient": "Select a client.",
+          "titleRequired": "Title is required.",
+          "caseNumberRequired": "Case number is required.",
+          "statusLookupFailed": "Could not determine the starting status. Please try again.",
+          "caseNumberInUse": "That case number is already in use.",
+          "createFailed": "Could not create the case. Please try again."
+        }
+      }
     }
   }
 }

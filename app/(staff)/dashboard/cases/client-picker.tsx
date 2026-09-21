@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { searchClients, type ClientOption } from './actions'
 import { Label, FieldSuccess, controlClass } from '@/components/dashboard/form'
 
@@ -11,6 +12,7 @@ import { Label, FieldSuccess, controlClass } from '@/components/dashboard/form'
  * answer is "go create them in Clients first."
  */
 export function ClientPicker({ initial }: { initial?: ClientOption }) {
+  const t = useTranslations('dashboard.cases.new')
   const [term, setTerm] = useState(initial?.full_name ?? '')
   const [results, setResults] = useState<ClientOption[]>([])
   const [selected, setSelected] = useState<ClientOption | null>(initial ?? null)
@@ -39,7 +41,7 @@ export function ClientPicker({ initial }: { initial?: ClientOption }) {
   return (
     <div className="relative flex flex-col gap-1.5">
       <Label htmlFor="client_search" required>
-        Client
+        {t('clientLabel')}
       </Label>
       <input
         id="client_search"
@@ -51,7 +53,7 @@ export function ClientPicker({ initial }: { initial?: ClientOption }) {
         }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder="Search existing clients by name or national ID"
+        placeholder={t('clientSearchPlaceholder')}
         autoComplete="off"
         className={controlClass}
       />
@@ -81,9 +83,16 @@ export function ClientPicker({ initial }: { initial?: ClientOption }) {
       )}
 
       {open && term.trim() && !selected && results.length === 0 && (
-        <p className="text-xs text-fg-muted">No matching client. Add them in Clients first.</p>
+        <p className="text-xs text-fg-muted">{t('noMatchingClient')}</p>
       )}
-      {selected && <FieldSuccess>Selected: {selected.full_name}</FieldSuccess>}
+      {selected && (
+        <FieldSuccess>
+          {t.rich('selectedClient', {
+            name: selected.full_name,
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
+        </FieldSuccess>
+      )}
     </div>
   )
 }
