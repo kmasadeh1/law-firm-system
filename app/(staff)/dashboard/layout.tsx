@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardShell, type NavGroup, type NavItem } from '@/components/dashboard/shell'
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
@@ -43,39 +44,42 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   const isOwner = staffRow?.user_type === 'owner'
   const homeHref = isOwner ? '/dashboard/owner' : '/dashboard/staff'
 
-  const dailyWork: NavItem[] = [{ href: homeHref, label: 'Home', icon: 'home' }]
+  const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
+  const t = await getTranslations({ locale, namespace: 'dashboard.nav' })
+
+  const dailyWork: NavItem[] = [{ href: homeHref, label: t('home'), icon: 'home' }]
   if (isOwner || clientsManage) {
-    dailyWork.push({ href: '/dashboard/clients', label: 'Clients', icon: 'clients' })
+    dailyWork.push({ href: '/dashboard/clients', label: t('clients'), icon: 'clients' })
   }
   if (isOwner || enquiriesManage) {
-    dailyWork.push({ href: '/dashboard/enquiries', label: 'Enquiries', icon: 'enquiries' })
+    dailyWork.push({ href: '/dashboard/enquiries', label: t('enquiries'), icon: 'enquiries' })
   }
-  dailyWork.push({ href: '/dashboard/cases', label: 'Cases', icon: 'cases' })
-  dailyWork.push({ href: '/dashboard/appointments', label: 'Appointments', icon: 'appointments' })
+  dailyWork.push({ href: '/dashboard/cases', label: t('cases'), icon: 'cases' })
+  dailyWork.push({ href: '/dashboard/appointments', label: t('appointments'), icon: 'appointments' })
   // Deadlines has no single gating permission (owner, cases_manage,
   // court_dates_manage, or just being on the case's team all qualify), so
   // - like Cases and Appointments - it's always shown and RLS scopes what's
   // actually visible.
-  dailyWork.push({ href: '/dashboard/deadlines', label: 'Deadlines', icon: 'deadlines' })
+  dailyWork.push({ href: '/dashboard/deadlines', label: t('deadlines'), icon: 'deadlines' })
 
   const money: NavItem[] = []
   if (isOwner || feesView) {
-    money.push({ href: '/dashboard/fees', label: 'Fees & payments', icon: 'fees' })
+    money.push({ href: '/dashboard/fees', label: t('feesAndPayments'), icon: 'fees' })
   }
 
   const administration: NavItem[] = []
   if (isOwner) {
-    administration.push({ href: '/dashboard/owner/staff', label: 'Staff accounts', icon: 'staff' })
-    administration.push({ href: '/dashboard/owner/roles', label: 'Roles & permissions', icon: 'roles' })
+    administration.push({ href: '/dashboard/owner/staff', label: t('staffAccounts'), icon: 'staff' })
+    administration.push({ href: '/dashboard/owner/roles', label: t('rolesAndPermissions'), icon: 'roles' })
     administration.push({
       href: '/dashboard/owner/deadline-period-types',
-      label: 'Deadline period types',
+      label: t('deadlinePeriodTypes'),
       icon: 'period-types',
     })
-    administration.push({ href: '/dashboard/owner/activity', label: 'Activity log', icon: 'activity' })
+    administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
   }
   if (isOwner || reportsView) {
-    administration.push({ href: '/dashboard/reports', label: 'Reports', icon: 'reports' })
+    administration.push({ href: '/dashboard/reports', label: t('reports'), icon: 'reports' })
   }
 
   // A group with no visible items must not render at all - no empty
@@ -84,13 +88,12 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   // NavLinks also filters defensively, but building the list already-clean
   // keeps this the single source of truth for what a role sees.
   const navGroups: NavGroup[] = [
-    { title: 'Daily work', items: dailyWork },
-    { title: 'Money', items: money },
-    { title: 'Administration', items: administration },
+    { title: t('groupDailyWork'), items: dailyWork },
+    { title: t('groupMoney'), items: money },
+    { title: t('groupAdministration'), items: administration },
   ].filter((group) => group.items.length > 0)
 
-  const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
-  const roleLabel = isOwner ? 'Owner' : staffRow?.roles ? localizedName(staffRow.roles, locale) : 'Staff'
+  const roleLabel = isOwner ? t('roleOwner') : staffRow?.roles ? localizedName(staffRow.roles, locale) : t('roleStaffFallback')
 
   return (
     <DashboardShell

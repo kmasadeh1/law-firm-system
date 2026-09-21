@@ -128,6 +128,25 @@
     "switchToLightTheme": "Switch to light theme",
     "switchToDarkTheme": "Switch to dark theme",
     "lightMode": "Light mode",
-    "darkMode": "Dark mode"
+    "darkMode": "Dark mode",
+    "nav": {
+      "groupDailyWork": "Daily work",
+      "groupMoney": "Money",
+      "groupAdministration": "Administration",
+      "home": "Home",
+      "clients": "Clients",
+      "enquiries": "Enquiries",
+      "cases": "Cases",
+      "appointments": "Appointments",
+      "deadlines": "Deadlines",
+      "feesAndPayments": "Fees & payments",
+      "staffAccounts": "Staff accounts",
+      "rolesAndPermissions": "Roles & permissions",
+      "deadlinePeriodTypes": "Deadline period types",
+      "activityLog": "Activity log",
+      "reports": "Reports",
+      "roleOwner": "Owner",
+      "roleStaffFallback": "Staff"
+    }
   }
 }
