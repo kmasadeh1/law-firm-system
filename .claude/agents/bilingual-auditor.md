@@ -31,11 +31,18 @@ Audit the changed files for four problems.
    test data.
 
 3. UNISOLATED LTR DATA INSIDE RTL TEXT
-   Case numbers, national IDs, phone numbers, email addresses, money
-   amounts and dates are LTR data. Inside an Arabic sentence their parts
-   can reorder and read wrong. They need dir="ltr" or a <bdi> wrapper.
-   Phone and email on the enquiry detail page already do this correctly —
-   use that as the reference pattern.
+   Formatted times and dates (the biggest miss — "9:00 AM" renders as
+   "AM 9:00" inside an RTL run), money amounts, case numbers, national
+   IDs, phone numbers, email addresses, and any other identifier made of
+   Latin characters or digits. Inside an Arabic sentence their parts can
+   reorder and read wrong. They need dir="ltr" or a <bdi> wrapper. Phone
+   and email on the enquiry detail page already do this correctly — use
+   that as the reference pattern.
+
+   Also flag separator-joined strings that mix directions — a pattern
+   like {lawyerName} · {clientName} · {type} where the parts can be
+   different languages. Each segment needs its own isolation or they
+   reorder against each other.
 
 4. DATABASE STRINGS RENDERED WITHOUT FALLBACK
    case_statuses, roles and deadline_period_types carry name_ar alongside
