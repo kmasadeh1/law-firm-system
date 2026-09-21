@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Crest } from '@/components/crest'
 import { ThemeToggle } from './theme-toggle'
+import { LocaleToggle } from './locale-toggle'
 import type { Theme } from './theme-store'
 import {
   MenuIcon,
@@ -136,7 +137,14 @@ export function DashboardShell({
           <p className="truncate text-sm font-medium text-fg">{userName}</p>
           <p className="text-xs text-fg-muted">{roleLabel}</p>
         </div>
-        <ThemeToggle initialTheme={initialTheme} />
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <ThemeToggle initialTheme={initialTheme} />
+          </div>
+          <div className="flex-1">
+            <LocaleToggle />
+          </div>
+        </div>
         <form action={logoutAction}>
           <button
             type="submit"
@@ -165,6 +173,7 @@ export function DashboardShell({
         </Link>
         <div className="flex items-center gap-1">
           <ThemeToggle initialTheme={initialTheme} compact />
+          <LocaleToggle compact />
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}

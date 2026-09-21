@@ -132,7 +132,9 @@
       "switchToLightTheme": "Switch to light theme",
       "switchToDarkTheme": "Switch to dark theme",
       "lightMode": "Light mode",
-      "darkMode": "Dark mode"
+      "darkMode": "Dark mode",
+      "switchToArabic": "Switch to Arabic",
+      "switchToEnglish": "Switch to English"
     },
     "nav": {
       "groupDailyWork": "Daily work",
