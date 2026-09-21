@@ -46,6 +46,12 @@ violated:
 - `npm run start` — run the production build
 - `npm run lint` — ESLint (flat config, `eslint-config-next`)
 - `npx tsc --noEmit` — typecheck (no dedicated npm script for this yet)
+- `npm run check:messages` — verifies the Arabic message fallback: every
+  `en.json` key resolves after the deep merge, every `ar.json` key has an
+  `en.json` counterpart (no orphans), and reports the untranslated-key count
+  as a progress metric. Run this after every string-extraction batch,
+  alongside `tsc` and `build` — it catches a key that renders as a raw path
+  or blank string under Arabic, which neither of those two checks does.
 
 No test framework is set up yet — there is no test script and no test runner
 in `package.json`.
