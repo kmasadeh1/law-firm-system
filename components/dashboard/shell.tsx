@@ -117,7 +117,7 @@ export function DashboardShell({
   initialTheme: Theme
   children: React.ReactNode
 }) {
-  const t = useTranslations('dashboard')
+  const t = useTranslations('dashboard.shell')
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const sidebarContent = (

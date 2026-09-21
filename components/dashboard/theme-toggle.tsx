@@ -32,7 +32,7 @@ export function ThemeToggle({
   compact?: boolean
 }) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, () => initialTheme)
-  const t = useTranslations('dashboard')
+  const t = useTranslations('dashboard.shell')
 
   function toggle() {
     setTheme(theme === 'dark' ? 'light' : 'dark')

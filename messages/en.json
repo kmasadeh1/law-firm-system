@@ -122,13 +122,15 @@
     "invalidMessage": "This link is no longer valid — please contact the office."
   },
   "dashboard": {
-    "logOut": "Log out",
-    "openMenu": "Open menu",
-    "closeMenu": "Close menu",
-    "switchToLightTheme": "Switch to light theme",
-    "switchToDarkTheme": "Switch to dark theme",
-    "lightMode": "Light mode",
-    "darkMode": "Dark mode",
+    "shell": {
+      "logOut": "Log out",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "switchToLightTheme": "Switch to light theme",
+      "switchToDarkTheme": "Switch to dark theme",
+      "lightMode": "Light mode",
+      "darkMode": "Dark mode"
+    },
     "nav": {
       "groupDailyWork": "Daily work",
       "groupMoney": "Money",
