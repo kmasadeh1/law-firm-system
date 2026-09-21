@@ -3,7 +3,7 @@ import { Amiri, Source_Serif_4 } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
 import { getStaffLocale } from '@/lib/get-staff-locale'
-import enMessages from '@/messages/en.json'
+import { getMessagesForLocale } from '@/i18n/messages'
 import '../globals.css'
 
 const amiri = Amiri({
@@ -40,12 +40,11 @@ export default async function StaffRootLayout({ children }: { children: React.Re
   const locale = await getStaffLocale()
   const dir = locale === 'ar' ? 'rtl' : 'ltr'
 
-  // No Arabic dashboard translations exist yet (a later task adds them), so
-  // the dashboard message namespace always comes from English regardless of
-  // the staff member's locale - that's the intended fallback, not a bug:
-  // <html> and formatting still reflect the real locale, only the strings
-  // that don't exist yet in Arabic stay in English.
-  const messages = { dashboard: enMessages.dashboard }
+  // Arabic dashboard translations arrive in phases, key by key - a missing
+  // key falls back to English rather than the whole namespace doing so (see
+  // i18n/messages.ts). Only the dashboard slice is sent to the client here;
+  // the public site's namespaces aren't relevant to this route tree.
+  const messages = { dashboard: getMessagesForLocale(locale).dashboard }
 
   return (
     <html
