@@ -2,12 +2,14 @@
 
 import { useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { createDeadline, extendDeadline, type PeriodTypeOption } from '../../deadlines/actions'
 import { urgencyOf, urgencyClass, urgencyLabel } from '../../deadlines/urgency'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { Banner } from '@/components/dashboard/banner'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
+import { localizedName } from '@/lib/localized-name'
 
 type Deadline = {
   id: string
@@ -135,6 +137,7 @@ export function DeadlinesSection({
   deadlines: Deadline[]
   periodTypes: PeriodTypeOption[]
 }) {
+  const locale = useLocale()
   const addFormRef = useRef<HTMLFormElement>(null)
   const [periodTypeId, setPeriodTypeId] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -189,7 +192,7 @@ export function DeadlinesSection({
               <option value="">Select…</option>
               {periodTypes.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.period_days} days)
+                  {localizedName(p, locale)} ({p.period_days} days)
                 </option>
               ))}
             </select>

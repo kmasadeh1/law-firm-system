@@ -7,7 +7,7 @@ export default async function NewDeadlinePage() {
   const supabase = await createClient()
   const { data: periodTypes } = await supabase
     .from('deadline_period_types')
-    .select('id, name, period_days, description')
+    .select('id, name, name_ar, period_days, description')
     .order('name')
 
   return (

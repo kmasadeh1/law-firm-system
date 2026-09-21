@@ -1,12 +1,14 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useLocale } from 'next-intl'
 import { addStaff, regenerateTempPassword, setStaffActive } from './actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Switch } from '@/components/dashboard/switch'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { localizedName } from '@/lib/localized-name'
 
 type StaffRow = {
   id: string
@@ -16,10 +18,10 @@ type StaffRow = {
   must_change_password: boolean
   temp_password_set_at: string | null
   temp_password_expires_at: string | null
-  roles: { name: string } | null
+  roles: { name: string; name_ar: string | null } | null
 }
 
-type RoleOption = { id: string; name: string }
+type RoleOption = { id: string; name: string; name_ar: string | null }
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
@@ -71,6 +73,7 @@ function GeneratedPasswordPanel({ password }: { password: string }) {
 }
 
 function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (password: string) => void }) {
+  const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -125,7 +128,7 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
               </option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
-                  {role.name}
+                  {localizedName(role, locale)}
                 </option>
               ))}
             </select>
@@ -210,6 +213,7 @@ function ActiveToggle({ staffId, isActive }: { staffId: string; isActive: boolea
 }
 
 function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (password: string) => void }) {
+  const locale = useLocale()
   const expired = isExpired(row.temp_password_expires_at)
 
   return (
@@ -218,7 +222,7 @@ function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (passwor
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium text-fg">{row.full_name}</span>
           <Badge variant={row.user_type === 'owner' ? 'accent' : 'neutral'}>
-            {row.user_type === 'owner' ? 'Owner' : (row.roles?.name ?? 'No role')}
+            {row.user_type === 'owner' ? 'Owner' : row.roles ? localizedName(row.roles, locale) : 'No role'}
           </Badge>
           {row.must_change_password && (
             <Badge variant={expired ? 'muted' : 'accent'}>

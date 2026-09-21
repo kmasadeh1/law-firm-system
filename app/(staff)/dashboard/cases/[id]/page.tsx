@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
+import { getStaffLocale } from '@/lib/get-staff-locale'
+import { localizedName } from '@/lib/localized-name'
 import { StatusSection } from './status-section'
 import { TeamSection } from './team-section'
 import { OpposingPartiesSection } from './opposing-parties-section'
@@ -14,6 +16,7 @@ import { TimelineSection, type TimelineRow } from './timeline-section'
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
   const { id } = await params
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   // No access gate here either - a row RLS hides looks identical to one
   // that doesn't exist, same as the Clients edit page.
@@ -52,18 +55,18 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: expenseTotalsRow },
     { data: timelineRows, error: timelineError },
   ] = await Promise.all([
-    supabase.from('case_statuses').select('id, name, is_terminal').order('sort_order'),
+    supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order'),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
     supabase.from('staff_directory').select('id, full_name').eq('is_active', true).order('full_name'),
     supabase.from('case_opposing_parties').select('id, name, national_id').eq('case_id', id),
     supabase
       .from('deadlines')
       .select(
-        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, description, deadline_period_types(name, period_days)'
+        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, description, deadline_period_types(name, name_ar, period_days)'
       )
       .eq('case_id', id)
       .order('effective_due_date', { ascending: true, nullsFirst: false }),
-    supabase.from('deadline_period_types').select('id, name, period_days, description').order('name'),
+    supabase.from('deadline_period_types').select('id, name, name_ar, period_days, description').order('name'),
     supabase
       .from('case_share_links')
       .select('id, label, created_at, expires_at, revoked_at, last_accessed_at, access_count')
@@ -121,7 +124,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     extended_by_name: d.extended_by ? (nameById.get(d.extended_by) ?? 'Unknown staff') : null,
     extended_at: d.extended_at,
     description: d.description,
-    period_type_name: d.deadline_period_types?.name ?? 'Unknown period',
+    period_type_name: d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : 'Unknown period',
     period_days: d.deadline_period_types?.period_days ?? 0,
   }))
 

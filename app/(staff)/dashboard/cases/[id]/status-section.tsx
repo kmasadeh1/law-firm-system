@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useLocale } from 'next-intl'
 import { setCaseStatus } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { localizedName } from '@/lib/localized-name'
 
-type StatusOption = { id: string; name: string; is_terminal: boolean }
+type StatusOption = { id: string; name: string; name_ar: string | null; is_terminal: boolean }
 
 export function StatusSection({
   caseId,
@@ -17,6 +19,7 @@ export function StatusSection({
   currentStatusId: string
   statuses: StatusOption[]
 }) {
+  const locale = useLocale()
   const [statusId, setStatusId] = useState(currentStatusId)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -53,7 +56,7 @@ export function StatusSection({
         >
           {statuses.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name}
+              {localizedName(s, locale)}
             </option>
           ))}
         </select>

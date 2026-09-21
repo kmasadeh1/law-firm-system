@@ -5,14 +5,17 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
+import { getStaffLocale } from '@/lib/get-staff-locale'
+import { localizedName } from '@/lib/localized-name'
 
 export default async function CasesListPage({ searchParams }: PageProps<'/dashboard/cases'>) {
   const { q, status } = (await searchParams) as { q?: string; status?: string }
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   const { data: statuses } = await supabase
     .from('case_statuses')
-    .select('id, name, sort_order')
+    .select('id, name, name_ar, sort_order')
     .order('sort_order')
 
   // No access gate here - this just renders whatever RLS returns for the
@@ -20,7 +23,7 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   // including a legitimately empty list.
   let query = supabase
     .from('cases')
-    .select('id, case_number, title, case_type, clients(full_name), case_statuses(name)')
+    .select('id, case_number, title, case_type, clients(full_name), case_statuses(name, name_ar)')
     .order('created_at', { ascending: false })
 
   const term = q?.trim()
@@ -59,7 +62,7 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
           <option value="">All statuses</option>
           {(statuses ?? []).map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name}
+              {localizedName(s, locale)}
             </option>
           ))}
         </select>
@@ -102,7 +105,8 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
                     <span className="text-fg-muted"> — {c.title}</span>
                   </span>
                   <span className="text-fg-muted">
-                    {c.clients?.full_name ?? '—'} · {c.case_statuses?.name ?? '—'}
+                    {c.clients?.full_name ?? '—'} ·{' '}
+                    {c.case_statuses ? localizedName(c.case_statuses, locale) : '—'}
                   </span>
                 </Link>
               </li>

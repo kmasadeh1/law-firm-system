@@ -5,6 +5,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Badge } from '@/components/dashboard/badge'
 import { LinkButton } from '@/components/dashboard/button'
+import { localizedName } from '@/lib/localized-name'
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
@@ -18,7 +19,7 @@ export default async function StaffDashboardPage() {
 
   const nowIso = new Date().toISOString()
 
-  const [{ data: appointments }, { data: assignments }] = await Promise.all([
+  const [{ data: appointments }, { data: assignments }, { data: staffRow }] = await Promise.all([
     supabase
       .from('appointments')
       .select('id, type, starts_at, clients(full_name), cases(case_number)')
@@ -28,10 +29,13 @@ export default async function StaffDashboardPage() {
       .limit(5),
     supabase
       .from('case_lawyers')
-      .select('is_lead, cases(id, case_number, title, case_statuses(name))')
+      .select('is_lead, cases(id, case_number, title, case_statuses(name, name_ar))')
       .eq('staff_id', staffId)
       .limit(8),
+    supabase.from('staff').select('locale').eq('id', staffId).maybeSingle(),
   ])
+
+  const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
 
   return (
     <div className="flex flex-col gap-8">
@@ -96,7 +100,9 @@ export default async function StaffDashboardPage() {
                       </span>
                       <span className="flex items-center gap-2">
                         {a.is_lead && <Badge variant="accent">Lead</Badge>}
-                        <span className="text-fg-muted">{a.cases!.case_statuses?.name ?? '—'}</span>
+                        <span className="text-fg-muted">
+                          {a.cases!.case_statuses ? localizedName(a.cases!.case_statuses, locale) : '—'}
+                        </span>
                       </span>
                     </Link>
                   </li>

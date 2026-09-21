@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { createDeadline, type DeadlineRow, type PeriodTypeOption } from '../actions'
 import { CasePicker } from '../case-picker'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
@@ -9,8 +10,10 @@ import { Button } from '@/components/dashboard/button'
 import { Banner } from '@/components/dashboard/banner'
 import { Panel } from '@/components/dashboard/panel'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
+import { localizedName } from '@/lib/localized-name'
 
 export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] }) {
+  const locale = useLocale()
   const formRef = useRef<HTMLFormElement>(null)
   const [periodTypeId, setPeriodTypeId] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -58,12 +61,13 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
         </p>
         {rolledForward && (
           <Banner kind="warning">
-            Falls on a weekend ({result.unadjusted_due_date}) — moved to {result.due_date}.
+            Falls on a weekend (<bdi>{result.unadjusted_due_date}</bdi>) — moved to{' '}
+            <bdi>{result.due_date}</bdi>.
           </Banner>
         )}
         {result.effective_due_date !== result.due_date && (
           <p className="text-sm text-fg-muted">
-            Effective due date (after any extension): {result.effective_due_date}
+            Effective due date (after any extension): <bdi>{result.effective_due_date}</bdi>
           </p>
         )}
         <div className="flex gap-3">
@@ -104,7 +108,7 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
           <option value="">Select a period type…</option>
           {periodTypes.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name} ({p.period_days} days)
+              {localizedName(p, locale)} ({p.period_days} days)
             </option>
           ))}
         </select>

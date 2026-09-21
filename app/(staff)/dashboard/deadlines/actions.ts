@@ -39,6 +39,7 @@ export async function searchCases(term: string): Promise<CaseOption[]> {
 export type PeriodTypeOption = {
   id: string
   name: string
+  name_ar: string | null
   period_days: number
   description: string | null
 }
@@ -47,7 +48,7 @@ export async function listPeriodTypes(): Promise<PeriodTypeOption[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('deadline_period_types')
-    .select('id, name, period_days, description')
+    .select('id, name, name_ar, period_days, description')
     .order('name')
 
   return data ?? []

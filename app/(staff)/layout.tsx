@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Amiri, Source_Serif_4 } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
-import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import enMessages from '@/messages/en.json'
 import '../globals.css'
 
@@ -37,22 +37,7 @@ export default async function StaffRootLayout({ children }: { children: React.Re
   // flash. When unset, data-theme is simply omitted and the CSS
   // prefers-color-scheme fallback in globals.css decides (also zero-flash).
   const theme = await getThemeCookie()
-
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getClaims()
-  const user = data?.claims
-
-  let locale: 'en' | 'ar' = 'en'
-  if (user) {
-    const { data: staffRow } = await supabase
-      .from('staff')
-      .select('locale')
-      .eq('id', user.sub as string)
-      .maybeSingle()
-    if (staffRow?.locale === 'ar') {
-      locale = 'ar'
-    }
-  }
+  const locale = await getStaffLocale()
   const dir = locale === 'ar' ? 'rtl' : 'ltr'
 
   // No Arabic dashboard translations exist yet (a later task adds them), so

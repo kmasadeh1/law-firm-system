@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardShell, type NavGroup, type NavItem } from '@/components/dashboard/shell'
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
+import { localizedName } from '@/lib/localized-name'
 import { logout } from './actions'
 
 /**
@@ -27,7 +28,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     { data: reportsView },
     initialTheme,
   ] = await Promise.all([
-    supabase.from('staff').select('full_name, user_type, roles(name)').eq('id', user.sub as string).maybeSingle(),
+    supabase
+      .from('staff')
+      .select('full_name, user_type, locale, roles(name, name_ar)')
+      .eq('id', user.sub as string)
+      .maybeSingle(),
     supabase.rpc('has_permission', { p_key: 'clients_manage' }),
     supabase.rpc('has_permission', { p_key: 'fees_view' }),
     supabase.rpc('has_permission', { p_key: 'enquiries_manage' }),
@@ -84,7 +89,8 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     { title: 'Administration', items: administration },
   ].filter((group) => group.items.length > 0)
 
-  const roleLabel = isOwner ? 'Owner' : (staffRow?.roles?.name ?? 'Staff')
+  const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
+  const roleLabel = isOwner ? 'Owner' : staffRow?.roles ? localizedName(staffRow.roles, locale) : 'Staff'
 
   return (
     <DashboardShell

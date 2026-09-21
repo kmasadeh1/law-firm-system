@@ -13,7 +13,7 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
   let staffQuery = supabase
     .from('staff')
     .select(
-      'id, full_name, user_type, is_active, must_change_password, temp_password_set_at, temp_password_expires_at, roles(name)'
+      'id, full_name, user_type, is_active, must_change_password, temp_password_set_at, temp_password_expires_at, roles(name, name_ar)'
     )
     .order('full_name')
   if (!includeInactive) {
@@ -22,7 +22,7 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
 
   const [{ data: staffRows }, { data: roles }] = await Promise.all([
     staffQuery,
-    supabase.from('roles').select('id, name').order('name'),
+    supabase.from('roles').select('id, name, name_ar').order('name'),
   ])
 
   return (

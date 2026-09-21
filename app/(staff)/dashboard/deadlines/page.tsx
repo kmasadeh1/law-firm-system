@@ -5,9 +5,12 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton } from '@/components/dashboard/button'
 import { urgencyOf, urgencyClass, urgencyLabel } from './urgency'
+import { getStaffLocale } from '@/lib/get-staff-locale'
+import { localizedName } from '@/lib/localized-name'
 
 export default async function DeadlinesListPage() {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
 
   // RLS already scopes this to what the signed-in user can see (owner,
   // cases_manage, court_dates_manage, or is_on_case) - no extra gate here,
@@ -15,7 +18,7 @@ export default async function DeadlinesListPage() {
   const { data: deadlines } = await supabase
     .from('deadlines')
     .select(
-      'id, case_id, trigger_date, effective_due_date, extended_due_date, cases(case_number, title), deadline_period_types(name)'
+      'id, case_id, trigger_date, effective_due_date, extended_due_date, cases(case_number, title), deadline_period_types(name, name_ar)'
     )
     .order('effective_due_date', { ascending: true, nullsFirst: false })
 
@@ -52,7 +55,9 @@ export default async function DeadlinesListPage() {
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span>
-                      <span className="font-medium text-fg">{d.deadline_period_types?.name ?? '—'}</span>
+                      <span className="font-medium text-fg">
+                        {d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : '—'}
+                      </span>
                       <span className="text-fg-muted">
                         {' '}
                         — {d.cases?.case_number} · {d.cases?.title}
