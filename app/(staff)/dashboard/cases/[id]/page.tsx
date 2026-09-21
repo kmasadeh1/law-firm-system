@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -17,6 +18,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
   const { id } = await params
   const supabase = await createClient()
   const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.page' })
+  const tCommon = await getTranslations({ locale, namespace: 'dashboard.common' })
 
   // No access gate here either - a row RLS hides looks identical to one
   // that doesn't exist, same as the Clients edit page.
@@ -31,10 +34,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
   if (!caseRow) {
     return (
       <div className="flex flex-col gap-6">
-        <BackLink href="/dashboard/cases" label="Cases" />
-        <p className="text-sm text-fg-muted">
-          This case doesn&apos;t exist, or you don&apos;t have access to it.
-        </p>
+        <BackLink href="/dashboard/cases" label={t('backToCases')} />
+        <p className="text-sm text-fg-muted">{t('caseNotFound')}</p>
       </div>
     )
   }
@@ -107,10 +108,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
   )
   const nameById = new Map(activeStaff.map((s) => [s.id, s.full_name]))
   const staffNameById = Object.fromEntries(nameById)
-  const team = (teamRows ?? []).map((t) => ({
-    staff_id: t.staff_id,
-    is_lead: t.is_lead,
-    full_name: nameById.get(t.staff_id) ?? 'Unknown staff',
+  const team = (teamRows ?? []).map((row) => ({
+    staff_id: row.staff_id,
+    is_lead: row.is_lead,
+    full_name: nameById.get(row.staff_id) ?? tCommon('unknownStaff'),
   }))
 
   const deadlines = (deadlineRows ?? []).map((d) => ({
@@ -121,10 +122,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     effective_due_date: d.effective_due_date,
     extended_due_date: d.extended_due_date,
     extension_reason: d.extension_reason,
-    extended_by_name: d.extended_by ? (nameById.get(d.extended_by) ?? 'Unknown staff') : null,
+    extended_by_name: d.extended_by ? (nameById.get(d.extended_by) ?? tCommon('unknownStaff')) : null,
     extended_at: d.extended_at,
     description: d.description,
-    period_type_name: d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : 'Unknown period',
+    period_type_name: d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : t('unknownPeriod'),
     period_days: d.deadline_period_types?.period_days ?? 0,
   }))
 
@@ -139,18 +140,18 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     note: n.note,
     created_at: n.created_at,
     edited_at: n.edited_at,
-    author_name: n.staff_id ? (allNameById.get(n.staff_id) ?? 'Unknown staff') : 'Unknown staff',
+    author_name: n.staff_id ? (allNameById.get(n.staff_id) ?? tCommon('unknownStaff')) : tCommon('unknownStaff'),
     deleted_at: n.deleted_at,
-    deleted_by_name: n.deleted_by ? (allNameById.get(n.deleted_by) ?? 'Unknown staff') : null,
+    deleted_by_name: n.deleted_by ? (allNameById.get(n.deleted_by) ?? tCommon('unknownStaff')) : null,
   }))
 
   const documents: DocumentRow[] = (documentRows ?? []).map((d) => ({
     id: d.id,
     filename: d.filename,
     uploaded_at: d.uploaded_at,
-    uploaded_by_name: d.uploaded_by ? (nameById.get(d.uploaded_by) ?? 'Unknown staff') : 'Unknown staff',
+    uploaded_by_name: d.uploaded_by ? (nameById.get(d.uploaded_by) ?? tCommon('unknownStaff')) : tCommon('unknownStaff'),
     deleted_at: d.deleted_at,
-    deleted_by_name: d.deleted_by ? (allNameById.get(d.deleted_by) ?? 'Unknown staff') : null,
+    deleted_by_name: d.deleted_by ? (allNameById.get(d.deleted_by) ?? tCommon('unknownStaff')) : null,
   }))
 
   const expenses: Expense[] = (expenseRows ?? []).map((e) => ({
@@ -160,7 +161,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     incurred_at: e.incurred_at,
     reimbursed: e.reimbursed,
     reimbursed_at: e.reimbursed_at,
-    recorded_by_name: e.recorded_by ? (allNameById.get(e.recorded_by) ?? 'Unknown staff') : 'Unknown staff',
+    recorded_by_name: e.recorded_by ? (allNameById.get(e.recorded_by) ?? tCommon('unknownStaff')) : tCommon('unknownStaff'),
   }))
 
   const timeline: TimelineRow[] = (timelineRows ?? []).map((row) => ({
@@ -176,14 +177,19 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <BackLink href="/dashboard/cases" label="Cases" />
+        <BackLink href="/dashboard/cases" label={t('backToCases')} />
         <PageHeader
           title={
             <>
               <bdi>{caseRow.case_number}</bdi> — {caseRow.title}
             </>
           }
-          description={`Client: ${caseRow.clients?.full_name ?? '—'}${caseRow.case_type ? ` · ${caseRow.case_type}` : ''}`}
+          description={t.rich('description', {
+            hasType: caseRow.case_type ? 'yes' : 'other',
+            name: caseRow.clients?.full_name ?? '—',
+            caseType: caseRow.case_type ?? '',
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         />
       </div>
 
@@ -217,7 +223,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       )}
 
       {timelineError ? (
-        <p className="text-sm text-fg-muted">Timeline unavailable: {timelineError.message}</p>
+        <p className="text-sm text-fg-muted">
+          {t.rich('timelineUnavailable', {
+            message: timelineError.message,
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
+        </p>
       ) : (
         <TimelineSection rows={timeline} staffNameById={staffNameById} />
       )}

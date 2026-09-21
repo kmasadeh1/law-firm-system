@@ -122,6 +122,9 @@
     "invalidMessage": "This link is no longer valid — please contact the office."
   },
   "dashboard": {
+    "common": {
+      "unknownStaff": "Unknown staff"
+    },
     "shell": {
       "logOut": "Log out",
       "openMenu": "Open menu",
@@ -200,6 +203,86 @@
           "statusLookupFailed": "Could not determine the starting status. Please try again.",
           "caseNumberInUse": "That case number is already in use.",
           "createFailed": "Could not create the case. Please try again."
+        }
+      },
+      "detail": {
+        "page": {
+          "backToCases": "Cases",
+          "caseNotFound": "This case doesn't exist, or you don't have access to it.",
+          "description": "{hasType, select, yes {Client: <bdi>{name}</bdi> · <bdi>{caseType}</bdi>} other {Client: <bdi>{name}</bdi>}}",
+          "timelineUnavailable": "Timeline unavailable: <bdi>{message}</bdi>",
+          "unknownPeriod": "Unknown period"
+        },
+        "status": {
+          "heading": "Status",
+          "saving": "Saving…",
+          "saveStatus": "Save status",
+          "saved": "Saved",
+          "errors": {
+            "updateFailed": "Could not update the status. Please try again."
+          }
+        },
+        "team": {
+          "heading": "Team",
+          "noLeadWarning": "No lead lawyer assigned yet - only the owner can close this case until one is set.",
+          "nobodyAssigned": "Nobody is assigned yet.",
+          "lead": "Lead",
+          "removeAsLead": "Remove as lead",
+          "makeLead": "Make lead",
+          "remove": "Remove",
+          "addToTeam": "Add to team",
+          "selectStaff": "Select staff…",
+          "asLead": "as lead",
+          "add": "Add",
+          "errors": {
+            "alreadyHasLead": "This case already has a lead lawyer. Remove them as lead first, then promote someone else.",
+            "alreadyOnCase": "That person is already on this case.",
+            "noPermissionChange": "You don't have permission to change this case's team.",
+            "addFailed": "Could not add them to the case. Please try again.",
+            "updateFailed": "Could not update the team. Please try again.",
+            "removeFailed": "Could not remove them from the case. Please try again.",
+            "noPermissionRemove": "You don't have permission to change this case's team, or they're already off it."
+          }
+        },
+        "expenses": {
+          "heading": "Expenses",
+          "description": "Costs the firm has paid out on this case - court fees, translation, expert fees - tracked separately from the agreed fee and marked when the client reimburses them.",
+          "incurredBadge": "Incurred:",
+          "reimbursedBadge": "Reimbursed:",
+          "outstandingBadge": "Outstanding:",
+          "noExpensesYet": "No expenses recorded yet.",
+          "descriptionLabel": "Description",
+          "amountLabel": "Amount (JD)",
+          "incurredLabel": "Date incurred",
+          "descriptionPlaceholder": "e.g. Court filing fee",
+          "adding": "Adding…",
+          "addExpense": "Add expense",
+          "saving": "Saving…",
+          "save": "Save",
+          "cancel": "Cancel",
+          "incurredLine": "Incurred <bdi>{date}</bdi> · recorded by {name}",
+          "reimbursedOn": "Reimbursed <bdi>{date}</bdi>",
+          "notYetReimbursed": "Not yet reimbursed",
+          "markUnreimbursed": "Mark unreimbursed",
+          "markReimbursed": "Mark reimbursed",
+          "edit": "Edit",
+          "deleting": "Deleting…",
+          "delete": "Delete",
+          "confirmDelete": "Confirm delete?",
+          "errors": {
+            "descriptionRequired": "Description is required.",
+            "incurredRequired": "Date incurred is required.",
+            "amountRequired": "Amount is required.",
+            "invalidAmount": "Enter a valid amount greater than zero.",
+            "noPermissionRecord": "You don't have permission to record expenses on this case.",
+            "recordFailed": "Could not record the expense. Please try again.",
+            "saveFailed": "Could not save the expense. Please try again.",
+            "noPermissionEdit": "You don't have permission to edit this expense.",
+            "reimbursedUpdateFailed": "Could not update the reimbursement status. Please try again.",
+            "noPermissionUpdate": "You don't have permission to update this expense.",
+            "deleteFailed": "Could not delete the expense. Please try again.",
+            "noPermissionDelete": "You don't have permission to delete this expense."
+          }
         }
       }
     }

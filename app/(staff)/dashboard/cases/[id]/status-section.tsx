@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { setCaseStatus } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
@@ -20,6 +20,7 @@ export function StatusSection({
   statuses: StatusOption[]
 }) {
   const locale = useLocale()
+  const t = useTranslations('dashboard.cases.detail.status')
   const [statusId, setStatusId] = useState(currentStatusId)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -43,7 +44,7 @@ export function StatusSection({
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-status-section">
-      <h2 className="font-heading text-lg text-fg">Status</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
       <div className="flex flex-wrap items-center gap-2">
         <select
           id="status_id"
@@ -61,9 +62,9 @@ export function StatusSection({
           ))}
         </select>
         <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending || !changed}>
-          {isPending ? 'Saving…' : 'Save status'}
+          {isPending ? t('saving') : t('saveStatus')}
         </Button>
-        {saved && !changed && <FieldSuccess>Saved</FieldSuccess>}
+        {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
       </div>
       {error && <FieldError>{error}</FieldError>}
     </Panel>

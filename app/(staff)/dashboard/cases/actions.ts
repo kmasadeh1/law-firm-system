@@ -103,6 +103,8 @@ export async function createCase(
 // --- Status --------------------------------------------------------------
 
 export async function setCaseStatus(caseId: string, statusId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.status.errors' })
   const supabase = await createClient()
   const { error } = await supabase
     .from('cases')
@@ -115,7 +117,7 @@ export async function setCaseStatus(caseId: string, statusId: string): Promise<A
     if (error.code === 'P0001') {
       return { error: error.message }
     }
-    return { error: 'Could not update the status. Please try again.' }
+    return { error: t('updateFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -129,6 +131,8 @@ export async function addTeamMember(
   staffId: string,
   isLead: boolean
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.team.errors' })
   const supabase = await createClient()
   const { error } = await supabase
     .from('case_lawyers')
@@ -136,18 +140,15 @@ export async function addTeamMember(
 
   if (error) {
     if (error.code === '23505' && error.message.includes('case_lawyers_one_lead')) {
-      return {
-        error:
-          'This case already has a lead lawyer. Remove them as lead first, then promote someone else.',
-      }
+      return { error: t('alreadyHasLead') }
     }
     if (error.code === '23505') {
-      return { error: 'That person is already on this case.' }
+      return { error: t('alreadyOnCase') }
     }
     if (error.code === '42501') {
-      return { error: "You don't have permission to change this case's team." }
+      return { error: t('noPermissionChange') }
     }
-    return { error: 'Could not add them to the case. Please try again.' }
+    return { error: t('addFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -159,6 +160,8 @@ export async function setTeamMemberLead(
   staffId: string,
   isLead: boolean
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.team.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_lawyers')
@@ -169,18 +172,15 @@ export async function setTeamMemberLead(
 
   if (error) {
     if (error.code === '23505' && error.message.includes('case_lawyers_one_lead')) {
-      return {
-        error:
-          'This case already has a lead lawyer. Remove them as lead first, then promote someone else.',
-      }
+      return { error: t('alreadyHasLead') }
     }
-    return { error: 'Could not update the team. Please try again.' }
+    return { error: t('updateFailed') }
   }
 
   // UPDATE blocked by RLS matches zero rows rather than erroring - treat
   // that the same as a denial rather than silently doing nothing.
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to change this case's team." }
+    return { error: t('noPermissionChange') }
   }
 
   revalidatePath(casePath(caseId))
@@ -188,6 +188,8 @@ export async function setTeamMemberLead(
 }
 
 export async function removeTeamMember(caseId: string, staffId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.team.errors' })
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_lawyers')
@@ -197,11 +199,11 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
     .select('staff_id')
 
   if (error) {
-    return { error: 'Could not remove them from the case. Please try again.' }
+    return { error: t('removeFailed') }
   }
 
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to change this case's team, or they're already off it." }
+    return { error: t('noPermissionRemove') }
   }
 
   revalidatePath(casePath(caseId))
@@ -542,25 +544,30 @@ export async function restoreDocument(caseId: string, documentId: string): Promi
 
 // --- Expenses ------------------------------------------------------------
 
-function parseAmount(formData: FormData): number | { error: string } {
+async function parseAmount(
+  formData: FormData,
+  t: Awaited<ReturnType<typeof getTranslations>>
+): Promise<number | { error: string }> {
   const raw = formData.get('amount')
-  if (typeof raw !== 'string' || !raw.trim()) return { error: 'Amount is required.' }
+  if (typeof raw !== 'string' || !raw.trim()) return { error: t('amountRequired') }
   const amount = Number(raw)
-  if (!Number.isFinite(amount) || amount <= 0) return { error: 'Enter a valid amount greater than zero.' }
+  if (!Number.isFinite(amount) || amount <= 0) return { error: t('invalidAmount') }
   return amount
 }
 
 export async function addExpense(caseId: string, formData: FormData): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.expenses.errors' })
   const description = formData.get('description')
   const incurredAt = formData.get('incurred_at')
 
   if (typeof description !== 'string' || !description.trim()) {
-    return { error: 'Description is required.' }
+    return { error: t('descriptionRequired') }
   }
   if (typeof incurredAt !== 'string' || !incurredAt) {
-    return { error: 'Date incurred is required.' }
+    return { error: t('incurredRequired') }
   }
-  const amount = parseAmount(formData)
+  const amount = await parseAmount(formData, t)
   if (typeof amount !== 'number') return amount
 
   const supabase = await createClient()
@@ -576,9 +583,9 @@ export async function addExpense(caseId: string, formData: FormData): Promise<Ac
 
   if (error) {
     if (error.code === '42501') {
-      return { error: "You don't have permission to record expenses on this case." }
+      return { error: t('noPermissionRecord') }
     }
-    return { error: 'Could not record the expense. Please try again.' }
+    return { error: t('recordFailed') }
   }
 
   revalidatePath(casePath(caseId))
@@ -590,16 +597,18 @@ export async function editExpense(
   expenseId: string,
   formData: FormData
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.expenses.errors' })
   const description = formData.get('description')
   const incurredAt = formData.get('incurred_at')
 
   if (typeof description !== 'string' || !description.trim()) {
-    return { error: 'Description is required.' }
+    return { error: t('descriptionRequired') }
   }
   if (typeof incurredAt !== 'string' || !incurredAt) {
-    return { error: 'Date incurred is required.' }
+    return { error: t('incurredRequired') }
   }
-  const amount = parseAmount(formData)
+  const amount = await parseAmount(formData, t)
   if (typeof amount !== 'number') return amount
 
   const supabase = await createClient()
@@ -611,10 +620,10 @@ export async function editExpense(
     .select('id')
 
   if (error) {
-    return { error: 'Could not save the expense. Please try again.' }
+    return { error: t('saveFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to edit this expense." }
+    return { error: t('noPermissionEdit') }
   }
 
   revalidatePath(casePath(caseId))
@@ -626,6 +635,8 @@ export async function setExpenseReimbursed(
   expenseId: string,
   reimbursed: boolean
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.expenses.errors' })
   const supabase = await createClient()
   // reimbursed and reimbursed_at are set together so they can never
   // disagree - there's no database constraint enforcing that pairing, so
@@ -641,10 +652,10 @@ export async function setExpenseReimbursed(
     .select('id')
 
   if (error) {
-    return { error: 'Could not update the reimbursement status. Please try again.' }
+    return { error: t('reimbursedUpdateFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to update this expense." }
+    return { error: t('noPermissionUpdate') }
   }
 
   revalidatePath(casePath(caseId))
@@ -652,6 +663,8 @@ export async function setExpenseReimbursed(
 }
 
 export async function deleteExpense(caseId: string, expenseId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.expenses.errors' })
   const supabase = await createClient()
   // Expenses allow a real DELETE (unlike case_notes/documents) - existing
   // schema, not something to soften into a soft delete here.
@@ -663,10 +676,10 @@ export async function deleteExpense(caseId: string, expenseId: string): Promise<
     .select('id')
 
   if (error) {
-    return { error: 'Could not delete the expense. Please try again.' }
+    return { error: t('deleteFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to delete this expense." }
+    return { error: t('noPermissionDelete') }
   }
 
   revalidatePath(casePath(caseId))

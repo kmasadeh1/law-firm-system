@@ -53,6 +53,15 @@ violated:
   alongside `tsc` and `build` — it catches a key that renders as a raw path
   or blank string under Arabic, which neither of those two checks does.
 
+**Dashboard string-extraction convention:** a section's `dashboard.cases.*`
+namespace follows where its server actions live, not which page it renders
+on. `expenses-section.tsx`'s errors live in `cases/actions.ts`, so it's under
+`dashboard.cases.detail.expenses`. `deadlines-section.tsx` renders inside the
+same case detail page but its errors live in `deadlines/actions.ts`, so it is
+NOT under `dashboard.cases.*` at all — it belongs to whichever batch covers
+the Deadlines feature area. This keeps a batch from ever needing to touch
+the same `actions.ts` file twice.
+
 No test framework is set up yet — there is no test script and no test runner
 in `package.json`.
 

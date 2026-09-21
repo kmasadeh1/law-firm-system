@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { addTeamMember, removeTeamMember, setTeamMemberLead } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
@@ -20,6 +21,7 @@ export function TeamSection({
   team: TeamMember[]
   availableStaff: StaffOption[]
 }) {
+  const t = useTranslations('dashboard.cases.detail.team')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [addStaffId, setAddStaffId] = useState('')
@@ -38,23 +40,19 @@ export function TeamSection({
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-team-section">
-      <h2 className="font-heading text-lg text-fg">Team</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
-      {!hasLead && (
-        <Banner kind="warning">
-          No lead lawyer assigned yet - only the owner can close this case until one is set.
-        </Banner>
-      )}
+      {!hasLead && <Banner kind="warning">{t('noLeadWarning')}</Banner>}
 
       {team.length === 0 ? (
-        <p className="text-sm text-fg-muted">Nobody is assigned yet.</p>
+        <p className="text-sm text-fg-muted">{t('nobodyAssigned')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {team.map((m) => (
             <li key={m.staff_id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
               <span className="flex items-center gap-2 text-fg">
                 {m.full_name}
-                {m.is_lead && <Badge variant="accent">Lead</Badge>}
+                {m.is_lead && <Badge variant="accent">{t('lead')}</Badge>}
               </span>
               <span className="flex gap-3">
                 {m.is_lead ? (
@@ -64,7 +62,7 @@ export function TeamSection({
                     disabled={isPending}
                     onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, false))}
                   >
-                    Remove as lead
+                    {t('removeAsLead')}
                   </Button>
                 ) : (
                   <Button
@@ -73,7 +71,7 @@ export function TeamSection({
                     disabled={isPending}
                     onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, true))}
                   >
-                    Make lead
+                    {t('makeLead')}
                   </Button>
                 )}
                 <Button
@@ -82,7 +80,7 @@ export function TeamSection({
                   disabled={isPending}
                   onClick={() => runAction(() => removeTeamMember(caseId, m.staff_id))}
                 >
-                  Remove
+                  {t('remove')}
                 </Button>
               </span>
             </li>
@@ -96,7 +94,7 @@ export function TeamSection({
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-col gap-1">
             <label htmlFor="add-staff" className="text-sm text-fg-muted">
-              Add to team
+              {t('addToTeam')}
             </label>
             <select
               id="add-staff"
@@ -104,7 +102,7 @@ export function TeamSection({
               onChange={(e) => setAddStaffId(e.target.value)}
               className={controlClass}
             >
-              <option value="">Select staff…</option>
+              <option value="">{t('selectStaff')}</option>
               {candidates.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.full_name}
@@ -114,7 +112,7 @@ export function TeamSection({
           </div>
           <label className="flex items-center gap-1.5 pb-2 text-sm text-fg-muted">
             <input type="checkbox" checked={addAsLead} onChange={(e) => setAddAsLead(e.target.checked)} />
-            as lead
+            {t('asLead')}
           </label>
           <Button
             type="button"
@@ -132,7 +130,7 @@ export function TeamSection({
               })
             }
           >
-            Add
+            {t('add')}
           </Button>
         </div>
       )}
