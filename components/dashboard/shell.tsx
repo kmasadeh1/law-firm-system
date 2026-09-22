@@ -210,14 +210,19 @@ export function DashboardShell({
               <span className="text-fg-muted"> · {roleLabel}</span>
             </p>
 
+            {/* Quiet by colour/weight, not by omission: an unlabelled icon
+                is a bad fit for this audience for a destructive action.
+                Label shows at sm and up, same breakpoint the theme and
+                language controls already use - icon-only only below that,
+                where the row genuinely can't fit three labelled controls. */}
             <form action={logoutAction} className="ms-1 border-s border-line ps-2 sm:ms-2 sm:ps-3">
               <button
                 type="submit"
                 aria-label={t('logOut')}
-                title={t('logOut')}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-fg-muted/70 transition-colors hover:text-fg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="flex items-center gap-1.5 rounded-md px-1.5 py-1.5 text-sm text-fg-muted/70 transition-colors hover:text-fg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 <LogoutIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('logOut')}</span>
               </button>
             </form>
 
