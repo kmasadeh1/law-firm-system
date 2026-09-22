@@ -1,6 +1,7 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
+import { LanguagePair } from '@/components/language-pair'
 
 /**
  * Switches the whole site to the other locale from the current page, at the
@@ -14,24 +15,21 @@ export function LanguageSwitcher({ href = '/' }: { href?: string }) {
   const t = useTranslations('languageSwitcher')
 
   return (
-    <div className="flex items-center gap-1 text-sm">
-      {routing.locales.map((loc, i) => (
-        <span key={loc} className="flex items-center gap-1">
-          {i > 0 && <span className="text-warm-grey">/</span>}
-          <Link
-            href={href}
-            locale={loc}
-            aria-current={loc === locale ? 'true' : undefined}
-            className={
-              loc === locale
-                ? 'text-brass'
-                : 'text-paper-dim transition-colors hover:text-paper'
-            }
-          >
-            {t(loc)}
-          </Link>
-        </span>
-      ))}
-    </div>
+    <LanguagePair
+      options={routing.locales.map((loc) => ({ code: loc, label: t(loc), active: loc === locale }))}
+      activeClassName="text-brass"
+      inactiveClassName="text-paper-dim transition-colors hover:text-paper"
+      separatorClassName="text-warm-grey"
+      renderOption={(option, className) => (
+        <Link
+          href={href}
+          locale={option.code}
+          aria-current={option.active ? 'true' : undefined}
+          className={className}
+        >
+          {option.label}
+        </Link>
+      )}
+    />
   )
 }

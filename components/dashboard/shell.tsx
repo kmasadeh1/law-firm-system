@@ -170,14 +170,29 @@ export function DashboardShell({
         {/* Content header: spans the main content area, above the page's own
             title (PageHeader, rendered by each page inside children - this
             bar is shell-level chrome, the two are deliberately not merged).
-            Sticky so the controls stay reachable scrolling a long list.
+            Sticky, opaque (bg-surface/border-line) so it separates from
+            scrolled content the same way the sidebar separates from the
+            main column - the public site's header doesn't need this since
+            it isn't sticky, so it's a deliberate divergence from that
+            sibling, not a miss. py-4 (rather than the public header's own
+            py-5) keeps it close to the sidebar's own p-4 brand-block
+            padding, so the two line up as one band rather than reading as
+            independently positioned; horizontal padding matches <main>
+            below it (px-4 sm:px-6 md:px-8), not the public header's wider
+            scale, so the header's edges stay aligned with the content
+            column it sits above.
+
             Inline-start holds the mobile nav trigger (the aside it opens is
             hidden below md, so this is its only home); everything else is
             pushed to inline-end via ms-auto, in reading order theme,
-            language, account, log out - a plain flex row, so it mirrors
-            under dir="rtl" the same way the rest of the app already relies
-            on for start/end layout. */}
-        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-3 sm:px-6 md:px-8">
+            account, log out (set apart with its own divider, the quietest
+            thing here since it's rare and semi-destructive), then the
+            language pair outermost - mirroring the public header's own
+            "content, then language, last" rhythm. Plain flex row, so it
+            mirrors under dir="rtl" the same way the rest of the app already
+            relies on for start/end layout - the language pair's own
+            internal order mirrors the same way, for the same reason. */}
+        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-4 sm:px-6 md:px-8">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -187,24 +202,26 @@ export function DashboardShell({
             <MenuIcon className="h-5 w-5" />
           </button>
 
-          <div className="flex items-center gap-1 ms-auto sm:gap-2">
+          <div className="flex items-center gap-2 ms-auto sm:gap-3">
             <ThemeToggle initialTheme={initialTheme} />
-            <LocaleToggle />
-            <div className="text-end">
-              <p className="max-w-[7rem] truncate text-sm font-medium text-fg sm:max-w-[10rem]">{userName}</p>
-              <p className="hidden text-xs text-fg-muted sm:block">{roleLabel}</p>
-            </div>
-            <form action={logoutAction}>
+
+            <p className="max-w-[10rem] truncate text-sm text-fg sm:max-w-[14rem]">
+              <span className="font-medium">{userName}</span>
+              <span className="text-fg-muted"> · {roleLabel}</span>
+            </p>
+
+            <form action={logoutAction} className="ms-1 border-s border-line ps-2 sm:ms-2 sm:ps-3">
               <button
                 type="submit"
                 aria-label={t('logOut')}
                 title={t('logOut')}
-                className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-fg-muted/70 transition-colors hover:text-fg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
                 <LogoutIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('logOut')}</span>
               </button>
             </form>
+
+            <LocaleToggle />
           </div>
         </header>
 
