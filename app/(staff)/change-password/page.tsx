@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { Crest } from '@/components/crest'
 import { ChangePasswordForm } from './change-password-form'
 
@@ -27,16 +29,17 @@ export default async function ChangePasswordPage() {
 
   const homeHref = staffRow.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
 
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'staffAuth' })
+
   return (
     <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
       <div className="relative flex flex-col justify-between overflow-hidden bg-ink-raised px-8 py-10 text-paper sm:px-12 md:py-16">
         <div className="flex items-center gap-3">
           <Crest className="h-9 w-9" />
           <span className="flex flex-col">
-            <span className="font-heading text-lg leading-tight tracking-wide">
-              Ahmad Al-Masadeh &amp; Associates
-            </span>
-            <span className="text-xs text-paper-dim">Law Firm | Advocates &amp; Legal Consultants</span>
+            <span className="font-heading text-lg leading-tight tracking-wide">{t('firmName')}</span>
+            <span className="text-xs text-paper-dim">{t('firmTagline')}</span>
           </span>
         </div>
 
@@ -55,7 +58,7 @@ export default async function ChangePasswordPage() {
         <div className="mb-2 w-full max-w-sm md:hidden">
           <div className="flex items-center gap-2">
             <Crest className="h-6 w-6" />
-            <span className="font-heading text-base text-paper">Ahmad Al-Masadeh &amp; Associates</span>
+            <span className="font-heading text-base text-paper">{t('firmName')}</span>
           </div>
         </div>
         <h1 className="mb-5 w-full max-w-sm font-heading text-2xl text-paper">Change password</h1>

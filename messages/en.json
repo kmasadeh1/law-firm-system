@@ -3,6 +3,10 @@
     "firmName": "Ahmad Al-Masadeh & Associates",
     "firmTagline": "Law Firm | Advocates & Legal Consultants"
   },
+  "staffAuth": {
+    "firmName": "Ahmad Al-Masadeh & Associates",
+    "firmTagline": "Law Firm | Advocates & Legal Consultants"
+  },
   "nav": {
     "home": "Home",
     "practiceAreas": "Practice Areas",
@@ -132,6 +136,7 @@
       "saving": "Saving…"
     },
     "shell": {
+      "firmName": "Ahmad Al-Masadeh & Associates",
       "logOut": "Log out",
       "openMenu": "Open menu",
       "closeMenu": "Close menu",

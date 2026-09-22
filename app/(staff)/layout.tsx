@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Amiri, Source_Serif_4 } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { getMessagesForLocale } from '@/i18n/messages'
@@ -17,9 +18,13 @@ const sourceSerif = Source_Serif_4({
   subsets: ['latin'],
 })
 
-export const metadata: Metadata = {
-  title: 'Ahmad Al-Masadeh & Associates - Staff sign in',
-  description: 'Staff sign in',
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'staffAuth' })
+  return {
+    title: `${t('firmName')} - Staff sign in`,
+    description: 'Staff sign in',
+  }
 }
 
 // This is a Next.js root layout in its own right - the staff area

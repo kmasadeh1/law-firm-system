@@ -46,6 +46,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
 
   const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
   const t = await getTranslations({ locale, namespace: 'dashboard.nav' })
+  const tShell = await getTranslations({ locale, namespace: 'dashboard.shell' })
 
   const dailyWork: NavItem[] = [{ href: homeHref, label: t('home'), icon: 'home' }]
   if (isOwner || clientsManage) {
@@ -97,7 +98,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
 
   return (
     <DashboardShell
-      firmName="Ahmad Al-Masadeh & Associates"
+      firmName={tShell('firmName')}
       homeHref={homeHref}
       navGroups={navGroups}
       userName={staffRow?.full_name ?? 'Signed in'}

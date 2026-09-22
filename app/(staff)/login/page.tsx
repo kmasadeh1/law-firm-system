@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { Crest } from '@/components/crest'
 import { login } from './actions'
 
@@ -24,6 +26,9 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
     redirect(staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff')
   }
 
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'staffAuth' })
+
   return (
     <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
       {/* Branding panel */}
@@ -31,10 +36,8 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
         <div className="flex items-center gap-3">
           <Crest className="h-9 w-9" />
           <span className="flex flex-col">
-            <span className="font-heading text-lg leading-tight tracking-wide">
-              Ahmad Al-Masadeh &amp; Associates
-            </span>
-            <span className="text-xs text-paper-dim">Law Firm | Advocates &amp; Legal Consultants</span>
+            <span className="font-heading text-lg leading-tight tracking-wide">{t('firmName')}</span>
+            <span className="text-xs text-paper-dim">{t('firmTagline')}</span>
           </span>
         </div>
 
@@ -60,7 +63,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
           <div className="mb-2 md:hidden">
             <div className="flex items-center gap-2">
               <Crest className="h-6 w-6" />
-              <span className="font-heading text-base text-paper">Ahmad Al-Masadeh &amp; Associates</span>
+              <span className="font-heading text-base text-paper">{t('firmName')}</span>
             </div>
           </div>
 

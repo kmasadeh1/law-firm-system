@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { Amiri, IBM_Plex_Sans_Arabic, Source_Serif_4 } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
@@ -22,9 +23,13 @@ const plexArabic = IBM_Plex_Sans_Arabic({
   weight: ['400', '500', '600'],
 })
 
-export const metadata: Metadata = {
-  title: 'Ahmad Al-Masadeh & Associates',
-  description: 'Placeholder firm site',
+export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'layout' })
+  return {
+    title: t('firmName'),
+    description: 'Placeholder firm site',
+  }
 }
 
 // This is a Next.js root layout in its own right (see the "Multiple root
