@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
@@ -9,6 +11,8 @@ import { controlClass } from '@/components/dashboard/form'
 export default async function ClientsListPage({ searchParams }: PageProps<'/dashboard/clients'>) {
   const { q } = (await searchParams) as { q?: string }
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.clients.list' })
 
   const term = q?.trim()
 
@@ -19,14 +23,14 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Clients"
+        title={t('title')}
         action={
           <div className="flex flex-wrap gap-2">
             <LinkButton href="/dashboard/clients/conflict-checks" variant="secondary">
-              Conflict-check history
+              {t('conflictCheckHistory')}
             </LinkButton>
             <LinkButton href="/dashboard/clients/new" variant="primary">
-              Add client
+              {t('addClient')}
             </LinkButton>
           </div>
         }
@@ -37,30 +41,30 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
           type="text"
           name="q"
           defaultValue={term ?? ''}
-          placeholder="Search by name, phone, or national ID"
+          placeholder={t('searchPlaceholder')}
           className={`w-full max-w-sm ${controlClass}`}
         />
         <Button type="submit" variant="secondary">
-          Search
+          {t('search')}
         </Button>
         {term && (
           <Link
             href="/dashboard/clients"
             className="flex items-center text-sm text-fg-muted underline-offset-2 hover:underline"
           >
-            Clear
+            {t('clear')}
           </Link>
         )}
       </form>
 
       {!clients || clients.length === 0 ? (
         <EmptyState
-          title={term ? 'No clients match that search.' : 'No clients yet'}
-          description={term ? undefined : 'Add your first client to start building case files.'}
+          title={term ? t('noClientsFiltered') : t('noClientsYet')}
+          description={term ? undefined : t('noClientsYetDescription')}
           action={
             !term && (
               <LinkButton href="/dashboard/clients/new" variant="secondary">
-                Add client
+                {t('addClient')}
               </LinkButton>
             )
           }

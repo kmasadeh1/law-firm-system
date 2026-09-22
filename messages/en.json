@@ -426,6 +426,59 @@
           }
         }
       }
+    },
+    "clients": {
+      "list": {
+        "title": "Clients",
+        "conflictCheckHistory": "Conflict-check history",
+        "addClient": "Add client",
+        "searchPlaceholder": "Search by name, phone, or national ID",
+        "search": "Search",
+        "clear": "Clear",
+        "noClientsFiltered": "No clients match that search.",
+        "noClientsYet": "No clients yet",
+        "noClientsYetDescription": "Add your first client to start building case files."
+      },
+      "new": {
+        "backToClients": "Clients",
+        "title": "Add client"
+      },
+      "detail": {
+        "page": {
+          "backToClients": "Clients",
+          "clientNotFound": "Client not found",
+          "clientNotFoundDescription": "This client doesn't exist, or you don't have access to it."
+        },
+        "balance": {
+          "heading": "Fees position",
+          "noEngagementsYet": "No fee engagements for this client yet.",
+          "agreedFixedFees": "Agreed (fixed fees): <bdi>{amount}</bdi>",
+          "scheduled": "Scheduled: <bdi>{amount}</bdi>",
+          "paid": "Paid: <bdi>{amount}</bdi>",
+          "outstandingScheduled": "Outstanding (scheduled): <bdi>{amount}</bdi>",
+          "alsoHasPercentageEngagements": "{count, plural, one {Also has # percentage-fee agreement} other {Also has # percentage-fee agreements}} — the agreed total above covers fixed-fee agreements only."
+        }
+      },
+      "form": {
+        "fullNameLabel": "Full name",
+        "nationalIdLabel": "National ID",
+        "phoneLabel": "Phone",
+        "emailLabel": "Email",
+        "notesLabel": "Notes",
+        "checking": "Checking…",
+        "saving": "Saving…",
+        "createClient": "Create client",
+        "saveChanges": "Save changes",
+        "saved": "Saved",
+        "matchExistingOpposingParty": "<bdi>{name}</bdi> — existing opposing party in a case",
+        "matchExistingClient": "<bdi>{name}</bdi> — existing client",
+        "errors": {
+          "fullNameRequired": "Full name is required.",
+          "conflictCheckFailed": "Could not run the conflict check. Please try again.",
+          "createFailed": "Could not create the client. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
+        }
+      }
     }
   }
 }

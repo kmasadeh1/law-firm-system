@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 export type ConflictMatch = {
   source: string
@@ -18,10 +20,13 @@ type ClientFields = {
   notes: string | null
 }
 
-function readFields(formData: FormData): ClientFields | { error: string } {
+async function readFields(formData: FormData): Promise<ClientFields | { error: string }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.clients.form.errors' })
+
   const full_name = formData.get('full_name')
   if (typeof full_name !== 'string' || !full_name.trim()) {
-    return { error: 'Full name is required.' }
+    return { error: t('fullNameRequired') }
   }
 
   const optional = (key: string) => {
@@ -42,9 +47,11 @@ export async function createClientRecord(
   formData: FormData,
   confirmed: boolean
 ): Promise<{ error?: string; matches?: ConflictMatch[]; clientId?: string }> {
-  const fields = readFields(formData)
+  const fields = await readFields(formData)
   if ('error' in fields) return fields
 
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.clients.form.errors' })
   const supabase = await createClient()
 
   if (!confirmed) {
@@ -54,7 +61,7 @@ export async function createClientRecord(
     })
 
     if (conflictError) {
-      return { error: 'Could not run the conflict check. Please try again.' }
+      return { error: t('conflictCheckFailed') }
     }
     if (matches && matches.length > 0) {
       return { matches }
@@ -70,7 +77,7 @@ export async function createClientRecord(
     .single()
 
   if (error) {
-    return { error: 'Could not create the client. Please try again.' }
+    return { error: t('createFailed') }
   }
 
   revalidatePath('/dashboard/clients')
@@ -81,14 +88,16 @@ export async function updateClientRecord(
   clientId: string,
   formData: FormData
 ): Promise<{ error?: string }> {
-  const fields = readFields(formData)
+  const fields = await readFields(formData)
   if ('error' in fields) return fields
 
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.clients.form.errors' })
   const supabase = await createClient()
   const { error } = await supabase.from('clients').update(fields).eq('id', clientId)
 
   if (error) {
-    return { error: 'Could not save the changes. Please try again.' }
+    return { error: t('saveFailed') }
   }
 
   revalidatePath('/dashboard/clients')

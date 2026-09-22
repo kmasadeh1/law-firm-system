@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { createClientRecord, updateClientRecord, type ConflictMatch } from './actions'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { Button } from '@/components/dashboard/button'
@@ -20,14 +21,20 @@ type Props =
   | { mode: 'create' }
   | { mode: 'edit'; client: ClientRow }
 
-function matchLabel(match: ConflictMatch) {
+// Only two outcomes here (unlike the case-detail opposing-parties flow's
+// three) - this form has no "current case" to compare a matched opposing
+// party against, so same-case vs other-case isn't a distinction it can
+// draw.
+function matchLabel(match: ConflictMatch, t: ReturnType<typeof useTranslations>) {
+  const bdi = (chunks: React.ReactNode) => <bdi>{chunks}</bdi>
   return match.source === 'opposing_party'
-    ? `${match.matched_name} — existing opposing party in a case`
-    : `${match.matched_name} — existing client`
+    ? t.rich('matchExistingOpposingParty', { name: match.matched_name, bdi })
+    : t.rich('matchExistingClient', { name: match.matched_name, bdi })
 }
 
 export function ClientForm(props: Props) {
   const router = useRouter()
+  const t = useTranslations('dashboard.clients.form')
   const formRef = useRef<HTMLFormElement>(null)
 
   const [matches, setMatches] = useState<ConflictMatch[] | null>(null)
@@ -90,7 +97,7 @@ export function ClientForm(props: Props) {
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
       <Field>
         <Label htmlFor="full_name" required>
-          Full name
+          {t('fullNameLabel')}
         </Label>
         <input
           id="full_name"
@@ -101,25 +108,25 @@ export function ClientForm(props: Props) {
         />
       </Field>
       <Field>
-        <Label htmlFor="national_id">National ID</Label>
+        <Label htmlFor="national_id">{t('nationalIdLabel')}</Label>
         <input id="national_id" name="national_id" defaultValue={initial.national_id ?? ''} className={controlClass} />
       </Field>
       <Field>
-        <Label htmlFor="phone">Phone</Label>
+        <Label htmlFor="phone">{t('phoneLabel')}</Label>
         <input id="phone" name="phone" type="tel" defaultValue={initial.phone ?? ''} className={controlClass} />
       </Field>
       <Field>
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('emailLabel')}</Label>
         <input id="email" name="email" type="email" defaultValue={initial.email ?? ''} className={controlClass} />
       </Field>
       <Field>
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">{t('notesLabel')}</Label>
         <textarea id="notes" name="notes" rows={3} defaultValue={initial.notes ?? ''} className={controlClass} />
       </Field>
 
       {matches && matches.length > 0 && (
         <ConflictWarning
-          labels={matches.map(matchLabel)}
+          labels={matches.map((m) => matchLabel(m, t))}
           onConfirm={handleConfirmAnyway}
           onEdit={() => setMatches(null)}
           pending={isPending}
@@ -133,13 +140,13 @@ export function ClientForm(props: Props) {
           <Button type="submit" variant="primary" disabled={isPending}>
             {isPending
               ? props.mode === 'create'
-                ? 'Checking…'
-                : 'Saving…'
+                ? t('checking')
+                : t('saving')
               : props.mode === 'create'
-                ? 'Create client'
-                : 'Save changes'}
+                ? t('createClient')
+                : t('saveChanges')}
           </Button>
-          {saved && <FieldSuccess>Saved</FieldSuccess>}
+          {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
         </div>
       )}
     </form>
