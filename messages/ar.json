@@ -120,5 +120,30 @@
     "noNextHearing": "لا توجد جلسة محددة حالياً",
     "invalidTitle": "الرابط غير صالح",
     "invalidMessage": "هذا الرابط لم يعد صالحاً - يرجى التواصل مع المكتب."
+  },
+  "dashboard": {
+    "shell": {
+      "logOut": "تسجيل الخروج",
+      "lightMode": "الوضع الفاتح",
+      "darkMode": "الوضع الداكن"
+    },
+    "nav": {
+      "groupDailyWork": "العمل اليومي",
+      "groupMoney": "المالية",
+      "groupAdministration": "الإدارة",
+      "home": "الرئيسية",
+      "clients": "العملاء",
+      "enquiries": "الاستفسارات",
+      "cases": "القضايا",
+      "appointments": "المواعيد",
+      "deadlines": "المهل",
+      "feesAndPayments": "الأتعاب والمدفوعات",
+      "staffAccounts": "حسابات الموظفين",
+      "rolesAndPermissions": "الأدوار والصلاحيات",
+      "deadlinePeriodTypes": "أنواع المهل",
+      "activityLog": "سجل النشاط",
+      "reports": "التقارير",
+      "roleOwner": "المالك"
+    }
   }
 }

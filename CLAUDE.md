@@ -86,6 +86,21 @@ report initially framed this as an inconsistency between "names aren't
 isolated" and "matched names are isolated"; it isn't one — the axis was
 just described wrong until this note.)
 
+**Open Arabic terminology decisions (nav labels, first translation pass):**
+the sidebar's `dashboard.nav.clients` and `dashboard.nav.deadlines` /
+`dashboard.nav.deadlinePeriodTypes` were translated with a placeholder term
+pending the firm's own call — flagging both here so they aren't forgotten:
+
+- **Clients** — used العملاء (generic business usage). الموكلون is the
+  term specific to a lawyer's clients (from وكالة), and a law firm may well
+  prefer it. Needs the firm's call.
+- **Deadlines** / **Deadline period types** — used المهل (مهلة, pl. مهل),
+  the standard term for a legal time limit, fitting the statutory periods
+  this system tracks. المواعيد النهائية is the generic rendering but
+  collides with المواعيد (Appointments). Needs the firm's call — and
+  whatever's picked must apply to both `dashboard.nav.deadlines` and
+  `dashboard.nav.deadlinePeriodTypes` together, not just one.
+
 No test framework is set up yet — there is no test script and no test runner
 in `package.json`.
 
