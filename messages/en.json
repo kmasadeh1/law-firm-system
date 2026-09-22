@@ -125,6 +125,12 @@
     "common": {
       "unknownStaff": "Unknown staff"
     },
+    "conflict": {
+      "possibleMatch": "{count, plural, one {Possible match found} other {Possible matches found}} — review before continuing:",
+      "createAnyway": "Create anyway",
+      "editDetailsInstead": "Edit details instead",
+      "saving": "Saving…"
+    },
     "shell": {
       "logOut": "Log out",
       "openMenu": "Open menu",
@@ -357,9 +363,9 @@
           "checking": "Checking…",
           "add": "Add",
           "addAnyway": "Add anyway",
-          "matchSameCase": "{name} — already an opposing party on this case",
-          "matchOtherCase": "{name} — already an opposing party on another case",
-          "matchExistingClient": "{name} — existing client",
+          "matchSameCase": "<bdi>{name}</bdi> — already an opposing party on this case",
+          "matchOtherCase": "<bdi>{name}</bdi> — already an opposing party on another case",
+          "matchExistingClient": "<bdi>{name}</bdi> — existing client",
           "errors": {
             "nameRequired": "Name is required.",
             "conflictCheckFailed": "Could not run the conflict check. Please try again.",

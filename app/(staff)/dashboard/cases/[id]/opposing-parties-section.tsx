@@ -15,10 +15,11 @@ type OpposingParty = { id: string; name: string; national_id: string | null }
 // case" and "existing client" are different sentences in Arabic, not the
 // same template with a swapped-in word.
 //
-// Plain t(), not t.rich(): ConflictWarning (shared with the Clients conflict
-// flow, out of scope here) types `labels` as string[], so the matched name
-// can't carry a <bdi> wrapper through this call site the way it does
-// elsewhere in this batch - noted rather than silently dropped.
+// t.rich() with a <bdi>-wrapped name, now that ConflictWarning types
+// `labels` as ReactNode[] (batch 4) rather than string[] (the constraint
+// that forced plain t() here in batch 3d).
+const bdi = (chunks: React.ReactNode) => <bdi>{chunks}</bdi>
+
 function matchLabel(
   match: ConflictMatch,
   currentCaseId: string,
@@ -26,10 +27,10 @@ function matchLabel(
 ) {
   if (match.source === 'opposing_party') {
     return match.case_id === currentCaseId
-      ? t('matchSameCase', { name: match.matched_name })
-      : t('matchOtherCase', { name: match.matched_name })
+      ? t.rich('matchSameCase', { name: match.matched_name, bdi })
+      : t.rich('matchOtherCase', { name: match.matched_name, bdi })
   }
-  return t('matchExistingClient', { name: match.matched_name })
+  return t.rich('matchExistingClient', { name: match.matched_name, bdi })
 }
 
 export function OpposingPartiesSection({
