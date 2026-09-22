@@ -30,19 +30,47 @@ Audit the changed files for four problems.
    Ignore: aria-labels pending extraction, console output, code comments,
    test data.
 
-3. UNISOLATED LTR DATA INSIDE RTL TEXT
-   Formatted times and dates (the biggest miss — "9:00 AM" renders as
-   "AM 9:00" inside an RTL run), money amounts, case numbers, national
-   IDs, phone numbers, email addresses, and any other identifier made of
-   Latin characters or digits. Inside an Arabic sentence their parts can
-   reorder and read wrong. They need dir="ltr" or a <bdi> wrapper. Phone
-   and email on the enquiry detail page already do this correctly — use
-   that as the reference pattern.
+3. UNISOLATED VALUES INSIDE A SENTENCE
+
+   Two different tools, don't conflate them:
+
+   - dir="ltr" FORCES a direction. Correct only for values that are LTR
+     by nature — phone numbers, email addresses, case numbers, national
+     IDs. Wrong for a person's name: a name is whatever script it's
+     written in, and forcing it LTR breaks Arabic names.
+   - <bdi> ISOLATES without forcing. It stops a value's direction from
+     reordering the content around it, whatever that direction is.
+
+   The rule for <bdi> is about POSITION, not the value's type: flag any
+   value interpolated into a sentence alongside other content — a
+   formatted date, a money amount, a case number, a national ID, a
+   phone number, a person's name in a match/comparison sentence, or
+   anything else sitting next to other text — if it isn't isolated.
+   ("9:00 AM" reordering to "AM 9:00" inside an RTL run is the classic
+   case, but it's an instance of the position rule, not a separate
+   "dates and money" rule.)
+
+   Do NOT flag a value that renders alone: a page title, a table cell,
+   a standalone field, a list row with no surrounding sentence. It has
+   no neighbours to disturb and needs nothing. A client's full_name
+   used as a page title, or a case's title on its own, is correctly
+   unwrapped — don't flag it for "matching" a wrapped name used
+   elsewhere in a sentence context. Same value, different position,
+   different answer — that's the rule working correctly, not an
+   inconsistency.
+
+   Phone and email on the enquiry detail page already do this
+   correctly (dir="ltr", standalone) — use that as the reference for
+   the forcing case. The case-detail opposing-parties match messages
+   use <bdi> around a name inside a sentence — use that as the
+   reference for the isolating case.
 
    Also flag separator-joined strings that mix directions — a pattern
    like {lawyerName} · {clientName} · {type} where the parts can be
    different languages. Each segment needs its own isolation or they
-   reorder against each other.
+   reorder against each other. This is the same position rule: each
+   segment sits next to others, so each needs isolation regardless of
+   what kind of value it is.
 
 4. DATABASE STRINGS RENDERED WITHOUT FALLBACK
    case_statuses, roles and deadline_period_types carry name_ar alongside
@@ -72,7 +100,7 @@ why.
 Close with:
   Direction utilities: N
   Hardcoded strings: N
-  Unisolated LTR data: N
+  Unisolated in-sentence values: N
   Missing localizedName: N
 
 Report only. Do not edit.

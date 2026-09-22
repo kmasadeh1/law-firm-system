@@ -79,9 +79,14 @@ export default async function OwnerDashboardPage() {
                     </span>
                     <span className="text-fg-muted">
                       {a.type === 'court_date' ? t('courtDate') : t('consultation')}
-                      {a.clients?.full_name && <> · {a.clients.full_name}</>}
+                      {a.clients?.full_name && (
+                        <>
+                          {' · '}
+                          <bdi>{a.clients.full_name}</bdi>
+                        </>
+                      )}
                       {' · '}
-                      {a.staff_id ? (nameById.get(a.staff_id) ?? t('unassigned')) : t('unassigned')}
+                      <bdi>{a.staff_id ? (nameById.get(a.staff_id) ?? t('unassigned')) : t('unassigned')}</bdi>
                     </span>
                   </Link>
                 </li>
@@ -109,7 +114,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/cases/${c.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        <bdi>{c.case_number}</bdi> — {c.title}
+                        <bdi>{c.case_number}</bdi> — <bdi>{c.title}</bdi>
                       </Link>
                     </li>
                   ))}
@@ -128,7 +133,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/appointments/${a.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        <bdi>{formatTime(a.starts_at, locale)}</bdi> · {a.clients?.full_name ?? t('unknownClient')}
+                        <bdi>{formatTime(a.starts_at, locale)}</bdi> · <bdi>{a.clients?.full_name ?? t('unknownClient')}</bdi>
                       </Link>
                     </li>
                   ))}
@@ -153,7 +158,10 @@ export default async function OwnerDashboardPage() {
                     <span className="text-fg">
                       {activityEventTitle(entry.table_name, entry.action, detail)}
                       {entry.actor_id && (
-                        <span className="text-fg-muted"> · {nameById.get(entry.actor_id) ?? t('unknownStaff')}</span>
+                        <span className="text-fg-muted">
+                          {' · '}
+                          <bdi>{nameById.get(entry.actor_id) ?? t('unknownStaff')}</bdi>
+                        </span>
                       )}
                     </span>
                     <span className="text-fg-muted">

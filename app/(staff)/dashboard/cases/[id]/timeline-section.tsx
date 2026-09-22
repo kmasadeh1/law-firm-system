@@ -50,7 +50,7 @@ function eventDetail(
       const staffId = typeof detail.staff_id === 'string' ? detail.staff_id : null
       const name = staffId ? (staffNameById[staffId] ?? t('unknownStaffMember')) : null
       if (!name) return null
-      return detail.is_lead ? t('caseLawyerLead', { name }) : name
+      return detail.is_lead ? t.rich('caseLawyerLead', { name, bdi }) : name
     }
     case 'case_notes':
       return typeof detail.note === 'string' ? truncate(detail.note, 120) : null
@@ -153,7 +153,7 @@ function TimelineEntry({
       <div className="min-w-0">
         <p className="text-fg">
           {activityEventTitle(row.entity, row.action, row.detail)}
-          <span className="text-fg-muted"> · {row.actor_name ?? t('systemFallback')}</span>
+          <span className="text-fg-muted"> · <bdi>{row.actor_name ?? t('systemFallback')}</bdi></span>
         </p>
         {row.detail_redacted ? (
           <p className="mt-0.5 text-xs italic text-fg-muted">{t('detailsHidden')}</p>

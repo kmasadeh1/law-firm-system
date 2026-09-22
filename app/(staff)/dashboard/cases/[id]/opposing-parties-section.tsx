@@ -90,7 +90,7 @@ export function OpposingPartiesSection({
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {parties.map((p) => (
             <li key={p.id} className="px-3 py-2 text-sm text-fg">
-              {p.name}
+              <bdi>{p.name}</bdi>
               {p.national_id && <span className="text-fg-muted"> · <bdi>{p.national_id}</bdi></span>}
             </li>
           ))}

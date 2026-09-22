@@ -106,10 +106,13 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
                     <span className="font-medium text-fg">
                       <bdi>{c.case_number}</bdi>
                     </span>
-                    <span className="text-fg-muted"> — {c.title}</span>
+                    <span className="text-fg-muted">
+                      {' — '}
+                      <bdi>{c.title}</bdi>
+                    </span>
                   </span>
                   <span className="text-fg-muted">
-                    {c.clients?.full_name ?? '—'} ·{' '}
+                    <bdi>{c.clients?.full_name ?? '—'}</bdi> ·{' '}
                     {c.case_statuses ? localizedName(c.case_statuses, locale) : '—'}
                   </span>
                 </Link>

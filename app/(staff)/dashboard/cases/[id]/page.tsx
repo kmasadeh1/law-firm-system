@@ -181,7 +181,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         <PageHeader
           title={
             <>
-              <bdi>{caseRow.case_number}</bdi> — {caseRow.title}
+              <bdi>{caseRow.case_number}</bdi> — <bdi>{caseRow.title}</bdi>
             </>
           }
           description={t.rich('description', {

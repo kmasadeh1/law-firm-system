@@ -62,6 +62,30 @@ NOT under `dashboard.cases.*` at all — it belongs to whichever batch covers
 the Deadlines feature area. This keeps a batch from ever needing to touch
 the same `actions.ts` file twice.
 
+**Bidi convention — two different tools, don't conflate them:**
+
+- `dir="ltr"` **forces** a direction. Correct for values that are LTR by
+  nature: phone numbers, email addresses, case numbers, national IDs.
+  Wrong for a person's name — a name is whatever script it's written in,
+  and forcing it LTR breaks Arabic names.
+- `<bdi>` **isolates** without forcing. It stops a value's direction from
+  reordering the content around it, whatever that direction is.
+
+The rule for `<bdi>` is about **position, not the value's type**: isolate
+any value interpolated into a sentence alongside other content. A value
+rendered alone — a page title, a table cell, a standalone field — has no
+neighbours to disturb and needs nothing.
+
+There is no exception for names under this rule. A name in a match
+sentence (`matchSameCase`, `matchExistingClient`, etc. — batch 4) is
+wrapped because it's in a sentence, sitting next to other text. A name
+used as a page title, or alone in a list row, isn't wrapped because it
+stands alone. Both are the same rule applied to two different positions —
+not a name-shaped exception carved out of a data-type rule. (Batch 4's
+report initially framed this as an inconsistency between "names aren't
+isolated" and "matched names are isolated"; it isn't one — the axis was
+just described wrong until this note.)
+
 No test framework is set up yet — there is no test script and no test runner
 in `package.json`.
 

@@ -206,8 +206,13 @@ export function DashboardShell({
             <ThemeToggle initialTheme={initialTheme} />
 
             <p className="max-w-[10rem] truncate text-sm text-fg sm:max-w-[14rem]">
-              <span className="font-medium">{userName}</span>
-              <span className="text-fg-muted"> · {roleLabel}</span>
+              <span className="font-medium">
+                <bdi>{userName}</bdi>
+              </span>
+              <span className="text-fg-muted">
+                {' · '}
+                <bdi>{roleLabel}</bdi>
+              </span>
             </p>
 
             {/* Quiet by colour/weight, not by omission: an unlabelled icon

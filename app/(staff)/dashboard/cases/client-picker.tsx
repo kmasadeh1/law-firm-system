@@ -74,7 +74,7 @@ export function ClientPicker({ initial }: { initial?: ClientOption }) {
                 }}
                 className="block w-full px-3 py-2 text-start text-sm text-fg hover:bg-line/40"
               >
-                {c.full_name}
+                <bdi>{c.full_name}</bdi>
                 {c.national_id && <span className="text-fg-muted"> · <bdi>{c.national_id}</bdi></span>}
               </button>
             </li>
