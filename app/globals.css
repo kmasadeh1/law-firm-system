@@ -1,39 +1,80 @@
 @import "tailwindcss";
 
 /*
- * Visual identity: dark theme built on an ink base with gold (the firm's
- * real brand colour, sampled from the logo) as the accent - for text,
- * buttons and rules alike. Burgundy is gone entirely; it was an invented
- * placeholder and never part of the actual identity. This is not an
- * inverted light theme - ink is the only background these tokens are
- * designed against.
+ * Single canonical dark palette - the one source of truth for the firm's
+ * dark brand identity, consumed by BOTH the public site's fixed dark theme
+ * (below) and the dashboard's dark theme variant (further down). Defined
+ * once, unconditionally, at :root. Values are the dashboard's own dark-
+ * theme values: the dashboard is the surface people spend hours in and is
+ * the one that's been iterated on, so where the two trees used to disagree
+ * it wins (canvas was retuned from a warm #221f1c to a neutral #141414 -
+ * see the dashboard block below for why - but that retune never made it
+ * back to the public site, which is the "browner vs colder near-black"
+ * drift this block exists to close). Change a value here and both trees
+ * change together; that's the point of it existing as its own thing rather
+ * than two palettes that happen to agree today.
+ */
+:root {
+  --palette-canvas: #141414;
+  --palette-surface: #1b1b1b;
+  --palette-border: #847a68;
+  --palette-fg: #f3ede2;
+  --palette-fg-muted: #d9d0c1;
+  --palette-accent: #b08d3f;
+  --palette-accent-hover: #c19f52;
+  --palette-accent-fg: #221f1c;
+  --palette-danger: #d9738a;
+}
+
+/*
+ * Public site + login/change-password identity: a single fixed dark theme,
+ * no toggle - gold (the firm's real brand colour, sampled from the logo) as
+ * the accent for text, buttons and rules alike. Burgundy is gone entirely;
+ * it was an invented placeholder and never part of the actual identity.
  *
- * Contrast, measured (WCAG relative luminance):
- *   gold #b08d3f on ink #221f1c        = 5.25:1 (passes AA for normal text)
+ * Token names here (ink/paper/brass/...) are kept distinct from the
+ * dashboard's canvas/fg/accent family on purpose, even though the values
+ * are now shared: those dashboard names are wired to the theme toggle
+ * below, and reusing them here would silently pick up that toggle's state
+ * - wrong for an unauthenticated /login visitor, or for a staff member
+ * who's chosen light dashboard mode, both of whom must still see this same
+ * fixed dark identity regardless. Everything below is an alias into the
+ * shared palette above, not an independent literal, so it can't drift from
+ * the dashboard again.
+ *
+ * Contrast, measured (WCAG relative luminance) against --palette-canvas:
+ *   gold #b08d3f on canvas #141414     = 5.90:1 (passes AA for normal text)
  *   ink #221f1c on gold #b08d3f        = 5.25:1 (dark text on filled gold buttons)
- *   paper #f3ede2 on ink #221f1c       = 14.07:1
+ *   paper #f3ede2 on canvas #141414    = 15.81:1
  * Gold does NOT go on paper/light fills here - see brass-hover below and
  * the light dashboard theme further down for why.
  */
 @theme {
-  --color-ink: #221f1c;
-  --color-ink-raised: #2a2622;
-  --color-brass: #b08d3f;
+  --color-ink: var(--palette-canvas);
+  --color-ink-raised: var(--palette-surface);
+  --color-brass: var(--palette-accent);
   /* Lighter, not darker, on purpose: brass's text pairing is dark ink, and
      darkening a gold fill pulls it toward ink and erodes that contrast.
      Lightening it (ink-on-this = 6.52:1) is a safe hover/pressed state. */
-  --color-brass-hover: #c19f52;
-  --color-warm-grey: #6a645c;
+  --color-brass-hover: var(--palette-accent-hover);
+  /* One token at varying opacity for dividers/borders/muted-and-disabled
+     text (/25, /40, and full respectively) rather than the dashboard's
+     three purpose-built tokens - aliased to the closer match of the two,
+     control-border, since that's the role public already leans on it for
+     (input borders). This does shift dividers and disabled/footer text a
+     little lighter than the old #6a645c; flagging rather than fragmenting
+     into three new tokens nobody asked for. */
+  --color-warm-grey: var(--palette-border);
   /* Replaces burgundy for error/alert framing - a semantic state colour,
      not a brand colour, so it doesn't come from the gold family. Matches
      the dashboard dark theme's danger-text for one danger red app-wide. */
-  --color-danger: #d9738a;
+  --color-danger: var(--palette-danger);
 
   /* Not part of the given palette - a warm off-white needed so body text
      reads on the ink background. Swap freely if a specific value is
      preferred. */
-  --color-paper: #f3ede2;
-  --color-paper-dim: #d9d0c1;
+  --color-paper: var(--palette-fg);
+  --color-paper-dim: var(--palette-fg-muted);
 }
 
 /* Font variables (--font-amiri etc.) are set as CSS custom properties by
@@ -96,6 +137,12 @@ body {
  *   control-border #847a68 on surface     = 4.07:1 (non-text UI, needs 3:1)
  *   danger-text #d9738a on canvas/surface = 5.94:1 / 5.55:1
  *   success-text #5aab80 on canvas/surface= 6.64:1 / 6.21:1
+ *
+ * canvas/surface/control-border/fg/fg-muted/accent/accent-fg/accent-border/
+ * danger-text/focus below are var() references into the shared --palette-*
+ * block up top, not independent literals - this dark variant IS the
+ * canonical dark palette. line and success-text have no public-site
+ * equivalent (nothing to keep in sync), so they stay as their own literals.
  */
 :root {
   --dash-canvas: #faf7f2;
@@ -114,34 +161,34 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --dash-canvas: #141414;
-    --dash-surface: #1b1b1b;
+    --dash-canvas: var(--palette-canvas);
+    --dash-surface: var(--palette-surface);
     --dash-line: #2a2a2a;
-    --dash-control-border: #847a68;
-    --dash-fg: #f3ede2;
-    --dash-fg-muted: #d9d0c1;
-    --dash-accent: #b08d3f;
-    --dash-accent-fg: #221f1c;
-    --dash-accent-border: #b08d3f;
-    --dash-danger-text: #d9738a;
+    --dash-control-border: var(--palette-border);
+    --dash-fg: var(--palette-fg);
+    --dash-fg-muted: var(--palette-fg-muted);
+    --dash-accent: var(--palette-accent);
+    --dash-accent-fg: var(--palette-accent-fg);
+    --dash-accent-border: var(--palette-accent);
+    --dash-danger-text: var(--palette-danger);
     --dash-success-text: #5aab80;
-    --dash-focus: #b08d3f;
+    --dash-focus: var(--palette-accent);
   }
 }
 
 :root[data-theme="dark"] {
-  --dash-canvas: #141414;
-  --dash-surface: #1b1b1b;
+  --dash-canvas: var(--palette-canvas);
+  --dash-surface: var(--palette-surface);
   --dash-line: #2a2a2a;
-  --dash-control-border: #847a68;
-  --dash-fg: #f3ede2;
-  --dash-fg-muted: #d9d0c1;
-  --dash-accent: #b08d3f;
-  --dash-accent-fg: #221f1c;
-  --dash-accent-border: #b08d3f;
-  --dash-danger-text: #d9738a;
+  --dash-control-border: var(--palette-border);
+  --dash-fg: var(--palette-fg);
+  --dash-fg-muted: var(--palette-fg-muted);
+  --dash-accent: var(--palette-accent);
+  --dash-accent-fg: var(--palette-accent-fg);
+  --dash-accent-border: var(--palette-accent);
+  --dash-danger-text: var(--palette-danger);
   --dash-success-text: #5aab80;
-  --dash-focus: #b08d3f;
+  --dash-focus: var(--palette-accent);
 }
 
 @theme inline {
