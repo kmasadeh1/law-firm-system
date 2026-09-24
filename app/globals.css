@@ -17,11 +17,18 @@
 :root {
   --palette-canvas: #141414;
   --palette-surface: #1b1b1b;
-  --palette-border: #847a68;
+  --palette-border: #8c8270;
   --palette-fg: #f3ede2;
   --palette-fg-muted: #d9d0c1;
   --palette-accent: #b08d3f;
   --palette-accent-hover: #c19f52;
+  /* Foreground for text/icons sitting ON a filled accent background (solid
+     buttons, active nav pill, badges) - never a text color against canvas
+     or surface directly. Misused that way as a link color in two dashboard
+     files (measured 1.09-1.12:1, effectively invisible); fixed at the call
+     sites to text-fg-muted, the token already used for this exact kind of
+     "show/hide" toggle link elsewhere in the dashboard. Token itself is
+     correct for its actual job and wasn't touched. */
   --palette-accent-fg: #221f1c;
   --palette-danger: #d9738a;
 }
@@ -63,7 +70,12 @@
      control-border, since that's the role public already leans on it for
      (input borders). This does shift dividers and disabled/footer text a
      little lighter than the old #6a645c; flagging rather than fragmenting
-     into three new tokens nobody asked for. */
+     into three new tokens nobody asked for.
+     Full-opacity text use (footer, disabled controls) measured 4.35:1 on
+     ink #141414 - short of the 4.5:1 AA body-text threshold. Nudged from
+     #847a68 to #8c8270 to clear it: 4.86:1 on ink, 4.55:1 on ink-raised
+     #1b1b1b. Border/divider use only needs 3:1 and was already well past
+     it, so this only helps that usage, never hurts it. */
   --color-warm-grey: var(--palette-border);
   /* Replaces burgundy for error/alert framing - a semantic state colour,
      not a brand colour, so it doesn't come from the gold family. Matches
@@ -134,7 +146,9 @@ body {
  *   fg on surface #1b1b1b                 = 14.78:1
  *   fg-muted on surface                   = 11.27:1
  *   gold accent-border on surface         = 5.52:1
- *   control-border #847a68 on surface     = 4.07:1 (non-text UI, needs 3:1)
+ *   control-border #8c8270 on surface     = 4.55:1 (non-text UI, needs 3:1 -
+ *                                            was #847a68 at 4.07:1 before the
+ *                                            warm-grey text-contrast fix below)
  *   danger-text #d9738a on canvas/surface = 5.94:1 / 5.55:1
  *   success-text #5aab80 on canvas/surface= 6.64:1 / 6.21:1
  *

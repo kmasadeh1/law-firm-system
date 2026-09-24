@@ -121,7 +121,7 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
           <h2 className="font-heading text-lg text-fg">Lawyer workload</h2>
           <Link
             href={includeInactive ? '/dashboard/reports' : '/dashboard/reports?showInactive=1'}
-            className="text-sm text-accent-fg underline-offset-2 hover:underline"
+            className="text-sm text-fg-muted underline-offset-2 hover:underline"
           >
             {includeInactive ? 'Hide deactivated staff' : 'Show deactivated staff'}
           </Link>

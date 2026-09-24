@@ -33,7 +33,7 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
           action={
             <Link
               href={includeInactive ? '/dashboard/owner/staff' : '/dashboard/owner/staff?showInactive=1'}
-              className="text-sm text-accent-fg underline-offset-2 hover:underline"
+              className="text-sm text-fg-muted underline-offset-2 hover:underline"
             >
               {includeInactive ? 'Hide deactivated staff' : 'Show deactivated staff'}
             </Link>
