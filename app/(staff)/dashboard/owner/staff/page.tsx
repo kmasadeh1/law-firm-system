@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { StaffAdmin } from './staff-admin'
 
@@ -28,7 +27,6 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <BackLink href="/dashboard/owner" label="Firm overview" />
         <PageHeader
           title="Staff accounts"
           description="Create logins, reissue temporary passwords, and activate or deactivate staff. Accounts are never deleted."

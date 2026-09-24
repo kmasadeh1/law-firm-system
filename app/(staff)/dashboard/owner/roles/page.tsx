@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { RolesAdmin } from './roles-admin'
-import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 
 export default async function RolesPage() {
@@ -14,10 +13,7 @@ export default async function RolesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <BackLink href="/dashboard/owner" label="Firm overview" />
-        <PageHeader title="Roles & permissions" />
-      </div>
+      <PageHeader title="Roles & permissions" />
 
       <RolesAdmin
         roles={roles ?? []}

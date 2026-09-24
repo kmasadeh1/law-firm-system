@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
@@ -92,10 +91,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <BackLink href="/dashboard/owner" label="Firm overview" />
-        <PageHeader title="Activity log" description="Every recorded change across the firm, newest first." />
-      </div>
+      <PageHeader title="Activity log" description="Every recorded change across the firm, newest first." />
 
       <form method="get" className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">

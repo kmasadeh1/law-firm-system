@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
@@ -35,10 +34,7 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <BackLink href="/dashboard/owner" label="Firm overview" />
-        <PageHeader title="Reports" description="Firm-wide collection, overdue instalments, and lawyer workload." />
-      </div>
+      <PageHeader title="Reports" description="Firm-wide collection, overdue instalments, and lawyer workload." />
 
       <Panel className="flex flex-col gap-4">
         <h2 className="font-heading text-lg text-fg">Collection summary</h2>

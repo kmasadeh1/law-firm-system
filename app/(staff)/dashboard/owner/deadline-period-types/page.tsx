@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { PeriodTypesAdmin } from './period-types-admin'
-import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Banner } from '@/components/dashboard/banner'
 
@@ -13,10 +12,7 @@ export default async function DeadlinePeriodTypesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <BackLink href="/dashboard/owner" label="Firm overview" />
-        <PageHeader title="Deadline period types" />
-      </div>
+      <PageHeader title="Deadline period types" />
 
       <Banner kind="warning">
         These periods came from secondary research, not the primary Official Gazette text with
