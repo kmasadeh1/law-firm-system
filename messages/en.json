@@ -554,6 +554,73 @@
         "cancelled": "Cancelled",
         "no_show": "No-show"
       }
+    },
+    "deadlines": {
+      "list": {
+        "title": "Deadlines",
+        "newDeadline": "New deadline",
+        "noneYet": "No deadlines yet",
+        "noneYetDescription": "Add a deadline against a case to start tracking it.",
+        "extendedTag": "(extended)"
+      },
+      "new": {
+        "backToDeadlines": "Deadlines",
+        "title": "New deadline",
+        "resultHeading": "Deadline added",
+        "resultLine": "Trigger date <bdi>{trigger}</bdi> <icon></icon> due <bdi><strong>{due}</strong></bdi>",
+        "effectiveDueDateLine": "Effective due date (after any extension): <bdi>{date}</bdi>",
+        "goToCase": "Go to case",
+        "addAnother": "Add another"
+      },
+      "form": {
+        "periodTypeLabel": "Period type",
+        "selectPeriodTypePlaceholder": "Select a period type…",
+        "periodOptionLabel": "{name} ({days, plural, one {# day} other {# days}})",
+        "triggerDateLabel": "Trigger date",
+        "triggerDateHelp": "The due date is computed by the database from this date and the period type - it isn't entered directly.",
+        "notesLabel": "Notes",
+        "adding": "Adding…",
+        "addDeadline": "Add deadline",
+        "caseLabel": "Case",
+        "caseSearchPlaceholder": "Search cases by number or title",
+        "noMatchingCase": "No matching case.",
+        "selectedCase": "Selected: <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "weekendRollover": "Falls on a weekend (<bdi>{unadjustedDate}</bdi>) — moved to <bdi>{dueDate}</bdi>.",
+        "errors": {
+          "selectCase": "Select a case.",
+          "selectPeriodType": "Select a period type.",
+          "triggerDateRequired": "Trigger date is required.",
+          "noPermissionAdd": "You don't have permission to add a deadline to this case.",
+          "addFailed": "Could not add the deadline. Please try again.",
+          "extendedDateRequired": "Extended date is required.",
+          "extensionReasonRequired": "A reason is required for an extension.",
+          "bothExtensionFieldsRequired": "Both an extended date and a reason are required.",
+          "noPermissionExtend": "You don't have permission to extend this deadline.",
+          "extendFailed": "Could not save the extension. Please try again."
+        }
+      },
+      "section": {
+        "heading": "Deadlines",
+        "noneYet": "No deadlines yet.",
+        "periodDaysLine": "({days, plural, one {# day} other {# days}}) · trigger <bdi>{date}</bdi>",
+        "extendedToLine": "Extended to <strong><bdi>{date}</bdi></strong> (originally <bdi>{originalDate}</bdi>)",
+        "reasonLine": "Reason: <bdi>{reason}</bdi>",
+        "grantedByFragment": " · granted by <bdi>{name}</bdi>",
+        "onDateFragment": " on <bdi>{date}</bdi>",
+        "newDueDateLabel": "New due date",
+        "reasonLabel": "Reason",
+        "saving": "Saving…",
+        "saveExtension": "Save extension",
+        "cancel": "Cancel",
+        "changeExtension": "Change extension",
+        "extend": "Extend",
+        "viewAllDeadlines": "View all deadlines"
+      },
+      "urgency": {
+        "overdue": "Overdue",
+        "soon": "Due soon",
+        "later": "Upcoming"
+      }
     }
   }
 }

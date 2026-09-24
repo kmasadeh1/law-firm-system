@@ -2,14 +2,15 @@
 
 import { useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { createDeadline, extendDeadline, type PeriodTypeOption } from '../../deadlines/actions'
-import { urgencyOf, urgencyClass, urgencyLabel } from '../../deadlines/urgency'
+import { urgencyOf, urgencyClass } from '../../deadlines/urgency'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { Banner } from '@/components/dashboard/banner'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
 import { localizedName } from '@/lib/localized-name'
+import { formatDate } from '@/lib/format-date-time'
 
 type Deadline = {
   id: string
@@ -27,6 +28,10 @@ type Deadline = {
 }
 
 function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline }) {
+  const locale = useLocale()
+  const t = useTranslations('dashboard.deadlines.section')
+  const tUrgency = useTranslations('dashboard.deadlines.urgency')
+  const tForm = useTranslations('dashboard.deadlines.form')
   const [extending, setExtending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -59,25 +64,32 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
           <span className="font-medium text-fg">{deadline.period_type_name}</span>
           <span className="text-fg-muted">
             {' '}
-            ({deadline.period_days} days) · trigger <bdi>{deadline.trigger_date}</bdi>
+            {t.rich('periodDaysLine', {
+              days: deadline.period_days,
+              date: formatDate(deadline.trigger_date, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </span>
         </div>
         <span className="flex items-center gap-2">
           <span className="text-fg-muted">
-            {deadline.effective_due_date ? <bdi>{deadline.effective_due_date}</bdi> : '—'}
+            {deadline.effective_due_date ? <bdi>{formatDate(deadline.effective_due_date, locale)}</bdi> : '—'}
           </span>
           <span
             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${urgencyClass[urgency]}`}
           >
-            {urgencyLabel[urgency]}
+            {tUrgency(urgency)}
           </span>
         </span>
       </div>
 
       {rolledForward && (
         <p className="text-xs text-fg-muted">
-          Falls on a weekend (<bdi>{deadline.unadjusted_due_date}</bdi>) — moved to{' '}
-          <bdi>{deadline.due_date}</bdi>.
+          {tForm.rich('weekendRollover', {
+            unadjustedDate: formatDate(deadline.unadjusted_due_date!, locale),
+            dueDate: formatDate(deadline.due_date!, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </p>
       )}
 
@@ -86,21 +98,25 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
       {deadline.extended_due_date ? (
         <div className="rounded-md border border-accent-border/50 bg-accent-border/10 p-2 text-xs text-fg">
           <p>
-            Extended to{' '}
-            <strong>
-              <bdi>{deadline.extended_due_date}</bdi>
-            </strong>{' '}
-            (originally <bdi>{deadline.due_date}</bdi>)
+            {t.rich('extendedToLine', {
+              date: formatDate(deadline.extended_due_date, locale),
+              originalDate: deadline.due_date ? formatDate(deadline.due_date, locale) : '',
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
           <p className="mt-1 text-fg-muted">
-            Reason: {deadline.extension_reason}
-            {deadline.extended_by_name && <> · granted by {deadline.extended_by_name}</>}
-            {deadline.extended_at && (
-              <>
-                {' '}
-                on <bdi>{deadline.extended_at.slice(0, 10)}</bdi>
-              </>
-            )}
+            {t.rich('reasonLine', {
+              reason: deadline.extension_reason ?? '',
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
+            {deadline.extended_by_name &&
+              t.rich('grantedByFragment', { name: deadline.extended_by_name, bdi: (chunks) => <bdi>{chunks}</bdi> })}
+            {deadline.extended_at &&
+              t.rich('onDateFragment', {
+                date: formatDate(deadline.extended_at, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })}
           </p>
         </div>
       ) : null}
@@ -109,7 +125,7 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
         <form ref={formRef} onSubmit={handleExtend} className="flex flex-wrap items-end gap-2">
           <Field>
             <Label htmlFor={`extended-${deadline.id}`} required>
-              New due date
+              {t('newDueDateLabel')}
             </Label>
             <input
               id={`extended-${deadline.id}`}
@@ -121,20 +137,20 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
           </Field>
           <Field>
             <Label htmlFor={`reason-${deadline.id}`} required>
-              Reason
+              {t('reasonLabel')}
             </Label>
             <input id={`reason-${deadline.id}`} name="extension_reason" required className={controlClass} />
           </Field>
           <Button type="submit" variant="secondary" disabled={isPending}>
-            {isPending ? 'Saving…' : 'Save extension'}
+            {isPending ? t('saving') : t('saveExtension')}
           </Button>
           <Button type="button" variant="ghost" onClick={() => setExtending(false)} disabled={isPending}>
-            Cancel
+            {t('cancel')}
           </Button>
         </form>
       ) : (
         <Button type="button" variant="ghost" onClick={() => setExtending(true)} className="self-start">
-          {deadline.extended_due_date ? 'Change extension' : 'Extend'}
+          {deadline.extended_due_date ? t('changeExtension') : t('extend')}
         </Button>
       )}
 
@@ -153,6 +169,8 @@ export function DeadlinesSection({
   periodTypes: PeriodTypeOption[]
 }) {
   const locale = useLocale()
+  const t = useTranslations('dashboard.deadlines.section')
+  const tForm = useTranslations('dashboard.deadlines.form')
   const addFormRef = useRef<HTMLFormElement>(null)
   const [periodTypeId, setPeriodTypeId] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -177,10 +195,10 @@ export function DeadlinesSection({
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-deadlines-section">
-      <h2 className="font-heading text-lg text-fg">Deadlines</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
       {deadlines.length === 0 ? (
-        <p className="text-sm text-fg-muted">No deadlines yet.</p>
+        <p className="text-sm text-fg-muted">{t('noneYet')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {deadlines.map((d) => (
@@ -194,7 +212,7 @@ export function DeadlinesSection({
         <div className="flex flex-wrap items-end gap-2">
           <Field>
             <Label htmlFor="dl-period" required>
-              Period type
+              {tForm('periodTypeLabel')}
             </Label>
             <select
               id="dl-period"
@@ -204,32 +222,32 @@ export function DeadlinesSection({
               onChange={(e) => setPeriodTypeId(e.target.value)}
               className={controlClass}
             >
-              <option value="">Select…</option>
+              <option value="">{tForm('selectPeriodTypePlaceholder')}</option>
               {periodTypes.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {localizedName(p, locale)} ({p.period_days} days)
+                  {tForm('periodOptionLabel', { name: localizedName(p, locale), days: p.period_days })}
                 </option>
               ))}
             </select>
           </Field>
           <Field>
             <Label htmlFor="dl-trigger" required>
-              Trigger date
+              {tForm('triggerDateLabel')}
             </Label>
             <input id="dl-trigger" name="trigger_date" type="date" required className={controlClass} />
           </Field>
           <Button type="submit" variant="secondary" disabled={isPending}>
-            {isPending ? 'Adding…' : 'Add deadline'}
+            {isPending ? tForm('adding') : tForm('addDeadline')}
           </Button>
         </div>
         {selectedPeriod?.description && <Banner kind="warning">{selectedPeriod.description}</Banner>}
-        <HelpText>Due date is computed from the trigger date and period type - not entered directly.</HelpText>
+        <HelpText>{tForm('triggerDateHelp')}</HelpText>
       </form>
 
       {error && <FieldError>{error}</FieldError>}
 
       <Link href="/dashboard/deadlines" className="text-xs text-fg-muted underline-offset-2 hover:underline">
-        View all deadlines
+        {t('viewAllDeadlines')}
       </Link>
     </Panel>
   )

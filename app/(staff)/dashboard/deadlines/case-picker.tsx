@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { searchCases, type CaseOption } from './actions'
 import { Label, FieldSuccess, controlClass } from '@/components/dashboard/form'
 
@@ -10,6 +11,7 @@ import { Label, FieldSuccess, controlClass } from '@/components/dashboard/form'
  * which is only required for court dates).
  */
 export function CasePicker({ initial }: { initial?: CaseOption }) {
+  const t = useTranslations('dashboard.deadlines.form')
   const [term, setTerm] = useState(initial ? `${initial.case_number} — ${initial.title}` : '')
   const [results, setResults] = useState<CaseOption[]>([])
   const [selected, setSelected] = useState<CaseOption | null>(initial ?? null)
@@ -35,7 +37,7 @@ export function CasePicker({ initial }: { initial?: CaseOption }) {
   return (
     <div className="relative flex flex-col gap-1.5">
       <Label htmlFor="case_search" required>
-        Case
+        {t('caseLabel')}
       </Label>
       <input
         id="case_search"
@@ -47,7 +49,7 @@ export function CasePicker({ initial }: { initial?: CaseOption }) {
         }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder="Search cases by number or title"
+        placeholder={t('caseSearchPlaceholder')}
         autoComplete="off"
         className={controlClass}
       />
@@ -68,7 +70,7 @@ export function CasePicker({ initial }: { initial?: CaseOption }) {
                 }}
                 className="block w-full px-3 py-2 text-start text-sm text-fg hover:bg-line/40"
               >
-                <bdi>{c.case_number}</bdi> — {c.title}
+                <bdi>{c.case_number}</bdi> — <bdi>{c.title}</bdi>
               </button>
             </li>
           ))}
@@ -76,11 +78,15 @@ export function CasePicker({ initial }: { initial?: CaseOption }) {
       )}
 
       {open && term.trim() && !selected && results.length === 0 && (
-        <p className="text-xs text-fg-muted">No matching case.</p>
+        <p className="text-xs text-fg-muted">{t('noMatchingCase')}</p>
       )}
       {selected && (
         <FieldSuccess>
-          Selected: <bdi>{selected.case_number}</bdi> — {selected.title}
+          {t.rich('selectedCase', {
+            caseNumber: selected.case_number,
+            title: selected.title,
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </FieldSuccess>
       )}
     </div>

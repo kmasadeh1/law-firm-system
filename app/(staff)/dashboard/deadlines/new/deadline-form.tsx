@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { createDeadline, type DeadlineRow, type PeriodTypeOption } from '../actions'
 import { CasePicker } from '../case-picker'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
@@ -11,9 +11,12 @@ import { Banner } from '@/components/dashboard/banner'
 import { Panel } from '@/components/dashboard/panel'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
 import { localizedName } from '@/lib/localized-name'
+import { formatDate } from '@/lib/format-date-time'
 
 export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] }) {
   const locale = useLocale()
+  const t = useTranslations('dashboard.deadlines.new')
+  const tForm = useTranslations('dashboard.deadlines.form')
   const formRef = useRef<HTMLFormElement>(null)
   const [periodTypeId, setPeriodTypeId] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -50,24 +53,34 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
 
     return (
       <Panel className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Deadline added</h2>
+        <h2 className="font-heading text-lg text-fg">{t('resultHeading')}</h2>
         <p className="flex flex-wrap items-center gap-1 text-sm text-fg">
-          Trigger date <bdi>{result.trigger_date}</bdi>
-          {/* Forward/progression, same direction as the "Older" pagination
-              chevron - rotated by default (points right under ltr) and
-              unrotated under rtl (points left). */}
-          <ChevronLeftIcon className="h-3 w-3 rotate-180 rtl:rotate-0" />
-          due <bdi><strong>{result.due_date}</strong></bdi>
+          {t.rich('resultLine', {
+            trigger: formatDate(result.trigger_date, locale),
+            due: formatDate(result.due_date!, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+            strong: (chunks) => <strong>{chunks}</strong>,
+            // Forward/progression, same direction as the "Older" pagination
+            // chevron - rotated by default (points right under ltr) and
+            // unrotated under rtl (points left).
+            icon: () => <ChevronLeftIcon className="h-3 w-3 rotate-180 rtl:rotate-0" />,
+          })}
         </p>
         {rolledForward && (
           <Banner kind="warning">
-            Falls on a weekend (<bdi>{result.unadjusted_due_date}</bdi>) — moved to{' '}
-            <bdi>{result.due_date}</bdi>.
+            {tForm.rich('weekendRollover', {
+              unadjustedDate: formatDate(result.unadjusted_due_date!, locale),
+              dueDate: formatDate(result.due_date!, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </Banner>
         )}
         {result.effective_due_date !== result.due_date && (
           <p className="text-sm text-fg-muted">
-            Effective due date (after any extension): <bdi>{result.effective_due_date}</bdi>
+            {t.rich('effectiveDueDateLine', {
+              date: formatDate(result.effective_due_date!, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </p>
         )}
         <div className="flex gap-3">
@@ -75,14 +88,14 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
             href={`/dashboard/cases/${result.case_id}`}
             className="text-sm text-accent underline-offset-2 hover:underline"
           >
-            Go to case
+            {t('goToCase')}
           </Link>
           <button
             type="button"
             onClick={() => setResult(null)}
             className="text-sm text-fg-muted underline-offset-2 hover:underline"
           >
-            Add another
+            {t('addAnother')}
           </button>
         </div>
       </Panel>
@@ -95,7 +108,7 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
 
       <Field>
         <Label htmlFor="period_type_id" required>
-          Period type
+          {tForm('periodTypeLabel')}
         </Label>
         <select
           id="period_type_id"
@@ -105,10 +118,10 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
           onChange={(e) => setPeriodTypeId(e.target.value)}
           className={controlClass}
         >
-          <option value="">Select a period type…</option>
+          <option value="">{tForm('selectPeriodTypePlaceholder')}</option>
           {periodTypes.map((p) => (
             <option key={p.id} value={p.id}>
-              {localizedName(p, locale)} ({p.period_days} days)
+              {tForm('periodOptionLabel', { name: localizedName(p, locale), days: p.period_days })}
             </option>
           ))}
         </select>
@@ -120,24 +133,21 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
 
       <Field>
         <Label htmlFor="trigger_date" required>
-          Trigger date
+          {tForm('triggerDateLabel')}
         </Label>
         <input id="trigger_date" name="trigger_date" type="date" required className={controlClass} />
-        <HelpText>
-          The due date is computed by the database from this date and the period type - it isn&apos;t
-          entered directly.
-        </HelpText>
+        <HelpText>{tForm('triggerDateHelp')}</HelpText>
       </Field>
 
       <Field>
-        <Label htmlFor="description">Notes</Label>
+        <Label htmlFor="description">{tForm('notesLabel')}</Label>
         <textarea id="description" name="description" rows={2} className={controlClass} />
       </Field>
 
       {error && <FieldError>{error}</FieldError>}
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
-        {isPending ? 'Adding…' : 'Add deadline'}
+        {isPending ? tForm('adding') : tForm('addDeadline')}
       </Button>
     </form>
   )

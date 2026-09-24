@@ -23,8 +23,12 @@ export const urgencyClass: Record<Urgency, string> = {
   later: 'border border-line text-fg-muted',
 }
 
-export const urgencyLabel: Record<Urgency, string> = {
-  overdue: 'Overdue',
-  soon: 'Due soon',
-  later: 'Upcoming',
-}
+// Text lives in messages/en.json under dashboard.deadlines.urgency.<value> -
+// look it up with a translator scoped to that namespace and call it with the
+// urgency value as the key (tUrgency(urgency)), same convention as the
+// appointment_type/appointment_status enum lookups. This isn't a Postgres
+// enum (it's derived client-side from a date comparison, never stored), but
+// it's the same shape of problem - a small fixed set of values rendered as
+// text in more than one file (the deadlines list and the case-detail
+// deadlines section) - so it gets the same treatment rather than a second
+// hardcoded label map.

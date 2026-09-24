@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 type ActionResult = { error?: string }
 
@@ -70,19 +72,21 @@ export type DeadlineRow = {
 export async function createDeadline(
   formData: FormData
 ): Promise<ActionResult & { deadline?: DeadlineRow }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.deadlines.form.errors' })
   const case_id = formData.get('case_id')
   const period_type_id = formData.get('period_type_id')
   const trigger_date = formData.get('trigger_date')
   const description = formData.get('description')
 
   if (typeof case_id !== 'string' || !case_id) {
-    return { error: 'Select a case.' }
+    return { error: t('selectCase') }
   }
   if (typeof period_type_id !== 'string' || !period_type_id) {
-    return { error: 'Select a period type.' }
+    return { error: t('selectPeriodType') }
   }
   if (typeof trigger_date !== 'string' || !trigger_date.trim()) {
-    return { error: 'Trigger date is required.' }
+    return { error: t('triggerDateRequired') }
   }
 
   const supabase = await createClient()
@@ -103,9 +107,9 @@ export async function createDeadline(
 
   if (error) {
     if (error.code === INSUFFICIENT_PRIVILEGE) {
-      return { error: "You don't have permission to add a deadline to this case." }
+      return { error: t('noPermissionAdd') }
     }
-    return { error: 'Could not add the deadline. Please try again.' }
+    return { error: t('addFailed') }
   }
 
   revalidatePath(DEADLINES_PATH)
@@ -120,14 +124,16 @@ export async function extendDeadline(
   deadlineId: string,
   formData: FormData
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.deadlines.form.errors' })
   const extended_due_date = formData.get('extended_due_date')
   const extension_reason = formData.get('extension_reason')
 
   if (typeof extended_due_date !== 'string' || !extended_due_date.trim()) {
-    return { error: 'Extended date is required.' }
+    return { error: t('extendedDateRequired') }
   }
   if (typeof extension_reason !== 'string' || !extension_reason.trim()) {
-    return { error: 'A reason is required for an extension.' }
+    return { error: t('extensionReasonRequired') }
   }
 
   const supabase = await createClient()
@@ -144,12 +150,12 @@ export async function extendDeadline(
 
   if (error) {
     if (error.code === CHECK_VIOLATION) {
-      return { error: 'Both an extended date and a reason are required.' }
+      return { error: t('bothExtensionFieldsRequired') }
     }
     if (error.code === INSUFFICIENT_PRIVILEGE) {
-      return { error: "You don't have permission to extend this deadline." }
+      return { error: t('noPermissionExtend') }
     }
-    return { error: 'Could not save the extension. Please try again.' }
+    return { error: t('extendFailed') }
   }
 
   revalidatePath(DEADLINES_PATH)
