@@ -5,6 +5,7 @@ import { linkCase, unlinkCase } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { FieldError, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 
 type CaseRow = { id: string; case_number: string; title: string }
 
@@ -22,6 +23,7 @@ export function CasesSection({
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [addCaseId, setAddCaseId] = useState('')
+  const [confirmingUnlink, setConfirmingUnlink] = useState<CaseRow | null>(null)
 
   const candidates = clientCases.filter((c) => !linkedCases.some((l) => l.id === c.id))
 
@@ -50,7 +52,7 @@ export function CasesSection({
                 type="button"
                 variant="danger"
                 disabled={isPending}
-                onClick={() => runAction(() => unlinkCase(engagementId, c.id))}
+                onClick={() => setConfirmingUnlink(c)}
               >
                 Unlink
               </Button>
@@ -97,6 +99,31 @@ export function CasesSection({
           </Button>
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={confirmingUnlink !== null}
+        onCancel={() => setConfirmingUnlink(null)}
+        onConfirm={() => {
+          if (!confirmingUnlink) return
+          const caseId = confirmingUnlink.id
+          setConfirmingUnlink(null)
+          runAction(() => unlinkCase(engagementId, caseId))
+        }}
+        kind="hard"
+        itemLabel={
+          confirmingUnlink ? (
+            <>
+              <bdi>{confirmingUnlink.case_number}</bdi> — <bdi>{confirmingUnlink.title}</bdi>
+            </>
+          ) : (
+            ''
+          )
+        }
+        confirmLabel="Unlink"
+        pendingLabel="Unlinking…"
+        pending={isPending}
+        note="The case and the engagement both stay - only the connection between them is removed."
+      />
     </Panel>
   )
 }

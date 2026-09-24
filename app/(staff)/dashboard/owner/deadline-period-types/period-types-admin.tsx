@@ -6,6 +6,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 
 type PeriodType = {
   id: string
@@ -172,17 +173,13 @@ function PeriodTypeCard({
     })
   }
 
-  function handleDeleteClick() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true)
-      return
-    }
+  function handleConfirmDelete() {
     setDeleteError(null)
     startDelete(async () => {
       const result = await deletePeriodType(periodType.id)
+      setConfirmingDelete(false)
       if (result.error) {
         setDeleteError(result.error)
-        setConfirmingDelete(false)
         return
       }
       onDeleted()
@@ -259,17 +256,24 @@ function PeriodTypeCard({
           </Button>
           {saved && !changed && <FieldSuccess>Saved</FieldSuccess>}
           <div className="grow" />
-          <Button type="button" variant="danger" onClick={handleDeleteClick} disabled={isDeleting}>
-            {isDeleting ? 'Deleting…' : confirmingDelete ? 'Confirm delete?' : 'Delete'}
+          <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isDeleting}>
+            {isDeleting ? 'Deleting…' : 'Delete'}
           </Button>
-          {confirmingDelete && !isDeleting && (
-            <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
-              Cancel
-            </Button>
-          )}
         </div>
         {deleteError && <FieldError>{deleteError}</FieldError>}
       </form>
+
+      <DeleteConfirmDialog
+        open={confirmingDelete}
+        onCancel={() => setConfirmingDelete(false)}
+        onConfirm={handleConfirmDelete}
+        kind="hard"
+        itemLabel={periodType.name}
+        confirmLabel="Delete"
+        pendingLabel="Deleting…"
+        pending={isDeleting}
+        note="A period type referenced by any existing deadline can't be deleted until those deadlines use a different type."
+      />
     </Panel>
   )
 }

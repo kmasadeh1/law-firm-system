@@ -129,7 +129,7 @@
     "common": {
       "unknownStaff": "Unknown staff",
       "deleteConfirm": {
-        "title": "{verb} <bdi>{item}</bdi>?",
+        "title": "{verb} <item></item>?",
         "softNote": "This can be restored afterward.",
         "hardNote": "This can't be undone.",
         "deactivateNote": "This can be reactivated afterward.",
@@ -288,7 +288,6 @@
           "edit": "Edit",
           "deleting": "Deleting…",
           "delete": "Delete",
-          "confirmDelete": "Confirm delete?",
           "errors": {
             "descriptionRequired": "Description is required.",
             "incurredRequired": "Date incurred is required.",
@@ -317,7 +316,6 @@
           "cancel": "Cancel",
           "deleting": "Deleting…",
           "delete": "Delete",
-          "confirmDelete": "Confirm delete?",
           "restoring": "Restoring…",
           "restore": "Restore",
           "authorLine": "<bdi>{author}</bdi> · <bdi>{date}</bdi>",
@@ -425,9 +423,8 @@
           "copyLink": "Copy link",
           "sendViaWhatsapp": "Send via WhatsApp",
           "revoking": "Revoking…",
-          "confirmRevoke": "Confirm revoke?",
           "revoke": "Revoke",
-          "cancel": "Cancel",
+          "revokeNote": "The client holding this link will no longer be able to open it.",
           "errors": {
             "noPermissionShare": "You don't have permission to share this case.",
             "generateFailed": "Could not generate a share link. Please try again.",

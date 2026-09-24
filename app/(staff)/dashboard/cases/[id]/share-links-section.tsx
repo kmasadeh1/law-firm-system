@@ -7,6 +7,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatDateTime, formatDate } from '@/lib/format-date-time'
 
 type ShareLink = {
@@ -90,38 +91,39 @@ function GeneratedLinkPanel({ url }: { url: string }) {
   )
 }
 
-function RevokeButton({ caseId, linkId }: { caseId: string; linkId: string }) {
+function RevokeButton({ caseId, linkId, linkLabel }: { caseId: string; linkId: string; linkLabel: string }) {
   const t = useTranslations('dashboard.cases.detail.shareLinks')
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  function handleClick() {
-    if (!confirming) {
-      setConfirming(true)
-      return
-    }
+  function handleConfirm() {
     setError(null)
     startTransition(async () => {
       const result = await revokeShareLink(caseId, linkId)
-      if (result.error) {
-        setError(result.error)
-        setConfirming(false)
-      }
+      setConfirming(false)
+      if (result.error) setError(result.error)
     })
   }
 
   return (
     <div className="flex items-center gap-2">
-      <Button type="button" variant="danger" onClick={handleClick} disabled={isPending}>
-        {isPending ? t('revoking') : confirming ? t('confirmRevoke') : t('revoke')}
+      <Button type="button" variant="danger" onClick={() => setConfirming(true)} disabled={isPending}>
+        {isPending ? t('revoking') : t('revoke')}
       </Button>
-      {confirming && !isPending && (
-        <Button type="button" variant="ghost" onClick={() => setConfirming(false)}>
-          {t('cancel')}
-        </Button>
-      )}
       {error && <FieldError>{error}</FieldError>}
+
+      <DeleteConfirmDialog
+        open={confirming}
+        onCancel={() => setConfirming(false)}
+        onConfirm={handleConfirm}
+        kind="hard"
+        itemLabel={linkLabel}
+        confirmLabel={t('revoke')}
+        pendingLabel={t('revoking')}
+        pending={isPending}
+        note={t('revokeNote')}
+      />
     </div>
   )
 }
@@ -165,7 +167,9 @@ function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
           {t('viewCount', { count: link.access_count })}
         </p>
       </div>
-      {status === 'active' && <RevokeButton caseId={caseId} linkId={link.id} />}
+      {status === 'active' && (
+        <RevokeButton caseId={caseId} linkId={link.id} linkLabel={link.label || t('untitledLink')} />
+      )}
     </li>
   )
 }

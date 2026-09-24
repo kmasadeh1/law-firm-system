@@ -8,6 +8,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatDate } from '@/lib/format-date-time'
 
 export type ExpenseTotals = {
@@ -57,18 +58,12 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
     })
   }
 
-  function handleDelete() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true)
-      return
-    }
+  function handleConfirmDelete() {
     setError(null)
     startTransition(async () => {
       const result = await deleteExpense(caseId, expense.id)
-      if (result.error) {
-        setError(result.error)
-        setConfirmingDelete(false)
-      }
+      setConfirmingDelete(false)
+      if (result.error) setError(result.error)
     })
   }
 
@@ -167,15 +162,21 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
         <Button type="button" variant="ghost" onClick={() => setIsEditing(true)}>
           {t('edit')}
         </Button>
-        <Button type="button" variant="danger" onClick={handleDelete} disabled={isPending}>
-          {isPending ? t('deleting') : confirmingDelete ? t('confirmDelete') : t('delete')}
+        <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
+          {isPending ? t('deleting') : t('delete')}
         </Button>
-        {confirmingDelete && !isPending && (
-          <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
-            {t('cancel')}
-          </Button>
-        )}
       </div>
+
+      <DeleteConfirmDialog
+        open={confirmingDelete}
+        onCancel={() => setConfirmingDelete(false)}
+        onConfirm={handleConfirmDelete}
+        kind="hard"
+        itemLabel={expense.description}
+        confirmLabel={t('delete')}
+        pendingLabel={t('deleting')}
+        pending={isPending}
+      />
     </li>
   )
 }

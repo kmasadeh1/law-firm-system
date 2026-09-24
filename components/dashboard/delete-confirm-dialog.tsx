@@ -20,6 +20,7 @@ export function DeleteConfirmDialog({
   confirmLabel,
   pendingLabel,
   pending = false,
+  note,
 }: {
   open: boolean
   onCancel: () => void
@@ -27,12 +28,25 @@ export function DeleteConfirmDialog({
   kind: DeleteConfirmKind
   /** The identifying detail - a filename, a note's first line, a person's
    *  name. Rendered isolated with <bdi>, not forced LTR: this is often a
-   *  name, and names aren't LTR data. */
-  itemLabel: string
-  /** The actual verb: "Delete", "Remove", "Deactivate" - never "OK". */
+   *  name, and names aren't LTR data. A plain string is wrapped in one
+   *  <bdi> as a whole; when the detail is a composite of several values
+   *  (an amount and a date, a case number and a title), pass a ReactNode
+   *  with each value isolated individually instead - bundling them into
+   *  one string first would isolate the whole run together and lose the
+   *  per-value boundary the values need from each other. */
+  itemLabel: React.ReactNode
+  /** The actual verb: "Delete", "Remove", "Deactivate", "Revoke",
+   *  "Unlink" - never "OK". */
   confirmLabel: string
   pendingLabel?: string
   pending?: boolean
+  /** Overrides the generic kind-derived reassurance/warning line when the
+   *  actual consequence needs saying precisely - e.g. "the client holding
+   *  this link will no longer be able to open it" instead of a generic
+   *  "can't be undone". Sourced from the caller's own namespace, since the
+   *  wording is specific to that action, not shared. Falls back to the
+   *  kind-derived default when omitted. */
+  note?: React.ReactNode
 }) {
   const t = useTranslations('dashboard.common.deleteConfirm')
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -68,7 +82,8 @@ export function DeleteConfirmDialog({
     onCancel()
   }
 
-  const note = kind === 'soft' ? t('softNote') : kind === 'deactivate' ? t('deactivateNote') : t('hardNote')
+  const defaultNote = kind === 'soft' ? t('softNote') : kind === 'deactivate' ? t('deactivateNote') : t('hardNote')
+  const noteContent = note ?? defaultNote
 
   return (
     <dialog
@@ -84,11 +99,15 @@ export function DeleteConfirmDialog({
           <h2 id={headingId} className="font-heading text-base text-fg">
             {t.rich('title', {
               verb: confirmLabel,
-              item: itemLabel,
-              bdi: (chunks) => <bdi>{chunks}</bdi>,
+              // A plain string gets the dialog's own <bdi>; a caller that
+              // already composed itemLabel as several individually-isolated
+              // pieces (an amount and a date, a case number and a title) is
+              // rendered as-is instead of bundling everything into one
+              // isolate, which would lose the boundary between those pieces.
+              item: () => (typeof itemLabel === 'string' ? <bdi>{itemLabel}</bdi> : itemLabel),
             })}
           </h2>
-          <p className="text-sm text-fg-muted">{note}</p>
+          <p className="text-sm text-fg-muted">{noteContent}</p>
         </div>
 
         <div className="flex items-center justify-end gap-2">

@@ -7,7 +7,15 @@ import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { FieldError, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatDateTime } from '@/lib/format-date-time'
+
+// The identifying detail for the confirm dialog - the note's first line,
+// trimmed so a long note doesn't blow out the dialog.
+function firstLine(text: string, maxLength = 60) {
+  const line = text.split('\n')[0]!.trim()
+  return line.length > maxLength ? `${line.slice(0, maxLength - 1)}…` : line
+}
 
 export type CaseNote = {
   id: string
@@ -85,18 +93,12 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
     })
   }
 
-  function handleDelete() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true)
-      return
-    }
+  function handleConfirmDelete() {
     setError(null)
     startTransition(async () => {
       const result = await deleteCaseNote(caseId, note.id)
-      if (result.error) {
-        setError(result.error)
-        setConfirmingDelete(false)
-      }
+      setConfirmingDelete(false)
+      if (result.error) setError(result.error)
     })
   }
 
@@ -148,16 +150,22 @@ function NoteItem({ caseId, note }: { caseId: string; note: CaseNote }) {
         <Button type="button" variant="ghost" onClick={() => setIsEditing(true)}>
           {t('edit')}
         </Button>
-        <Button type="button" variant="danger" onClick={handleDelete} disabled={isPending}>
-          {isPending ? t('deleting') : confirmingDelete ? t('confirmDelete') : t('delete')}
+        <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
+          {isPending ? t('deleting') : t('delete')}
         </Button>
-        {confirmingDelete && !isPending && (
-          <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
-            {t('cancel')}
-          </Button>
-        )}
       </div>
       {error && <FieldError>{error}</FieldError>}
+
+      <DeleteConfirmDialog
+        open={confirmingDelete}
+        onCancel={() => setConfirmingDelete(false)}
+        onConfirm={handleConfirmDelete}
+        kind="soft"
+        itemLabel={firstLine(note.note)}
+        confirmLabel={t('delete')}
+        pendingLabel={t('deleting')}
+        pending={isPending}
+      />
     </li>
   )
 }

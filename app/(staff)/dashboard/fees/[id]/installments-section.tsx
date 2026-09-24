@@ -12,6 +12,7 @@ import { Button } from '@/components/dashboard/button'
 import { Badge } from '@/components/dashboard/badge'
 import { Banner } from '@/components/dashboard/banner'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatAmount } from '../format'
 
 type Payment = { id: string; amount: number; paid_at: string; method: string | null }
@@ -39,6 +40,7 @@ function InstallmentRow({
   const [editing, setEditing] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
   const editFormRef = useRef<HTMLFormElement>(null)
   const paymentFormRef = useRef<HTMLFormElement>(null)
@@ -57,13 +59,28 @@ function InstallmentRow({
     })
   }
 
-  function handleDelete() {
+  function handleConfirmDelete() {
     setError(null)
     startTransition(async () => {
       const result = await deleteInstallment(engagementId, installment.id)
+      setConfirmingDelete(false)
       if (result.error) setError(result.error)
     })
   }
+
+  const hasPayments = installment.payments.length > 0
+  // Amount and date each get their own <bdi>, matching the row display
+  // above - bundling them into one string first would isolate the whole
+  // run together instead of each value from its neighbour.
+  const installmentLabel = installment.due_date ? (
+    <>
+      <bdi>{formatAmount(installment.amount)}</bdi> due <bdi>{installment.due_date}</bdi>
+    </>
+  ) : (
+    <>
+      <bdi>{formatAmount(installment.amount)}</bdi>, no due date
+    </>
+  )
 
   function handleRecordPayment(e: React.FormEvent) {
     e.preventDefault()
@@ -157,13 +174,29 @@ function InstallmentRow({
           <Button type="button" variant="ghost" onClick={() => setEditing(true)}>
             Edit
           </Button>
-          <Button type="button" variant="danger" disabled={isPending} onClick={handleDelete}>
+          <Button type="button" variant="danger" disabled={isPending} onClick={() => setConfirmingDelete(true)}>
             Delete
           </Button>
         </div>
       </div>
 
       {error && !editing && <FieldError>{error}</FieldError>}
+
+      <DeleteConfirmDialog
+        open={confirmingDelete}
+        onCancel={() => setConfirmingDelete(false)}
+        onConfirm={handleConfirmDelete}
+        kind="hard"
+        itemLabel={installmentLabel}
+        confirmLabel="Delete"
+        pendingLabel="Deleting…"
+        pending={isPending}
+        note={
+          hasPayments
+            ? "Payments have already been recorded against this instalment - deleting it will fail until those payments are removed."
+            : "No payments have been recorded against this instalment yet. This can't be undone."
+        }
+      />
 
       {expanded && (
         <div className="flex flex-col gap-3 rounded-md border border-line bg-canvas p-3">

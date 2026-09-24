@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { Switch } from '@/components/dashboard/switch'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 
 type PermissionKeyRow = {
   key: string
@@ -249,17 +250,13 @@ function RoleCard({
     })
   }
 
-  function handleDeleteClick() {
-    if (!confirmingDelete) {
-      setConfirmingDelete(true)
-      return
-    }
+  function handleConfirmDelete() {
     setDeleteError(null)
     startDelete(async () => {
       const result = await deleteRole(role.id)
+      setConfirmingDelete(false)
       if (result.error) {
         setDeleteError(result.error)
-        setConfirmingDelete(false)
         return
       }
       onDeleted()
@@ -301,17 +298,24 @@ function RoleCard({
 
         <div className="grow" />
 
-        <Button type="button" variant="danger" onClick={handleDeleteClick} disabled={isDeleting}>
-          {isDeleting ? 'Deleting…' : confirmingDelete ? 'Confirm delete?' : 'Delete role'}
+        <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isDeleting}>
+          {isDeleting ? 'Deleting…' : 'Delete role'}
         </Button>
-        {confirmingDelete && !isDeleting && (
-          <Button type="button" variant="ghost" onClick={() => setConfirmingDelete(false)}>
-            Cancel
-          </Button>
-        )}
       </div>
       {renameError && <FieldError>{renameError}</FieldError>}
       {deleteError && <FieldError>{deleteError}</FieldError>}
+
+      <DeleteConfirmDialog
+        open={confirmingDelete}
+        onCancel={() => setConfirmingDelete(false)}
+        onConfirm={handleConfirmDelete}
+        kind="hard"
+        itemLabel={role.name}
+        confirmLabel="Delete role"
+        pendingLabel="Deleting…"
+        pending={isDeleting}
+        note="A role held by any staff member can't be deleted until they're moved to another role first."
+      />
 
       <div className="mt-5 flex flex-col gap-5">
         {groups.map((group) => (
