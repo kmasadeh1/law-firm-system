@@ -314,7 +314,7 @@ function RoleCard({
         confirmLabel="Delete role"
         pendingLabel="Deleting…"
         pending={isDeleting}
-        note="A role held by any staff member can't be deleted until they're moved to another role first."
+        note="A role held by any staff member can't be deleted until they're moved to another role first. Its permission settings will also be removed."
       />
 
       <div className="mt-5 flex flex-col gap-5">
