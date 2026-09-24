@@ -57,6 +57,18 @@ export type NavGroup = {
   items: NavItem[]
 }
 
+// First letter of the first two words, uppercased - toLocaleUpperCase is a
+// no-op on scripts without case (Arabic), so this works for either locale's
+// names without a locale check.
+function initials(name: string) {
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  return words
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toLocaleUpperCase()
+}
+
 function isActive(pathname: string, href: string) {
   if (href === '/dashboard/owner' || href === '/dashboard/staff') {
     return pathname === href
@@ -172,27 +184,27 @@ export function DashboardShell({
             bar is shell-level chrome, the two are deliberately not merged).
             Sticky, opaque (bg-surface/border-line) so it separates from
             scrolled content the same way the sidebar separates from the
-            main column - the public site's header doesn't need this since
-            it isn't sticky, so it's a deliberate divergence from that
-            sibling, not a miss. py-4 (rather than the public header's own
-            py-5) keeps it close to the sidebar's own p-4 brand-block
-            padding, so the two line up as one band rather than reading as
-            independently positioned; horizontal padding matches <main>
-            below it (px-4 sm:px-6 md:px-8), not the public header's wider
-            scale, so the header's edges stay aligned with the content
-            column it sits above.
+            main column.
+
+            Deliberately NOT aligned to the sidebar's brand-block height -
+            that block stays taller (it's the identity anchor), this is a
+            plain utility bar and reads as more finished short than
+            stretched to match: py-2 with the row's h-9 controls lands
+            around 52px total, not the brand block's own height. Horizontal
+            padding matches <main> below it (px-4 sm:px-6 md:px-8) so the
+            header's edges stay aligned with the content column it sits
+            above.
 
             Inline-start holds the mobile nav trigger (the aside it opens is
             hidden below md, so this is its only home); everything else is
-            pushed to inline-end via ms-auto, in reading order theme,
-            account, log out (set apart with its own divider, the quietest
-            thing here since it's rare and semi-destructive), then the
-            language pair outermost - mirroring the public header's own
-            "content, then language, last" rhythm. Plain flex row, so it
-            mirrors under dir="rtl" the same way the rest of the app already
-            relies on for start/end layout - the language pair's own
-            internal order mirrors the same way, for the same reason. */}
-        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-4 sm:px-6 md:px-8">
+            pushed to inline-end via ms-auto as two groups separated by one
+            divider: theme + language (what you'd change), then the account
+            - avatar, name/role, log out - grouped together because log out
+            acts on the account, not on the page. Plain flex row, so it
+            mirrors under dir="rtl" the same way the rest of the app relies
+            on for start/end layout; the language pair's own internal order
+            mirrors the same way, for the same reason. */}
+        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-2 sm:px-6 md:px-8">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -202,10 +214,26 @@ export function DashboardShell({
             <MenuIcon className="h-5 w-5" />
           </button>
 
-          <div className="flex items-center gap-2 ms-auto sm:gap-3">
+          <div className="flex items-center gap-1 ms-auto sm:gap-2">
             <ThemeToggle initialTheme={initialTheme} />
+            <LocaleToggle />
+          </div>
 
-            <p className="max-w-[10rem] truncate text-sm text-fg sm:max-w-[14rem]">
+          <div className="ms-2 flex items-center gap-2 border-s border-line ps-3 sm:ms-3">
+            {/* Fixed dark-on-brass, independent of the light/dark toggle -
+                a brand-identity mark (same reasoning as the crest) rather
+                than a theme-reactive control, so it stays legible and
+                recognisable in either dashboard theme. ink/brass are the
+                same shared-palette tokens the public site's identity uses
+                (5.90:1, already measured). */}
+            <span
+              aria-hidden="true"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-medium text-brass"
+            >
+              {initials(userName)}
+            </span>
+
+            <p className="max-w-[8rem] truncate text-sm leading-tight text-fg sm:max-w-[12rem]">
               <span className="font-medium">
                 <bdi>{userName}</bdi>
               </span>
@@ -219,8 +247,8 @@ export function DashboardShell({
                 is a bad fit for this audience for a destructive action.
                 Label shows at sm and up, same breakpoint the theme and
                 language controls already use - icon-only only below that,
-                where the row genuinely can't fit three labelled controls. */}
-            <form action={logoutAction} className="ms-1 border-s border-line ps-2 sm:ms-2 sm:ps-3">
+                where the row genuinely can't fit a labelled control. */}
+            <form action={logoutAction}>
               <button
                 type="submit"
                 aria-label={t('logOut')}
@@ -230,8 +258,6 @@ export function DashboardShell({
                 <span className="hidden sm:inline">{t('logOut')}</span>
               </button>
             </form>
-
-            <LocaleToggle />
           </div>
         </header>
 
