@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { linkCase, unlinkCase } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
@@ -20,6 +21,7 @@ export function CasesSection({
   linkedCases: CaseRow[]
   clientCases: CaseRow[]
 }) {
+  const t = useTranslations('dashboard.fees.detail.cases')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [addCaseId, setAddCaseId] = useState('')
@@ -37,16 +39,16 @@ export function CasesSection({
 
   return (
     <Panel className="flex flex-col gap-3">
-      <h2 className="font-heading text-lg text-fg">Linked cases</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
       {linkedCases.length === 0 ? (
-        <p className="text-sm text-fg-muted">No cases linked yet.</p>
+        <p className="text-sm text-fg-muted">{t('noneYet')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {linkedCases.map((c) => (
             <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
               <span className="text-fg">
-                <bdi>{c.case_number}</bdi> — {c.title}
+                {t.rich('caseRow', { caseNumber: c.case_number, title: c.title, bdi: (chunks) => <bdi>{chunks}</bdi> })}
               </span>
               <Button
                 type="button"
@@ -54,7 +56,7 @@ export function CasesSection({
                 disabled={isPending}
                 onClick={() => setConfirmingUnlink(c)}
               >
-                Unlink
+                {t('unlink')}
               </Button>
             </li>
           ))}
@@ -67,7 +69,7 @@ export function CasesSection({
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-col gap-1">
             <label htmlFor="add-case" className="text-sm text-fg-muted">
-              Link a case
+              {t('linkCaseLabel')}
             </label>
             <select
               id="add-case"
@@ -75,10 +77,10 @@ export function CasesSection({
               onChange={(e) => setAddCaseId(e.target.value)}
               className={controlClass}
             >
-              <option value="">Select a case…</option>
+              <option value="">{t('selectCasePlaceholder')}</option>
               {candidates.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.case_number} — {c.title}
+                  {t('caseOptionLabel', { caseNumber: c.case_number, title: c.title })}
                 </option>
               ))}
             </select>
@@ -95,7 +97,7 @@ export function CasesSection({
               })
             }
           >
-            Link
+            {t('link')}
           </Button>
         </div>
       )}
@@ -111,18 +113,18 @@ export function CasesSection({
         }}
         kind="hard"
         itemLabel={
-          confirmingUnlink ? (
-            <>
-              <bdi>{confirmingUnlink.case_number}</bdi> — <bdi>{confirmingUnlink.title}</bdi>
-            </>
-          ) : (
-            ''
-          )
+          confirmingUnlink
+            ? t.rich('caseRow', {
+                caseNumber: confirmingUnlink.case_number,
+                title: confirmingUnlink.title,
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })
+            : ''
         }
-        confirmLabel="Unlink"
-        pendingLabel="Unlinking…"
+        confirmLabel={t('unlink')}
+        pendingLabel={t('unlinking')}
         pending={isPending}
-        note="The case and the engagement both stay - only the connection between them is removed."
+        note={t('unlinkNote')}
       />
     </Panel>
   )

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { createEngagement, listClientCases, type CaseOption, type ClientOption } from '../actions'
 import { ClientPicker } from '../client-picker'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
@@ -11,6 +12,8 @@ type FeeType = 'fixed' | 'percentage'
 
 export function EngagementForm() {
   const router = useRouter()
+  const t = useTranslations('dashboard.fees.form')
+  const tType = useTranslations('dashboard.fees.type')
   const formRef = useRef<HTMLFormElement>(null)
   const [feeType, setFeeType] = useState<FeeType>('fixed')
   const [cases, setCases] = useState<CaseOption[]>([])
@@ -53,7 +56,7 @@ export function EngagementForm() {
 
       <Field>
         <Label htmlFor="fee_type" required>
-          Fee type
+          {t('feeTypeLabel')}
         </Label>
         <select
           id="fee_type"
@@ -62,15 +65,15 @@ export function EngagementForm() {
           onChange={(e) => setFeeType(e.target.value as FeeType)}
           className={controlClass}
         >
-          <option value="fixed">Fixed amount</option>
-          <option value="percentage">Percentage</option>
+          <option value="fixed">{tType('fixed')}</option>
+          <option value="percentage">{tType('percentage')}</option>
         </select>
       </Field>
 
       {feeType === 'fixed' ? (
         <Field>
           <Label htmlFor="fixed_amount" required>
-            Agreed amount
+            {t('agreedAmountLabel')}
           </Label>
           <input
             id="fixed_amount"
@@ -85,7 +88,7 @@ export function EngagementForm() {
       ) : (
         <Field>
           <Label htmlFor="percentage" required>
-            Agreed percentage
+            {t('agreedPercentageLabel')}
           </Label>
           <input
             id="percentage"
@@ -97,20 +100,14 @@ export function EngagementForm() {
             required
             className={controlClass}
           />
-          <HelpText>
-            Stored for reference only. There&apos;s nowhere to record an award amount, so no total
-            or balance is calculated from this rate - add instalments by hand as they&apos;re
-            agreed.
-          </HelpText>
+          <HelpText>{t('percentageHelp')}</HelpText>
         </Field>
       )}
 
       <Field>
-        <Label htmlFor="case_ids">Linked cases</Label>
+        <Label htmlFor="case_ids">{t('linkedCasesLabel')}</Label>
         {cases.length === 0 ? (
-          <HelpText>
-            {'Select a client above to see their cases. You can also link cases later from the engagement page.'}
-          </HelpText>
+          <HelpText>{t('linkedCasesHelp')}</HelpText>
         ) : (
           <ul className="flex flex-col gap-1.5 rounded-md border border-line p-2">
             {cases.map((c) => (
@@ -127,7 +124,11 @@ export function EngagementForm() {
                       )
                     }
                   />
-                  <bdi>{c.case_number}</bdi> — {c.title}
+                  {t.rich('caseOption', {
+                    caseNumber: c.case_number,
+                    title: c.title,
+                    bdi: (chunks) => <bdi>{chunks}</bdi>,
+                  })}
                 </label>
               </li>
             ))}
@@ -138,7 +139,7 @@ export function EngagementForm() {
       {error && <FieldError>{error}</FieldError>}
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
-        {isPending ? 'Creating…' : 'Create engagement'}
+        {isPending ? t('creating') : t('createEngagement')}
       </Button>
     </form>
   )

@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { addExpense, editExpense, setExpenseReimbursed, deleteExpense } from '../actions'
-import { formatAmount } from '../../fees/format'
+import { formatAmount } from '@/lib/format-money'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
@@ -130,7 +130,7 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
         <p className="font-medium text-fg">
           {expense.description}{' '}
           <span className="text-fg-muted">
-            · <bdi>{formatAmount(expense.amount)}</bdi>
+            · <bdi>{formatAmount(expense.amount, locale)}</bdi>
           </span>
         </p>
         <p className="mt-0.5 text-xs text-fg-muted">
@@ -190,6 +190,7 @@ export function ExpensesSection({
   expenses: Expense[]
   totals: ExpenseTotals
 }) {
+  const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -218,13 +219,13 @@ export function ExpensesSection({
 
       <div className="flex flex-wrap gap-2">
         <Badge variant="neutral">
-          {t('incurredBadge')} <bdi>{formatAmount(totals.incurred)}</bdi>
+          {t('incurredBadge')} <bdi>{formatAmount(totals.incurred, locale)}</bdi>
         </Badge>
         <Badge variant="neutral">
-          {t('reimbursedBadge')} <bdi>{formatAmount(totals.reimbursed)}</bdi>
+          {t('reimbursedBadge')} <bdi>{formatAmount(totals.reimbursed, locale)}</bdi>
         </Badge>
         <Badge variant={totals.outstanding > 0 ? 'accent' : 'muted'}>
-          {t('outstandingBadge')} <bdi>{formatAmount(totals.outstanding)}</bdi>
+          {t('outstandingBadge')} <bdi>{formatAmount(totals.outstanding, locale)}</bdi>
         </Badge>
       </div>
 

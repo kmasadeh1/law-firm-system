@@ -1,14 +1,20 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton } from '@/components/dashboard/button'
 import { Badge } from '@/components/dashboard/badge'
-import { formatAmount, formatFeeType } from './format'
+import { formatAmount } from '@/lib/format-money'
+import { formatFeeType } from './format'
 
 export default async function FeesListPage() {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.fees.list' })
+  const tType = await getTranslations({ locale, namespace: 'dashboard.fees.type' })
 
   const { data: engagements } = await supabase
     .from('engagements')
@@ -24,21 +30,21 @@ export default async function FeesListPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Fees & payments"
+        title={t('title')}
         action={
           <LinkButton href="/dashboard/fees/new" variant="primary">
-            New engagement
+            {t('newEngagement')}
           </LinkButton>
         }
       />
 
       {!engagements || engagements.length === 0 ? (
         <EmptyState
-          title="No fee engagements yet"
-          description="Record a fee agreement to start tracking instalments and payments."
+          title={t('noneYet')}
+          description={t('noneYetDescription')}
           action={
             <LinkButton href="/dashboard/fees/new" variant="secondary">
-              New engagement
+              {t('newEngagement')}
             </LinkButton>
           }
         />
@@ -56,18 +62,22 @@ export default async function FeesListPage() {
                     <span>
                       <span className="font-medium text-fg">{e.clients?.full_name ?? '—'}</span>
                       <span className="text-fg-muted">
-                        {' '}
-                        — {e.fee_type === 'fixed' ? 'Fixed' : 'Percentage'}:{' '}
-                        <bdi>{formatFeeType(e.fee_type, e.fixed_amount, e.percentage)}</bdi>
+                        {' — '}
+                        {tType(e.fee_type)}
+                        {': '}
+                        <bdi>{formatFeeType(e.fee_type, e.fixed_amount, e.percentage, locale)}</bdi>
                       </span>
                     </span>
                     <span className="flex items-center gap-2">
                       {outstanding !== null && outstanding > 0 ? (
                         <Badge variant="accent">
-                          Outstanding (scheduled): <bdi>{formatAmount(outstanding)}</bdi>
+                          {t.rich('outstandingScheduled', {
+                            amount: formatAmount(outstanding, locale),
+                            bdi: (chunks) => <bdi>{chunks}</bdi>,
+                          })}
                         </Badge>
                       ) : (
-                        <Badge variant="muted">Settled</Badge>
+                        <Badge variant="muted">{t('settled')}</Badge>
                       )}
                     </span>
                   </Link>

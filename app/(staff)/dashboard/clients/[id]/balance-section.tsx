@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
-import { formatAmount } from '../../fees/format'
+import { formatAmount } from '@/lib/format-money'
 
 type Balance = {
   agreed_fixed_fee_total: number | null
@@ -37,13 +37,13 @@ export async function BalanceSection({ balance }: { balance: Balance | null }) {
       <div className="flex flex-wrap gap-2">
         {balance.agreed_fixed_fee_total !== null && (
           <Badge variant="neutral">
-            {t.rich('agreedFixedFees', { amount: formatAmount(balance.agreed_fixed_fee_total), bdi })}
+            {t.rich('agreedFixedFees', { amount: formatAmount(balance.agreed_fixed_fee_total, locale), bdi })}
           </Badge>
         )}
-        <Badge variant="neutral">{t.rich('scheduled', { amount: formatAmount(balance.scheduled_total), bdi })}</Badge>
-        <Badge variant="neutral">{t.rich('paid', { amount: formatAmount(balance.paid_total), bdi })}</Badge>
+        <Badge variant="neutral">{t.rich('scheduled', { amount: formatAmount(balance.scheduled_total, locale), bdi })}</Badge>
+        <Badge variant="neutral">{t.rich('paid', { amount: formatAmount(balance.paid_total, locale), bdi })}</Badge>
         <Badge variant={(balance.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
-          {t.rich('outstandingScheduled', { amount: formatAmount(balance.scheduled_outstanding), bdi })}
+          {t.rich('outstandingScheduled', { amount: formatAmount(balance.scheduled_outstanding, locale), bdi })}
         </Badge>
       </div>
       {hasPercentageEngagements && (

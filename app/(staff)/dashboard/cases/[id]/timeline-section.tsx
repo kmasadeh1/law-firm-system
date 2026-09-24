@@ -4,7 +4,8 @@ import { Fragment, useState, type ReactNode } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
-import { formatAmount, formatFeeType } from '../../fees/format'
+import { formatAmount } from '@/lib/format-money'
+import { formatFeeType } from '../../fees/format'
 import { activityEventTitle, type ActivityAction } from '@/lib/activity-labels'
 import { formatTime, formatFullDate, formatDate } from '@/lib/format-date-time'
 
@@ -57,13 +58,13 @@ function eventDetail(
     case 'documents':
       return typeof detail.filename === 'string' ? detail.filename : null
     case 'payments': {
-      const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
+      const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount, locale) : null
       const method = typeof detail.method === 'string' ? detail.method : null
       if (!amount) return null
       return method ? t.rich('paymentWithMethod', { amount, method, bdi }) : <bdi>{amount}</bdi>
     }
     case 'expenses': {
-      const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
+      const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount, locale) : null
       const description = typeof detail.description === 'string' ? detail.description : null
       if (description && amount) {
         return t.rich('expenseWithAmount', { description, amount, bdi })
@@ -71,7 +72,7 @@ function eventDetail(
       return description ?? (amount ? <bdi>{amount}</bdi> : null)
     }
     case 'engagement_installments': {
-      const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount) : null
+      const amount = typeof detail.amount === 'number' ? formatAmount(detail.amount, locale) : null
       const description = typeof detail.description === 'string' ? detail.description : null
       const due = formatDueDate(detail.due_date, locale)
       const parts: ReactNode[] = []
@@ -96,7 +97,8 @@ function eventDetail(
           {formatFeeType(
             feeType,
             typeof detail.fixed_amount === 'number' ? detail.fixed_amount : null,
-            typeof detail.percentage === 'number' ? detail.percentage : null
+            typeof detail.percentage === 'number' ? detail.percentage : null,
+            locale
           )}
         </bdi>
       )

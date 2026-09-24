@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { EmptyState } from '@/components/dashboard/empty-state'
-import { formatAmount } from '@/app/(staff)/dashboard/fees/format'
+import { formatAmount } from '@/lib/format-money'
 import { formatDate as formatDateWithLocale } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 
@@ -42,19 +42,19 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
           <div>
             <dt className="text-xs text-fg-muted">Total scheduled</dt>
             <dd className="mt-1 text-xl font-medium text-fg">
-              <bdi>{formatAmount(summary?.total_scheduled ?? null)}</bdi>
+              <bdi>{formatAmount(summary?.total_scheduled ?? null, locale)}</bdi>
             </dd>
           </div>
           <div>
             <dt className="text-xs text-fg-muted">Total paid</dt>
             <dd className="mt-1 text-xl font-medium text-fg">
-              <bdi>{formatAmount(summary?.total_paid ?? null)}</bdi>
+              <bdi>{formatAmount(summary?.total_paid ?? null, locale)}</bdi>
             </dd>
           </div>
           <div>
             <dt className="text-xs text-fg-muted">Total outstanding</dt>
             <dd className="mt-1 text-xl font-medium text-fg">
-              <bdi>{formatAmount(summary?.total_outstanding ?? null)}</bdi>
+              <bdi>{formatAmount(summary?.total_outstanding ?? null, locale)}</bdi>
             </dd>
           </div>
           <div>
@@ -97,13 +97,13 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
                       <bdi>{formatDate(row.due_date)}</bdi>
                     </td>
                     <td className="py-2 pe-4 text-fg">
-                      <bdi>{formatAmount(row.installment_amount)}</bdi>
+                      <bdi>{formatAmount(row.installment_amount, locale)}</bdi>
                     </td>
                     <td className="py-2 pe-4 text-fg">
-                      <bdi>{formatAmount(row.paid_amount)}</bdi>
+                      <bdi>{formatAmount(row.paid_amount, locale)}</bdi>
                     </td>
                     <td className="py-2 pe-4 font-medium text-fg">
-                      <bdi>{formatAmount(row.balance_due)}</bdi>
+                      <bdi>{formatAmount(row.balance_due, locale)}</bdi>
                     </td>
                     <td className="py-2 pe-4 text-fg">
                       <bdi>{row.days_overdue ?? '—'}</bdi>

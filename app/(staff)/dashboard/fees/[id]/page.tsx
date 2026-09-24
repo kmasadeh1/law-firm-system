@@ -1,9 +1,12 @@
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
-import { formatAmount, formatFeeType } from '../format'
+import { formatAmount, formatPercentage } from '@/lib/format-money'
+import { formatFeeType } from '../format'
 import { CasesSection } from './cases-section'
 import { AgreementSection } from './agreement-section'
 import { InstallmentsSection } from './installments-section'
@@ -11,6 +14,9 @@ import { InstallmentsSection } from './installments-section'
 export default async function EngagementDetailPage({ params }: PageProps<'/dashboard/fees/[id]'>) {
   const { id } = await params
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.fees.detail' })
+  const tType = await getTranslations({ locale, namespace: 'dashboard.fees.type' })
 
   const { data: engagement } = await supabase
     .from('engagements')
@@ -23,10 +29,8 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
   if (!engagement) {
     return (
       <div className="flex flex-col gap-6">
-        <BackLink href="/dashboard/fees" label="Fees & payments" />
-        <p className="text-sm text-fg-muted">
-          This engagement doesn&apos;t exist, or you don&apos;t have access to it.
-        </p>
+        <BackLink href="/dashboard/fees" label={t('backToFees')} />
+        <p className="text-sm text-fg-muted">{t('notFound')}</p>
       </div>
     )
   }
@@ -109,13 +113,14 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <BackLink href="/dashboard/fees" label="Fees & payments" />
+        <BackLink href="/dashboard/fees" label={t('backToFees')} />
         <PageHeader
-          title={engagement.clients?.full_name ?? 'Engagement'}
+          title={engagement.clients?.full_name ?? t('engagementFallback')}
           description={
             <>
-              {engagement.fee_type === 'fixed' ? 'Fixed fee' : 'Percentage fee'}:{' '}
-              <bdi>{formatFeeType(engagement.fee_type, engagement.fixed_amount, engagement.percentage)}</bdi>
+              {tType(engagement.fee_type)}
+              {': '}
+              <bdi>{formatFeeType(engagement.fee_type, engagement.fixed_amount, engagement.percentage, locale)}</bdi>
             </>
           }
         />
@@ -125,21 +130,30 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
         <div className="flex flex-wrap items-center gap-3">
           {engagement.fee_type === 'fixed' ? (
             <Badge variant="neutral">
-              Agreed: <bdi>{formatAmount(balance?.agreed_fixed_fee ?? null)}</bdi>
+              {t.rich('agreedFixed', {
+                amount: formatAmount(balance?.agreed_fixed_fee ?? null, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })}
             </Badge>
           ) : (
             <Badge variant="neutral">
-              Agreed: <bdi>{balance?.agreed_percentage ?? engagement.percentage ?? '—'}%</bdi> of award
+              {t.rich('agreedPercentage', {
+                percentage: formatPercentage(balance?.agreed_percentage ?? engagement.percentage ?? null, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })}
             </Badge>
           )}
           <Badge variant="neutral">
-            Scheduled: <bdi>{formatAmount(balance?.scheduled_total ?? 0)}</bdi>
+            {t.rich('scheduled', { amount: formatAmount(balance?.scheduled_total ?? 0, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
           <Badge variant="neutral">
-            Paid: <bdi>{formatAmount(balance?.paid_total ?? 0)}</bdi>
+            {t.rich('paid', { amount: formatAmount(balance?.paid_total ?? 0, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
           <Badge variant={(balance?.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
-            Outstanding (scheduled): <bdi>{formatAmount(balance?.scheduled_outstanding ?? 0)}</bdi>
+            {t.rich('outstandingScheduled', {
+              amount: formatAmount(balance?.scheduled_outstanding ?? 0, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </Badge>
         </div>
         {engagement.fee_type === 'fixed' &&
@@ -147,15 +161,15 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
           balance?.unscheduled_amount !== undefined &&
           balance.unscheduled_amount !== 0 && (
             <p className="text-sm text-fg-muted">
-              {balance.unscheduled_amount > 0 ? (
-                <>
-                  <bdi>{formatAmount(balance.unscheduled_amount)}</bdi> of the agreed fee is not scheduled yet.
-                </>
-              ) : (
-                <>
-                  The schedule exceeds the agreed fee by <bdi>{formatAmount(Math.abs(balance.unscheduled_amount))}</bdi>.
-                </>
-              )}
+              {balance.unscheduled_amount > 0
+                ? t.rich('unscheduledPositive', {
+                    amount: formatAmount(balance.unscheduled_amount, locale),
+                    bdi: (chunks) => <bdi>{chunks}</bdi>,
+                  })
+                : t.rich('unscheduledNegative', {
+                    amount: formatAmount(Math.abs(balance.unscheduled_amount), locale),
+                    bdi: (chunks) => <bdi>{chunks}</bdi>,
+                  })}
             </p>
           )}
       </Panel>

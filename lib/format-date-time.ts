@@ -6,7 +6,7 @@
 // Latin numerals. Flip this one constant to switch the whole firm.
 const AR_LOCALE_TAG = 'ar-JO-u-nu-latn'
 
-function localeTag(locale: string) {
+export function localeTag(locale: string) {
   return locale === 'ar' ? AR_LOCALE_TAG : 'en'
 }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   createInstallment,
   deleteInstallment,
@@ -13,7 +14,8 @@ import { Badge } from '@/components/dashboard/badge'
 import { Banner } from '@/components/dashboard/banner'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
-import { formatAmount } from '../format'
+import { formatAmount } from '@/lib/format-money'
+import { formatDate } from '@/lib/format-date-time'
 
 type Payment = { id: string; amount: number; paid_at: string; method: string | null }
 
@@ -37,6 +39,8 @@ function InstallmentRow({
   installment: Installment
   canRecordPayments: boolean
 }) {
+  const locale = useLocale()
+  const t = useTranslations('dashboard.fees.detail.installments')
   const [editing, setEditing] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -72,15 +76,16 @@ function InstallmentRow({
   // Amount and date each get their own <bdi>, matching the row display
   // above - bundling them into one string first would isolate the whole
   // run together instead of each value from its neighbour.
-  const installmentLabel = installment.due_date ? (
-    <>
-      <bdi>{formatAmount(installment.amount)}</bdi> due <bdi>{installment.due_date}</bdi>
-    </>
-  ) : (
-    <>
-      <bdi>{formatAmount(installment.amount)}</bdi>, no due date
-    </>
-  )
+  const installmentLabel = installment.due_date
+    ? t.rich('deleteItemDue', {
+        amount: formatAmount(installment.amount, locale),
+        date: formatDate(installment.due_date, locale),
+        bdi: (chunks) => <bdi>{chunks}</bdi>,
+      })
+    : t.rich('deleteItemNoDueDate', {
+        amount: formatAmount(installment.amount, locale),
+        bdi: (chunks) => <bdi>{chunks}</bdi>,
+      })
 
   function handleRecordPayment(e: React.FormEvent) {
     e.preventDefault()
@@ -105,7 +110,7 @@ function InstallmentRow({
               name="description"
               defaultValue={installment.description}
               required
-              placeholder="Description"
+              placeholder={t('descriptionPlaceholder')}
               className={`flex-1 ${controlClass}`}
             />
             <input
@@ -126,17 +131,17 @@ function InstallmentRow({
             <input
               name="payer_name"
               defaultValue={installment.payer_name ?? ''}
-              placeholder="Payer (if not the client)"
+              placeholder={t('payerPlaceholder')}
               className={controlClass}
             />
           </div>
           {error && <FieldError>{error}</FieldError>}
           <div className="flex gap-2">
             <Button type="submit" variant="primary" disabled={isPending}>
-              {isPending ? 'Saving…' : 'Save'}
+              {isPending ? t('saving') : t('save')}
             </Button>
             <Button type="button" variant="ghost" onClick={() => setEditing(false)} disabled={isPending}>
-              Cancel
+              {t('cancel')}
             </Button>
           </div>
         </form>
@@ -150,32 +155,31 @@ function InstallmentRow({
         <div className="text-sm">
           <span className="font-medium text-fg">{installment.description}</span>
           <span className="text-fg-muted">
-            {' '}
-            · <bdi>{formatAmount(installment.amount)}</bdi>
-            {installment.due_date && (
-              <>
-                {' '}
-                · due <bdi>{installment.due_date}</bdi>
-              </>
-            )}
-            {installment.payer_name && ` · payer: ${installment.payer_name}`}
+            {t.rich('amountLine', { amount: formatAmount(installment.amount, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+            {installment.due_date &&
+              t.rich('dueDateFragment', {
+                date: formatDate(installment.due_date, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })}
+            {installment.payer_name &&
+              t.rich('payerFragment', { name: installment.payer_name, bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="muted">
-            Paid: <bdi>{formatAmount(installment.paid_amount)}</bdi>
+            {t.rich('paidBadge', { amount: formatAmount(installment.paid_amount, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
           <Badge variant={installment.balance_due > 0 ? 'accent' : 'muted'}>
-            Balance: <bdi>{formatAmount(installment.balance_due)}</bdi>
+            {t.rich('balanceBadge', { amount: formatAmount(installment.balance_due, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
           <Button type="button" variant="ghost" onClick={() => setExpanded((v) => !v)}>
-            {expanded ? 'Hide payments' : 'Payments'}
+            {expanded ? t('hidePayments') : t('showPayments')}
           </Button>
           <Button type="button" variant="ghost" onClick={() => setEditing(true)}>
-            Edit
+            {t('edit')}
           </Button>
           <Button type="button" variant="danger" disabled={isPending} onClick={() => setConfirmingDelete(true)}>
-            Delete
+            {t('delete')}
           </Button>
         </div>
       </div>
@@ -188,30 +192,26 @@ function InstallmentRow({
         onConfirm={handleConfirmDelete}
         kind="hard"
         itemLabel={installmentLabel}
-        confirmLabel="Delete"
-        pendingLabel="Deleting…"
+        confirmLabel={t('delete')}
+        pendingLabel={t('deleting')}
         pending={isPending}
-        note={
-          hasPayments
-            ? "Payments have already been recorded against this instalment - deleting it will fail until those payments are removed."
-            : "No payments have been recorded against this instalment yet. This can't be undone."
-        }
+        note={hasPayments ? t('deleteNoteHasPayments') : t('deleteNoteNoPayments')}
       />
 
       {expanded && (
         <div className="flex flex-col gap-3 rounded-md border border-line bg-canvas p-3">
           {installment.payments.length === 0 ? (
-            <p className="text-sm text-fg-muted">No payments recorded yet.</p>
+            <p className="text-sm text-fg-muted">{t('noPaymentsYet')}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-line">
               {installment.payments.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1.5 text-sm">
                   <span className="text-fg">
-                    <bdi>{formatAmount(p.amount)}</bdi>
+                    <bdi>{formatAmount(p.amount, locale)}</bdi>
                   </span>
                   <span className="text-fg-muted">
-                    <bdi>{p.paid_at}</bdi>
-                    {p.method && ` · ${p.method}`}
+                    <bdi>{formatDate(p.paid_at, locale)}</bdi>
+                    {p.method && t.rich('paymentMethodFragment', { method: p.method, bdi: (chunks) => <bdi>{chunks}</bdi> })}
                   </span>
                 </li>
               ))}
@@ -220,14 +220,11 @@ function InstallmentRow({
 
           {canRecordPayments ? (
             <form ref={paymentFormRef} onSubmit={handleRecordPayment} className="flex flex-col gap-2">
-              <Banner kind="warning">
-                Payments can&apos;t be edited or removed once recorded. A mistake is corrected with
-                an offsetting entry, not by changing history.
-              </Banner>
+              <Banner kind="warning">{t('paymentsImmutableBanner')}</Banner>
               <div className="flex flex-wrap items-end gap-2">
                 <Field>
                   <Label htmlFor={`amount-${installment.id}`} required>
-                    Amount
+                    {t('amountLabel')}
                   </Label>
                   <input
                     id={`amount-${installment.id}`}
@@ -241,7 +238,7 @@ function InstallmentRow({
                 </Field>
                 <Field>
                   <Label htmlFor={`paid_at-${installment.id}`} required>
-                    Date
+                    {t('dateLabel')}
                   </Label>
                   <input
                     id={`paid_at-${installment.id}`}
@@ -253,18 +250,21 @@ function InstallmentRow({
                   />
                 </Field>
                 <Field>
-                  <Label htmlFor={`method-${installment.id}`}>Method</Label>
-                  <input id={`method-${installment.id}`} name="method" placeholder="e.g. cash, transfer" className={controlClass} />
+                  <Label htmlFor={`method-${installment.id}`}>{t('methodLabel')}</Label>
+                  <input
+                    id={`method-${installment.id}`}
+                    name="method"
+                    placeholder={t('methodPlaceholder')}
+                    className={controlClass}
+                  />
                 </Field>
                 <Button type="submit" variant="primary" disabled={isPending}>
-                  {isPending ? 'Recording…' : 'Record payment'}
+                  {isPending ? t('recording') : t('recordPayment')}
                 </Button>
               </div>
             </form>
           ) : (
-            <p className="text-xs text-fg-muted">
-              You don&apos;t have permission to record payments.
-            </p>
+            <p className="text-xs text-fg-muted">{t('noPermissionRecordPayments')}</p>
           )}
         </div>
       )}
@@ -281,6 +281,7 @@ export function InstallmentsSection({
   installments: Installment[]
   canRecordPayments: boolean
 }) {
+  const t = useTranslations('dashboard.fees.detail.installments')
   const addFormRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -301,10 +302,10 @@ export function InstallmentsSection({
 
   return (
     <Panel className="flex flex-col gap-3">
-      <h2 className="font-heading text-lg text-fg">Instalments</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
       {installments.length === 0 ? (
-        <p className="text-sm text-fg-muted">No instalments yet.</p>
+        <p className="text-sm text-fg-muted">{t('noneYet')}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {installments.map((i) => (
@@ -321,26 +322,32 @@ export function InstallmentsSection({
       <form ref={addFormRef} onSubmit={handleAdd} className="flex flex-wrap items-end gap-2">
         <Field>
           <Label htmlFor="new-description" required>
-            Description
+            {t('descriptionLabel')}
           </Label>
-          <input id="new-description" name="description" required placeholder="e.g. on signing" className={controlClass} />
+          <input
+            id="new-description"
+            name="description"
+            required
+            placeholder={t('descriptionAddPlaceholder')}
+            className={controlClass}
+          />
         </Field>
         <Field>
-          <Label htmlFor="new-due-date">Due date</Label>
+          <Label htmlFor="new-due-date">{t('dueDateLabel')}</Label>
           <input id="new-due-date" name="due_date" type="date" className={controlClass} />
         </Field>
         <Field>
           <Label htmlFor="new-amount" required>
-            Amount
+            {t('amountLabel')}
           </Label>
           <input id="new-amount" name="amount" type="number" min="0" step="0.01" required className={controlClass} />
         </Field>
         <Field>
-          <Label htmlFor="new-payer">Payer</Label>
-          <input id="new-payer" name="payer_name" placeholder="If not the client" className={controlClass} />
+          <Label htmlFor="new-payer">{t('payerLabel')}</Label>
+          <input id="new-payer" name="payer_name" placeholder={t('payerAddPlaceholder')} className={controlClass} />
         </Field>
         <Button type="submit" variant="secondary" disabled={isPending}>
-          {isPending ? 'Adding…' : 'Add instalment'}
+          {isPending ? t('adding') : t('addInstallment')}
         </Button>
       </form>
 
