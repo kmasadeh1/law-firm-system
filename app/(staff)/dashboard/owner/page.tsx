@@ -13,6 +13,7 @@ export default async function OwnerDashboardPage() {
   const supabase = await createClient()
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.overview' })
+  const tType = await getTranslations({ locale, namespace: 'dashboard.appointments.type' })
 
   const startOfDay = new Date()
   startOfDay.setHours(0, 0, 0, 0)
@@ -78,7 +79,7 @@ export default async function OwnerDashboardPage() {
                       <bdi>{formatTime(a.starts_at, locale)}</bdi>
                     </span>
                     <span className="text-fg-muted">
-                      {a.type === 'court_date' ? t('courtDate') : t('consultation')}
+                      {tType(a.type)}
                       {a.clients?.full_name && (
                         <>
                           {' · '}

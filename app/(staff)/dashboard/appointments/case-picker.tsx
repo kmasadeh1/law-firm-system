@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { searchCases, type CaseOption } from './actions'
 import { Label, FieldSuccess, HelpText, controlClass } from '@/components/dashboard/form'
 
@@ -15,6 +16,7 @@ export function CasePicker({
   required: boolean
   initial?: CaseOption
 }) {
+  const t = useTranslations('dashboard.appointments.form')
   const [term, setTerm] = useState(initial ? `${initial.case_number} — ${initial.title}` : '')
   const [results, setResults] = useState<CaseOption[]>([])
   const [selected, setSelected] = useState<CaseOption | null>(initial ?? null)
@@ -40,7 +42,7 @@ export function CasePicker({
   return (
     <div className="relative flex flex-col gap-1.5">
       <Label htmlFor="case_search" required={required}>
-        Case
+        {t('caseLabel')}
       </Label>
       <input
         id="case_search"
@@ -52,7 +54,7 @@ export function CasePicker({
         }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        placeholder="Search cases by number or title"
+        placeholder={t('caseSearchPlaceholder')}
         autoComplete="off"
         disabled={!required}
         className={controlClass}
@@ -74,7 +76,7 @@ export function CasePicker({
                 }}
                 className="block w-full px-3 py-2 text-start text-sm text-fg hover:bg-line/40"
               >
-                <bdi>{c.case_number}</bdi> — {c.title}
+                <bdi>{c.case_number}</bdi> — <bdi>{c.title}</bdi>
               </button>
             </li>
           ))}
@@ -82,14 +84,18 @@ export function CasePicker({
       )}
 
       {required && open && term.trim() && !selected && results.length === 0 && (
-        <p className="text-xs text-fg-muted">No matching case.</p>
+        <p className="text-xs text-fg-muted">{t('noMatchingCase')}</p>
       )}
       {required && selected && (
         <FieldSuccess>
-          Selected: <bdi>{selected.case_number}</bdi> — {selected.title}
+          {t.rich('selectedCase', {
+            caseNumber: selected.case_number,
+            title: selected.title,
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         </FieldSuccess>
       )}
-      {!required && <HelpText>Only used for court dates.</HelpText>}
+      {!required && <HelpText>{t('courtDatesOnlyHelp')}</HelpText>}
     </div>
   )
 }

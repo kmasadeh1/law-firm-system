@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 type ActionResult = { error?: string }
 
@@ -36,6 +38,8 @@ export async function searchCases(term: string): Promise<CaseOption[]> {
 export async function createAppointment(
   formData: FormData
 ): Promise<ActionResult & { appointmentId?: string }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.appointments.form.errors' })
   const type = formData.get('type')
   const client_id = formData.get('client_id')
   const case_id = formData.get('case_id')
@@ -45,16 +49,16 @@ export async function createAppointment(
   const notes = formData.get('notes')
 
   if (type !== 'consultation' && type !== 'court_date') {
-    return { error: 'Select an appointment type.' }
+    return { error: t('selectType') }
   }
   if (typeof client_id !== 'string' || !client_id) {
-    return { error: 'Select a client.' }
+    return { error: t('selectClient') }
   }
   if (typeof starts_at !== 'string' || !starts_at) {
-    return { error: 'Start time is required.' }
+    return { error: t('startRequired') }
   }
   if (typeof ends_at !== 'string' || !ends_at) {
-    return { error: 'End time is required.' }
+    return { error: t('endRequired') }
   }
   // case_id-required-for-court_date is a DB check constraint, not
   // reimplemented here - the required attribute on the case picker covers
@@ -86,12 +90,12 @@ export async function createAppointment(
     // a check-violation - the client already requires a case for that type,
     // so this only fires if that constraint is ever tightened further.
     if (error.code === '23514') {
-      return { error: 'A court date must be linked to a case.' }
+      return { error: t('courtDateNeedsCase') }
     }
     if (error.code === '42501') {
-      return { error: "You don't have permission to create this appointment." }
+      return { error: t('noPermissionCreate') }
     }
-    return { error: 'Could not create the appointment. Please try again.' }
+    return { error: t('createFailed') }
   }
 
   revalidatePath('/dashboard/appointments')
@@ -104,6 +108,8 @@ export async function updateAppointment(
   id: string,
   formData: FormData
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.appointments.form.errors' })
   const type = formData.get('type')
   const client_id = formData.get('client_id')
   const case_id = formData.get('case_id')
@@ -114,16 +120,16 @@ export async function updateAppointment(
   const status = formData.get('status')
 
   if (type !== 'consultation' && type !== 'court_date') {
-    return { error: 'Select an appointment type.' }
+    return { error: t('selectType') }
   }
   if (typeof client_id !== 'string' || !client_id) {
-    return { error: 'Select a client.' }
+    return { error: t('selectClient') }
   }
   if (typeof starts_at !== 'string' || !starts_at) {
-    return { error: 'Start time is required.' }
+    return { error: t('startRequired') }
   }
   if (typeof ends_at !== 'string' || !ends_at) {
-    return { error: 'End time is required.' }
+    return { error: t('endRequired') }
   }
   // Same as createAppointment - case_id-required-for-court_date is left to
   // the DB check constraint, not duplicated here.
@@ -133,7 +139,7 @@ export async function updateAppointment(
     status !== 'cancelled' &&
     status !== 'no_show'
   ) {
-    return { error: 'Select a valid status.' }
+    return { error: t('selectStatus') }
   }
 
   const supabase = await createClient()
@@ -154,14 +160,14 @@ export async function updateAppointment(
 
   if (error) {
     if (error.code === '23514') {
-      return { error: 'A court date must be linked to a case.' }
+      return { error: t('courtDateNeedsCase') }
     }
-    return { error: 'Could not update the appointment. Please try again.' }
+    return { error: t('updateFailed') }
   }
 
   // UPDATE blocked by RLS matches zero rows rather than erroring.
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to change this appointment." }
+    return { error: t('noPermissionUpdate') }
   }
 
   revalidatePath(appointmentPath(id))

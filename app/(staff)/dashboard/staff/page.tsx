@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
@@ -33,6 +34,11 @@ export default async function StaffDashboardPage() {
   ])
 
   const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
+  // Only the appointment-type enum lookup is extracted here - the rest of
+  // this page is a pending extraction batch of its own, matching the
+  // convention that a code-defined enum never gets a second copy of its
+  // mapping just because the page around it isn't translated yet.
+  const tType = await getTranslations({ locale, namespace: 'dashboard.appointments.type' })
 
   return (
     <div className="flex flex-col gap-8">
@@ -63,8 +69,13 @@ export default async function StaffDashboardPage() {
                       <bdi>{formatDateTime(a.starts_at, locale)}</bdi>
                     </span>
                     <span className="text-fg-muted">
-                      {a.type === 'court_date' ? 'Court date' : 'Consultation'}
-                      {a.clients?.full_name && <> · {a.clients.full_name}</>}
+                      {tType(a.type)}
+                      {a.clients?.full_name && (
+                        <>
+                          {' · '}
+                          <bdi>{a.clients.full_name}</bdi>
+                        </>
+                      )}
                       {a.cases?.case_number && (
                         <>
                           {' '}

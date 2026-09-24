@@ -62,6 +62,19 @@ NOT under `dashboard.cases.*` at all — it belongs to whichever batch covers
 the Deadlines feature area. This keeps a batch from ever needing to touch
 the same `actions.ts` file twice.
 
+**Code-defined enum translation convention (batch 5):** a Postgres enum
+value (`appointment_type`, `appointment_status`, etc.) is a fixed,
+code-defined set — never look it up in a database column the way
+`case_statuses`/`roles` are localized. Translate it in the message file
+instead, keyed by the enum value itself: `dashboard.appointments.type.
+court_date`, `dashboard.appointments.status.no_show`. Grab a translator
+scoped to that one leaf (`useTranslations('dashboard.appointments.type')`)
+and call it with the raw enum value as the key (`tType(a.type)`) rather
+than a switch/ternary per call site. If the same enum renders in more than
+one feature area (appointment type also shows on the owner and staff
+overview pages), every call site points at the same keys — never a
+second copy of the mapping.
+
 **Bidi convention — two different tools, don't conflate them:**
 
 - `dir="ltr"` **forces** a direction. Correct for values that are LTR by

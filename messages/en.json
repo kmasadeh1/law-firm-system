@@ -178,8 +178,6 @@
       "description": "Today across the firm, recent activity, and anything needing attention.",
       "todaysSchedule": "Today's schedule",
       "nothingToday": "Nothing on the calendar today",
-      "courtDate": "Court date",
-      "consultation": "Consultation",
       "unassigned": "Unassigned",
       "needingAttention": "Needing attention",
       "nothingNeedsAttention": "Nothing needs attention right now",
@@ -485,6 +483,76 @@
           "createFailed": "Could not create the client. Please try again.",
           "saveFailed": "Could not save the changes. Please try again."
         }
+      }
+    },
+    "appointments": {
+      "list": {
+        "title": "Appointments",
+        "newAppointment": "New appointment",
+        "fromLabel": "From",
+        "toLabel": "To",
+        "allTypes": "All types",
+        "filter": "Filter",
+        "clear": "Clear",
+        "noneMatchFilters": "No appointments match those filters.",
+        "noneYet": "No appointments yet",
+        "noneYetDescription": "Schedule a consultation or court date to get started."
+      },
+      "new": {
+        "backToAppointments": "Appointments",
+        "title": "New appointment",
+        "youFallback": "You"
+      },
+      "detail": {
+        "backToAppointments": "Appointments",
+        "notFound": "This appointment doesn't exist, or you don't have access to it.",
+        "clientMissing": "This appointment's client record is missing.",
+        "youFallback": "You"
+      },
+      "form": {
+        "typeLabel": "Type",
+        "clientLabel": "Client",
+        "clientSearchPlaceholder": "Search existing clients by name or national ID",
+        "noMatchingClient": "No matching client. Add them in Clients first.",
+        "selectedClient": "Selected: <bdi>{name}</bdi>",
+        "caseLabel": "Case",
+        "caseSearchPlaceholder": "Search cases by number or title",
+        "noMatchingCase": "No matching case.",
+        "selectedCase": "Selected: <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "courtDatesOnlyHelp": "Only used for court dates.",
+        "assignedToLabel": "Assigned to",
+        "assignedYouOption": "{name} (you)",
+        "assignedYou": "<bdi>{name}</bdi> (you)",
+        "startsLabel": "Starts",
+        "endsLabel": "Ends",
+        "notesLabel": "Notes",
+        "statusLabel": "Status",
+        "saving": "Saving…",
+        "saved": "Saved.",
+        "createAppointment": "Create appointment",
+        "saveChanges": "Save changes",
+        "errors": {
+          "selectType": "Select an appointment type.",
+          "selectClient": "Select a client.",
+          "startRequired": "Start time is required.",
+          "endRequired": "End time is required.",
+          "selectStatus": "Select a valid status.",
+          "courtDateNeedsCase": "A court date must be linked to a case.",
+          "noPermissionCreate": "You don't have permission to create this appointment.",
+          "createFailed": "Could not create the appointment. Please try again.",
+          "noPermissionUpdate": "You don't have permission to change this appointment.",
+          "updateFailed": "Could not update the appointment. Please try again."
+        }
+      },
+      "type": {
+        "consultation": "Consultation",
+        "court_date": "Court date"
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No-show"
       }
     }
   }

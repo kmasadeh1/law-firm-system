@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { AppointmentForm } from '../appointment-form'
@@ -19,6 +21,9 @@ export default async function NewAppointmentPage() {
     redirect('/login')
   }
 
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.appointments.new' })
+
   const [{ data: canAssignAll }, { data: canAssignCourtDates }, { data: staff }, { data: me }] =
     await Promise.all([
       supabase.rpc('has_permission', { p_key: 'appointments_view_all' }),
@@ -34,14 +39,14 @@ export default async function NewAppointmentPage() {
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <div>
-        <BackLink href="/dashboard/appointments" label="Appointments" />
-        <PageHeader title="New appointment" />
+        <BackLink href="/dashboard/appointments" label={t('backToAppointments')} />
+        <PageHeader title={t('title')} />
       </div>
 
       <AppointmentForm
         mode="create"
         currentStaffId={user.sub as string}
-        currentStaffName={me?.full_name ?? 'You'}
+        currentStaffName={me?.full_name ?? t('youFallback')}
         staffOptions={staffOptions}
         canAssignAll={Boolean(canAssignAll)}
         canAssignCourtDates={Boolean(canAssignCourtDates)}

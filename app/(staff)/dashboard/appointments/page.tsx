@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
@@ -15,6 +16,9 @@ export default async function AppointmentsListPage({
   const { from, to, type } = (await searchParams) as { from?: string; to?: string; type?: string }
   const supabase = await createClient()
   const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.appointments.list' })
+  const tType = await getTranslations({ locale, namespace: 'dashboard.appointments.type' })
+  const tStatus = await getTranslations({ locale, namespace: 'dashboard.appointments.status' })
 
   // No access gate here - this just renders whatever RLS returns for the
   // signed-in user (owner, appointments_view_all, court_dates_manage for
@@ -41,10 +45,10 @@ export default async function AppointmentsListPage({
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Appointments"
+        title={t('title')}
         action={
           <LinkButton href="/dashboard/appointments/new" variant="primary">
-            New appointment
+            {t('newAppointment')}
           </LinkButton>
         }
       />
@@ -52,42 +56,42 @@ export default async function AppointmentsListPage({
       <form method="get" className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
           <label htmlFor="from" className="text-xs text-fg-muted">
-            From
+            {t('fromLabel')}
           </label>
           <input id="from" type="date" name="from" defaultValue={from ?? ''} className={controlClass} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="to" className="text-xs text-fg-muted">
-            To
+            {t('toLabel')}
           </label>
           <input id="to" type="date" name="to" defaultValue={to ?? ''} className={controlClass} />
         </div>
         <select name="type" defaultValue={type ?? ''} className={controlClass}>
-          <option value="">All types</option>
-          <option value="consultation">Consultation</option>
-          <option value="court_date">Court date</option>
+          <option value="">{t('allTypes')}</option>
+          <option value="consultation">{tType('consultation')}</option>
+          <option value="court_date">{tType('court_date')}</option>
         </select>
         <Button type="submit" variant="secondary">
-          Filter
+          {t('filter')}
         </Button>
         {hasFilters && (
           <Link
             href="/dashboard/appointments"
             className="flex items-center text-sm text-fg-muted underline-offset-2 hover:underline"
           >
-            Clear
+            {t('clear')}
           </Link>
         )}
       </form>
 
       {!appointments || appointments.length === 0 ? (
         <EmptyState
-          title={hasFilters ? 'No appointments match those filters.' : 'No appointments yet'}
-          description={hasFilters ? undefined : 'Schedule a consultation or court date to get started.'}
+          title={hasFilters ? t('noneMatchFilters') : t('noneYet')}
+          description={hasFilters ? undefined : t('noneYetDescription')}
           action={
             !hasFilters && (
               <LinkButton href="/dashboard/appointments/new" variant="secondary">
-                New appointment
+                {t('newAppointment')}
               </LinkButton>
             )
           }
@@ -105,17 +109,17 @@ export default async function AppointmentsListPage({
                     <span className="font-medium text-fg">
                       <bdi>{formatDateTime(a.starts_at, locale)}</bdi>
                     </span>
-                    <span className="text-fg-muted"> — {a.type === 'court_date' ? 'Court date' : 'Consultation'}</span>
+                    <span className="text-fg-muted"> — {tType(a.type)}</span>
                   </span>
                   <span className="flex items-center gap-2 text-fg-muted">
-                    {a.clients?.full_name ?? '—'}
+                    <bdi>{a.clients?.full_name ?? '—'}</bdi>
                     {a.cases?.case_number && (
                       <>
                         {' '}
                         · <bdi>{a.cases.case_number}</bdi>
                       </>
                     )}
-                    <Badge variant={a.status === 'scheduled' ? 'neutral' : 'muted'}>{a.status}</Badge>
+                    <Badge variant={a.status === 'scheduled' ? 'neutral' : 'muted'}>{tStatus(a.status)}</Badge>
                   </span>
                 </Link>
               </li>

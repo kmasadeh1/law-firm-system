@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { createAppointment, updateAppointment } from './actions'
 import { ClientPicker } from './client-picker'
 import { CasePicker } from './case-picker'
@@ -50,6 +51,9 @@ export function AppointmentForm({
   canAssignCourtDates: boolean
 }) {
   const router = useRouter()
+  const t = useTranslations('dashboard.appointments.form')
+  const tType = useTranslations('dashboard.appointments.type')
+  const tStatus = useTranslations('dashboard.appointments.status')
   const formRef = useRef<HTMLFormElement>(null)
   const [type, setType] = useState<AppointmentType>(initial?.type ?? 'consultation')
   const [error, setError] = useState<string | null>(null)
@@ -92,7 +96,7 @@ export function AppointmentForm({
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
       <Field>
         <Label htmlFor="type" required>
-          Type
+          {t('typeLabel')}
         </Label>
         <select
           id="type"
@@ -101,8 +105,8 @@ export function AppointmentForm({
           onChange={(e) => setType(e.target.value as AppointmentType)}
           className={controlClass}
         >
-          <option value="consultation">Consultation</option>
-          <option value="court_date">Court date</option>
+          <option value="consultation">{tType('consultation')}</option>
+          <option value="court_date">{tType('court_date')}</option>
         </select>
       </Field>
 
@@ -111,19 +115,21 @@ export function AppointmentForm({
       <CasePicker required={type === 'court_date'} initial={initial?.case ?? undefined} />
 
       <Field>
-        <span className="text-sm font-medium text-fg">Assigned to</span>
+        <span className="text-sm font-medium text-fg">{t('assignedToLabel')}</span>
         {canAssignNow ? (
           <select name="staff_id" defaultValue={assignedStaffId} className={controlClass}>
             {staffOptions.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.id === currentStaffId ? `${s.full_name} (you)` : s.full_name}
+                {s.id === currentStaffId ? t('assignedYouOption', { name: s.full_name }) : s.full_name}
               </option>
             ))}
           </select>
         ) : (
           <>
             <input type="hidden" name="staff_id" value={currentStaffId} />
-            <p className="text-sm text-fg-muted">{currentStaffName} (you)</p>
+            <p className="text-sm text-fg-muted">
+              {t.rich('assignedYou', { name: currentStaffName, bdi: (chunks) => <bdi>{chunks}</bdi> })}
+            </p>
           </>
         )}
       </Field>
@@ -131,7 +137,7 @@ export function AppointmentForm({
       <div className="flex flex-wrap gap-4">
         <Field>
           <Label htmlFor="starts_at" required>
-            Starts
+            {t('startsLabel')}
           </Label>
           <input
             id="starts_at"
@@ -144,7 +150,7 @@ export function AppointmentForm({
         </Field>
         <Field>
           <Label htmlFor="ends_at" required>
-            Ends
+            {t('endsLabel')}
           </Label>
           <input
             id="ends_at"
@@ -158,27 +164,27 @@ export function AppointmentForm({
       </div>
 
       <Field>
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">{t('notesLabel')}</Label>
         <textarea id="notes" name="notes" rows={3} defaultValue={initial?.notes ?? ''} className={controlClass} />
       </Field>
 
       {mode === 'edit' && (
         <Field>
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="status">{t('statusLabel')}</Label>
           <select id="status" name="status" defaultValue={initial?.status} className={controlClass}>
-            <option value="scheduled">Scheduled</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="no_show">No-show</option>
+            <option value="scheduled">{tStatus('scheduled')}</option>
+            <option value="completed">{tStatus('completed')}</option>
+            <option value="cancelled">{tStatus('cancelled')}</option>
+            <option value="no_show">{tStatus('no_show')}</option>
           </select>
         </Field>
       )}
 
       {error && <FieldError>{error}</FieldError>}
-      {saved && <FieldSuccess>Saved.</FieldSuccess>}
+      {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
-        {isPending ? 'Saving…' : mode === 'create' ? 'Create appointment' : 'Save changes'}
+        {isPending ? t('saving') : mode === 'create' ? t('createAppointment') : t('saveChanges')}
       </Button>
     </form>
   )
