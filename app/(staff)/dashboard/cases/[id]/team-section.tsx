@@ -8,6 +8,7 @@ import { Button } from '@/components/dashboard/button'
 import { Banner } from '@/components/dashboard/banner'
 import { FieldError, controlClass } from '@/components/dashboard/form'
 import { Badge } from '@/components/dashboard/badge'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 
 type TeamMember = { staff_id: string; full_name: string; is_lead: boolean }
 type StaffOption = { id: string; full_name: string }
@@ -26,6 +27,7 @@ export function TeamSection({
   const [isPending, startTransition] = useTransition()
   const [addStaffId, setAddStaffId] = useState('')
   const [addAsLead, setAddAsLead] = useState(false)
+  const [confirmingRemove, setConfirmingRemove] = useState<TeamMember | null>(null)
 
   const hasLead = team.some((m) => m.is_lead)
   const candidates = availableStaff.filter((s) => !team.some((m) => m.staff_id === s.id))
@@ -78,7 +80,7 @@ export function TeamSection({
                   type="button"
                   variant="danger"
                   disabled={isPending}
-                  onClick={() => runAction(() => removeTeamMember(caseId, m.staff_id))}
+                  onClick={() => setConfirmingRemove(m)}
                 >
                   {t('remove')}
                 </Button>
@@ -134,6 +136,20 @@ export function TeamSection({
           </Button>
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={confirmingRemove !== null}
+        onCancel={() => setConfirmingRemove(null)}
+        onConfirm={() => {
+          if (!confirmingRemove) return
+          const staffId = confirmingRemove.staff_id
+          setConfirmingRemove(null)
+          runAction(() => removeTeamMember(caseId, staffId))
+        }}
+        kind="hard"
+        itemLabel={confirmingRemove?.full_name ?? ''}
+        confirmLabel={t('remove')}
+      />
     </Panel>
   )
 }

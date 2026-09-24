@@ -8,6 +8,7 @@ import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Switch } from '@/components/dashboard/switch'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
+import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { localizedName } from '@/lib/localized-name'
 import { formatDateTime } from '@/lib/format-date-time'
 
@@ -182,12 +183,13 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
   )
 }
 
-function ActiveToggle({ staffId, isActive }: { staffId: string; isActive: boolean }) {
+function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullName: string; isActive: boolean }) {
   const [checked, setChecked] = useState(isActive)
   const [error, setError] = useState<string | null>(null)
+  const [confirmingDeactivate, setConfirmingDeactivate] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  function handleChange(next: boolean) {
+  function apply(next: boolean) {
     const previous = checked
     setError(null)
     setChecked(next)
@@ -200,11 +202,33 @@ function ActiveToggle({ staffId, isActive }: { staffId: string; isActive: boolea
     })
   }
 
+  // Reactivating isn't destructive - only turning an account off needs the
+  // extra step.
+  function handleChange(next: boolean) {
+    if (next) {
+      apply(next)
+    } else {
+      setConfirmingDeactivate(true)
+    }
+  }
+
   return (
     <div className="flex items-center gap-2">
       <Switch checked={checked} disabled={isPending} onChange={handleChange} label={checked ? 'Active' : 'Inactive'} />
       <span className="text-sm text-fg-muted">{checked ? 'Active' : 'Deactivated'}</span>
       {error && <FieldError>{error}</FieldError>}
+
+      <DeleteConfirmDialog
+        open={confirmingDeactivate}
+        onCancel={() => setConfirmingDeactivate(false)}
+        onConfirm={() => {
+          setConfirmingDeactivate(false)
+          apply(false)
+        }}
+        kind="deactivate"
+        itemLabel={fullName}
+        confirmLabel="Deactivate"
+      />
     </div>
   )
 }
@@ -237,7 +261,7 @@ function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (passwor
 
       {row.user_type !== 'owner' && (
         <div className="flex flex-wrap items-center gap-3">
-          <ActiveToggle staffId={row.id} isActive={row.is_active} />
+          <ActiveToggle staffId={row.id} fullName={row.full_name} isActive={row.is_active} />
           <RegenerateButton staffId={row.id} onDone={onPassword} />
         </div>
       )}

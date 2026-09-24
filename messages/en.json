@@ -127,7 +127,14 @@
   },
   "dashboard": {
     "common": {
-      "unknownStaff": "Unknown staff"
+      "unknownStaff": "Unknown staff",
+      "deleteConfirm": {
+        "title": "{verb} <bdi>{item}</bdi>?",
+        "softNote": "This can be restored afterward.",
+        "hardNote": "This can't be undone.",
+        "deactivateNote": "This can be reactivated afterward.",
+        "cancel": "Cancel"
+      }
     },
     "conflict": {
       "possibleMatch": "{count, plural, one {Possible match found} other {Possible matches found}} — review before continuing:",
@@ -339,8 +346,6 @@
           "opening": "Opening…",
           "remove": "Remove",
           "removing": "Removing…",
-          "confirmRemove": "Confirm remove?",
-          "cancel": "Cancel",
           "restoring": "Restoring…",
           "restore": "Restore",
           "uploadedLine": "Uploaded by <bdi>{name}</bdi> · <bdi>{date}</bdi>",
