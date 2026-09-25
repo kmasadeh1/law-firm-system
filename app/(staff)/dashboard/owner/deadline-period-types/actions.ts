@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 type ActionResult = { error?: string }
 
@@ -18,7 +20,10 @@ type Fields = {
   description_ar: string
 }
 
-function readFields(formData: FormData): Fields | { error: string } {
+function readFields(
+  formData: FormData,
+  t: Awaited<ReturnType<typeof getTranslations>>
+): Fields | { error: string } {
   const name = formData.get('name')
   const name_ar = formData.get('name_ar')
   const period_days_raw = formData.get('period_days')
@@ -26,11 +31,11 @@ function readFields(formData: FormData): Fields | { error: string } {
   const description_ar = formData.get('description_ar')
 
   if (typeof name !== 'string' || !name.trim()) {
-    return { error: 'Name is required.' }
+    return { error: t('nameRequired') }
   }
   const period_days = typeof period_days_raw === 'string' ? Number(period_days_raw) : NaN
   if (!Number.isInteger(period_days) || period_days <= 0) {
-    return { error: 'Enter a whole number of days.' }
+    return { error: t('invalidDays') }
   }
 
   return {
@@ -56,7 +61,9 @@ type PeriodTypeRow = {
 export async function createPeriodType(
   formData: FormData
 ): Promise<ActionResult & { periodType?: PeriodTypeRow }> {
-  const fields = readFields(formData)
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes.errors' })
+  const fields = readFields(formData, t)
   if ('error' in fields) return fields
 
   const supabase = await createClient()
@@ -68,9 +75,9 @@ export async function createPeriodType(
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
-      return { error: 'A period type with that name already exists.' }
+      return { error: t('nameExists') }
     }
-    return { error: 'Could not create the period type. Please try again.' }
+    return { error: t('createFailed') }
   }
 
   revalidatePath(PATH)
@@ -78,7 +85,9 @@ export async function createPeriodType(
 }
 
 export async function updatePeriodType(id: string, formData: FormData): Promise<ActionResult> {
-  const fields = readFields(formData)
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes.errors' })
+  const fields = readFields(formData, t)
   if ('error' in fields) return fields
 
   const supabase = await createClient()
@@ -86,9 +95,9 @@ export async function updatePeriodType(id: string, formData: FormData): Promise<
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
-      return { error: 'A period type with that name already exists.' }
+      return { error: t('nameExists') }
     }
-    return { error: 'Could not save the changes. Please try again.' }
+    return { error: t('saveFailed') }
   }
 
   revalidatePath(PATH)
@@ -96,14 +105,16 @@ export async function updatePeriodType(id: string, formData: FormData): Promise<
 }
 
 export async function deletePeriodType(id: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes.errors' })
   const supabase = await createClient()
   const { error } = await supabase.from('deadline_period_types').delete().eq('id', id)
 
   if (error) {
     if (error.code === FOREIGN_KEY_VIOLATION) {
-      return { error: "Can't delete a period type while a deadline uses it." }
+      return { error: t('inUse') }
     }
-    return { error: 'Could not delete the period type. Please try again.' }
+    return { error: t('deleteFailed') }
   }
 
   revalidatePath(PATH)

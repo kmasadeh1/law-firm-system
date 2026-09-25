@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { createPeriodType, deletePeriodType, updatePeriodType } from './actions'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
@@ -18,6 +19,7 @@ type PeriodType = {
 }
 
 export function PeriodTypesAdmin({ periodTypes: initial }: { periodTypes: PeriodType[] }) {
+  const t = useTranslations('dashboard.admin.periodTypes')
   const [periodTypes, setPeriodTypes] = useState(initial)
 
   return (
@@ -25,7 +27,7 @@ export function PeriodTypesAdmin({ periodTypes: initial }: { periodTypes: Period
       <CreateForm onCreated={(pt) => setPeriodTypes((prev) => [...prev, pt].sort((a, b) => a.name.localeCompare(b.name)))} />
 
       {periodTypes.length === 0 && (
-        <EmptyState title="No period types yet" description="Create one above to get started." />
+        <EmptyState title={t('noneYet')} description={t('noneYetDescription')} />
       )}
 
       <div className="flex flex-col gap-4">
@@ -47,6 +49,7 @@ export function PeriodTypesAdmin({ periodTypes: initial }: { periodTypes: Period
 }
 
 function CreateForm({ onCreated }: { onCreated: (pt: PeriodType) => void }) {
+  const t = useTranslations('dashboard.admin.periodTypes.createForm')
   const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -70,38 +73,38 @@ function CreateForm({ onCreated }: { onCreated: (pt: PeriodType) => void }) {
 
   return (
     <Panel className="flex flex-col gap-3">
-      <h2 className="font-heading text-lg text-fg">New period type</h2>
+      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-3">
           <Field>
             <Label htmlFor="new-pt-name" required>
-              Name
+              {t('nameLabel')}
             </Label>
             <input id="new-pt-name" name="name" required className={controlClass} />
           </Field>
           <Field>
-            <Label htmlFor="new-pt-name-ar">Name (Arabic)</Label>
+            <Label htmlFor="new-pt-name-ar">{t('nameArLabel')}</Label>
             <input id="new-pt-name-ar" name="name_ar" dir="rtl" lang="ar" className={controlClass} />
           </Field>
         </div>
         <Field>
           <Label htmlFor="new-pt-days" required>
-            Period (days)
+            {t('periodDaysLabel')}
           </Label>
           <input id="new-pt-days" name="period_days" type="number" min="1" step="1" required className={controlClass} />
         </Field>
         <Field>
-          <Label htmlFor="new-pt-description">Description / source</Label>
+          <Label htmlFor="new-pt-description">{t('descriptionLabel')}</Label>
           <textarea
             id="new-pt-description"
             name="description"
             rows={2}
-            placeholder='e.g. "DRAFT — unverified. Source: ..."'
+            placeholder={t('descriptionPlaceholder')}
             className={controlClass}
           />
         </Field>
         <Field>
-          <Label htmlFor="new-pt-description-ar">Description (Arabic)</Label>
+          <Label htmlFor="new-pt-description-ar">{t('descriptionArLabel')}</Label>
           <textarea
             id="new-pt-description-ar"
             name="description_ar"
@@ -113,7 +116,7 @@ function CreateForm({ onCreated }: { onCreated: (pt: PeriodType) => void }) {
         </Field>
         {error && <FieldError>{error}</FieldError>}
         <Button type="submit" variant="primary" disabled={isPending} className="self-start">
-          {isPending ? 'Creating…' : 'Create period type'}
+          {isPending ? t('creating') : t('createPeriodType')}
         </Button>
       </form>
     </Panel>
@@ -129,6 +132,7 @@ function PeriodTypeCard({
   onUpdated: (pt: PeriodType) => void
   onDeleted: () => void
 }) {
+  const t = useTranslations('dashboard.admin.periodTypes.card')
   const formRef = useRef<HTMLFormElement>(null)
   const [name, setName] = useState(periodType.name)
   const [nameAr, setNameAr] = useState(periodType.name_ar ?? '')
@@ -221,8 +225,8 @@ function PeriodTypeCard({
           }}
           dir="rtl"
           lang="ar"
-          placeholder="Name (Arabic)"
-          aria-label="Name (Arabic)"
+          placeholder={t('nameArAriaLabel')}
+          aria-label={t('nameArAriaLabel')}
           className={controlClass}
         />
         <textarea
@@ -245,19 +249,19 @@ function PeriodTypeCard({
           }}
           dir="rtl"
           lang="ar"
-          placeholder="Description (Arabic)"
-          aria-label="Description (Arabic)"
+          placeholder={t('descriptionArAriaLabel')}
+          aria-label={t('descriptionArAriaLabel')}
           className={controlClass}
         />
         {error && <FieldError>{error}</FieldError>}
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" variant="secondary" disabled={isSaving || !changed}>
-            {isSaving ? 'Saving…' : 'Save'}
+            {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && !changed && <FieldSuccess>Saved</FieldSuccess>}
+          {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
           <div className="grow" />
           <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isDeleting}>
-            {isDeleting ? 'Deleting…' : 'Delete'}
+            {isDeleting ? t('deleting') : t('delete')}
           </Button>
         </div>
         {deleteError && <FieldError>{deleteError}</FieldError>}
@@ -269,10 +273,10 @@ function PeriodTypeCard({
         onConfirm={handleConfirmDelete}
         kind="hard"
         itemLabel={periodType.name}
-        confirmLabel="Delete"
-        pendingLabel="Deleting…"
+        confirmLabel={t('delete')}
+        pendingLabel={t('deleting')}
         pending={isDeleting}
-        note="A period type referenced by any existing deadline can't be deleted until those deadlines use a different type."
+        note={t('deleteNote')}
       />
     </Panel>
   )

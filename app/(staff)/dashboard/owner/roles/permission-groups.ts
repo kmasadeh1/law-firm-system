@@ -3,9 +3,13 @@
 // does; that's entirely defined by has_permission() in the database. Any
 // permission_keys row not listed below still renders, under "Other", so a
 // future key never silently disappears from this screen.
-export const PERMISSION_GROUPS: { title: string; keys: string[] }[] = [
+//
+// titleKey looks up dashboard.admin.roles.permissionGroups.<titleKey> -
+// group titles are UI chrome, not database content, so they're translated
+// like any other fixed set rather than read from a column.
+export const PERMISSION_GROUPS: { titleKey: string; keys: string[] }[] = [
   {
-    title: 'Clients & Cases',
+    titleKey: 'clientsCases',
     keys: [
       'clients_manage',
       'cases_manage',
@@ -17,19 +21,19 @@ export const PERMISSION_GROUPS: { title: string; keys: string[] }[] = [
     ],
   },
   {
-    title: 'Scheduling',
+    titleKey: 'scheduling',
     keys: ['appointments_view_all', 'court_dates_manage'],
   },
   {
-    title: 'Billing',
+    titleKey: 'billing',
     keys: ['fees_view', 'payments_record', 'expenses_manage'],
   },
   {
-    title: 'Front Office',
+    titleKey: 'frontOffice',
     keys: ['enquiries_manage', 'public_content_manage'],
   },
   {
-    title: 'Reporting',
+    titleKey: 'reporting',
     keys: ['reports_view'],
   },
 ]

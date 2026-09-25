@@ -2,8 +2,10 @@
 
 import { randomInt } from 'crypto'
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 const STAFF_PATH = '/dashboard/owner/staff'
 const TEMP_PASSWORD_VALID_DAYS = 7
@@ -29,18 +31,20 @@ function expiryFromNow(): { setAt: string; expiresAt: string } {
 }
 
 export async function addStaff(formData: FormData): Promise<ActionResult & { password?: string }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.staff.errors' })
   const fullName = formData.get('full_name')
   const email = formData.get('email')
   const roleId = formData.get('role_id')
 
   if (typeof fullName !== 'string' || !fullName.trim()) {
-    return { error: 'Full name is required.' }
+    return { error: t('fullNameRequired') }
   }
   if (typeof email !== 'string' || !email.trim()) {
-    return { error: 'Email is required.' }
+    return { error: t('emailRequired') }
   }
   if (typeof roleId !== 'string' || !roleId) {
-    return { error: 'Choose a role.' }
+    return { error: t('chooseRole') }
   }
 
   const admin = createAdminClient()
@@ -53,7 +57,7 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
   })
 
   if (createError || !created.user) {
-    return { error: createError?.message ?? 'Could not create the login.' }
+    return { error: createError?.message ?? t('couldNotCreateLogin') }
   }
 
   const { setAt, expiresAt } = expiryFromNow()
@@ -75,10 +79,14 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
     const { error: cleanupError } = await admin.auth.admin.deleteUser(created.user.id)
     if (cleanupError) {
       return {
-        error: `Could not create the staff record (${staffError.message}), and cleanup of the orphaned login also failed (${cleanupError.message}). Auth user ${created.user.id} needs manual removal.`,
+        error: t('staffRecordFailedWithCleanup', {
+          staffMessage: staffError.message,
+          cleanupMessage: cleanupError.message,
+          userId: created.user.id,
+        }),
       }
     }
-    return { error: `Could not create the staff record: ${staffError.message}. The login was rolled back.` }
+    return { error: t('staffRecordFailedRolledBack', { staffMessage: staffError.message }) }
   }
 
   revalidatePath(STAFF_PATH)
@@ -88,6 +96,8 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
 export async function regenerateTempPassword(
   staffId: string
 ): Promise<ActionResult & { password?: string }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.staff.errors' })
   const admin = createAdminClient()
   const password = generateTempPassword()
 
@@ -109,7 +119,7 @@ export async function regenerateTempPassword(
 
   if (error) {
     return {
-      error: `The password was reset, but updating the staff record failed: ${error.message}. The account may not be flagged to require a change.`,
+      error: t('passwordResetButRecordFailed', { message: error.message }),
     }
   }
 
@@ -118,11 +128,13 @@ export async function regenerateTempPassword(
 }
 
 export async function setStaffActive(staffId: string, isActive: boolean): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.staff.errors' })
   const supabase = await createClient()
   const { error } = await supabase.from('staff').update({ is_active: isActive }).eq('id', staffId)
 
   if (error) {
-    return { error: 'Could not update that account. Please try again.' }
+    return { error: t('updateAccountFailed') }
   }
 
   revalidatePath(STAFF_PATH)

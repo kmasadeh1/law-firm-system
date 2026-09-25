@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 
 const ROLES_PATH = '/dashboard/owner/roles'
 
@@ -18,9 +20,11 @@ export async function createRole(
   name: string,
   nameAr: string
 ): Promise<ActionResult & { role?: { id: string; name: string; name_ar: string | null } }> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.roles.errors' })
   const trimmed = name.trim()
   if (!trimmed) {
-    return { error: 'Role name is required.' }
+    return { error: t('roleNameRequired') }
   }
 
   const supabase = await createClient()
@@ -35,9 +39,9 @@ export async function createRole(
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
-      return { error: 'A role with that name already exists.' }
+      return { error: t('roleNameExists') }
     }
-    return { error: 'Could not create the role. Please try again.' }
+    return { error: t('createFailed') }
   }
 
   revalidatePath(ROLES_PATH)
@@ -45,9 +49,11 @@ export async function createRole(
 }
 
 export async function renameRole(roleId: string, name: string, nameAr: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.roles.errors' })
   const trimmed = name.trim()
   if (!trimmed) {
-    return { error: 'Role name is required.' }
+    return { error: t('roleNameRequired') }
   }
 
   const supabase = await createClient()
@@ -55,9 +61,9 @@ export async function renameRole(roleId: string, name: string, nameAr: string): 
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
-      return { error: 'A role with that name already exists.' }
+      return { error: t('roleNameExists') }
     }
-    return { error: 'Could not rename the role. Please try again.' }
+    return { error: t('renameFailed') }
   }
 
   revalidatePath(ROLES_PATH)
@@ -65,14 +71,16 @@ export async function renameRole(roleId: string, name: string, nameAr: string): 
 }
 
 export async function deleteRole(roleId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.roles.errors' })
   const supabase = await createClient()
   const { error } = await supabase.from('roles').delete().eq('id', roleId)
 
   if (error) {
     if (error.code === FOREIGN_KEY_VIOLATION) {
-      return { error: "Can't delete a role while staff are assigned to it." }
+      return { error: t('roleInUse') }
     }
-    return { error: 'Could not delete the role. Please try again.' }
+    return { error: t('deleteFailed') }
   }
 
   revalidatePath(ROLES_PATH)
@@ -84,6 +92,8 @@ export async function setRolePermission(
   permissionKey: string,
   enabled: boolean
 ): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.roles.errors' })
   const supabase = await createClient()
   const { error } = await supabase
     .from('role_permissions')
@@ -93,7 +103,7 @@ export async function setRolePermission(
     )
 
   if (error) {
-    return { error: 'Could not save that change. Please try again.' }
+    return { error: t('permissionSaveFailed') }
   }
 
   revalidatePath(ROLES_PATH)

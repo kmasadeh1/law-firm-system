@@ -1,10 +1,14 @@
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PeriodTypesAdmin } from './period-types-admin'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Banner } from '@/components/dashboard/banner'
 
 export default async function DeadlinePeriodTypesPage() {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes' })
   const { data: periodTypes } = await supabase
     .from('deadline_period_types')
     .select('id, name, name_ar, period_days, description, description_ar')
@@ -12,12 +16,11 @@ export default async function DeadlinePeriodTypesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Deadline period types" />
+      <PageHeader title={t('title')} />
 
       <Banner kind="warning">
-        These periods came from secondary research, not the primary Official Gazette text with
-        current amendments. Every row marked &quot;DRAFT — unverified&quot; needs your verification
-        before the firm relies on it for a real deadline.
+        <span className="block">{t('sourceWarning')}</span>
+        <span className="mt-1 block font-medium">{t('unverifiedWarning')}</span>
       </Banner>
 
       <PeriodTypesAdmin periodTypes={periodTypes ?? []} />

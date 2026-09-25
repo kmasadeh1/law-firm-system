@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { createRole, deleteRole, renameRole, setRolePermission } from './actions'
 import { PERMISSION_GROUPS } from './permission-groups'
 import { Panel } from '@/components/dashboard/panel'
@@ -39,7 +40,25 @@ function cellId(roleId: string, key: string) {
   return `${roleId}:${key}`
 }
 
+// permission_keys is a code-defined set (nobody can add one from the UI),
+// so label/description are translated in the message file rather than
+// read from the database as the primary source. The database columns stay
+// as a fallback: a future migration that adds a permission_keys row
+// without also adding its message key degrades to the English label
+// stored there, never to the raw key ("cases_view_all").
+function usePermissionText() {
+  const t = useTranslations('dashboard.admin.permissions')
+  return {
+    label: (pk: PermissionKeyRow) => (t.has(`${pk.key}.label`) ? t(`${pk.key}.label`) : pk.label),
+    description: (pk: PermissionKeyRow) => {
+      if (!pk.description) return null
+      return t.has(`${pk.key}.description`) ? t(`${pk.key}.description`) : pk.description
+    },
+  }
+}
+
 export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermissions }: Props) {
+  const t = useTranslations('dashboard.admin.roles')
   const [roles, setRoles] = useState(initialRoles)
   // Bumped after any confirmed-successful role action anywhere on the page,
   // so stale errors elsewhere (e.g. the create-role form) know to clear.
@@ -74,12 +93,12 @@ export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermission
           used.add(pk.key)
           return true
         })
-      return { title: group.title, items }
+      return { titleKey: group.titleKey, items }
     }).filter((group) => group.items.length > 0)
 
     const leftover = grantableKeys.filter((pk) => !used.has(pk.key))
     if (leftover.length > 0) {
-      named.push({ title: 'Other', items: leftover })
+      named.push({ titleKey: 'other', items: leftover })
     }
 
     return named
@@ -95,7 +114,7 @@ export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermission
         }}
       />
 
-      {roles.length === 0 && <EmptyState title="No roles yet" description="Create one above to get started." />}
+      {roles.length === 0 && <EmptyState title={t('noneYet')} description={t('noneYetDescription')} />}
 
       <div className="flex flex-col gap-8">
         {roles.map((role) => (
@@ -135,6 +154,7 @@ function CreateRoleForm({
   revision: number
   onCreated: (role: RoleRow) => void
 }) {
+  const t = useTranslations('dashboard.admin.roles.createForm')
   const [name, setName] = useState('')
   const [nameAr, setNameAr] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -170,7 +190,7 @@ function CreateRoleForm({
     <Panel className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-3">
         <Field>
-          <Label htmlFor="new-role-name">Name</Label>
+          <Label htmlFor="new-role-name">{t('nameLabel')}</Label>
           <input
             id="new-role-name"
             value={name}
@@ -178,12 +198,12 @@ function CreateRoleForm({
               setName(e.target.value)
               setError(null)
             }}
-            placeholder="e.g. Paralegal"
+            placeholder={t('namePlaceholder')}
             className={controlClass}
           />
         </Field>
         <Field>
-          <Label htmlFor="new-role-name-ar">Name (Arabic)</Label>
+          <Label htmlFor="new-role-name-ar">{t('nameArLabel')}</Label>
           <input
             id="new-role-name-ar"
             value={nameAr}
@@ -196,10 +216,10 @@ function CreateRoleForm({
       </div>
       <div>
         <Button type="button" variant="primary" onClick={handleCreate} disabled={isPending || !name.trim()}>
-          {isPending ? 'Creating…' : 'Create role'}
+          {isPending ? t('creating') : t('createRole')}
         </Button>
       </div>
-      <p className="text-xs text-fg-muted">Starts with every permission off.</p>
+      <p className="text-xs text-fg-muted">{t('startsWithNoPermissions')}</p>
       {error && <FieldError>{error}</FieldError>}
     </Panel>
   )
@@ -216,7 +236,7 @@ function RoleCard({
   onDeleted,
 }: {
   role: RoleRow
-  groups: { title: string; items: PermissionKeyRow[] }[]
+  groups: { titleKey: string; items: PermissionKeyRow[] }[]
   ownerOnlyKeys: PermissionKeyRow[]
   enabledMap: Record<string, boolean>
   onToggle: (key: string, enabled: boolean) => void
@@ -224,6 +244,8 @@ function RoleCard({
   onRenamed: (name: string, nameAr: string | null) => void
   onDeleted: () => void
 }) {
+  const t = useTranslations('dashboard.admin.roles.card')
+  const tGroups = useTranslations('dashboard.admin.roles.permissionGroups')
   const [nameInput, setNameInput] = useState(role.name)
   const [nameArInput, setNameArInput] = useState(role.name_ar ?? '')
   const [renameError, setRenameError] = useState<string | null>(null)
@@ -282,8 +304,8 @@ function RoleCard({
           }}
           dir="rtl"
           lang="ar"
-          placeholder="Name (Arabic)"
-          aria-label="Name (Arabic)"
+          placeholder={t('nameArAriaLabel')}
+          aria-label={t('nameArAriaLabel')}
           className={controlClass}
         />
         <Button
@@ -292,14 +314,14 @@ function RoleCard({
           onClick={handleRename}
           disabled={isRenaming || !nameChanged || !nameInput.trim()}
         >
-          {isRenaming ? 'Saving…' : 'Save name'}
+          {isRenaming ? t('saving') : t('saveName')}
         </Button>
-        {renameSaved && !nameChanged && <FieldSuccess>Saved</FieldSuccess>}
+        {renameSaved && !nameChanged && <FieldSuccess>{t('saved')}</FieldSuccess>}
 
         <div className="grow" />
 
         <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isDeleting}>
-          {isDeleting ? 'Deleting…' : 'Delete role'}
+          {isDeleting ? t('deleting') : t('deleteRole')}
         </Button>
       </div>
       {renameError && <FieldError>{renameError}</FieldError>}
@@ -311,16 +333,16 @@ function RoleCard({
         onConfirm={handleConfirmDelete}
         kind="hard"
         itemLabel={role.name}
-        confirmLabel="Delete role"
-        pendingLabel="Deleting…"
+        confirmLabel={t('deleteRole')}
+        pendingLabel={t('deleting')}
         pending={isDeleting}
-        note="A role held by any staff member can't be deleted until they're moved to another role first. Its permission settings will also be removed."
+        note={t('deleteNote')}
       />
 
       <div className="mt-5 flex flex-col gap-5">
         {groups.map((group) => (
-          <div key={group.title}>
-            <h3 className="text-sm font-semibold text-fg-muted">{group.title}</h3>
+          <div key={group.titleKey}>
+            <h3 className="text-sm font-semibold text-fg-muted">{tGroups(group.titleKey)}</h3>
             <div className="mt-2 flex flex-col gap-2">
               {group.items.map((pk) => (
                 <PermissionToggle
@@ -337,23 +359,33 @@ function RoleCard({
         ))}
 
         <div>
-          <h3 className="text-sm font-semibold text-fg-muted">Administration</h3>
+          <h3 className="text-sm font-semibold text-fg-muted">{t('administrationHeading')}</h3>
           <div className="mt-2 flex flex-col gap-2">
             {ownerOnlyKeys.map((pk) => (
-              <div key={pk.key} className="flex items-start gap-2 opacity-60">
-                <Switch checked={false} disabled label={`${pk.label} (owner only, locked)`} />
-                <div>
-                  <p className="text-sm text-fg">
-                    {pk.label} <span className="text-xs">(Owner only)</span>
-                  </p>
-                  <p className="text-xs text-fg-muted">Owner only — can&apos;t be granted to any role.</p>
-                </div>
-              </div>
+              <OwnerOnlyPermissionRow key={pk.key} permissionKey={pk} />
             ))}
           </div>
         </div>
       </div>
     </Panel>
+  )
+}
+
+function OwnerOnlyPermissionRow({ permissionKey: pk }: { permissionKey: PermissionKeyRow }) {
+  const t = useTranslations('dashboard.admin.roles.card')
+  const { label } = usePermissionText()
+  const permissionLabel = label(pk)
+
+  return (
+    <div className="flex items-start gap-2 opacity-60">
+      <Switch checked={false} disabled label={t('ownerOnlySwitchLabel', { label: permissionLabel })} />
+      <div>
+        <p className="text-sm text-fg">
+          {permissionLabel} <span className="text-xs">{t('ownerOnlyBadge')}</span>
+        </p>
+        <p className="text-xs text-fg-muted">{t('ownerOnlyDescription')}</p>
+      </div>
+    </div>
   )
 }
 
@@ -370,6 +402,10 @@ function PermissionToggle({
   onToggle: (key: string, enabled: boolean) => void
   onSaved: () => void
 }) {
+  const t = useTranslations('dashboard.admin.roles.card')
+  const { label, description } = usePermissionText()
+  const permissionLabel = label(permissionKey)
+  const permissionDescription = description(permissionKey)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -390,13 +426,13 @@ function PermissionToggle({
 
   return (
     <div className="flex items-start gap-2">
-      <Switch checked={enabled} disabled={isPending} onChange={handleChange} label={permissionKey.label} />
+      <Switch checked={enabled} disabled={isPending} onChange={handleChange} label={permissionLabel} />
       <div>
         <p className="text-sm text-fg">
-          {permissionKey.label}
-          {isPending && <span className="ms-2 text-xs text-fg-muted">Saving…</span>}
+          {permissionLabel}
+          {isPending && <span className="ms-2 text-xs text-fg-muted">{t('savingPermission')}</span>}
         </p>
-        {permissionKey.description && <p className="text-xs text-fg-muted">{permissionKey.description}</p>}
+        {permissionDescription && <p className="text-xs text-fg-muted">{permissionDescription}</p>}
         {error && <p className="text-xs text-danger-text">{error}</p>}
       </div>
     </div>

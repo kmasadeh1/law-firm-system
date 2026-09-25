@@ -771,6 +771,199 @@
         "noPermissionRecordPayment": "You don't have permission to record payments.",
         "recordPaymentFailed": "Could not record the payment. Please try again."
       }
+    },
+    "admin": {
+      "userType": {
+        "owner": "Owner",
+        "staff": "Staff"
+      },
+      "staff": {
+        "title": "Staff accounts",
+        "description": "Create logins, reissue temporary passwords, and activate or deactivate staff. Accounts are never deleted.",
+        "showDeactivated": "Show deactivated staff",
+        "hideDeactivated": "Hide deactivated staff",
+        "passwordPanel": {
+          "heading": "This password will only be shown once — save it now",
+          "description": "It isn't stored anywhere it can be retrieved later. Pass it to them directly now - if you leave this page first, you'll have to issue a new one instead.",
+          "copy": "Copy password",
+          "copied": "Copied!"
+        },
+        "addForm": {
+          "heading": "Add staff",
+          "description": "Generates a temporary password. They'll need to change it before they can use anything else in the dashboard.",
+          "fullNameLabel": "Full name",
+          "emailLabel": "Email",
+          "roleLabel": "Role",
+          "chooseRolePlaceholder": "Choose a role",
+          "creating": "Creating…",
+          "createAccount": "Create account"
+        },
+        "regenerate": {
+          "issuing": "Issuing…",
+          "confirmReplace": "Confirm - replaces current password?",
+          "issueNew": "Issue new temporary password",
+          "cancel": "Cancel"
+        },
+        "row": {
+          "noRole": "No role",
+          "tempPasswordExpiredBadge": "Temporary password expired",
+          "awaitingPasswordChangeBadge": "Awaiting password change",
+          "tempPasswordExpiresLine": "Temporary password expires <bdi>{date}</bdi>",
+          "tempPasswordExpiredLine": "Temporary password expired <bdi>{date}</bdi>",
+          "activeAriaLabel": "Active",
+          "inactiveAriaLabel": "Inactive",
+          "activeText": "Active",
+          "deactivatedText": "Deactivated",
+          "deactivate": "Deactivate"
+        },
+        "errors": {
+          "fullNameRequired": "Full name is required.",
+          "emailRequired": "Email is required.",
+          "chooseRole": "Choose a role.",
+          "couldNotCreateLogin": "Could not create the login.",
+          "staffRecordFailedWithCleanup": "Could not create the staff record ({staffMessage}), and cleanup of the orphaned login also failed ({cleanupMessage}). Auth user {userId} needs manual removal.",
+          "staffRecordFailedRolledBack": "Could not create the staff record: {staffMessage}. The login was rolled back.",
+          "passwordResetButRecordFailed": "The password was reset, but updating the staff record failed: {message}. The account may not be flagged to require a change.",
+          "updateAccountFailed": "Could not update that account. Please try again."
+        }
+      },
+      "roles": {
+        "title": "Roles & permissions",
+        "createForm": {
+          "nameLabel": "Name",
+          "namePlaceholder": "e.g. Paralegal",
+          "nameArLabel": "Name (Arabic)",
+          "creating": "Creating…",
+          "createRole": "Create role",
+          "startsWithNoPermissions": "Starts with every permission off."
+        },
+        "noneYet": "No roles yet",
+        "noneYetDescription": "Create one above to get started.",
+        "card": {
+          "nameArAriaLabel": "Name (Arabic)",
+          "saving": "Saving…",
+          "saveName": "Save name",
+          "saved": "Saved",
+          "deleting": "Deleting…",
+          "deleteRole": "Delete role",
+          "deleteNote": "A role held by any staff member can't be deleted until they're moved to another role first. Its permission settings will also be removed.",
+          "administrationHeading": "Administration",
+          "ownerOnlyBadge": "(Owner only)",
+          "ownerOnlyDescription": "Owner only — can't be granted to any role.",
+          "ownerOnlySwitchLabel": "{label} (owner only, locked)",
+          "savingPermission": "Saving…"
+        },
+        "permissionGroups": {
+          "clientsCases": "Clients & Cases",
+          "scheduling": "Scheduling",
+          "billing": "Billing",
+          "frontOffice": "Front Office",
+          "reporting": "Reporting",
+          "other": "Other"
+        },
+        "errors": {
+          "roleNameRequired": "Role name is required.",
+          "roleNameExists": "A role with that name already exists.",
+          "createFailed": "Could not create the role. Please try again.",
+          "renameFailed": "Could not rename the role. Please try again.",
+          "deleteFailed": "Could not delete the role. Please try again.",
+          "roleInUse": "Can't delete a role while staff are assigned to it.",
+          "permissionSaveFailed": "Could not save that change. Please try again."
+        }
+      },
+      "periodTypes": {
+        "title": "Deadline period types",
+        "sourceWarning": "These periods came from secondary research, not the primary Official Gazette text with current amendments.",
+        "unverifiedWarning": "Every row marked \"DRAFT — unverified\" needs your verification before the firm relies on it for a real deadline.",
+        "createForm": {
+          "heading": "New period type",
+          "nameLabel": "Name",
+          "nameArLabel": "Name (Arabic)",
+          "periodDaysLabel": "Period (days)",
+          "descriptionLabel": "Description / source",
+          "descriptionPlaceholder": "e.g. \"DRAFT — unverified. Source: ...\"",
+          "descriptionArLabel": "Description (Arabic)",
+          "creating": "Creating…",
+          "createPeriodType": "Create period type"
+        },
+        "noneYet": "No period types yet",
+        "noneYetDescription": "Create one above to get started.",
+        "card": {
+          "nameArAriaLabel": "Name (Arabic)",
+          "descriptionArAriaLabel": "Description (Arabic)",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved",
+          "deleting": "Deleting…",
+          "delete": "Delete",
+          "deleteNote": "A period type referenced by any existing deadline can't be deleted until those deadlines use a different type."
+        },
+        "errors": {
+          "nameRequired": "Name is required.",
+          "invalidDays": "Enter a whole number of days.",
+          "nameExists": "A period type with that name already exists.",
+          "createFailed": "Could not create the period type. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again.",
+          "inUse": "Can't delete a period type while a deadline uses it.",
+          "deleteFailed": "Could not delete the period type. Please try again."
+        }
+      },
+      "permissions": {
+        "appointments_view_all": {
+          "label": "View every appointment in the office"
+        },
+        "case_notes_access": {
+          "label": "Access case notes"
+        },
+        "case_notes_view_all": {
+          "label": "View case notes on every case",
+          "description": "Without this, notes are limited to cases the staff member is assigned to."
+        },
+        "cases_manage": {
+          "label": "Create and edit cases"
+        },
+        "cases_view_all": {
+          "label": "View every case in the firm",
+          "description": "Without this, a staff member only sees cases they are assigned to."
+        },
+        "clients_manage": {
+          "label": "View and edit client records"
+        },
+        "court_dates_manage": {
+          "label": "Manage court dates"
+        },
+        "documents_access": {
+          "label": "Access case documents"
+        },
+        "documents_view_all": {
+          "label": "View documents on every case",
+          "description": "Without this, documents are limited to cases the staff member is assigned to."
+        },
+        "enquiries_manage": {
+          "label": "Manage public-site enquiries"
+        },
+        "expenses_manage": {
+          "label": "Manage expenses"
+        },
+        "fees_view": {
+          "label": "View agreed fees and balances"
+        },
+        "payments_record": {
+          "label": "Record a payment"
+        },
+        "public_content_manage": {
+          "label": "Edit public site content"
+        },
+        "reports_view": {
+          "label": "View reports"
+        },
+        "roles_permissions_manage": {
+          "label": "Create roles and set permissions"
+        },
+        "staff_manage": {
+          "label": "Add or deactivate staff accounts"
+        }
+      }
     }
   }
 }

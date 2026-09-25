@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { addStaff, regenerateTempPassword, setStaffActive } from './actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
@@ -33,6 +33,7 @@ function isExpired(iso: string | null) {
 // control, copy button. The password can't be retrieved again after this,
 // so the owner needs to pass it on before navigating away.
 function GeneratedPasswordPanel({ password }: { password: string }) {
+  const t = useTranslations('dashboard.admin.staff.passwordPanel')
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -49,11 +50,8 @@ function GeneratedPasswordPanel({ password }: { password: string }) {
   return (
     <div role="alert" className="flex flex-col gap-3 rounded-md border-2 border-accent bg-accent-border/15 p-4">
       <div>
-        <p className="font-heading text-base text-fg">This password will only be shown once — save it now</p>
-        <p className="mt-1 text-sm text-fg-muted">
-          It isn&apos;t stored anywhere it can be retrieved later. Pass it to them directly now - if
-          you leave this page first, you&apos;ll have to issue a new one instead.
-        </p>
+        <p className="font-heading text-base text-fg">{t('heading')}</p>
+        <p className="mt-1 text-sm text-fg-muted">{t('description')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <input
@@ -63,7 +61,7 @@ function GeneratedPasswordPanel({ password }: { password: string }) {
           className={`min-w-0 flex-1 font-mono text-sm ${controlClass}`}
         />
         <Button type="button" variant="secondary" onClick={handleCopy}>
-          {copied ? 'Copied!' : 'Copy password'}
+          {copied ? t('copied') : t('copy')}
         </Button>
       </div>
     </div>
@@ -72,6 +70,7 @@ function GeneratedPasswordPanel({ password }: { password: string }) {
 
 function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (password: string) => void }) {
   const locale = useLocale()
+  const t = useTranslations('dashboard.admin.staff.addForm')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -96,33 +95,30 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
   return (
     <Panel className="flex flex-col gap-3">
       <div>
-        <h2 className="font-heading text-lg text-fg">Add staff</h2>
-        <p className="text-sm text-fg-muted">
-          Generates a temporary password. They&apos;ll need to change it before they can use anything
-          else in the dashboard.
-        </p>
+        <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
+        <p className="text-sm text-fg-muted">{t('description')}</p>
       </div>
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-3">
           <Field>
             <Label htmlFor="staff-full-name" required>
-              Full name
+              {t('fullNameLabel')}
             </Label>
             <input id="staff-full-name" name="full_name" className={controlClass} />
           </Field>
           <Field>
             <Label htmlFor="staff-email" required>
-              Email
+              {t('emailLabel')}
             </Label>
             <input id="staff-email" name="email" type="email" className={controlClass} />
           </Field>
           <Field>
             <Label htmlFor="staff-role" required>
-              Role
+              {t('roleLabel')}
             </Label>
             <select id="staff-role" name="role_id" defaultValue="" className={controlClass}>
               <option value="" disabled>
-                Choose a role
+                {t('chooseRolePlaceholder')}
               </option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
@@ -134,7 +130,7 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
         </div>
         <div>
           <Button type="submit" variant="primary" disabled={isPending}>
-            {isPending ? 'Creating…' : 'Create account'}
+            {isPending ? t('creating') : t('createAccount')}
           </Button>
         </div>
         {error && <FieldError>{error}</FieldError>}
@@ -144,6 +140,7 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
 }
 
 function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (password: string) => void }) {
+  const t = useTranslations('dashboard.admin.staff.regenerate')
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -171,11 +168,11 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
   return (
     <div className="flex items-center gap-2">
       <Button type="button" variant="ghost" onClick={handleClick} disabled={isPending}>
-        {isPending ? 'Issuing…' : confirming ? 'Confirm - replaces current password?' : 'Issue new temporary password'}
+        {isPending ? t('issuing') : confirming ? t('confirmReplace') : t('issueNew')}
       </Button>
       {confirming && !isPending && (
         <Button type="button" variant="ghost" onClick={() => setConfirming(false)}>
-          Cancel
+          {t('cancel')}
         </Button>
       )}
       {error && <FieldError>{error}</FieldError>}
@@ -184,6 +181,7 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
 }
 
 function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullName: string; isActive: boolean }) {
+  const t = useTranslations('dashboard.admin.staff.row')
   const [checked, setChecked] = useState(isActive)
   const [error, setError] = useState<string | null>(null)
   const [confirmingDeactivate, setConfirmingDeactivate] = useState(false)
@@ -214,8 +212,13 @@ function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullNa
 
   return (
     <div className="flex items-center gap-2">
-      <Switch checked={checked} disabled={isPending} onChange={handleChange} label={checked ? 'Active' : 'Inactive'} />
-      <span className="text-sm text-fg-muted">{checked ? 'Active' : 'Deactivated'}</span>
+      <Switch
+        checked={checked}
+        disabled={isPending}
+        onChange={handleChange}
+        label={checked ? t('activeAriaLabel') : t('inactiveAriaLabel')}
+      />
+      <span className="text-sm text-fg-muted">{checked ? t('activeText') : t('deactivatedText')}</span>
       {error && <FieldError>{error}</FieldError>}
 
       <DeleteConfirmDialog
@@ -227,7 +230,7 @@ function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullNa
         }}
         kind="deactivate"
         itemLabel={fullName}
-        confirmLabel="Deactivate"
+        confirmLabel={t('deactivate')}
       />
     </div>
   )
@@ -235,6 +238,8 @@ function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullNa
 
 function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (password: string) => void }) {
   const locale = useLocale()
+  const t = useTranslations('dashboard.admin.staff.row')
+  const tUserType = useTranslations('dashboard.admin.userType')
   const expired = isExpired(row.temp_password_expires_at)
 
   return (
@@ -243,18 +248,20 @@ function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (passwor
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium text-fg">{row.full_name}</span>
           <Badge variant={row.user_type === 'owner' ? 'accent' : 'neutral'}>
-            {row.user_type === 'owner' ? 'Owner' : row.roles ? localizedName(row.roles, locale) : 'No role'}
+            {row.user_type === 'owner' ? tUserType('owner') : row.roles ? localizedName(row.roles, locale) : t('noRole')}
           </Badge>
           {row.must_change_password && (
             <Badge variant={expired ? 'muted' : 'accent'}>
-              {expired ? 'Temporary password expired' : 'Awaiting password change'}
+              {expired ? t('tempPasswordExpiredBadge') : t('awaitingPasswordChangeBadge')}
             </Badge>
           )}
         </div>
         {row.must_change_password && row.temp_password_expires_at && (
           <p className="mt-0.5 text-xs text-fg-muted">
-            Temporary password {expired ? 'expired' : 'expires'}{' '}
-            <bdi>{formatDateTime(row.temp_password_expires_at, locale)}</bdi>
+            {t.rich(expired ? 'tempPasswordExpiredLine' : 'tempPasswordExpiresLine', {
+              date: formatDateTime(row.temp_password_expires_at, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
           </p>
         )}
       </div>
