@@ -126,14 +126,30 @@
     "invalidMessage": "هذا الرابط لم يعد صالحاً - يرجى التواصل مع المكتب."
   },
   "dashboard": {
+    "common": {
+      "unknownStaff": "موظف غير معروف",
+      "deleteConfirm": {
+        "title": "{verb} <item></item>؟",
+        "softNote": "يمكن استعادته لاحقاً.",
+        "hardNote": "لا يمكن التراجع عن هذا الإجراء.",
+        "deactivateNote": "يمكن إعادة تفعيله لاحقاً.",
+        "cancel": "إلغاء"
+      }
+    },
     "shell": {
       "firmName": "أحمد المساعده ومشاركوه",
       "logOut": "تسجيل الخروج",
-      "lightMode": "الوضع الفاتح",
-      "darkMode": "الوضع الداكن",
+      "openMenu": "فتح القائمة",
+      "closeMenu": "إغلاق القائمة",
       "myAccount": "حسابي",
       "openAccountMenu": "قائمة الحساب",
-      "closeAccountMenu": "إغلاق قائمة الحساب"
+      "closeAccountMenu": "إغلاق قائمة الحساب",
+      "switchToLightTheme": "التبديل إلى الوضع الفاتح",
+      "switchToDarkTheme": "التبديل إلى الوضع الداكن",
+      "lightMode": "الوضع الفاتح",
+      "darkMode": "الوضع الداكن",
+      "switchToArabic": "التبديل إلى العربية",
+      "switchToEnglish": "التبديل إلى الإنجليزية"
     },
     "nav": {
       "groupDailyWork": "العمل اليومي",
@@ -150,9 +166,370 @@
       "rolesAndPermissions": "الأدوار والصلاحيات",
       "deadlinePeriodTypes": "أنواع المهل",
       "activityLog": "سجل النشاط",
+      "settings": "الإعدادات",
       "reports": "التقارير",
       "roleOwner": "المالك",
-      "settings": "الإعدادات"
+      "roleStaffFallback": "موظف"
+    },
+    "overview": {
+      "title": "نظرة عامة على المكتب",
+      "description": "مجريات اليوم في المكتب، وآخر النشاط، وكل ما يحتاج إلى متابعة.",
+      "todaysSchedule": "جدول اليوم",
+      "nothingToday": "لا شيء في التقويم اليوم",
+      "unassigned": "غير مُسند",
+      "needingAttention": "بحاجة إلى متابعة",
+      "nothingNeedsAttention": "لا شيء يحتاج إلى متابعة حالياً",
+      "appointmentsPastTime": "{count, plural, zero {لا توجد مواعيد فات وقتها ولا تزال بحالة «مجدول»} one {موعد واحد فات وقته ولا يزال بحالة «مجدول»} two {موعدان فات وقتهما ولا يزالان بحالة «مجدول»} few {# مواعيد فات وقتها ولا تزال بحالة «مجدول»} many {# موعداً فات وقتها ولا تزال بحالة «مجدول»} other {# موعد فات وقتها ولا تزال بحالة «مجدول»}}",
+      "unknownClient": "عميل غير معروف",
+      "recentActivity": "آخر النشاط",
+      "noActivityYet": "لم يُسجَّل أي نشاط بعد",
+      "unknownStaff": "موظف غير معروف"
+    },
+    "cases": {
+      "list": {
+        "title": "القضايا",
+        "newCase": "قضية جديدة",
+        "searchPlaceholder": "البحث برقم القضية أو عنوانها",
+        "allStatuses": "جميع الحالات",
+        "filter": "تصفية",
+        "clear": "مسح",
+        "noCasesFiltered": "لا توجد قضايا تطابق عوامل التصفية هذه.",
+        "noCasesYet": "لا توجد قضايا بعد",
+        "noCasesYetDescription": "افتح قضيتك الأولى لبدء متابعتها."
+      },
+      "new": {
+        "backToCases": "القضايا",
+        "title": "قضية جديدة",
+        "clientLabel": "العميل",
+        "clientSearchPlaceholder": "ابحث في العملاء الحاليين بالاسم أو الرقم الوطني",
+        "noMatchingClient": "لا يوجد عميل مطابق. أضفه من قسم العملاء أولاً.",
+        "selectedClient": "المحدد: <bdi>{name}</bdi>",
+        "titleLabel": "العنوان",
+        "caseNumberLabel": "رقم القضية",
+        "caseNumberHelp": "يُدخل يدوياً - لا يُفرض نظام ترقيم محدد بعد.",
+        "caseTypeLabel": "نوع القضية",
+        "creating": "جارٍ الإنشاء…",
+        "submit": "إنشاء القضية",
+        "errors": {
+          "selectClient": "اختر عميلاً.",
+          "titleRequired": "العنوان مطلوب.",
+          "caseNumberRequired": "رقم القضية مطلوب.",
+          "statusLookupFailed": "تعذّر تحديد الحالة الابتدائية. يرجى المحاولة مرة أخرى.",
+          "caseNumberInUse": "رقم القضية هذا مستخدم بالفعل.",
+          "createFailed": "تعذّر إنشاء القضية. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "detail": {
+        "page": {
+          "backToCases": "القضايا",
+          "caseNotFound": "هذه القضية غير موجودة، أو ليس لديك صلاحية الوصول إليها.",
+          "description": "{hasType, select, yes {العميل: <bdi>{name}</bdi> · <bdi>{caseType}</bdi>} other {العميل: <bdi>{name}</bdi>}}",
+          "timelineUnavailable": "السجل الزمني غير متاح: <bdi>{message}</bdi>",
+          "unknownPeriod": "مدة غير معروفة"
+        },
+        "status": {
+          "heading": "الحالة",
+          "saving": "جارٍ الحفظ…",
+          "saveStatus": "حفظ الحالة",
+          "saved": "تم الحفظ",
+          "errors": {
+            "updateFailed": "تعذّر تحديث الحالة. يرجى المحاولة مرة أخرى."
+          }
+        },
+        "team": {
+          "heading": "فريق العمل",
+          "nobodyAssigned": "لم يُعيَّن أحد بعد.",
+          "remove": "إزالة",
+          "addToTeam": "إضافة إلى الفريق",
+          "selectStaff": "اختر موظفاً…",
+          "add": "إضافة",
+          "errors": {
+            "alreadyOnCase": "هذا الشخص مُضاف إلى هذه القضية بالفعل.",
+            "noPermissionChange": "ليس لديك صلاحية تعديل فريق هذه القضية.",
+            "addFailed": "تعذّرت إضافة الشخص إلى القضية. يرجى المحاولة مرة أخرى.",
+            "updateFailed": "تعذّر تحديث الفريق. يرجى المحاولة مرة أخرى.",
+            "removeFailed": "تعذّرت إزالة الشخص من القضية. يرجى المحاولة مرة أخرى.",
+            "noPermissionRemove": "ليس لديك صلاحية تعديل فريق هذه القضية، أو أن الشخص لم يعد ضمنه أصلاً."
+          }
+        },
+        "expenses": {
+          "heading": "المصاريف",
+          "description": "التكاليف التي دفعها المكتب على هذه القضية - رسوم المحكمة، والترجمة، وأتعاب الخبراء - تُتابَع بشكل منفصل عن الأتعاب المتفق عليها، ويُؤشَّر عليها عندما يسددها العميل.",
+          "incurredBadge": "المصروف:",
+          "reimbursedBadge": "المُسترَد:",
+          "outstandingBadge": "المتبقي:",
+          "noExpensesYet": "لم تُسجَّل أي مصاريف بعد.",
+          "descriptionLabel": "الوصف",
+          "amountLabel": "المبلغ (د.أ)",
+          "incurredLabel": "تاريخ الصرف",
+          "descriptionPlaceholder": "مثال: رسوم تسجيل الدعوى",
+          "adding": "جارٍ الإضافة…",
+          "addExpense": "إضافة مصروف",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "cancel": "إلغاء",
+          "incurredLine": "صُرف في <bdi>{date}</bdi> · سُجّل بواسطة <bdi>{name}</bdi>",
+          "reimbursedOn": "استُرد في <bdi>{date}</bdi>",
+          "notYetReimbursed": "لم يُسترد بعد",
+          "markUnreimbursed": "تحديد كغير مُسترَد",
+          "markReimbursed": "تحديد كمُسترَد",
+          "edit": "تعديل",
+          "deleting": "جارٍ الحذف…",
+          "delete": "حذف",
+          "errors": {
+            "descriptionRequired": "الوصف مطلوب.",
+            "incurredRequired": "تاريخ الصرف مطلوب.",
+            "amountRequired": "المبلغ مطلوب.",
+            "invalidAmount": "أدخل مبلغاً صحيحاً أكبر من صفر.",
+            "noPermissionRecord": "ليس لديك صلاحية تسجيل مصاريف على هذه القضية.",
+            "recordFailed": "تعذّر تسجيل المصروف. يرجى المحاولة مرة أخرى.",
+            "saveFailed": "تعذّر حفظ المصروف. يرجى المحاولة مرة أخرى.",
+            "noPermissionEdit": "ليس لديك صلاحية تعديل هذا المصروف.",
+            "reimbursedUpdateFailed": "تعذّر تحديث حالة الاسترداد. يرجى المحاولة مرة أخرى.",
+            "noPermissionUpdate": "ليس لديك صلاحية تحديث هذا المصروف.",
+            "deleteFailed": "تعذّر حذف المصروف. يرجى المحاولة مرة أخرى.",
+            "noPermissionDelete": "ليس لديك صلاحية حذف هذا المصروف."
+          }
+        },
+        "notes": {
+          "heading": "الملاحظات",
+          "noNotesYet": "لا توجد ملاحظات بعد.",
+          "addNotePlaceholder": "أضف ملاحظة إلى ملف القضية…",
+          "adding": "جارٍ الإضافة…",
+          "addNote": "إضافة ملاحظة",
+          "deletedNotesHeading": "الملاحظات المحذوفة",
+          "edit": "تعديل",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "cancel": "إلغاء",
+          "deleting": "جارٍ الحذف…",
+          "delete": "حذف",
+          "restoring": "جارٍ الاستعادة…",
+          "restore": "استعادة",
+          "authorLine": "<bdi>{author}</bdi> · <bdi>{date}</bdi>",
+          "editedSuffix": "· عُدّلت في <bdi>{date}</bdi>",
+          "deletedByLine": "حُذفت بواسطة <bdi>{name}</bdi> · <bdi>{date}</bdi>",
+          "errors": {
+            "writeSomething": "اكتب شيئاً قبل إضافة الملاحظة.",
+            "noPermissionAdd": "ليس لديك صلاحية إضافة ملاحظات إلى هذه القضية.",
+            "addFailed": "تعذّرت إضافة الملاحظة. يرجى المحاولة مرة أخرى.",
+            "cannotBeEmpty": "لا يمكن أن تكون الملاحظة فارغة.",
+            "saveFailed": "تعذّر حفظ الملاحظة. يرجى المحاولة مرة أخرى.",
+            "noPermissionEdit": "ليس لديك صلاحية تعديل هذه الملاحظة.",
+            "deleteFailed": "تعذّر حذف الملاحظة. يرجى المحاولة مرة أخرى.",
+            "noPermissionDelete": "ليس لديك صلاحية حذف هذه الملاحظة.",
+            "restoreFailed": "تعذّرت استعادة الملاحظة. يرجى المحاولة مرة أخرى.",
+            "noPermissionRestore": "ليس لديك صلاحية استعادة هذه الملاحظة."
+          }
+        },
+        "documents": {
+          "heading": "المستندات",
+          "noDocumentsYet": "لم يُرفع أي مستند بعد.",
+          "uploading": "جارٍ الرفع…",
+          "upload": "رفع",
+          "removedDocumentsHeading": "المستندات المُزالة",
+          "view": "عرض",
+          "opening": "جارٍ الفتح…",
+          "remove": "إزالة",
+          "removing": "جارٍ الإزالة…",
+          "restoring": "جارٍ الاستعادة…",
+          "restore": "استعادة",
+          "uploadedLine": "رُفع بواسطة <bdi>{name}</bdi> · <bdi>{date}</bdi>",
+          "removedByLine": "أُزيل بواسطة <bdi>{name}</bdi> · <bdi>{date}</bdi>",
+          "errors": {
+            "chooseFile": "اختر ملفاً لرفعه.",
+            "fileTooLarge": "حجم هذا الملف يتجاوز الحد المسموح به وهو 25 ميغابايت.",
+            "fileTypeNotSupported": "نوع هذا الملف غير مدعوم. الأنواع المسموح بها: PDF أو Word أو Excel أو نص عادي أو صيغ الصور الشائعة (بما فيها HEIC).",
+            "couldNotOpenFile": "تعذّر فتح هذا الملف.",
+            "uploadFailed": "تعذّر رفع الملف - قد لا تكون لديك صلاحية إضافة مستندات إلى هذه القضية.",
+            "saveRecordFailed": "تعذّر حفظ سجل المستند. يرجى المحاولة مرة أخرى.",
+            "notFound": "تعذّر العثور على هذا المستند، أو ليس لديك صلاحية عرضه.",
+            "linkGenerationFailed": "تعذّر إنشاء رابط لهذا الملف. يرجى المحاولة مرة أخرى.",
+            "removeFailed": "تعذّرت إزالة المستند. يرجى المحاولة مرة أخرى.",
+            "noPermissionRemove": "ليس لديك صلاحية إزالة هذا المستند.",
+            "restoreFailed": "تعذّرت استعادة المستند. يرجى المحاولة مرة أخرى.",
+            "noPermissionRestore": "ليس لديك صلاحية استعادة هذا المستند."
+          }
+        },
+        "opposingParties": {
+          "noneAddedYet": "لم يُضف أحد بعد.",
+          "nameLabel": "الاسم",
+          "nationalIdLabel": "الرقم الوطني",
+          "checking": "جارٍ التحقق…",
+          "add": "إضافة",
+          "addAnyway": "إضافة على أي حال",
+          "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
+          "errors": {
+            "nameRequired": "الاسم مطلوب."
+          }
+        },
+        "timeline": {
+          "heading": "السجل الزمني",
+          "noHistoryTitle": "لا يوجد سجل بعد",
+          "noHistoryDescription": "سيظهر هنا النشاط على هذه القضية فور حدوثه.",
+          "systemFallback": "النظام",
+          "detailsHidden": "التفاصيل مخفية — ليس لديك صلاحية عرضها",
+          "showMore": "{count, plural, zero {لا مزيد من الأحداث} one {عرض حدث واحد إضافي} two {عرض حدثين إضافيين} few {عرض # أحداث إضافية} many {عرض # حدثاً إضافياً} other {عرض # حدث إضافي}}",
+          "unknownStaffMember": "أحد الموظفين",
+          "paymentWithMethod": "<bdi>{amount}</bdi> عبر <bdi>{method}</bdi>",
+          "expenseWithAmount": "<bdi>{description}</bdi> — <bdi>{amount}</bdi>",
+          "dueDate": "تاريخ الاستحقاق <bdi>{date}</bdi>",
+          "descriptionDueDate": "<bdi>{description}</bdi> — تاريخ الاستحقاق <bdi>{date}</bdi>",
+          "caseMarkedClosed": "أُغلقت القضية"
+        },
+        "shareLinks": {
+          "heading": "المشاركة مع العميل",
+          "intro": "أنشئ رابطاً يستطيع العميل فتحه لمتابعة حالة هذه القضية — دون الحاجة إلى حساب. أرسله عبر واتساب أو بأي وسيلة تتواصل بها معه.",
+          "noShareLinksYet": "لا توجد روابط مشاركة بعد.",
+          "labelFieldLabel": "التسمية (اختياري)",
+          "labelPlaceholder": "مثال: أُرسل إلى والد العميل",
+          "expiresAfterLabel": "تنتهي الصلاحية بعد",
+          "expiry30": "30 يوماً",
+          "expiry90": "90 يوماً",
+          "expiry180": "180 يوماً",
+          "expiry365": "365 يوماً",
+          "generating": "جارٍ الإنشاء…",
+          "generateLink": "إنشاء رابط",
+          "untitledLink": "رابط بلا تسمية",
+          "statusActive": "نشط",
+          "statusExpired": "منتهي الصلاحية",
+          "statusRevoked": "مُبطَل",
+          "createdOn": "أُنشئ في <bdi>{date}</bdi>",
+          "expiresOn": "تنتهي صلاحيته في <bdi>{date}</bdi>",
+          "lastOpenedOn": "آخر فتح في <bdi>{date}</bdi>",
+          "neverOpened": "لم يُفتح قط",
+          "viewCount": "{count, plural, zero {لا توجد مشاهدات} one {مشاهدة واحدة} two {مشاهدتان} few {# مشاهدات} many {# مشاهدة} other {# مشاهدة}}",
+          "onceWarningTitle": "لن يُعرض هذا الرابط إلا مرة واحدة — احفظه الآن",
+          "onceWarningBody": "لا يُخزَّن الرابط في أي مكان يمكنك استرجاعه منه لاحقاً. إذا غادرت هذه الصفحة دون نسخه أو إرساله فسيضيع — وسيتعين عليك إنشاء رابط جديد، ولن يعيد ذلك هذا الرابط.",
+          "copied": "تم النسخ!",
+          "copyLink": "نسخ الرابط",
+          "sendViaWhatsapp": "إرسال عبر واتساب",
+          "revoking": "جارٍ الإبطال…",
+          "revoke": "إبطال",
+          "revokeNote": "لن يتمكن العميل الذي يحمل هذا الرابط من فتحه بعد الآن.",
+          "errors": {
+            "noPermissionShare": "ليس لديك صلاحية مشاركة هذه القضية.",
+            "generateFailed": "تعذّر إنشاء رابط المشاركة. يرجى المحاولة مرة أخرى.",
+            "revokeFailed": "تعذّر إبطال الرابط. يرجى المحاولة مرة أخرى.",
+            "noPermissionRevoke": "ليس لديك صلاحية إبطال هذا الرابط."
+          }
+        }
+      }
+    },
+    "clients": {
+      "list": {
+        "title": "العملاء",
+        "addClient": "إضافة عميل",
+        "searchPlaceholder": "البحث بالاسم أو الهاتف أو الرقم الوطني",
+        "search": "بحث",
+        "clear": "مسح",
+        "noClientsFiltered": "لا يوجد عملاء يطابقون هذا البحث.",
+        "noClientsYet": "لا يوجد عملاء بعد",
+        "noClientsYetDescription": "أضف عميلك الأول لبدء إنشاء ملفات القضايا."
+      },
+      "new": {
+        "backToClients": "العملاء",
+        "title": "إضافة عميل"
+      },
+      "detail": {
+        "page": {
+          "backToClients": "العملاء",
+          "clientNotFound": "العميل غير موجود",
+          "clientNotFoundDescription": "هذا العميل غير موجود، أو ليس لديك صلاحية الوصول إليه."
+        },
+        "balance": {
+          "heading": "موقف الأتعاب",
+          "agreedFixedFees": "المتفق عليه (أتعاب مقطوعة): <bdi>{amount}</bdi>",
+          "scheduled": "المجدول: <bdi>{amount}</bdi>",
+          "paid": "المدفوع: <bdi>{amount}</bdi>",
+          "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>"
+        }
+      },
+      "form": {
+        "fullNameLabel": "الاسم الكامل",
+        "nationalIdLabel": "الرقم الوطني",
+        "phoneLabel": "الهاتف",
+        "emailLabel": "البريد الإلكتروني",
+        "notesLabel": "الملاحظات",
+        "checking": "جارٍ التحقق…",
+        "saving": "جارٍ الحفظ…",
+        "createClient": "إنشاء العميل",
+        "saveChanges": "حفظ التغييرات",
+        "saved": "تم الحفظ",
+        "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
+        "errors": {
+          "fullNameRequired": "الاسم الكامل مطلوب.",
+          "createFailed": "تعذّر إنشاء العميل. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
+        }
+      }
+    },
+    "deadlines": {
+      "list": {
+        "title": "المهل",
+        "newDeadline": "مهلة جديدة",
+        "noneYet": "لا توجد مهل بعد",
+        "noneYetDescription": "أضف مهلة إلى قضية لبدء متابعتها.",
+        "extendedTag": "(مُمدَّدة)"
+      },
+      "new": {
+        "backToDeadlines": "المهل",
+        "title": "مهلة جديدة",
+        "resultHeading": "تمت إضافة المهلة",
+        "resultLine": "تاريخ البدء <bdi>{trigger}</bdi> <icon></icon> تستحق في <bdi><strong>{due}</strong></bdi>",
+        "effectiveDueDateLine": "تاريخ الاستحقاق الفعلي (بعد أي تمديد): <bdi>{date}</bdi>",
+        "goToCase": "الانتقال إلى القضية",
+        "addAnother": "إضافة مهلة أخرى"
+      },
+      "form": {
+        "periodTypeLabel": "نوع المهلة",
+        "selectPeriodTypePlaceholder": "اختر نوع المهلة…",
+        "periodOptionLabel": "{name} ({days, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يوماً} other {# يوم}})",
+        "triggerDateLabel": "تاريخ البدء",
+        "triggerDateHelp": "تحسب قاعدة البيانات تاريخ الاستحقاق انطلاقاً من هذا التاريخ ونوع المهلة - ولا يُدخل مباشرة.",
+        "notesLabel": "الملاحظات",
+        "adding": "جارٍ الإضافة…",
+        "addDeadline": "إضافة مهلة",
+        "caseLabel": "القضية",
+        "caseSearchPlaceholder": "ابحث في القضايا بالرقم أو العنوان",
+        "noMatchingCase": "لا توجد قضية مطابقة.",
+        "selectedCase": "المحددة: <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "weekendRollover": "يصادف عطلة نهاية الأسبوع (<bdi>{unadjustedDate}</bdi>) — نُقل إلى <bdi>{dueDate}</bdi>.",
+        "errors": {
+          "selectCase": "اختر قضية.",
+          "selectPeriodType": "اختر نوع المهلة.",
+          "triggerDateRequired": "تاريخ البدء مطلوب.",
+          "noPermissionAdd": "ليس لديك صلاحية إضافة مهلة إلى هذه القضية.",
+          "addFailed": "تعذّرت إضافة المهلة. يرجى المحاولة مرة أخرى.",
+          "extendedDateRequired": "تاريخ التمديد مطلوب.",
+          "extensionReasonRequired": "سبب التمديد مطلوب.",
+          "bothExtensionFieldsRequired": "يجب إدخال تاريخ التمديد والسبب معاً.",
+          "noPermissionExtend": "ليس لديك صلاحية تمديد هذه المهلة.",
+          "extendFailed": "تعذّر حفظ التمديد. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "section": {
+        "heading": "المهل",
+        "noneYet": "لا توجد مهل بعد.",
+        "periodDaysLine": "({days, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يوماً} other {# يوم}}) · تاريخ البدء <bdi>{date}</bdi>",
+        "extendedToLine": "مُدِّدت إلى <strong><bdi>{date}</bdi></strong> (التاريخ الأصلي <bdi>{originalDate}</bdi>)",
+        "reasonLine": "السبب: <bdi>{reason}</bdi>",
+        "grantedByFragment": " · بموافقة <bdi>{name}</bdi>",
+        "onDateFragment": " في <bdi>{date}</bdi>",
+        "newDueDateLabel": "تاريخ الاستحقاق الجديد",
+        "reasonLabel": "السبب",
+        "saving": "جارٍ الحفظ…",
+        "saveExtension": "حفظ التمديد",
+        "cancel": "إلغاء",
+        "changeExtension": "تغيير التمديد",
+        "extend": "تمديد",
+        "viewAllDeadlines": "عرض جميع المهل"
+      },
+      "urgency": {
+        "overdue": "متأخرة",
+        "soon": "تستحق قريباً",
+        "later": "قادمة"
+      }
     }
   }
 }
