@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
   const t = await getTranslations({ locale, namespace: 'layout' })
   return {
     title: t('firmName'),
-    description: 'Placeholder firm site',
+    description: t('metaDescription'),
   }
 }
 

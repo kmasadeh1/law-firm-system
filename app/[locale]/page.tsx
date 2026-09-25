@@ -214,7 +214,6 @@ export default function PublicHomePage() {
           <p>
             {t('layout.firmName')} &middot; {t('footer.rights')}
           </p>
-          <p>{t('footer.placeholderNotice')}</p>
         </div>
       </footer>
     </div>

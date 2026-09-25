@@ -1,7 +1,8 @@
 {
   "layout": {
     "firmName": "Ahmad Al-Masadeh & Associates",
-    "firmTagline": "Law Firm | Advocates & Legal Consultants"
+    "firmTagline": "Law Firm | Advocates & Legal Consultants",
+    "metaDescription": "A law firm in Amman, Jordan offering corporate and commercial, litigation and dispute resolution, real estate, family law, and labor and employment services for individuals and businesses."
   },
   "staffAuth": {
     "firmName": "Ahmad Al-Masadeh & Associates",
@@ -144,8 +145,7 @@
     "errorGeneric": "Something went wrong sending your message. Please try again, or reach us by phone or email above."
   },
   "footer": {
-    "rights": "All rights reserved.",
-    "placeholderNotice": "Placeholder content - not a real firm identity."
+    "rights": "All rights reserved."
   },
   "track": {
     "title": "Case Tracking",
