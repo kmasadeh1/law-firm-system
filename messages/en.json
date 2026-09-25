@@ -7,8 +7,20 @@
     "firmName": "Ahmad Al-Masadeh & Associates",
     "firmTagline": "Law Firm | Advocates & Legal Consultants",
     "changePassword": {
+      "headline": "Set a new password",
       "forcedBody": "You're signed in with a temporary password. Choose your own before you can use the rest of the dashboard.",
-      "voluntaryBody": "Choose a new password for your account."
+      "voluntaryBody": "Choose a new password for your account.",
+      "formHeading": "Change password",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm new password",
+      "submit": "Set password and continue",
+      "submitting": "Setting password…",
+      "expiredSuffix": "Ask the owner to issue you a new one.",
+      "errors": {
+        "tooShort": "Password must be at least 8 characters.",
+        "mismatch": "Passwords don't match.",
+        "expired": "This temporary password has expired."
+      }
     },
     "login": {
       "brandingHeading": "Staff sign in",
@@ -211,6 +223,18 @@
       "recentActivity": "Recent activity",
       "noActivityYet": "No activity recorded yet",
       "unknownStaff": "Unknown staff"
+    },
+    "staff": {
+      "title": "What's on today",
+      "description": "Your upcoming appointments and assigned cases.",
+      "upcomingAppointments": "Upcoming appointments",
+      "nothingScheduled": "Nothing scheduled",
+      "nothingScheduledDescription": "You have no upcoming appointments or court dates.",
+      "scheduleOne": "Schedule one",
+      "yourCases": "Your cases",
+      "noCasesAssigned": "No cases assigned yet",
+      "noCasesAssignedDescription": "Cases you're added to as a team member will show up here.",
+      "lead": "Lead"
     },
     "cases": {
       "list": {

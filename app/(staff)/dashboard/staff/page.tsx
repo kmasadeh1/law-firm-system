@@ -34,25 +34,22 @@ export default async function StaffDashboardPage() {
   ])
 
   const locale = staffRow?.locale === 'ar' ? 'ar' : 'en'
-  // Only the appointment-type enum lookup is extracted here - the rest of
-  // this page is a pending extraction batch of its own, matching the
-  // convention that a code-defined enum never gets a second copy of its
-  // mapping just because the page around it isn't translated yet.
+  const t = await getTranslations({ locale, namespace: 'dashboard.staff' })
   const tType = await getTranslations({ locale, namespace: 'dashboard.appointments.type' })
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="What's on today" description="Your upcoming appointments and assigned cases." />
+      <PageHeader title={t('title')} description={t('description')} />
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Upcoming appointments</h2>
+        <h2 className="font-heading text-lg text-fg">{t('upcomingAppointments')}</h2>
         {!appointments || appointments.length === 0 ? (
           <EmptyState
-            title="Nothing scheduled"
-            description="You have no upcoming appointments or court dates."
+            title={t('nothingScheduled')}
+            description={t('nothingScheduledDescription')}
             action={
               <LinkButton href="/dashboard/appointments/new" variant="secondary">
-                Schedule one
+                {t('scheduleOne')}
               </LinkButton>
             }
           />
@@ -92,11 +89,11 @@ export default async function StaffDashboardPage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Your cases</h2>
+        <h2 className="font-heading text-lg text-fg">{t('yourCases')}</h2>
         {!assignments || assignments.length === 0 ? (
           <EmptyState
-            title="No cases assigned yet"
-            description="Cases you're added to as a team member will show up here."
+            title={t('noCasesAssigned')}
+            description={t('noCasesAssignedDescription')}
           />
         ) : (
           <Panel className="p-0">
@@ -113,10 +110,14 @@ export default async function StaffDashboardPage() {
                         <span className="font-medium text-fg">
                           <bdi>{a.cases!.case_number}</bdi>
                         </span>
-                        <span className="text-fg-muted"> — {a.cases!.title}</span>
+                        <span className="text-fg-muted"> — <bdi>{a.cases!.title}</bdi></span>
                       </span>
                       <span className="flex items-center gap-2">
-                        {a.is_lead && <Badge variant="accent">Lead</Badge>}
+                        {a.is_lead && (
+                          <Badge variant="accent">
+                            <bdi>{t('lead')}</bdi>
+                          </Badge>
+                        )}
                         <span className="text-fg-muted">
                           {a.cases!.case_statuses ? localizedName(a.cases!.case_statuses, locale) : '—'}
                         </span>

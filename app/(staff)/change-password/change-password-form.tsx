@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { changePassword } from './actions'
 
 export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
   const router = useRouter()
+  const t = useTranslations('staffAuth.changePassword')
   const [error, setError] = useState<string | null>(null)
   const [expired, setExpired] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -32,13 +34,13 @@ export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
       {error && (
         <p className="rounded-sm border border-danger bg-danger/20 px-3 py-2 text-sm text-paper">
           {error}
-          {expired && ' Ask the owner to issue you a new one.'}
+          {expired && ` ${t('expiredSuffix')}`}
         </p>
       )}
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="password" className="text-sm text-paper-dim">
-          New password
+          {t('newPasswordLabel')}
         </label>
         <input
           id="password"
@@ -53,7 +55,7 @@ export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="confirm" className="text-sm text-paper-dim">
-          Confirm new password
+          {t('confirmPasswordLabel')}
         </label>
         <input
           id="confirm"
@@ -71,7 +73,7 @@ export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
         disabled={isPending}
         className="mt-2 rounded-sm bg-brass px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-brass-hover disabled:opacity-60"
       >
-        {isPending ? 'Setting password…' : 'Set password and continue'}
+        {isPending ? t('submitting') : t('submit')}
       </button>
     </form>
   )

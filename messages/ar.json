@@ -23,8 +23,20 @@
       }
     },
     "changePassword": {
+      "headline": "تعيين كلمة مرور جديدة",
       "forcedBody": "لقد سجّلت الدخول بكلمة مرور مؤقتة. اختر كلمة مرور خاصة بك قبل أن تتمكن من استخدام بقية لوحة التحكم.",
-      "voluntaryBody": "اختر كلمة مرور جديدة لحسابك."
+      "voluntaryBody": "اختر كلمة مرور جديدة لحسابك.",
+      "formHeading": "تغيير كلمة المرور",
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "confirmPasswordLabel": "تأكيد كلمة المرور الجديدة",
+      "submit": "تعيين كلمة المرور والمتابعة",
+      "submitting": "جارٍ تعيين كلمة المرور…",
+      "expiredSuffix": "يرجى التواصل مع مسؤول المكتب للحصول على كلمة مرور جديدة.",
+      "errors": {
+        "tooShort": "يجب ألا تقل كلمة المرور عن 8 أحرف.",
+        "mismatch": "كلمتا المرور غير متطابقتين.",
+        "expired": "انتهت صلاحية كلمة المرور المؤقتة."
+      }
     }
   },
   "nav": {
@@ -204,6 +216,17 @@
       "recentActivity": "آخر النشاط",
       "noActivityYet": "لم يُسجَّل أي نشاط بعد",
       "unknownStaff": "موظف غير معروف"
+    },
+    "staff": {
+      "title": "مستجدات اليوم",
+      "description": "مواعيدك القادمة والقضايا المسندة إليك.",
+      "upcomingAppointments": "المواعيد القادمة",
+      "nothingScheduled": "لا يوجد شيء مجدول",
+      "nothingScheduledDescription": "لا توجد لديك مواعيد أو جلسات قادمة.",
+      "scheduleOne": "جدولة موعد",
+      "yourCases": "قضاياك",
+      "noCasesAssigned": "لا توجد قضايا مسندة بعد",
+      "noCasesAssignedDescription": "ستظهر هنا القضايا التي أُضفت إليها كعضو في الفريق."
     },
     "cases": {
       "list": {

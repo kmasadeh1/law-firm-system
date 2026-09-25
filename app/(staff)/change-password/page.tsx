@@ -41,7 +41,7 @@ export default async function ChangePasswordPage() {
         </div>
 
         <div className="max-w-sm">
-          <p className="font-heading text-3xl leading-snug sm:text-4xl">Set a new password</p>
+          <p className="font-heading text-3xl leading-snug sm:text-4xl">{t('changePassword.headline')}</p>
           <p className="mt-4 text-sm leading-relaxed text-paper-dim">
             {staffRow?.must_change_password ? t('changePassword.forcedBody') : t('changePassword.voluntaryBody')}
           </p>
@@ -57,7 +57,7 @@ export default async function ChangePasswordPage() {
             <span className="font-heading text-base text-paper">{t('firmName')}</span>
           </div>
         </div>
-        <h1 className="mb-5 w-full max-w-sm font-heading text-2xl text-paper">Change password</h1>
+        <h1 className="mb-5 w-full max-w-sm font-heading text-2xl text-paper">{t('changePassword.formHeading')}</h1>
         <ChangePasswordForm homeHref={homeHref} />
       </div>
     </div>
