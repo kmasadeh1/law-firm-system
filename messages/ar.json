@@ -130,7 +130,10 @@
       "firmName": "أحمد المساعده ومشاركوه",
       "logOut": "تسجيل الخروج",
       "lightMode": "الوضع الفاتح",
-      "darkMode": "الوضع الداكن"
+      "darkMode": "الوضع الداكن",
+      "myAccount": "حسابي",
+      "openAccountMenu": "قائمة الحساب",
+      "closeAccountMenu": "إغلاق قائمة الحساب"
     },
     "nav": {
       "groupDailyWork": "العمل اليومي",

@@ -7,11 +7,11 @@ import { useTranslations } from 'next-intl'
 import { Crest } from '@/components/crest'
 import { ThemeToggle } from './theme-toggle'
 import { LocaleToggle } from './locale-toggle'
+import { AccountDrawer } from './account-drawer'
 import type { Theme } from './theme-store'
 import {
   MenuIcon,
   CloseIcon,
-  LogoutIcon,
   HomeIcon,
   ClientsIcon,
   CasesIcon,
@@ -55,18 +55,6 @@ export type NavItem = {
 export type NavGroup = {
   title: string
   items: NavItem[]
-}
-
-// First letter of the first two words, uppercased - toLocaleUpperCase is a
-// no-op on scripts without case (Arabic), so this works for either locale's
-// names without a locale check.
-function initials(name: string) {
-  const words = name.trim().split(/\s+/).filter(Boolean)
-  return words
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toLocaleUpperCase()
 }
 
 function isActive(pathname: string, href: string) {
@@ -199,11 +187,12 @@ export function DashboardShell({
             hidden below md, so this is its only home); everything else is
             pushed to inline-end via ms-auto as two groups separated by one
             divider: theme + language (what you'd change), then the account
-            - avatar, name/role, log out - grouped together because log out
-            acts on the account, not on the page. Plain flex row, so it
-            mirrors under dir="rtl" the same way the rest of the app relies
-            on for start/end layout; the language pair's own internal order
-            mirrors the same way, for the same reason. */}
+            drawer trigger (avatar + name/role) - log out lives inside that
+            drawer now, not as a separate visible control, since it acts on
+            the account rather than the page. Plain flex row, so it mirrors
+            under dir="rtl" the same way the rest of the app relies on for
+            start/end layout; the language pair's own internal order mirrors
+            the same way, for the same reason. */}
         <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-2 sm:px-6 md:px-8">
           <button
             type="button"
@@ -219,55 +208,8 @@ export function DashboardShell({
             <LocaleToggle />
           </div>
 
-          <div className="ms-2 flex items-center gap-2 border-s border-line ps-3 sm:ms-3">
-            {/* The avatar/name block is a link to the signed-in staff
-                member's own Settings page, not a display-only identity mark
-                - personal settings are an account affordance, reached from
-                here rather than the sidebar (which is for the app's
-                sections, not the account). */}
-            <Link
-              href="/dashboard/settings"
-              className="flex items-center gap-2 rounded-md transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >
-              {/* Fixed dark-on-brass, independent of the light/dark toggle -
-                  a brand-identity mark (same reasoning as the crest) rather
-                  than a theme-reactive control, so it stays legible and
-                  recognisable in either dashboard theme. ink/brass are the
-                  same shared-palette tokens the public site's identity uses
-                  (5.90:1, already measured). */}
-              <span
-                aria-hidden="true"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-medium text-brass"
-              >
-                {initials(userName)}
-              </span>
-
-              <p className="max-w-[8rem] truncate text-sm leading-tight text-fg sm:max-w-[12rem]">
-                <span className="font-medium">
-                  <bdi>{userName}</bdi>
-                </span>
-                <span className="text-fg-muted">
-                  {' · '}
-                  <bdi>{roleLabel}</bdi>
-                </span>
-              </p>
-            </Link>
-
-            {/* Quiet by colour/weight, not by omission: an unlabelled icon
-                is a bad fit for this audience for a destructive action.
-                Label shows at sm and up, same breakpoint the theme and
-                language controls already use - icon-only only below that,
-                where the row genuinely can't fit a labelled control. */}
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                aria-label={t('logOut')}
-                className="flex items-center gap-1.5 rounded-md px-1.5 py-1.5 text-sm text-fg-muted/70 transition-colors hover:text-fg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-              >
-                <LogoutIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('logOut')}</span>
-              </button>
-            </form>
+          <div className="ms-2 border-s border-line ps-3 sm:ms-3">
+            <AccountDrawer userName={userName} roleLabel={roleLabel} logoutAction={logoutAction} />
           </div>
         </header>
 
