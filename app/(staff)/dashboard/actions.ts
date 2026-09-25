@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { setStaffLocaleCookie } from '@/lib/get-staff-locale'
 
 export async function logout() {
   const supabase = await createClient()
@@ -25,5 +26,9 @@ export async function setLocale(locale: 'en' | 'ar') {
   if (!user) return
 
   await supabase.from('staff').update({ locale }).eq('id', user.sub as string)
+  // Also written here (not just on login) so a mid-session switch is what
+  // the next signed-out visit to /login remembers too, without waiting for
+  // another successful login to refresh it.
+  await setStaffLocaleCookie(locale)
   revalidatePath('/dashboard', 'layout')
 }

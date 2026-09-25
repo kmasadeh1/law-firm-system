@@ -9,6 +9,22 @@
     "changePassword": {
       "forcedBody": "You're signed in with a temporary password. Choose your own before you can use the rest of the dashboard.",
       "voluntaryBody": "Choose a new password for your account."
+    },
+    "login": {
+      "brandingHeading": "Staff sign in",
+      "brandingBody": "This area is for firm staff only. Clients and visitors looking for the firm's public site should head back to the homepage.",
+      "heading": "Sign in",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Log in",
+      "forgotPassword": "Forgot password? (coming soon)",
+      "forgotPasswordTitle": "Not implemented yet",
+      "errors": {
+        "missingFields": "Email and password are required.",
+        "invalidCredentials": "Invalid email or password.",
+        "noStaffAccount": "No staff account exists for this login.",
+        "deactivated": "This account has been deactivated."
+      }
     }
   },
   "nav": {
