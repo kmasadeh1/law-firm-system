@@ -179,7 +179,7 @@
       "unassigned": "غير مُسند",
       "needingAttention": "بحاجة إلى متابعة",
       "nothingNeedsAttention": "لا شيء يحتاج إلى متابعة حالياً",
-      "appointmentsPastTime": "{count, plural, zero {لا توجد مواعيد فات وقتها ولا تزال بحالة «مجدول»} one {موعد واحد فات وقته ولا يزال بحالة «مجدول»} two {موعدان فات وقتهما ولا يزالان بحالة «مجدول»} few {# مواعيد فات وقتها ولا تزال بحالة «مجدول»} many {# موعداً فات وقتها ولا تزال بحالة «مجدول»} other {# موعد فات وقتها ولا تزال بحالة «مجدول»}}",
+      "appointmentsPastTime": "{count, plural, zero {لا توجد مواعيد فات وقتها ولا تزال بحالة «مجدول»} one {موعد واحد فات وقته ولا يزال بحالة «مجدول»} two {موعدان فات وقتهما ولا يزالان بحالة «مجدول»} few {# مواعيد فات وقتها ولا تزال بحالة «مجدول»} many {# موعداً فات وقته ولا يزال بحالة «مجدول»} other {# موعد فات وقته ولا يزال بحالة «مجدول»}}",
       "unknownClient": "عميل غير معروف",
       "recentActivity": "آخر النشاط",
       "noActivityYet": "لم يُسجَّل أي نشاط بعد",
@@ -530,6 +530,428 @@
         "soon": "تستحق قريباً",
         "later": "قادمة"
       }
+    },
+    "appointments": {
+      "list": {
+        "title": "المواعيد",
+        "newAppointment": "موعد جديد",
+        "fromLabel": "من",
+        "toLabel": "إلى",
+        "allTypes": "جميع الأنواع",
+        "filter": "تصفية",
+        "clear": "مسح",
+        "noneMatchFilters": "لا توجد مواعيد تطابق عوامل التصفية هذه.",
+        "noneYet": "لا توجد مواعيد بعد",
+        "noneYetDescription": "حدد موعد استشارة أو موعد محكمة للبدء."
+      },
+      "new": {
+        "backToAppointments": "المواعيد",
+        "title": "موعد جديد",
+        "youFallback": "أنت"
+      },
+      "detail": {
+        "backToAppointments": "المواعيد",
+        "notFound": "هذا الموعد غير موجود، أو ليس لديك صلاحية الوصول إليه.",
+        "clientMissing": "سجل عميل هذا الموعد مفقود.",
+        "youFallback": "أنت"
+      },
+      "form": {
+        "typeLabel": "النوع",
+        "clientLabel": "العميل",
+        "clientSearchPlaceholder": "ابحث في العملاء الحاليين بالاسم أو الرقم الوطني",
+        "noMatchingClient": "لا يوجد عميل مطابق. أضفه من قسم العملاء أولاً.",
+        "selectedClient": "المحدد: <bdi>{name}</bdi>",
+        "caseLabel": "القضية",
+        "caseSearchPlaceholder": "ابحث في القضايا بالرقم أو العنوان",
+        "noMatchingCase": "لا توجد قضية مطابقة.",
+        "selectedCase": "المحددة: <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "courtDatesOnlyHelp": "تُستخدم فقط لمواعيد المحكمة.",
+        "assignedToLabel": "مُسند إلى",
+        "assignedYouOption": "{name} (أنت)",
+        "assignedYou": "<bdi>{name}</bdi> (أنت)",
+        "startsLabel": "يبدأ",
+        "endsLabel": "ينتهي",
+        "notesLabel": "الملاحظات",
+        "statusLabel": "الحالة",
+        "saving": "جارٍ الحفظ…",
+        "saved": "تم الحفظ.",
+        "createAppointment": "إنشاء موعد",
+        "saveChanges": "حفظ التغييرات",
+        "errors": {
+          "selectType": "اختر نوع الموعد.",
+          "selectClient": "اختر عميلاً.",
+          "startRequired": "وقت البدء مطلوب.",
+          "endRequired": "وقت الانتهاء مطلوب.",
+          "selectStatus": "اختر حالة صالحة.",
+          "courtDateNeedsCase": "يجب ربط موعد المحكمة بقضية.",
+          "noPermissionCreate": "ليس لديك صلاحية إنشاء هذا الموعد.",
+          "createFailed": "تعذّر إنشاء الموعد. يرجى المحاولة مرة أخرى.",
+          "noPermissionUpdate": "ليس لديك صلاحية تعديل هذا الموعد.",
+          "updateFailed": "تعذّر تحديث الموعد. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "type": {
+        "consultation": "استشارة",
+        "court_date": "موعد محكمة"
+      },
+      "status": {
+        "scheduled": "مُجدوَل",
+        "completed": "مكتمل",
+        "cancelled": "مُلغى",
+        "no_show": "تغيّب"
+      }
+    },
+    "fees": {
+      "list": {
+        "title": "الأتعاب والمدفوعات",
+        "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>",
+        "settled": "مسدد"
+      },
+      "new": {
+        "backToFees": "الأتعاب والمدفوعات"
+      },
+      "form": {
+        "feeTypeLabel": "نوع الأتعاب",
+        "agreedAmountLabel": "المبلغ المتفق عليه",
+        "agreedPercentageLabel": "النسبة المتفق عليها",
+        "linkedCasesLabel": "القضايا المرتبطة",
+        "caseOption": "<bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "creating": "جارٍ الإنشاء…"
+      },
+      "picker": {
+        "clientLabel": "العميل",
+        "searchPlaceholder": "ابحث في العملاء الحاليين بالاسم أو الرقم الوطني",
+        "noMatchingClient": "لا يوجد عميل مطابق. أضفه من قسم العملاء أولاً.",
+        "selected": "المحدد: <bdi>{name}</bdi>"
+      },
+      "type": {
+        "fixed": "ثابت",
+        "percentage": "نسبة مئوية"
+      },
+      "detail": {
+        "backToFees": "الأتعاب والمدفوعات",
+        "agreedFixed": "المتفق عليه: <bdi>{amount}</bdi>",
+        "agreedPercentage": "المتفق عليه: <bdi>{percentage}</bdi> من مبلغ الحكم",
+        "scheduled": "المجدول: <bdi>{amount}</bdi>",
+        "paid": "المدفوع: <bdi>{amount}</bdi>",
+        "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>",
+        "unscheduledPositive": "<bdi>{amount}</bdi> من الأتعاب المتفق عليها لم تُجدوَل بعد.",
+        "unscheduledNegative": "يتجاوز الجدول الأتعاب المتفق عليها بمقدار <bdi>{amount}</bdi>.",
+        "cases": {
+          "heading": "القضايا المرتبطة",
+          "noneYet": "لا توجد قضايا مرتبطة بعد.",
+          "caseRow": "<bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+          "unlink": "إلغاء الربط",
+          "linkCaseLabel": "ربط قضية",
+          "selectCasePlaceholder": "اختر قضية…",
+          "caseOptionLabel": "{caseNumber} — {title}",
+          "link": "ربط",
+          "unlinking": "جارٍ إلغاء الربط…"
+        },
+        "agreement": {
+          "heading": "الاتفاقية الموقعة",
+          "replaceWithLabel": "استبدال بـ",
+          "attachLabel": "إرفاق",
+          "selectDocumentPlaceholder": "اختر مستنداً…",
+          "saving": "جارٍ الحفظ…",
+          "replace": "استبدال",
+          "attach": "إرفاق",
+          "cancel": "إلغاء",
+          "chooseDocument": "اختر مستنداً.",
+          "detaching": "جارٍ فك الإرفاق…",
+          "detach": "فك الإرفاق",
+          "opening": "جارٍ الفتح…",
+          "view": "عرض",
+          "removedFromCase": "أُزيل من قضيته",
+          "removedFromCaseDescription": "أُزيل الملف المرفق من قضيته. أرفق بديلاً عنه، أو اترك هذا كسجل لما تم توقيعه.",
+          "noPermissionView": "توجد اتفاقية موقعة مرفقة، لكن ليس لديك صلاحية عرضها.",
+          "noDocumentsOnLinkedCases": "لم يُعثر على أي مستندات في القضية (القضايا) المرتبطة بعد.",
+          "noOtherDocuments": "لم يُعثر على مستندات أخرى في القضية (القضايا) المرتبطة.",
+          "openFailed": "تعذّر فتح هذا الملف."
+        },
+        "installments": {
+          "amountLine": " · <bdi>{amount}</bdi>",
+          "dueDateFragment": " · تاريخ الاستحقاق <bdi>{date}</bdi>",
+          "payerFragment": " · الدافع: <bdi>{name}</bdi>",
+          "paidBadge": "المدفوع: <bdi>{amount}</bdi>",
+          "balanceBadge": "الرصيد: <bdi>{amount}</bdi>",
+          "hidePayments": "إخفاء المدفوعات",
+          "showPayments": "المدفوعات",
+          "edit": "تعديل",
+          "delete": "حذف",
+          "deleting": "جارٍ الحذف…",
+          "descriptionPlaceholder": "الوصف",
+          "payerPlaceholder": "الدافع (إن لم يكن العميل)",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "cancel": "إلغاء",
+          "deleteItemDue": "<bdi>{amount}</bdi> يستحق في <bdi>{date}</bdi>",
+          "deleteItemNoDueDate": "<bdi>{amount}</bdi>، بلا تاريخ استحقاق",
+          "noPaymentsYet": "لم تُسجَّل أي مدفوعات بعد.",
+          "paymentMethodFragment": " · <bdi>{method}</bdi>",
+          "paymentsImmutableBanner": "لا يمكن تعديل المدفوعات أو حذفها بعد تسجيلها. يُصحَّح أي خطأ بقيد معاكس، لا بتغيير السجل.",
+          "amountLabel": "المبلغ",
+          "dateLabel": "التاريخ",
+          "methodLabel": "الطريقة",
+          "methodPlaceholder": "مثال: نقداً، تحويل بنكي",
+          "recording": "جارٍ التسجيل…",
+          "recordPayment": "تسجيل دفعة",
+          "noPermissionRecordPayments": "ليس لديك صلاحية تسجيل المدفوعات.",
+          "descriptionLabel": "الوصف",
+          "descriptionAddPlaceholder": "مثال: عند التوقيع",
+          "dueDateLabel": "تاريخ الاستحقاق",
+          "payerLabel": "الدافع",
+          "payerAddPlaceholder": "إن لم يكن العميل",
+          "adding": "جارٍ الإضافة…"
+        }
+      },
+      "errors": {
+        "selectClient": "اختر عميلاً.",
+        "selectFeeType": "اختر نوع الأتعاب.",
+        "enterAmount": "أدخل المبلغ المتفق عليه.",
+        "enterPercentage": "أدخل النسبة المتفق عليها.",
+        "invalidFeeTypeAmount": "هذا التوافق بين نوع الأتعاب والمبلغ/النسبة غير صالح.",
+        "selectCase": "اختر قضية.",
+        "linkFailed": "تعذّر ربط القضية. يرجى المحاولة مرة أخرى.",
+        "unlinkFailed": "تعذّر إلغاء ربط القضية. يرجى المحاولة مرة أخرى.",
+        "documentNotFound": "تعذّر العثور على هذا المستند، أو ليس لديك صلاحية عرضه.",
+        "saveFailed": "تعذّر حفظ التغيير. يرجى المحاولة مرة أخرى.",
+        "linkGenerationFailed": "تعذّر إنشاء رابط لهذا الملف. يرجى المحاولة مرة أخرى.",
+        "descriptionRequired": "الوصف مطلوب.",
+        "invalidAmount": "أدخل مبلغاً صحيحاً.",
+        "saveInstallmentFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+        "dateRequired": "التاريخ مطلوب.",
+        "noPermissionRecordPayment": "ليس لديك صلاحية تسجيل المدفوعات.",
+        "recordPaymentFailed": "تعذّر تسجيل الدفعة. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "admin": {
+      "userType": {
+        "owner": "المالك",
+        "staff": "موظف"
+      },
+      "staff": {
+        "title": "حسابات الموظفين",
+        "description": "إنشاء بيانات الدخول، وإعادة إصدار كلمات مرور مؤقتة، وتفعيل الموظفين أو إلغاء تفعيلهم. لا تُحذف الحسابات أبداً.",
+        "showDeactivated": "إظهار الموظفين المعطَّلين",
+        "hideDeactivated": "إخفاء الموظفين المعطَّلين",
+        "passwordPanel": {
+          "heading": "لن تُعرض كلمة المرور هذه إلا مرة واحدة — احفظها الآن",
+          "description": "لا تُخزَّن في أي مكان يمكن استرجاعها منه لاحقاً. سلّمها له مباشرة الآن - فإذا غادرت هذه الصفحة أولاً، سيتعيّن عليك إصدار كلمة مرور جديدة بدلاً منها.",
+          "copy": "نسخ كلمة المرور",
+          "copied": "تم النسخ!"
+        },
+        "addForm": {
+          "heading": "إضافة موظف",
+          "description": "يُنشئ كلمة مرور مؤقتة. سيحتاج الموظف إلى تغييرها قبل استخدام أي شيء آخر في لوحة التحكم.",
+          "fullNameLabel": "الاسم الكامل",
+          "emailLabel": "البريد الإلكتروني",
+          "roleLabel": "الدور",
+          "chooseRolePlaceholder": "اختر دوراً",
+          "creating": "جارٍ الإنشاء…",
+          "createAccount": "إنشاء الحساب"
+        },
+        "regenerate": {
+          "issuing": "جارٍ الإصدار…",
+          "confirmReplace": "تأكيد - سيستبدل كلمة المرور الحالية؟",
+          "issueNew": "إصدار كلمة مرور مؤقتة جديدة",
+          "cancel": "إلغاء"
+        },
+        "row": {
+          "noRole": "بلا دور",
+          "tempPasswordExpiredBadge": "انتهت صلاحية كلمة المرور المؤقتة",
+          "awaitingPasswordChangeBadge": "بانتظار تغيير كلمة المرور",
+          "tempPasswordExpiresLine": "تنتهي صلاحية كلمة المرور المؤقتة في <bdi>{date}</bdi>",
+          "tempPasswordExpiredLine": "انتهت صلاحية كلمة المرور المؤقتة في <bdi>{date}</bdi>",
+          "activeAriaLabel": "نشط",
+          "inactiveAriaLabel": "غير نشط",
+          "activeText": "نشط",
+          "deactivatedText": "معطَّل",
+          "deactivate": "تعطيل"
+        },
+        "errors": {
+          "fullNameRequired": "الاسم الكامل مطلوب.",
+          "emailRequired": "البريد الإلكتروني مطلوب.",
+          "chooseRole": "اختر دوراً.",
+          "couldNotCreateLogin": "تعذّر إنشاء بيانات الدخول.",
+          "staffRecordFailedWithCleanup": "تعذّر إنشاء سجل الموظف ({staffMessage})، كما تعذّر تنظيف بيانات الدخول اليتيمة ({cleanupMessage}). يحتاج المستخدم {userId} إلى إزالة يدوية.",
+          "staffRecordFailedRolledBack": "تعذّر إنشاء سجل الموظف: {staffMessage}. تم التراجع عن بيانات الدخول.",
+          "passwordResetButRecordFailed": "أُعيد تعيين كلمة المرور، لكن تحديث سجل الموظف فشل: {message}. قد لا يكون الحساب مُعلَّماً باشتراط تغيير كلمة المرور.",
+          "updateAccountFailed": "تعذّر تحديث هذا الحساب. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "roles": {
+        "title": "الأدوار والصلاحيات",
+        "createForm": {
+          "nameLabel": "الاسم",
+          "namePlaceholder": "مثال: مساعد قانوني",
+          "nameArLabel": "الاسم (بالعربية)",
+          "creating": "جارٍ الإنشاء…",
+          "createRole": "إنشاء دور",
+          "startsWithNoPermissions": "يبدأ بجميع الصلاحيات مُعطَّلة."
+        },
+        "noneYet": "لا توجد أدوار بعد",
+        "noneYetDescription": "أنشئ واحداً أعلاه للبدء.",
+        "card": {
+          "nameArAriaLabel": "الاسم (بالعربية)",
+          "saving": "جارٍ الحفظ…",
+          "saveName": "حفظ الاسم",
+          "saved": "تم الحفظ",
+          "deleting": "جارٍ الحذف…",
+          "deleteRole": "حذف الدور",
+          "deleteNote": "لا يمكن حذف دور يشغله أي موظف حتى يُنقل إلى دور آخر أولاً. ستُحذف أيضاً إعدادات صلاحياته.",
+          "administrationHeading": "الإدارة",
+          "ownerOnlyBadge": "(للمالك فقط)",
+          "ownerOnlyDescription": "للمالك فقط — لا يمكن منحها لأي دور.",
+          "ownerOnlySwitchLabel": "{label} (للمالك فقط، مقفلة)",
+          "savingPermission": "جارٍ الحفظ…"
+        },
+        "permissionGroups": {
+          "clientsCases": "العملاء والقضايا",
+          "scheduling": "الجدولة",
+          "billing": "الفوترة",
+          "frontOffice": "الاستقبال",
+          "reporting": "التقارير",
+          "other": "أخرى"
+        },
+        "errors": {
+          "roleNameRequired": "اسم الدور مطلوب.",
+          "roleNameExists": "يوجد بالفعل دور بهذا الاسم.",
+          "createFailed": "تعذّر إنشاء الدور. يرجى المحاولة مرة أخرى.",
+          "renameFailed": "تعذّر إعادة تسمية الدور. يرجى المحاولة مرة أخرى.",
+          "deleteFailed": "تعذّر حذف الدور. يرجى المحاولة مرة أخرى.",
+          "roleInUse": "لا يمكن حذف دور بينما يوجد موظفون مُسندون إليه.",
+          "permissionSaveFailed": "تعذّر حفظ هذا التغيير. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "periodTypes": {
+        "title": "أنواع المهل",
+        "sourceWarning": "هذه المهل مستقاة من بحث ثانوي، وليس من نص الجريدة الرسمية الأساسي بتعديلاته الحالية.",
+        "unverifiedWarning": "كل صف مُعلَّم بـ«مسودة — غير موثّق» يحتاج إلى تحققك قبل أن يعتمد عليه المكتب في مهلة فعلية.",
+        "createForm": {
+          "heading": "نوع مهلة جديد",
+          "nameLabel": "الاسم",
+          "nameArLabel": "الاسم (بالعربية)",
+          "periodDaysLabel": "المدة (بالأيام)",
+          "descriptionLabel": "الوصف / المصدر",
+          "descriptionPlaceholder": "مثال: «مسودة — غير موثّق. المصدر: ...»",
+          "descriptionArLabel": "الوصف (بالعربية)",
+          "creating": "جارٍ الإنشاء…",
+          "createPeriodType": "إنشاء نوع المهلة"
+        },
+        "noneYet": "لا توجد أنواع مهل بعد",
+        "noneYetDescription": "أنشئ واحداً أعلاه للبدء.",
+        "card": {
+          "nameArAriaLabel": "الاسم (بالعربية)",
+          "descriptionArAriaLabel": "الوصف (بالعربية)",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ",
+          "deleting": "جارٍ الحذف…",
+          "delete": "حذف",
+          "deleteNote": "لا يمكن حذف نوع مهلة تشير إليه أي مهلة قائمة حتى تستخدم تلك المهل نوعاً آخر."
+        },
+        "errors": {
+          "nameRequired": "الاسم مطلوب.",
+          "invalidDays": "أدخل عدداً صحيحاً من الأيام.",
+          "nameExists": "يوجد بالفعل نوع مهلة بهذا الاسم.",
+          "createFailed": "تعذّر إنشاء نوع المهلة. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+          "inUse": "لا يمكن حذف نوع مهلة بينما تستخدمه إحدى المهل.",
+          "deleteFailed": "تعذّر حذف نوع المهلة. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "permissions": {
+        "appointments_view_all": {
+          "label": "عرض كل موعد في المكتب"
+        },
+        "case_notes_access": {
+          "label": "الوصول إلى ملاحظات القضايا"
+        },
+        "case_notes_view_all": {
+          "label": "عرض ملاحظات القضايا على كل قضية",
+          "description": "بدون هذه الصلاحية، تقتصر الملاحظات على القضايا المُسند إليها الموظف."
+        },
+        "cases_manage": {
+          "label": "إنشاء القضايا وتعديلها"
+        },
+        "cases_view_all": {
+          "label": "عرض كل قضية في المكتب",
+          "description": "بدون هذه الصلاحية، لا يرى الموظف إلا القضايا المُسند إليها."
+        },
+        "clients_manage": {
+          "label": "عرض سجلات العملاء وتعديلها"
+        },
+        "court_dates_manage": {
+          "label": "إدارة مواعيد المحكمة"
+        },
+        "documents_access": {
+          "label": "الوصول إلى مستندات القضايا"
+        },
+        "documents_view_all": {
+          "label": "عرض المستندات على كل قضية",
+          "description": "بدون هذه الصلاحية، تقتصر المستندات على القضايا المُسند إليها الموظف."
+        },
+        "enquiries_manage": {
+          "label": "إدارة استفسارات الموقع العام"
+        },
+        "expenses_manage": {
+          "label": "إدارة المصاريف"
+        },
+        "fees_view": {
+          "label": "عرض الأتعاب المتفق عليها والأرصدة"
+        },
+        "payments_record": {
+          "label": "تسجيل دفعة"
+        },
+        "public_content_manage": {
+          "label": "تعديل محتوى الموقع العام"
+        },
+        "reports_view": {
+          "label": "عرض التقارير"
+        },
+        "roles_permissions_manage": {
+          "label": "إنشاء الأدوار وتحديد الصلاحيات"
+        },
+        "staff_manage": {
+          "label": "إضافة حسابات الموظفين أو تعطيلها"
+        }
+      }
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "description": "حسابك الشخصي - الاسم، والهاتف، واللغة، والمظهر، وكلمة المرور.",
+      "profile": {
+        "heading": "الملف الشخصي",
+        "fullNameLabel": "الاسم الكامل",
+        "phoneLabel": "الهاتف",
+        "saving": "جارٍ الحفظ…",
+        "save": "حفظ",
+        "saved": "تم الحفظ"
+      },
+      "language": {
+        "heading": "اللغة",
+        "description": "يُطبَّق التبديل فوراً وفي كل مكان - وهو نفس عنصر التحكم الموجود في الترويسة."
+      },
+      "theme": {
+        "heading": "المظهر",
+        "description": "الوضع الفاتح أو الداكن للوحة التحكم. وهو نفس عنصر التحكم الموجود في الترويسة."
+      },
+      "password": {
+        "heading": "كلمة المرور",
+        "description": "غيّر كلمة المرور التي تسجّل بها الدخول.",
+        "changePassword": "تغيير كلمة المرور"
+      },
+      "errors": {
+        "fullNameRequired": "الاسم الكامل مطلوب.",
+        "updateFailed": "تعذّر حفظ تغييراتك. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "conflict": {
+      "possibleMatch": "{count, plural, zero {لم يُعثر على أي تطابق محتمل} one {تم العثور على تطابق محتمل واحد} two {تم العثور على تطابقين محتملين} few {تم العثور على # تطابقات محتملة} many {تم العثور على # تطابقاً محتملاً} other {تم العثور على # تطابق محتمل}} — يرجى المراجعة قبل المتابعة:",
+      "createAnyway": "الإنشاء على أي حال",
+      "editDetailsInstead": "تعديل التفاصيل بدلاً من ذلك",
+      "saving": "جارٍ الحفظ…"
     }
   }
 }
