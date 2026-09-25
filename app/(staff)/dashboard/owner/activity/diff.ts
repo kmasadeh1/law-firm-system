@@ -39,9 +39,13 @@ export function diffFields(
   return diffs
 }
 
-export function formatFieldValue(value: unknown, locale: string): string {
+export function formatFieldValue(
+  value: unknown,
+  locale: string,
+  yesNo: { yes: string; no: string }
+): string {
   if (value === null || value === undefined) return '—'
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+  if (typeof value === 'boolean') return value ? yesNo.yes : yesNo.no
   if (typeof value === 'string') {
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
       const parsed = new Date(value)

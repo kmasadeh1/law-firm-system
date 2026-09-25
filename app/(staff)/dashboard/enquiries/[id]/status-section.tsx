@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { setEnquiryStatus } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
@@ -9,13 +10,11 @@ import type { Database } from '@/lib/supabase/database.types'
 
 type EnquiryStatus = Database['public']['Enums']['enquiry_status']
 
-const STATUS_OPTIONS: { value: EnquiryStatus; label: string }[] = [
-  { value: 'new', label: 'New' },
-  { value: 'assigned', label: 'Assigned' },
-  { value: 'resolved', label: 'Resolved' },
-]
+const STATUS_VALUES: EnquiryStatus[] = ['new', 'assigned', 'resolved']
 
 export function StatusSection({ enquiryId, currentStatus }: { enquiryId: string; currentStatus: EnquiryStatus }) {
+  const t = useTranslations('dashboard.enquiries')
+  const tStatus = useTranslations('dashboard.enquiries.status')
   const [status, setStatus] = useState<EnquiryStatus>(currentStatus)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -39,7 +38,7 @@ export function StatusSection({ enquiryId, currentStatus }: { enquiryId: string;
 
   return (
     <Panel className="flex flex-col gap-3">
-      <h2 className="font-heading text-lg text-fg">Status</h2>
+      <h2 className="font-heading text-lg text-fg">{t('detail.status.heading')}</h2>
       <div className="flex flex-wrap items-center gap-2">
         <select
           value={status}
@@ -49,16 +48,16 @@ export function StatusSection({ enquiryId, currentStatus }: { enquiryId: string;
           }}
           className={controlClass}
         >
-          {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
+          {STATUS_VALUES.map((value) => (
+            <option key={value} value={value}>
+              {tStatus(value)}
             </option>
           ))}
         </select>
         <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending || !changed}>
-          {isPending ? 'Saving…' : 'Save status'}
+          {isPending ? t('detail.status.saving') : t('detail.status.saveStatus')}
         </Button>
-        {saved && !changed && <FieldSuccess>Saved</FieldSuccess>}
+        {saved && !changed && <FieldSuccess>{t('detail.status.saved')}</FieldSuccess>}
       </div>
       {error && <FieldError>{error}</FieldError>}
     </Panel>

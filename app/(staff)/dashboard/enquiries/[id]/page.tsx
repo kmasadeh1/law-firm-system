@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -11,6 +12,7 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
   const { id } = await params
   const supabase = await createClient()
   const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries' })
 
   const { data: enquiry } = await supabase
     .from('enquiries')
@@ -21,10 +23,8 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
   if (!enquiry) {
     return (
       <div className="flex flex-col gap-6">
-        <BackLink href="/dashboard/enquiries" label="Enquiries" />
-        <p className="text-sm text-fg-muted">
-          This enquiry doesn&apos;t exist, or you don&apos;t have access to it.
-        </p>
+        <BackLink href="/dashboard/enquiries" label={t('list.title')} />
+        <p className="text-sm text-fg-muted">{t('detail.notFound')}</p>
       </div>
     )
   }
@@ -44,23 +44,22 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <BackLink href="/dashboard/enquiries" label="Enquiries" />
+        <BackLink href="/dashboard/enquiries" label={t('list.title')} />
         <PageHeader
           title={enquiry.name}
-          description={
-            <>
-              Received <bdi>{formatDateTime(enquiry.created_at, locale)}</bdi>
-            </>
-          }
+          description={t.rich('detail.receivedLine', {
+            date: formatDateTime(enquiry.created_at, locale),
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
         />
       </div>
 
       <Panel className="flex flex-col gap-3">
-        <h2 className="font-heading text-lg text-fg">Message</h2>
+        <h2 className="font-heading text-lg text-fg">{t('detail.messageHeading')}</h2>
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
           {enquiry.phone && (
             <>
-              <dt className="text-fg-muted">Phone</dt>
+              <dt className="text-fg-muted">{t('detail.phoneLabel')}</dt>
               <dd className="text-fg" dir="ltr">
                 {enquiry.phone}
               </dd>
@@ -68,7 +67,7 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
           )}
           {enquiry.email && (
             <>
-              <dt className="text-fg-muted">Email</dt>
+              <dt className="text-fg-muted">{t('detail.emailLabel')}</dt>
               <dd className="text-fg" dir="ltr">
                 {enquiry.email}
               </dd>

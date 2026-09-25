@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
@@ -16,15 +17,11 @@ const statusVariant: Record<EnquiryStatus, 'accent' | 'muted' | 'neutral'> = {
   resolved: 'muted',
 }
 
-const statusLabel: Record<EnquiryStatus, string> = {
-  new: 'New',
-  assigned: 'Assigned',
-  resolved: 'Resolved',
-}
-
 export default async function EnquiriesListPage() {
   const supabase = await createClient()
   const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.list' })
+  const tStatus = await getTranslations({ locale, namespace: 'dashboard.enquiries.status' })
 
   const [{ data: enquiries }, { data: staffDirectory }] = await Promise.all([
     supabase
@@ -42,10 +39,10 @@ export default async function EnquiriesListPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Enquiries" description="Messages submitted through the public site's contact form." />
+      <PageHeader title={t('title')} description={t('description')} />
 
       {!enquiries || enquiries.length === 0 ? (
-        <EmptyState title="No enquiries yet" description="Submissions from the public contact form will show up here." />
+        <EmptyState title={t('noneYet')} description={t('noneYetDescription')} />
       ) : (
         <Panel className="p-0">
           <ul className="flex flex-col divide-y divide-line">
@@ -57,7 +54,7 @@ export default async function EnquiriesListPage() {
                 >
                   <span className="flex items-center gap-2">
                     <span className="font-medium text-fg">{e.name}</span>
-                    <Badge variant={statusVariant[e.status]}>{statusLabel[e.status]}</Badge>
+                    <Badge variant={statusVariant[e.status]}>{tStatus(e.status)}</Badge>
                   </span>
                   <span className="text-fg-muted">
                     {e.phone || e.email ? (
@@ -70,7 +67,7 @@ export default async function EnquiriesListPage() {
                       '—'
                     )}
                     {' · '}
-                    {e.assigned_to ? (nameById.get(e.assigned_to) ?? 'Unknown staff') : 'Unassigned'}
+                    <bdi>{e.assigned_to ? (nameById.get(e.assigned_to) ?? t('unknownStaff')) : t('unassigned')}</bdi>
                     {' · '}
                     <bdi>{formatDateTime(e.created_at, locale)}</bdi>
                   </span>

@@ -1072,6 +1072,110 @@
           "update": "حُدّث حساب الموظف",
           "delete": "حُذف حساب الموظف"
         }
+      },
+      "list": {
+        "title": "سجل النشاط",
+        "description": "كل تغيير مسجّل في المكتب، من الأحدث إلى الأقدم.",
+        "entityLabel": "الكيان",
+        "allEntities": "جميع الكيانات",
+        "actorLabel": "المستخدم",
+        "everyone": "الجميع",
+        "system": "النظام",
+        "fromLabel": "من",
+        "toLabel": "إلى",
+        "filter": "تصفية",
+        "clear": "مسح",
+        "noneMatchFilters": "لا يوجد نشاط يطابق عوامل التصفية هذه.",
+        "noneYet": "لم يُسجَّل أي نشاط بعد",
+        "unknownStaff": "موظف غير معروف",
+        "hide": "إخفاء",
+        "details": "التفاصيل",
+        "yes": "نعم",
+        "no": "لا",
+        "newer": "الأحدث",
+        "older": "الأقدم",
+        "page": "الصفحة {page}"
+      }
+    },
+    "reports": {
+      "title": "التقارير",
+      "description": "التحصيل على مستوى المكتب، والأقساط المتأخرة، وحجم عمل المحامين.",
+      "notYetAvailable": "غير متاح بعد",
+      "collection": {
+        "heading": "ملخص التحصيل",
+        "totalScheduled": "إجمالي المجدول",
+        "totalPaid": "إجمالي المسدد",
+        "totalOutstanding": "إجمالي المتبقي",
+        "collectionRate": "نسبة التحصيل"
+      },
+      "overdue": {
+        "heading": "الأقساط المتأخرة",
+        "noneTitle": "لا توجد أقساط متأخرة",
+        "noneDescription": "كل قسط مجدول إما لم يحن موعد استحقاقه بعد أو سُدد بالكامل.",
+        "clientHeader": "العميل",
+        "descriptionHeader": "البيان",
+        "payerHeader": "الدافع",
+        "dueDateHeader": "تاريخ الاستحقاق",
+        "amountHeader": "المبلغ",
+        "paidHeader": "المسدد",
+        "balanceDueHeader": "المبلغ المستحق",
+        "daysOverdueHeader": "أيام التأخير",
+        "clientNameHidden": "اسم العميل غير مرئي"
+      },
+      "workload": {
+        "heading": "حجم عمل المحامين",
+        "showDeactivated": "إظهار الموظفين المعطَّلين",
+        "hideDeactivated": "إخفاء الموظفين المعطَّلين",
+        "noneTitle": "لا يوجد موظفون لعرضهم",
+        "noneDescription": "لا يوجد محامون يطابقون عامل التصفية الحالي.",
+        "lawyerHeader": "المحامي",
+        "statusHeader": "الحالة",
+        "activeText": "نشط",
+        "deactivatedText": "معطَّل",
+        "openCasesHeader": "القضايا المفتوحة",
+        "leadCasesHeader": "القضايا الرئيسية",
+        "upcomingDeadlinesHeader": "المهل القادمة",
+        "overdueDeadlinesHeader": "المهل المتأخرة",
+        "nextDeadlineHeader": "المهلة التالية"
+      }
+    },
+    "enquiries": {
+      "list": {
+        "title": "الاستفسارات",
+        "description": "الرسائل المرسلة عبر نموذج التواصل في الموقع العام.",
+        "noneYet": "لا توجد استفسارات بعد",
+        "noneYetDescription": "ستظهر هنا الرسائل المرسلة من نموذج التواصل العام.",
+        "unassigned": "غير مُسند",
+        "unknownStaff": "موظف غير معروف"
+      },
+      "status": {
+        "new": "جديد",
+        "assigned": "مُسند",
+        "resolved": "تمت المعالجة"
+      },
+      "detail": {
+        "notFound": "هذا الاستفسار غير موجود، أو ليس لديك صلاحية الوصول إليه.",
+        "receivedLine": "ورد في <bdi>{date}</bdi>",
+        "messageHeading": "الرسالة",
+        "phoneLabel": "الهاتف",
+        "emailLabel": "البريد الإلكتروني",
+        "assignment": {
+          "heading": "الإسناد",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ"
+        },
+        "status": {
+          "heading": "الحالة",
+          "saving": "جارٍ الحفظ…",
+          "saveStatus": "حفظ الحالة",
+          "saved": "تم الحفظ"
+        }
+      },
+      "errors": {
+        "saveAssignmentFailed": "تعذّر حفظ الإسناد. يرجى المحاولة مرة أخرى.",
+        "noPermissionChange": "ليس لديك صلاحية تعديل هذا الاستفسار.",
+        "updateStatusFailed": "تعذّر تحديث الحالة. يرجى المحاولة مرة أخرى."
       }
     }
   }

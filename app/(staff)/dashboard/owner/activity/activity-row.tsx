@@ -27,9 +27,11 @@ export function ActivityRow({
   locale: string
 }) {
   const [expanded, setExpanded] = useState(false)
+  const t = useTranslations('dashboard.activity.list')
   const tActivity = useTranslations('dashboard.activity')
   const diffs = diffFields(row.action, row.old_data, row.new_data)
   const hasDetail = diffs.length > 0
+  const yesNo = { yes: t('yes'), no: t('no') }
 
   return (
     <li className="py-2.5 text-sm">
@@ -48,7 +50,7 @@ export function ActivityRow({
         </span>
         {hasDetail && (
           <span className="shrink-0 text-xs text-fg-muted underline-offset-2 hover:underline">
-            {expanded ? 'Hide' : 'Details'}
+            {expanded ? t('hide') : t('details')}
           </span>
         )}
       </button>
@@ -60,15 +62,15 @@ export function ActivityRow({
               <span className="font-medium text-fg">{d.field.replace(/_/g, ' ')}</span>:{' '}
               {row.action === 'update' ? (
                 <span className="inline-flex items-center gap-1">
-                  <bdi>{formatFieldValue(d.before, locale)}</bdi>
+                  <bdi>{formatFieldValue(d.before, locale, yesNo)}</bdi>
                   {/* Forward/progression, same direction as the "Older"
                       pagination chevron - rotated by default (points right
                       under ltr) and unrotated under rtl (points left). */}
                   <ChevronLeftIcon className="h-3 w-3 rotate-180 rtl:rotate-0" />
-                  <bdi>{formatFieldValue(d.after, locale)}</bdi>
+                  <bdi>{formatFieldValue(d.after, locale, yesNo)}</bdi>
                 </span>
               ) : (
-                formatFieldValue(d.after ?? d.before, locale)
+                formatFieldValue(d.after ?? d.before, locale, yesNo)
               )}
             </li>
           ))}

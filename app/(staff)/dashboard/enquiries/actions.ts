@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
+import { getStaffLocale } from '@/lib/get-staff-locale'
 import type { Database } from '@/lib/supabase/database.types'
 
 type ActionResult = { error?: string }
@@ -15,6 +17,9 @@ function enquiryPath(id: string) {
 
 export async function assignEnquiry(enquiryId: string, staffId: string | null): Promise<ActionResult> {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.errors' })
+
   const { data, error } = await supabase
     .from('enquiries')
     .update({ assigned_to: staffId })
@@ -22,10 +27,10 @@ export async function assignEnquiry(enquiryId: string, staffId: string | null): 
     .select('id')
 
   if (error) {
-    return { error: 'Could not save the assignment. Please try again.' }
+    return { error: t('saveAssignmentFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to change this enquiry." }
+    return { error: t('noPermissionChange') }
   }
 
   revalidatePath(enquiryPath(enquiryId))
@@ -35,6 +40,9 @@ export async function assignEnquiry(enquiryId: string, staffId: string | null): 
 
 export async function setEnquiryStatus(enquiryId: string, status: EnquiryStatus): Promise<ActionResult> {
   const supabase = await createClient()
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.errors' })
+
   const { data, error } = await supabase
     .from('enquiries')
     .update({ status })
@@ -42,10 +50,10 @@ export async function setEnquiryStatus(enquiryId: string, status: EnquiryStatus)
     .select('id')
 
   if (error) {
-    return { error: 'Could not update the status. Please try again.' }
+    return { error: t('updateStatusFailed') }
   }
   if (!data || data.length === 0) {
-    return { error: "You don't have permission to change this enquiry." }
+    return { error: t('noPermissionChange') }
   }
 
   revalidatePath(enquiryPath(enquiryId))

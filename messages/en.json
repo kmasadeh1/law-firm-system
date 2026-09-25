@@ -1117,6 +1117,110 @@
           "update": "Staff account updated",
           "delete": "Staff account deleted"
         }
+      },
+      "list": {
+        "title": "Activity log",
+        "description": "Every recorded change across the firm, newest first.",
+        "entityLabel": "Entity",
+        "allEntities": "All entities",
+        "actorLabel": "Actor",
+        "everyone": "Everyone",
+        "system": "System",
+        "fromLabel": "From",
+        "toLabel": "To",
+        "filter": "Filter",
+        "clear": "Clear",
+        "noneMatchFilters": "No activity matches those filters.",
+        "noneYet": "No activity recorded yet",
+        "unknownStaff": "Unknown staff",
+        "hide": "Hide",
+        "details": "Details",
+        "yes": "Yes",
+        "no": "No",
+        "newer": "Newer",
+        "older": "Older",
+        "page": "Page {page}"
+      }
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Firm-wide collection, overdue instalments, and lawyer workload.",
+      "notYetAvailable": "Not yet available",
+      "collection": {
+        "heading": "Collection summary",
+        "totalScheduled": "Total scheduled",
+        "totalPaid": "Total paid",
+        "totalOutstanding": "Total outstanding",
+        "collectionRate": "Collection rate"
+      },
+      "overdue": {
+        "heading": "Overdue instalments",
+        "noneTitle": "No overdue instalments",
+        "noneDescription": "Every scheduled instalment is either not yet due or fully paid.",
+        "clientHeader": "Client",
+        "descriptionHeader": "Description",
+        "payerHeader": "Payer",
+        "dueDateHeader": "Due date",
+        "amountHeader": "Amount",
+        "paidHeader": "Paid",
+        "balanceDueHeader": "Balance due",
+        "daysOverdueHeader": "Days overdue",
+        "clientNameHidden": "Client name not visible"
+      },
+      "workload": {
+        "heading": "Lawyer workload",
+        "showDeactivated": "Show deactivated staff",
+        "hideDeactivated": "Hide deactivated staff",
+        "noneTitle": "No staff to show",
+        "noneDescription": "No lawyers match the current filter.",
+        "lawyerHeader": "Lawyer",
+        "statusHeader": "Status",
+        "activeText": "Active",
+        "deactivatedText": "Deactivated",
+        "openCasesHeader": "Open cases",
+        "leadCasesHeader": "Lead cases",
+        "upcomingDeadlinesHeader": "Upcoming deadlines",
+        "overdueDeadlinesHeader": "Overdue deadlines",
+        "nextDeadlineHeader": "Next deadline"
+      }
+    },
+    "enquiries": {
+      "list": {
+        "title": "Enquiries",
+        "description": "Messages submitted through the public site's contact form.",
+        "noneYet": "No enquiries yet",
+        "noneYetDescription": "Submissions from the public contact form will show up here.",
+        "unassigned": "Unassigned",
+        "unknownStaff": "Unknown staff"
+      },
+      "status": {
+        "new": "New",
+        "assigned": "Assigned",
+        "resolved": "Resolved"
+      },
+      "detail": {
+        "notFound": "This enquiry doesn't exist, or you don't have access to it.",
+        "receivedLine": "Received <bdi>{date}</bdi>",
+        "messageHeading": "Message",
+        "phoneLabel": "Phone",
+        "emailLabel": "Email",
+        "assignment": {
+          "heading": "Assignment",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved"
+        },
+        "status": {
+          "heading": "Status",
+          "saving": "Saving…",
+          "saveStatus": "Save status",
+          "saved": "Saved"
+        }
+      },
+      "errors": {
+        "saveAssignmentFailed": "Could not save the assignment. Please try again.",
+        "noPermissionChange": "You don't have permission to change this enquiry.",
+        "updateStatusFailed": "Could not update the status. Please try again."
       }
     }
   }

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
@@ -12,11 +13,6 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
 
 const PAGE_SIZE = 50
-
-function humanizeEntity(entity: string) {
-  const spaced = entity.replace(/_/g, ' ')
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
-}
 
 function groupByDay(rows: ActivityLogRow[], locale: string) {
   const groups: { day: string; rows: ActivityLogRow[] }[] = []
@@ -46,6 +42,8 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
 
   const supabase = await createClient()
   const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.activity.list' })
+  const tActivity = await getTranslations({ locale, namespace: 'dashboard.activity' })
 
   // Unfiltered, unlike active-staff pickers elsewhere - someone who's left
   // the firm should still be filterable by name in a firm-wide audit log,
@@ -91,29 +89,29 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Activity log" description="Every recorded change across the firm, newest first." />
+      <PageHeader title={t('title')} description={t('description')} />
 
       <form method="get" className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
           <label htmlFor="activity-entity" className="text-sm text-fg-muted">
-            Entity
+            {t('entityLabel')}
           </label>
           <select id="activity-entity" name="entity" defaultValue={entity ?? ''} className={controlClass}>
-            <option value="">All entities</option>
+            <option value="">{t('allEntities')}</option>
             {ENTITY_NAMES.map((e) => (
               <option key={e} value={e}>
-                {humanizeEntity(e)}
+                {tActivity(`entities.${e}.filterLabel`)}
               </option>
             ))}
           </select>
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="activity-actor" className="text-sm text-fg-muted">
-            Actor
+            {t('actorLabel')}
           </label>
           <select id="activity-actor" name="actor" defaultValue={actor ?? ''} className={controlClass}>
-            <option value="">Everyone</option>
-            <option value="system">System</option>
+            <option value="">{t('everyone')}</option>
+            <option value="system">{t('system')}</option>
             {staffOptions.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.full_name}
@@ -123,31 +121,31 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="activity-from" className="text-sm text-fg-muted">
-            From
+            {t('fromLabel')}
           </label>
           <input id="activity-from" type="date" name="from" defaultValue={from ?? ''} className={controlClass} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="activity-to" className="text-sm text-fg-muted">
-            To
+            {t('toLabel')}
           </label>
           <input id="activity-to" type="date" name="to" defaultValue={to ?? ''} className={controlClass} />
         </div>
         <Button type="submit" variant="secondary">
-          Filter
+          {t('filter')}
         </Button>
         {hasFilters && (
           <Link
             href="/dashboard/owner/activity"
             className="flex items-center text-sm text-fg-muted underline-offset-2 hover:underline"
           >
-            Clear
+            {t('clear')}
           </Link>
         )}
       </form>
 
       {pageRows.length === 0 ? (
-        <EmptyState title={hasFilters ? 'No activity matches those filters.' : 'No activity recorded yet'} />
+        <EmptyState title={hasFilters ? t('noneMatchFilters') : t('noneYet')} />
       ) : (
         <Panel className="flex flex-col gap-3">
           <div className="flex flex-col divide-y divide-line">
@@ -161,7 +159,7 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
                     <ActivityRow
                       key={row.id}
                       row={row}
-                      actorName={row.actor_id ? (nameById.get(row.actor_id) ?? 'Unknown staff') : 'System'}
+                      actorName={row.actor_id ? (nameById.get(row.actor_id) ?? t('unknownStaff')) : t('system')}
                       locale={locale}
                     />
                   ))}
@@ -177,18 +175,18 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
                 className="flex items-center gap-1 text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
               >
                 <ChevronLeftIcon className="h-3.5 w-3.5 rtl:rotate-180" />
-                Newer
+                {t('newer')}
               </Link>
             ) : (
               <span />
             )}
-            <span className="text-xs text-fg-muted">Page {page}</span>
+            <span className="text-xs text-fg-muted">{t('page', { page })}</span>
             {hasNext ? (
               <Link
                 href={pageHref(page + 1)}
                 className="flex items-center gap-1 text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
               >
-                Older
+                {t('older')}
                 {/* Points the opposite way from the "back" chevron above -
                     forward/next, so it's rotated 180deg by default (right
                     under ltr) and unrotated under rtl (left), rather than

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { assignEnquiry } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
@@ -17,6 +18,7 @@ export function AssignSection({
   currentAssignedTo: string | null
   staffOptions: StaffOption[]
 }) {
+  const t = useTranslations('dashboard.enquiries')
   const [assignedTo, setAssignedTo] = useState(currentAssignedTo ?? '')
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
@@ -40,7 +42,7 @@ export function AssignSection({
 
   return (
     <Panel className="flex flex-col gap-3">
-      <h2 className="font-heading text-lg text-fg">Assignment</h2>
+      <h2 className="font-heading text-lg text-fg">{t('detail.assignment.heading')}</h2>
       <div className="flex flex-wrap items-center gap-2">
         <select
           value={assignedTo}
@@ -50,7 +52,7 @@ export function AssignSection({
           }}
           className={controlClass}
         >
-          <option value="">Unassigned</option>
+          <option value="">{t('list.unassigned')}</option>
           {staffOptions.map((s) => (
             <option key={s.id} value={s.id}>
               {s.full_name}
@@ -58,9 +60,9 @@ export function AssignSection({
           ))}
         </select>
         <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending || !changed}>
-          {isPending ? 'Saving…' : 'Save'}
+          {isPending ? t('detail.assignment.saving') : t('detail.assignment.save')}
         </Button>
-        {saved && !changed && <FieldSuccess>Saved</FieldSuccess>}
+        {saved && !changed && <FieldSuccess>{t('detail.assignment.saved')}</FieldSuccess>}
       </div>
       {error && <FieldError>{error}</FieldError>}
     </Panel>
