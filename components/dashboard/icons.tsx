@@ -148,6 +148,15 @@ export function ReportsIcon({ className }: IconProps) {
   )
 }
 
+export function SettingsIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <circle cx="10" cy="10" r="2.5" />
+      <path d="M10 3v2M10 15v2M17 10h-2M5 10H3M14.6 5.4l-1.4 1.4M6.8 13.2l-1.4 1.4M14.6 14.6l-1.4-1.4M6.8 6.8 5.4 5.4" />
+    </svg>
+  )
+}
+
 export function LogoutIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

@@ -24,6 +24,7 @@ import {
   ActivityIcon,
   EnquiriesIcon,
   ReportsIcon,
+  SettingsIcon,
 } from './icons'
 
 // A component reference can't cross the server->client prop boundary (the
@@ -42,6 +43,7 @@ const iconByKey = {
   activity: ActivityIcon,
   enquiries: EnquiriesIcon,
   reports: ReportsIcon,
+  settings: SettingsIcon,
 } as const
 
 export type IconKey = keyof typeof iconByKey
@@ -103,6 +105,7 @@ export function DashboardShell({
   firmName,
   homeHref,
   navGroups,
+  settingsItem,
   userName,
   roleLabel,
   logoutAction,
@@ -112,6 +115,7 @@ export function DashboardShell({
   firmName: string
   homeHref: string
   navGroups: NavGroup[]
+  settingsItem: NavItem
   userName: string
   roleLabel: string
   logoutAction: () => Promise<void>
@@ -119,7 +123,11 @@ export function DashboardShell({
   children: React.ReactNode
 }) {
   const t = useTranslations('dashboard.shell')
+  const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const settingsActive = isActive(pathname, settingsItem.href)
+  const SettingsItemIcon = iconByKey[settingsItem.icon]
 
   const sidebarContent = (
     <>
@@ -130,6 +138,27 @@ export function DashboardShell({
 
       <div className="mt-6 flex-1 overflow-y-auto">
         <NavLinks groups={navGroups} onNavigate={() => setDrawerOpen(false)} />
+      </div>
+
+      {/* Ungrouped, pinned to the bottom by the flex-1 block above it -
+          Settings is personal, not a work area, so it isn't Daily work,
+          Money, or Administration, and a one-item group would repeat the
+          "expands to reveal a single item" mistake we're avoiding for the
+          header drawer too. Same link styling/active-state as a grouped
+          item, just no group title above it and a border standing in for
+          the visual separation a title would otherwise give it. */}
+      <div className="mt-2 border-t border-line pt-2">
+        <Link
+          href={settingsItem.href}
+          onClick={() => setDrawerOpen(false)}
+          aria-current={settingsActive ? 'page' : undefined}
+          className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+            settingsActive ? 'bg-accent text-accent-fg' : 'text-fg-muted hover:bg-line/40 hover:text-fg'
+          }`}
+        >
+          <SettingsItemIcon className="h-4 w-4 shrink-0" />
+          {settingsItem.label}
+        </Link>
       </div>
     </>
   )

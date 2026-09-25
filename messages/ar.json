@@ -151,7 +151,8 @@
       "deadlinePeriodTypes": "أنواع المهل",
       "activityLog": "سجل النشاط",
       "reports": "التقارير",
-      "roleOwner": "المالك"
+      "roleOwner": "المالك",
+      "settings": "الإعدادات"
     }
   }
 }

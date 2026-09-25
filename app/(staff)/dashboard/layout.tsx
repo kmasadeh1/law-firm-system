@@ -96,11 +96,18 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
 
   const roleLabel = isOwner ? t('roleOwner') : staffRow?.roles ? localizedName(staffRow.roles, locale) : t('roleStaffFallback')
 
+  // Ungrouped, not part of navGroups - Settings is personal, not a work
+  // area, so it doesn't belong in Daily work/Money/Administration. Pinned
+  // to the bottom of the sidebar by DashboardShell, plain link, no
+  // expansion machinery for what is currently a single page.
+  const settingsItem: NavItem = { href: '/dashboard/settings', label: t('settings'), icon: 'settings' }
+
   return (
     <DashboardShell
       firmName={tShell('firmName')}
       homeHref={homeHref}
       navGroups={navGroups}
+      settingsItem={settingsItem}
       userName={staffRow?.full_name ?? 'Signed in'}
       roleLabel={roleLabel}
       logoutAction={logout}
