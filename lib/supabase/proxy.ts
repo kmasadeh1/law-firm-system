@@ -63,22 +63,24 @@ export async function updateSession(request: NextRequest) {
   // return false at the database layer, so a signed-in-but-gated account
   // can't read or write anything beyond its own staff row regardless of
   // what routing does. Don't treat this block as the enforcement.
+  //
+  // There is deliberately no redirect-away from /change-password once
+  // must_change_password is false - that page is also reached voluntarily
+  // now (Settings -> Change password), so a signed-in staff member with no
+  // pending change must be able to sit on it. change-password/page.tsx's
+  // own form already navigates itself away on a successful change
+  // (router.push(homeHref)), so removing this doesn't strand anyone at the
+  // end of the forced first-login flow either.
   if (user) {
     const { data: staffRow } = await supabase
       .from('staff')
-      .select('must_change_password, user_type')
+      .select('must_change_password')
       .eq('id', user.sub as string)
       .maybeSingle()
 
     if (staffRow?.must_change_password && pathname.startsWith('/dashboard')) {
       const url = request.nextUrl.clone()
       url.pathname = '/change-password'
-      return NextResponse.redirect(url)
-    }
-
-    if (!staffRow?.must_change_password && pathname === '/change-password') {
-      const url = request.nextUrl.clone()
-      url.pathname = staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
       return NextResponse.redirect(url)
     }
   }

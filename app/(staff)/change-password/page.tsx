@@ -20,14 +20,11 @@ export default async function ChangePasswordPage() {
     .eq('id', user.sub as string)
     .maybeSingle()
 
-  // proxy.ts already redirects a cleared account away from here, but this
-  // page can still be requested directly - re-check rather than trust the
-  // route was reached only through the gate.
-  if (!staffRow?.must_change_password) {
-    redirect(staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff')
-  }
-
-  const homeHref = staffRow.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
+  // This page is reachable two ways now: the forced first-login flow
+  // (must_change_password true) and voluntarily from Settings once signed
+  // in normally. There is deliberately no redirect-away for the second
+  // case - proxy.ts only forces you TO this page, never away from it.
+  const homeHref = staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
 
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth' })
@@ -46,8 +43,7 @@ export default async function ChangePasswordPage() {
         <div className="max-w-sm">
           <p className="font-heading text-3xl leading-snug sm:text-4xl">Set a new password</p>
           <p className="mt-4 text-sm leading-relaxed text-paper-dim">
-            You&apos;re signed in with a temporary password. Choose your own before you can use
-            the rest of the dashboard.
+            {staffRow?.must_change_password ? t('changePassword.forcedBody') : t('changePassword.voluntaryBody')}
           </p>
         </div>
 

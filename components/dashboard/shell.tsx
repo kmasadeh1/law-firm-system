@@ -220,28 +220,38 @@ export function DashboardShell({
           </div>
 
           <div className="ms-2 flex items-center gap-2 border-s border-line ps-3 sm:ms-3">
-            {/* Fixed dark-on-brass, independent of the light/dark toggle -
-                a brand-identity mark (same reasoning as the crest) rather
-                than a theme-reactive control, so it stays legible and
-                recognisable in either dashboard theme. ink/brass are the
-                same shared-palette tokens the public site's identity uses
-                (5.90:1, already measured). */}
-            <span
-              aria-hidden="true"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-medium text-brass"
+            {/* The avatar/name block is a link to the signed-in staff
+                member's own Settings page, not a display-only identity mark
+                - personal settings are an account affordance, reached from
+                here rather than the sidebar (which is for the app's
+                sections, not the account). */}
+            <Link
+              href="/dashboard/settings"
+              className="flex items-center gap-2 rounded-md transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
-              {initials(userName)}
-            </span>
+              {/* Fixed dark-on-brass, independent of the light/dark toggle -
+                  a brand-identity mark (same reasoning as the crest) rather
+                  than a theme-reactive control, so it stays legible and
+                  recognisable in either dashboard theme. ink/brass are the
+                  same shared-palette tokens the public site's identity uses
+                  (5.90:1, already measured). */}
+              <span
+                aria-hidden="true"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-medium text-brass"
+              >
+                {initials(userName)}
+              </span>
 
-            <p className="max-w-[8rem] truncate text-sm leading-tight text-fg sm:max-w-[12rem]">
-              <span className="font-medium">
-                <bdi>{userName}</bdi>
-              </span>
-              <span className="text-fg-muted">
-                {' · '}
-                <bdi>{roleLabel}</bdi>
-              </span>
-            </p>
+              <p className="max-w-[8rem] truncate text-sm leading-tight text-fg sm:max-w-[12rem]">
+                <span className="font-medium">
+                  <bdi>{userName}</bdi>
+                </span>
+                <span className="text-fg-muted">
+                  {' · '}
+                  <bdi>{roleLabel}</bdi>
+                </span>
+              </p>
+            </Link>
 
             {/* Quiet by colour/weight, not by omission: an unlabelled icon
                 is a bad fit for this audience for a destructive action.

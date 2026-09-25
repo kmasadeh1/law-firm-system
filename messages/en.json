@@ -5,7 +5,11 @@
   },
   "staffAuth": {
     "firmName": "Ahmad Al-Masadeh & Associates",
-    "firmTagline": "Law Firm | Advocates & Legal Consultants"
+    "firmTagline": "Law Firm | Advocates & Legal Consultants",
+    "changePassword": {
+      "forcedBody": "You're signed in with a temporary password. Choose your own before you can use the rest of the dashboard.",
+      "voluntaryBody": "Choose a new password for your account."
+    }
   },
   "nav": {
     "home": "Home",
@@ -147,6 +151,7 @@
       "logOut": "Log out",
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
+      "settings": "Settings",
       "switchToLightTheme": "Switch to light theme",
       "switchToDarkTheme": "Switch to dark theme",
       "lightMode": "Light mode",
@@ -963,6 +968,35 @@
         "staff_manage": {
           "label": "Add or deactivate staff accounts"
         }
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Your own account - name, phone, language, theme, and password.",
+      "profile": {
+        "heading": "Profile",
+        "fullNameLabel": "Full name",
+        "phoneLabel": "Phone",
+        "saving": "Saving…",
+        "save": "Save",
+        "saved": "Saved"
+      },
+      "language": {
+        "heading": "Language",
+        "description": "Switching applies immediately and everywhere - this is the same control as the one in the header."
+      },
+      "theme": {
+        "heading": "Theme",
+        "description": "Light or dark mode for the dashboard. This is the same control as the one in the header."
+      },
+      "password": {
+        "heading": "Password",
+        "description": "Change the password you sign in with.",
+        "changePassword": "Change password"
+      },
+      "errors": {
+        "fullNameRequired": "Full name is required.",
+        "updateFailed": "Could not save your changes. Please try again."
       }
     }
   }
