@@ -7,6 +7,7 @@
   "staffAuth": {
     "firmName": "Ahmad Al-Masadeh & Associates",
     "firmTagline": "Law Firm | Advocates & Legal Consultants",
+    "pageTitleSuffix": "Staff sign in",
     "changePassword": {
       "headline": "Set a new password",
       "forcedBody": "You're signed in with a temporary password. Choose your own before you can use the rest of the dashboard.",
@@ -301,13 +302,14 @@
           "asLead": "as lead",
           "add": "Add",
           "errors": {
-            "alreadyHasLead": "This case already has a lead lawyer. Remove them as lead first, then promote someone else.",
-            "alreadyOnCase": "That person is already on this case.",
-            "noPermissionChange": "You don't have permission to change this case's team.",
-            "addFailed": "Could not add them to the case. Please try again.",
-            "updateFailed": "Could not update the team. Please try again.",
-            "removeFailed": "Could not remove them from the case. Please try again.",
-            "noPermissionRemove": "You don't have permission to change this case's team, or they're already off it."
+            "already_has_lead": "This case already has a lead lawyer. Remove them as lead first, then promote someone else.",
+            "already_on_case": "That person is already on this case.",
+            "no_permission_change": "You don't have permission to change this case's team.",
+            "add_failed": "Could not add them to the case. Please try again.",
+            "update_failed": "Could not update the team. Please try again.",
+            "remove_failed": "Could not remove them from the case. Please try again.",
+            "no_permission_remove": "You don't have permission to change this case's team, or they're already off it.",
+            "generic": "Something went wrong. Please try again."
           }
         },
         "expenses": {
@@ -421,9 +423,10 @@
           "matchOtherCase": "<bdi>{name}</bdi> — already an opposing party on another case",
           "matchExistingClient": "<bdi>{name}</bdi> — existing client",
           "errors": {
-            "nameRequired": "Name is required.",
-            "conflictCheckFailed": "Could not run the conflict check. Please try again.",
-            "addFailed": "Could not add the opposing party. Please try again."
+            "name_required": "Name is required.",
+            "conflict_check_failed": "Could not run the conflict check. Please try again.",
+            "add_failed": "Could not add the opposing party. Please try again.",
+            "generic": "Something went wrong. Please try again."
           }
         },
         "timeline": {
@@ -792,32 +795,33 @@
         }
       },
       "errors": {
-        "selectClient": "Select a client.",
-        "selectFeeType": "Select a fee type.",
-        "enterAmount": "Enter the agreed amount.",
-        "enterPercentage": "Enter the agreed percentage.",
-        "invalidFeeTypeAmount": "That combination of fee type and amount/percentage is not valid.",
-        "createFailed": "Could not create the engagement. Please try again.",
-        "casesLinkFailed": "Engagement created, but the selected cases could not be linked. Add them from the engagement page.",
-        "selectCase": "Select a case.",
-        "caseWrongClient": "That case doesn't belong to this engagement's client.",
-        "caseAlreadyLinked": "That case is already linked to this engagement.",
-        "linkFailed": "Could not link the case. Please try again.",
-        "unlinkFailed": "Could not unlink the case. Please try again.",
-        "documentNotFound": "Could not find that document, or you don't have permission to view it.",
-        "documentNotLinked": "That document isn't on a case linked to this engagement.",
-        "saveFailed": "Could not save the change. Please try again.",
-        "noPermissionChange": "You don't have permission to change this engagement.",
-        "linkGenerationFailed": "Could not generate a link to that file. Please try again.",
-        "descriptionRequired": "Description is required.",
-        "invalidAmount": "Enter a valid amount.",
-        "addInstallmentFailed": "Could not add the instalment. Please try again.",
-        "saveInstallmentFailed": "Could not save the changes. Please try again.",
-        "deleteInstallmentHasPayments": "Can't delete an instalment that has payments recorded against it.",
-        "deleteInstallmentFailed": "Could not delete the instalment. Please try again.",
-        "dateRequired": "Date is required.",
-        "noPermissionRecordPayment": "You don't have permission to record payments.",
-        "recordPaymentFailed": "Could not record the payment. Please try again."
+        "select_client": "Select a client.",
+        "select_fee_type": "Select a fee type.",
+        "enter_amount": "Enter the agreed amount.",
+        "enter_percentage": "Enter the agreed percentage.",
+        "invalid_fee_type_amount": "That combination of fee type and amount/percentage is not valid.",
+        "create_failed": "Could not create the engagement. Please try again.",
+        "cases_link_failed": "Engagement created, but the selected cases could not be linked. Add them from the engagement page.",
+        "select_case": "Select a case.",
+        "case_wrong_client": "That case doesn't belong to this engagement's client.",
+        "case_already_linked": "That case is already linked to this engagement.",
+        "link_failed": "Could not link the case. Please try again.",
+        "unlink_failed": "Could not unlink the case. Please try again.",
+        "document_not_found": "Could not find that document, or you don't have permission to view it.",
+        "document_not_linked": "That document isn't on a case linked to this engagement.",
+        "save_failed": "Could not save the change. Please try again.",
+        "no_permission_change": "You don't have permission to change this engagement.",
+        "link_generation_failed": "Could not generate a link to that file. Please try again.",
+        "description_required": "Description is required.",
+        "invalid_amount": "Enter a valid amount.",
+        "add_installment_failed": "Could not add the instalment. Please try again.",
+        "save_installment_failed": "Could not save the changes. Please try again.",
+        "installment_has_payments": "Can't delete an instalment that has payments recorded against it.",
+        "delete_installment_failed": "Could not delete the instalment. Please try again.",
+        "date_required": "Date is required.",
+        "no_permission_record_payment": "You don't have permission to record payments.",
+        "record_payment_failed": "Could not record the payment. Please try again.",
+        "generic": "Something went wrong. Please try again."
       }
     },
     "admin": {

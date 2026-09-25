@@ -8,6 +8,7 @@ import {
   recordPayment,
   updateInstallment,
 } from '../actions'
+import { resolveFeesError } from '../error-codes'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { Badge } from '@/components/dashboard/badge'
@@ -41,6 +42,7 @@ function InstallmentRow({
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.fees.detail.installments')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const [editing, setEditing] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,7 +58,7 @@ function InstallmentRow({
     startTransition(async () => {
       const result = await updateInstallment(engagementId, installment.id, formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveFeesError(result.error, tErrors))
         return
       }
       setEditing(false)
@@ -68,7 +70,7 @@ function InstallmentRow({
     startTransition(async () => {
       const result = await deleteInstallment(engagementId, installment.id)
       setConfirmingDelete(false)
-      if (result.error) setError(result.error)
+      if (result.error) setError(resolveFeesError(result.error, tErrors))
     })
   }
 
@@ -94,7 +96,7 @@ function InstallmentRow({
     startTransition(async () => {
       const result = await recordPayment(engagementId, installment.id, formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveFeesError(result.error, tErrors))
         return
       }
       paymentFormRef.current?.reset()
@@ -135,7 +137,11 @@ function InstallmentRow({
               className={controlClass}
             />
           </div>
-          {error && <FieldError>{error}</FieldError>}
+          {error && (
+            <FieldError>
+              <bdi>{error}</bdi>
+            </FieldError>
+          )}
           <div className="flex gap-2">
             <Button type="submit" variant="primary" disabled={isPending}>
               {isPending ? t('saving') : t('save')}
@@ -184,7 +190,11 @@ function InstallmentRow({
         </div>
       </div>
 
-      {error && !editing && <FieldError>{error}</FieldError>}
+      {error && !editing && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
 
       <DeleteConfirmDialog
         open={confirmingDelete}
@@ -282,6 +292,7 @@ export function InstallmentsSection({
   canRecordPayments: boolean
 }) {
   const t = useTranslations('dashboard.fees.detail.installments')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const addFormRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -293,7 +304,7 @@ export function InstallmentsSection({
     startTransition(async () => {
       const result = await createInstallment(engagementId, formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveFeesError(result.error, tErrors))
         return
       }
       addFormRef.current?.reset()
@@ -355,7 +366,11 @@ export function InstallmentsSection({
         </Button>
       </form>
 
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
     </Panel>
   )
 }

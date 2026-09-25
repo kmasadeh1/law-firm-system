@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { addTeamMember, removeTeamMember, setTeamMemberLead } from '../actions'
+import { addTeamMember, removeTeamMember, setTeamMemberLead, type TeamErrorCode } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { Banner } from '@/components/dashboard/banner'
@@ -12,6 +12,19 @@ import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialo
 
 type TeamMember = { staff_id: string; full_name: string; is_lead: boolean }
 type StaffOption = { id: string; full_name: string }
+
+// Closed set the server can return - anything else (there shouldn't be
+// anything else) falls back to a generic translated message rather than
+// passing an arbitrary value to t() as a key.
+const TEAM_ERROR_CODES: TeamErrorCode[] = [
+  'already_has_lead',
+  'already_on_case',
+  'no_permission_change',
+  'add_failed',
+  'update_failed',
+  'remove_failed',
+  'no_permission_remove',
+]
 
 export function TeamSection({
   caseId,
@@ -23,6 +36,7 @@ export function TeamSection({
   availableStaff: StaffOption[]
 }) {
   const t = useTranslations('dashboard.cases.detail.team')
+  const tErrors = useTranslations('dashboard.cases.detail.team.errors')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [addStaffId, setAddStaffId] = useState('')
@@ -32,11 +46,13 @@ export function TeamSection({
   const hasLead = team.some((m) => m.is_lead)
   const candidates = availableStaff.filter((s) => !team.some((m) => m.staff_id === s.id))
 
-  function runAction(fn: () => Promise<{ error?: string }>) {
+  function runAction(fn: () => Promise<{ error?: TeamErrorCode }>) {
     setError(null)
     startTransition(async () => {
       const result = await fn()
-      if (result.error) setError(result.error)
+      if (result.error) {
+        setError((TEAM_ERROR_CODES as string[]).includes(result.error) ? tErrors(result.error) : tErrors('generic'))
+      }
     })
   }
 
@@ -98,7 +114,11 @@ export function TeamSection({
         </ul>
       )}
 
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
 
       {candidates.length > 0 && (
         <div className="flex flex-wrap items-end gap-2">

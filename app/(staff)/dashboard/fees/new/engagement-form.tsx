@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { createEngagement, listClientCases, type CaseOption, type ClientOption } from '../actions'
+import { resolveFeesError } from '../error-codes'
 import { ClientPicker } from '../client-picker'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
 import { Button } from '@/components/dashboard/button'
@@ -14,6 +15,7 @@ export function EngagementForm() {
   const router = useRouter()
   const t = useTranslations('dashboard.fees.form')
   const tType = useTranslations('dashboard.fees.type')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const formRef = useRef<HTMLFormElement>(null)
   const [feeType, setFeeType] = useState<FeeType>('fixed')
   const [cases, setCases] = useState<CaseOption[]>([])
@@ -41,7 +43,7 @@ export function EngagementForm() {
     startTransition(async () => {
       const result = await createEngagement(formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveFeesError(result.error, tErrors))
         if (!result.engagementId) return
       }
       if (result.engagementId) {
@@ -140,7 +142,11 @@ export function EngagementForm() {
         )}
       </Field>
 
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
         {isPending ? t('creating') : <bdi>{t('createEngagement')}</bdi>}

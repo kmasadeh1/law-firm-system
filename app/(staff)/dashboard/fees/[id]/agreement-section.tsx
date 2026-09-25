@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { setSignedAgreement, getSignedAgreementUrl } from '../actions'
+import { resolveFeesError } from '../error-codes'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
@@ -26,6 +27,7 @@ function AttachPicker({
   isReplacing: boolean
 }) {
   const t = useTranslations('dashboard.fees.detail.agreement')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const [documentId, setDocumentId] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -39,7 +41,7 @@ function AttachPicker({
     startTransition(async () => {
       const result = await setSignedAgreement(engagementId, documentId)
       if (result.error) {
-        setError(result.error)
+        setError(resolveFeesError(result.error, tErrors))
         return
       }
       onDone()
@@ -76,13 +78,18 @@ function AttachPicker({
           </Button>
         )}
       </div>
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
     </div>
   )
 }
 
 function DetachButton({ engagementId, onDone }: { engagementId: string; onDone: () => void }) {
   const t = useTranslations('dashboard.fees.detail.agreement')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -91,7 +98,7 @@ function DetachButton({ engagementId, onDone }: { engagementId: string; onDone: 
     startTransition(async () => {
       const result = await setSignedAgreement(engagementId, null)
       if (result.error) {
-        setError(result.error)
+        setError(resolveFeesError(result.error, tErrors))
         return
       }
       onDone()
@@ -103,7 +110,11 @@ function DetachButton({ engagementId, onDone }: { engagementId: string; onDone: 
       <Button type="button" variant="ghost" onClick={handleClick} disabled={isPending}>
         {isPending ? t('detaching') : t('detach')}
       </Button>
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
     </div>
   )
 }
@@ -122,6 +133,7 @@ export function AgreementSection({
   candidates: SignableDocument[]
 }) {
   const t = useTranslations('dashboard.fees.detail.agreement')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const [replacing, setReplacing] = useState(false)
   const [viewError, setViewError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -134,7 +146,7 @@ export function AgreementSection({
       const result = await getSignedAgreementUrl(engagementId, attachedDocument.id)
       if (result.error || !result.url) {
         tab?.close()
-        setViewError(result.error ?? t('openFailed'))
+        setViewError(result.error ? resolveFeesError(result.error, tErrors) : t('openFailed'))
         return
       }
       if (tab) tab.location.href = result.url
@@ -164,7 +176,11 @@ export function AgreementSection({
           </div>
         </div>
       )}
-      {viewError && <FieldError>{viewError}</FieldError>}
+      {viewError && (
+        <FieldError>
+          <bdi>{viewError}</bdi>
+        </FieldError>
+      )}
 
       {hasAttached && attachedDocument && attachedDocument.deleted_at && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-sm">

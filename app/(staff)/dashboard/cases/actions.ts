@@ -126,13 +126,26 @@ export async function setCaseStatus(caseId: string, statusId: string): Promise<A
 
 // --- Team ------------------------------------------------------------------
 
+// Closed sets of codes, not translated strings - the server decides WHAT
+// HAPPENED, the render site (team-section.tsx) decides HOW TO SAY IT. See
+// TeamErrorCode/OpposingPartyErrorCode for the full sets these functions can
+// return; a caller-controlled value never reaches next-intl's t() directly.
+export type TeamErrorCode =
+  | 'already_has_lead'
+  | 'already_on_case'
+  | 'no_permission_change'
+  | 'add_failed'
+  | 'update_failed'
+  | 'remove_failed'
+  | 'no_permission_remove'
+
+type TeamActionResult = { error?: TeamErrorCode }
+
 export async function addTeamMember(
   caseId: string,
   staffId: string,
   isLead: boolean
-): Promise<ActionResult> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.team.errors' })
+): Promise<TeamActionResult> {
   const supabase = await createClient()
   const { error } = await supabase
     .from('case_lawyers')
@@ -140,15 +153,15 @@ export async function addTeamMember(
 
   if (error) {
     if (error.code === '23505' && error.message.includes('case_lawyers_one_lead')) {
-      return { error: t('alreadyHasLead') }
+      return { error: 'already_has_lead' }
     }
     if (error.code === '23505') {
-      return { error: t('alreadyOnCase') }
+      return { error: 'already_on_case' }
     }
     if (error.code === '42501') {
-      return { error: t('noPermissionChange') }
+      return { error: 'no_permission_change' }
     }
-    return { error: t('addFailed') }
+    return { error: 'add_failed' }
   }
 
   revalidatePath(casePath(caseId))
@@ -159,9 +172,7 @@ export async function setTeamMemberLead(
   caseId: string,
   staffId: string,
   isLead: boolean
-): Promise<ActionResult> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.team.errors' })
+): Promise<TeamActionResult> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_lawyers')
@@ -172,24 +183,22 @@ export async function setTeamMemberLead(
 
   if (error) {
     if (error.code === '23505' && error.message.includes('case_lawyers_one_lead')) {
-      return { error: t('alreadyHasLead') }
+      return { error: 'already_has_lead' }
     }
-    return { error: t('updateFailed') }
+    return { error: 'update_failed' }
   }
 
   // UPDATE blocked by RLS matches zero rows rather than erroring - treat
   // that the same as a denial rather than silently doing nothing.
   if (!data || data.length === 0) {
-    return { error: t('noPermissionChange') }
+    return { error: 'no_permission_change' }
   }
 
   revalidatePath(casePath(caseId))
   return {}
 }
 
-export async function removeTeamMember(caseId: string, staffId: string): Promise<ActionResult> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.team.errors' })
+export async function removeTeamMember(caseId: string, staffId: string): Promise<TeamActionResult> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('case_lawyers')
@@ -199,11 +208,11 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
     .select('staff_id')
 
   if (error) {
-    return { error: t('removeFailed') }
+    return { error: 'remove_failed' }
   }
 
   if (!data || data.length === 0) {
-    return { error: t('noPermissionRemove') }
+    return { error: 'no_permission_remove' }
   }
 
   revalidatePath(casePath(caseId))
@@ -212,18 +221,20 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
 
 // --- Opposing parties ------------------------------------------------------
 
+export type OpposingPartyErrorCode = 'name_required' | 'conflict_check_failed' | 'add_failed'
+
+type OpposingPartyActionResult = { error?: OpposingPartyErrorCode }
+
 export async function addOpposingParty(
   caseId: string,
   formData: FormData,
   confirmed: boolean
-): Promise<ActionResult & { matches?: ConflictMatch[] }> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.opposingParties.errors' })
+): Promise<OpposingPartyActionResult & { matches?: ConflictMatch[] }> {
   const name = formData.get('name')
   const national_id = formData.get('national_id')
 
   if (typeof name !== 'string' || !name.trim()) {
-    return { error: t('nameRequired') }
+    return { error: 'name_required' }
   }
   const trimmedName = name.trim()
   const trimmedNationalId =
@@ -238,7 +249,7 @@ export async function addOpposingParty(
     })
 
     if (conflictError) {
-      return { error: t('conflictCheckFailed') }
+      return { error: 'conflict_check_failed' }
     }
     if (matches && matches.length > 0) {
       return { matches }
@@ -250,7 +261,7 @@ export async function addOpposingParty(
     .insert({ case_id: caseId, name: trimmedName, national_id: trimmedNationalId })
 
   if (error) {
-    return { error: t('addFailed') }
+    return { error: 'add_failed' }
   }
 
   revalidatePath(casePath(caseId))

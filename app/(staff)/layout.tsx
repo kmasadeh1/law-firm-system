@@ -22,8 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth' })
   return {
-    title: `${t('firmName')} - Staff sign in`,
-    description: 'Staff sign in',
+    title: `${t('firmName')} - ${t('pageTitleSuffix')}`,
+    description: t('pageTitleSuffix'),
   }
 }
 

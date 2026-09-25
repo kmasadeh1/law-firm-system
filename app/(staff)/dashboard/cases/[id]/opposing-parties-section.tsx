@@ -2,13 +2,21 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { addOpposingParty, type ConflictMatch } from '../actions'
+import { addOpposingParty, type ConflictMatch, type OpposingPartyErrorCode } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { FieldError, controlClass } from '@/components/dashboard/form'
 import { ConflictWarning } from '@/components/dashboard/conflict-warning'
 
 type OpposingParty = { id: string; name: string; national_id: string | null }
+
+// Closed set the server can return - anything else falls back to a generic
+// translated message rather than passing an arbitrary value to t() as a key.
+const OPPOSING_PARTY_ERROR_CODES: OpposingPartyErrorCode[] = [
+  'name_required',
+  'conflict_check_failed',
+  'add_failed',
+]
 
 // Each distinct conflict-check outcome is its own complete message, not a
 // fragment glued to the matched name - "already an opposing party on this
@@ -48,10 +56,15 @@ export function OpposingPartiesSection({
   parties: OpposingParty[]
 }) {
   const t = useTranslations('dashboard.cases.detail.opposingParties')
+  const tErrors = useTranslations('dashboard.cases.detail.opposingParties.errors')
   const formRef = useRef<HTMLFormElement>(null)
   const [matches, setMatches] = useState<ConflictMatch[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  function resolveError(code: OpposingPartyErrorCode) {
+    return (OPPOSING_PARTY_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('generic')
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -61,7 +74,7 @@ export function OpposingPartiesSection({
     startTransition(async () => {
       const result = await addOpposingParty(caseId, formData, false)
       if (result.error) {
-        setError(result.error)
+        setError(resolveError(result.error))
         return
       }
       if (result.matches) {
@@ -79,7 +92,7 @@ export function OpposingPartiesSection({
     startTransition(async () => {
       const result = await addOpposingParty(caseId, formData, true)
       if (result.error) {
-        setError(result.error)
+        setError(resolveError(result.error))
         return
       }
       formRef.current?.reset()
@@ -136,7 +149,11 @@ export function OpposingPartiesSection({
         />
       )}
 
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
     </Panel>
   )
 }

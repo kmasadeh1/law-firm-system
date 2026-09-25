@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { linkCase, unlinkCase } from '../actions'
+import { resolveFeesError, type FeesErrorCode } from '../error-codes'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { FieldError, controlClass } from '@/components/dashboard/form'
@@ -22,6 +23,7 @@ export function CasesSection({
   clientCases: CaseRow[]
 }) {
   const t = useTranslations('dashboard.fees.detail.cases')
+  const tErrors = useTranslations('dashboard.fees.errors')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [addCaseId, setAddCaseId] = useState('')
@@ -29,11 +31,11 @@ export function CasesSection({
 
   const candidates = clientCases.filter((c) => !linkedCases.some((l) => l.id === c.id))
 
-  function runAction(fn: () => Promise<{ error?: string }>) {
+  function runAction(fn: () => Promise<{ error?: FeesErrorCode }>) {
     setError(null)
     startTransition(async () => {
       const result = await fn()
-      if (result.error) setError(result.error)
+      if (result.error) setError(resolveFeesError(result.error, tErrors))
     })
   }
 
@@ -63,7 +65,11 @@ export function CasesSection({
         </ul>
       )}
 
-      {error && <FieldError>{error}</FieldError>}
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
 
       {candidates.length > 0 && (
         <div className="flex flex-wrap items-end gap-2">
