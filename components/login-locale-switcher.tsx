@@ -16,7 +16,7 @@ const LANGUAGES: { code: LocaleCode; label: string }[] = [
   { code: 'ar', label: 'العربية' },
 ]
 
-export function LoginLocaleSwitcher() {
+export function LoginLocaleSwitcher({ variant }: { variant: 'desktop' | 'mobile' }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.shell')
   const [isPending, startTransition] = useTransition()
@@ -42,6 +42,9 @@ export function LoginLocaleSwitcher() {
       separatorClassName="text-paper-dim/60"
       renderOption={(option, className) => {
         if (option.active) {
+          // The active language is deliberately not a button - the shared
+          // LanguagePair design only makes the inactive option clickable.
+          // Leave this <span> as-is; it isn't a missed testid.
           return (
             <span className={className} aria-current="true">
               {option.label}
@@ -54,7 +57,7 @@ export function LoginLocaleSwitcher() {
           <button
             type="button"
             onClick={() => switchTo(code)}
-            data-testid={`login-locale-${code}`}
+            data-testid={`login-locale-${code}-${variant}`}
             disabled={isPending}
             aria-label={switchLabel}
             title={switchLabel}

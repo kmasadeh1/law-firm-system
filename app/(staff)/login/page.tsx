@@ -53,7 +53,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
               <span className="text-xs text-paper-dim">{t('firmTagline')}</span>
             </span>
           </div>
-          <LoginLocaleSwitcher />
+          <LoginLocaleSwitcher variant="desktop" />
         </div>
 
         <div className="max-w-sm">
@@ -75,7 +75,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
               <Crest className="h-6 w-6" />
               <span className="font-heading text-base text-paper">{t('firmName')}</span>
             </div>
-            <LoginLocaleSwitcher />
+            <LoginLocaleSwitcher variant="mobile" />
           </div>
 
           <h1 className="font-heading text-2xl text-paper">{tLogin('heading')}</h1>
