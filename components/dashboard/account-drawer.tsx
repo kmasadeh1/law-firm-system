@@ -123,7 +123,7 @@ export function AccountDrawer({
               type="submit"
               className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-start text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg"
             >
-              <LogoutIcon className="h-4 w-4" />
+              <LogoutIcon className="h-4 w-4 rtl:rotate-180" />
               {t('logOut')}
             </button>
           </form>
