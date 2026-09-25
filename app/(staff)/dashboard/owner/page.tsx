@@ -14,6 +14,7 @@ export default async function OwnerDashboardPage() {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.overview' })
   const tType = await getTranslations({ locale, namespace: 'dashboard.appointments.type' })
+  const tActivity = await getTranslations({ locale, namespace: 'dashboard.activity' })
 
   const startOfDay = new Date()
   startOfDay.setHours(0, 0, 0, 0)
@@ -157,7 +158,7 @@ export default async function OwnerDashboardPage() {
                 return (
                   <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm">
                     <span className="text-fg">
-                      {activityEventTitle(entry.table_name, entry.action, detail)}
+                      {activityEventTitle(tActivity, entry.table_name, entry.action, detail)}
                       {entry.actor_id && (
                         <span className="text-fg-muted">
                           {' · '}

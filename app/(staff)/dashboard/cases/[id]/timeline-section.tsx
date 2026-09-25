@@ -144,6 +144,7 @@ function TimelineEntry({
   locale: string
 }) {
   const t = useTranslations('dashboard.cases.detail.timeline')
+  const tActivity = useTranslations('dashboard.activity')
   const detail =
     row.detail && !row.detail_redacted ? eventDetail(row.entity, row.detail, staffNameById, locale, t) : null
 
@@ -154,7 +155,7 @@ function TimelineEntry({
       </span>
       <div className="min-w-0">
         <p className="text-fg">
-          {activityEventTitle(row.entity, row.action, row.detail)}
+          {activityEventTitle(tActivity, row.entity, row.action, row.detail)}
           <span className="text-fg-muted"> · <bdi>{row.actor_name ?? t('systemFallback')}</bdi></span>
         </p>
         {row.detail_redacted ? (

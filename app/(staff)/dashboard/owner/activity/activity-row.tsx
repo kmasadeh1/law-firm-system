@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { activityEventTitle, type ActivityAction } from '@/lib/activity-labels'
 import { formatTime } from '@/lib/format-date-time'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
@@ -26,6 +27,7 @@ export function ActivityRow({
   locale: string
 }) {
   const [expanded, setExpanded] = useState(false)
+  const tActivity = useTranslations('dashboard.activity')
   const diffs = diffFields(row.action, row.old_data, row.new_data)
   const hasDetail = diffs.length > 0
 
@@ -41,7 +43,7 @@ export function ActivityRow({
           <bdi>{formatTime(row.created_at, locale)}</bdi>
         </span>
         <span className="min-w-0 flex-1 text-fg">
-          {activityEventTitle(row.table_name, row.action, row.new_data ?? row.old_data)}
+          {activityEventTitle(tActivity, row.table_name, row.action, row.new_data ?? row.old_data)}
           <span className="text-fg-muted"> · {actorName}</span>
         </span>
         {hasDetail && (

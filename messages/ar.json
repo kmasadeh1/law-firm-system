@@ -21,6 +21,10 @@
         "noStaffAccount": "لا يوجد حساب موظف مرتبط بهذا الحساب.",
         "deactivated": "تم تعطيل هذا الحساب."
       }
+    },
+    "changePassword": {
+      "forcedBody": "لقد سجّلت الدخول بكلمة مرور مؤقتة. اختر كلمة مرور خاصة بك قبل أن تتمكن من استخدام بقية لوحة التحكم.",
+      "voluntaryBody": "اختر كلمة مرور جديدة لحسابك."
     }
   },
   "nav": {
@@ -968,6 +972,107 @@
       "createAnyway": "الإنشاء على أي حال",
       "editDetailsInstead": "تعديل التفاصيل بدلاً من ذلك",
       "saving": "جارٍ الحفظ…"
+    },
+    "activity": {
+      "fallback": "نشاط مُسجَّل",
+      "entities": {
+        "cases": {
+          "filterLabel": "القضايا",
+          "insert": "فُتحت القضية",
+          "update": "حُدّثت القضية",
+          "delete": "حُذفت القضية"
+        },
+        "case_lawyers": {
+          "filterLabel": "محامو القضايا",
+          "insert": "أُسند محامٍ إلى القضية",
+          "update": "حُدّث إسناد المحامي",
+          "delete": "أُزيل محامٍ من القضية"
+        },
+        "deadlines": {
+          "filterLabel": "المهل",
+          "insert": "أُضيفت مهلة",
+          "update": "حُدّثت المهلة",
+          "delete": "أُزيلت المهلة"
+        },
+        "case_notes": {
+          "filterLabel": "ملاحظات القضايا",
+          "insert": "أُضيفت ملاحظة",
+          "update": "عُدّلت الملاحظة",
+          "delete": "حُذفت الملاحظة"
+        },
+        "documents": {
+          "filterLabel": "المستندات",
+          "insert": "رُفع مستند",
+          "update": "حُدّث المستند",
+          "delete": "أُزيل المستند"
+        },
+        "engagements": {
+          "filterLabel": "Engagements",
+          "insert": "أُنشئ اتفاق أتعاب",
+          "update": "حُدّث اتفاق الأتعاب",
+          "delete": "حُذف اتفاق الأتعاب"
+        },
+        "engagement_installments": {
+          "filterLabel": "Engagement installments",
+          "insert": "تمت جدولة قسط",
+          "update": "حُدّث القسط",
+          "delete": "أُزيل القسط"
+        },
+        "engagement_cases": {
+          "filterLabel": "Engagement cases",
+          "insert": "رُبطت القضية باتفاق أتعاب",
+          "update": "حُدّث ربط اتفاق الأتعاب",
+          "delete": "أُلغي ربط القضية باتفاق الأتعاب"
+        },
+        "payments": {
+          "filterLabel": "المدفوعات",
+          "insert": "سُجّلت دفعة",
+          "update": "حُدّثت الدفعة",
+          "delete": "أُزيلت الدفعة"
+        },
+        "expenses": {
+          "filterLabel": "المصاريف",
+          "insert": "سُجّل مصروف",
+          "update": "حُدّث المصروف",
+          "delete": "أُزيل المصروف"
+        },
+        "case_opposing_parties": {
+          "filterLabel": "Case opposing parties",
+          "insert": "أُضيف خصم",
+          "update": "حُدّثت بيانات الخصم",
+          "delete": "أُزيل الخصم"
+        },
+        "clients": {
+          "filterLabel": "العملاء",
+          "insert": "أُضيف عميل",
+          "update": "حُدّثت بيانات العميل",
+          "delete": "حُذف العميل"
+        },
+        "roles": {
+          "filterLabel": "الأدوار",
+          "insert": "أُضيف دور",
+          "update": "حُدّث الدور",
+          "delete": "حُذف الدور"
+        },
+        "role_permissions": {
+          "filterLabel": "صلاحيات الأدوار",
+          "insert": "مُنحت صلاحية",
+          "update": "حُدّثت الصلاحية",
+          "delete": "سُحبت الصلاحية"
+        },
+        "appointments": {
+          "filterLabel": "المواعيد",
+          "insert": "حُجز موعد",
+          "update": "حُدّث الموعد",
+          "delete": "حُذف الموعد"
+        },
+        "staff": {
+          "filterLabel": "الموظفون",
+          "insert": "أُضيف موظف",
+          "update": "حُدّث حساب الموظف",
+          "delete": "حُذف حساب الموظف"
+        }
+      }
     }
   }
 }

@@ -1017,6 +1017,107 @@
         "fullNameRequired": "Full name is required.",
         "updateFailed": "Could not save your changes. Please try again."
       }
+    },
+    "activity": {
+      "fallback": "Activity recorded",
+      "entities": {
+        "cases": {
+          "filterLabel": "Cases",
+          "insert": "Case opened",
+          "update": "Case updated",
+          "delete": "Case deleted"
+        },
+        "case_lawyers": {
+          "filterLabel": "Case lawyers",
+          "insert": "Lawyer assigned",
+          "update": "Lawyer assignment updated",
+          "delete": "Lawyer removed from case"
+        },
+        "deadlines": {
+          "filterLabel": "Deadlines",
+          "insert": "Deadline added",
+          "update": "Deadline updated",
+          "delete": "Deadline removed"
+        },
+        "case_notes": {
+          "filterLabel": "Case notes",
+          "insert": "Note added",
+          "update": "Note edited",
+          "delete": "Note deleted"
+        },
+        "documents": {
+          "filterLabel": "Documents",
+          "insert": "Document uploaded",
+          "update": "Document updated",
+          "delete": "Document removed"
+        },
+        "engagements": {
+          "filterLabel": "Engagements",
+          "insert": "Engagement created",
+          "update": "Engagement updated",
+          "delete": "Engagement deleted"
+        },
+        "engagement_installments": {
+          "filterLabel": "Engagement installments",
+          "insert": "Instalment scheduled",
+          "update": "Instalment updated",
+          "delete": "Instalment removed"
+        },
+        "engagement_cases": {
+          "filterLabel": "Engagement cases",
+          "insert": "Linked to a fee engagement",
+          "update": "Engagement link updated",
+          "delete": "Unlinked from a fee engagement"
+        },
+        "payments": {
+          "filterLabel": "Payments",
+          "insert": "Payment recorded",
+          "update": "Payment updated",
+          "delete": "Payment removed"
+        },
+        "expenses": {
+          "filterLabel": "Expenses",
+          "insert": "Expense recorded",
+          "update": "Expense updated",
+          "delete": "Expense removed"
+        },
+        "case_opposing_parties": {
+          "filterLabel": "Case opposing parties",
+          "insert": "Opposing party added",
+          "update": "Opposing party updated",
+          "delete": "Opposing party removed"
+        },
+        "clients": {
+          "filterLabel": "Clients",
+          "insert": "Client added",
+          "update": "Client updated",
+          "delete": "Client deleted"
+        },
+        "roles": {
+          "filterLabel": "Roles",
+          "insert": "Role added",
+          "update": "Role updated",
+          "delete": "Role deleted"
+        },
+        "role_permissions": {
+          "filterLabel": "Role permissions",
+          "insert": "Permission granted",
+          "update": "Permission updated",
+          "delete": "Permission revoked"
+        },
+        "appointments": {
+          "filterLabel": "Appointments",
+          "insert": "Appointment booked",
+          "update": "Appointment updated",
+          "delete": "Appointment deleted"
+        },
+        "staff": {
+          "filterLabel": "Staff",
+          "insert": "Staff member added",
+          "update": "Staff account updated",
+          "delete": "Staff account deleted"
+        }
+      }
     }
   }
 }
