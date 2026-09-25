@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { formatRelativeTime } from '@/lib/format-relative-time'
-import { formatTime } from '@/lib/format-date-time'
+import { formatTime, formatDateTime } from '@/lib/format-date-time'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
@@ -135,7 +135,7 @@ export default async function OwnerDashboardPage() {
                         href={`/dashboard/appointments/${a.id}`}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
-                        <bdi>{formatTime(a.starts_at, locale)}</bdi> · <bdi>{a.clients?.full_name ?? t('unknownClient')}</bdi>
+                        <bdi>{formatDateTime(a.starts_at, locale)}</bdi> · <bdi>{a.clients?.full_name ?? t('unknownClient')}</bdi>
                       </Link>
                     </li>
                   ))}
