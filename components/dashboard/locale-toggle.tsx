@@ -61,6 +61,7 @@ export function LocaleToggle() {
           <button
             type="button"
             onClick={() => switchTo(code)}
+            data-testid={`dashboard-locale-${code}`}
             disabled={isPending}
             aria-label={switchLabel}
             title={switchLabel}

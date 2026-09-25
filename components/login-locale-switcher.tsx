@@ -54,6 +54,7 @@ export function LoginLocaleSwitcher() {
           <button
             type="button"
             onClick={() => switchTo(code)}
+            data-testid={`login-locale-${code}`}
             disabled={isPending}
             aria-label={switchLabel}
             title={switchLabel}

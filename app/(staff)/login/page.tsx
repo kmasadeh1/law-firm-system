@@ -81,7 +81,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
           <h1 className="font-heading text-2xl text-paper">{tLogin('heading')}</h1>
 
           {error && (
-            <p className="rounded-sm border border-danger bg-danger/20 px-3 py-2 text-sm text-paper">
+            <p data-testid="login-error" className="rounded-sm border border-danger bg-danger/20 px-3 py-2 text-sm text-paper">
               {error}
             </p>
           )}

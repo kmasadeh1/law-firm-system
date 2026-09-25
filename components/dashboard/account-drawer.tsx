@@ -64,6 +64,7 @@ export function AccountDrawer({
       <button
         ref={triggerRef}
         type="button"
+        data-testid="account-drawer-trigger"
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={open ? t('closeAccountMenu') : t('openAccountMenu')}
@@ -97,6 +98,7 @@ export function AccountDrawer({
       {open && (
         <div
           id={panelId}
+          data-testid="account-drawer-panel"
           className="absolute end-0 top-full z-50 mt-2 w-56 rounded-md border border-line bg-surface p-1.5 shadow-lg"
         >
           <div className="px-2 py-1.5">
@@ -112,6 +114,7 @@ export function AccountDrawer({
 
           <Link
             href="/dashboard/settings"
+            data-testid="account-drawer-my-account"
             onClick={() => setOpen(false)}
             className="block rounded-md px-2 py-1.5 text-sm text-fg transition-colors hover:bg-line/40"
           >
@@ -121,6 +124,7 @@ export function AccountDrawer({
           <form action={logoutAction}>
             <button
               type="submit"
+              data-testid="account-drawer-logout"
               className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-start text-sm text-fg-muted transition-colors hover:bg-line/40 hover:text-fg"
             >
               <LogoutIcon className="h-4 w-4 rtl:rotate-180" />
