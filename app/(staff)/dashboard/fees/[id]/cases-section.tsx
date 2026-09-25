@@ -124,7 +124,7 @@ export function CasesSection({
         confirmLabel={t('unlink')}
         pendingLabel={t('unlinking')}
         pending={isPending}
-        note={t('unlinkNote')}
+        note={<bdi>{t('unlinkNote')}</bdi>}
       />
     </Panel>
   )

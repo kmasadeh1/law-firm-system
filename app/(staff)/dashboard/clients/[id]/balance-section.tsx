@@ -24,7 +24,9 @@ export async function BalanceSection({ balance }: { balance: Balance | null }) {
     return (
       <Panel className="flex flex-col gap-2">
         <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
-        <p className="text-sm text-fg-muted">{t('noEngagementsYet')}</p>
+        <p className="text-sm text-fg-muted">
+          <bdi>{t('noEngagementsYet')}</bdi>
+        </p>
       </Panel>
     )
   }
@@ -48,7 +50,7 @@ export async function BalanceSection({ balance }: { balance: Balance | null }) {
       </div>
       {hasPercentageEngagements && (
         <p className="text-xs text-fg-muted">
-          {t('alsoHasPercentageEngagements', { count: balance.percentage_engagement_count ?? 0 })}
+          <bdi>{t('alsoHasPercentageEngagements', { count: balance.percentage_engagement_count ?? 0 })}</bdi>
         </p>
       )}
     </Panel>

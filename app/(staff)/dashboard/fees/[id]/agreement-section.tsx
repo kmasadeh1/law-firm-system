@@ -145,7 +145,9 @@ export function AgreementSection({
     <Panel className="flex flex-col gap-3">
       <div>
         <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
-        <p className="text-sm text-fg-muted">{t('description')}</p>
+        <p className="text-sm text-fg-muted">
+          <bdi>{t('description')}</bdi>
+        </p>
       </div>
 
       {hasAttached && attachedDocument && !attachedDocument.deleted_at && (
@@ -194,7 +196,11 @@ export function AgreementSection({
         </div>
       )}
 
-      {!hasAttached && !hasLinkedCases && <p className="text-sm text-fg-muted">{t('noLinkedCases')}</p>}
+      {!hasAttached && !hasLinkedCases && (
+        <p className="text-sm text-fg-muted">
+          <bdi>{t('noLinkedCases')}</bdi>
+        </p>
+      )}
 
       {!hasAttached && hasLinkedCases && candidates.length === 0 && (
         <p className="text-sm text-fg-muted">{t('noDocumentsOnLinkedCases')}</p>

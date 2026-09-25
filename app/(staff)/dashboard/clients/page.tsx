@@ -27,7 +27,7 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
         action={
           <div className="flex flex-wrap gap-2">
             <LinkButton href="/dashboard/clients/conflict-checks" variant="secondary">
-              {t('conflictCheckHistory')}
+              <bdi>{t('conflictCheckHistory')}</bdi>
             </LinkButton>
             <LinkButton href="/dashboard/clients/new" variant="primary">
               {t('addClient')}

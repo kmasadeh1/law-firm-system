@@ -51,7 +51,9 @@ function eventDetail(
       const staffId = typeof detail.staff_id === 'string' ? detail.staff_id : null
       const name = staffId ? (staffNameById[staffId] ?? t('unknownStaffMember')) : null
       if (!name) return null
-      return detail.is_lead ? t.rich('caseLawyerLead', { name, bdi }) : name
+      // caseLawyerLead is held English (pending the "lead lawyer" term) -
+      // the whole rendered sentence needs its own <bdi>, not just the name.
+      return detail.is_lead ? <bdi>{t.rich('caseLawyerLead', { name, bdi })}</bdi> : name
     }
     case 'case_notes':
       return typeof detail.note === 'string' ? truncate(detail.note, 120) : null

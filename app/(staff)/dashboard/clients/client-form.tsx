@@ -27,9 +27,15 @@ type Props =
 // draw.
 function matchLabel(match: ConflictMatch, t: ReturnType<typeof useTranslations>) {
   const bdi = (chunks: React.ReactNode) => <bdi>{chunks}</bdi>
-  return match.source === 'opposing_party'
-    ? t.rich('matchExistingOpposingParty', { name: match.matched_name, bdi })
-    : t.rich('matchExistingClient', { name: match.matched_name, bdi })
+  // matchExistingOpposingParty is held (English) pending the firm's term
+  // for "opposing party" - the whole sentence needs its own outer <bdi>,
+  // not just the interpolated name. matchExistingClient is already
+  // translated Arabic and needs none.
+  return match.source === 'opposing_party' ? (
+    <bdi>{t.rich('matchExistingOpposingParty', { name: match.matched_name, bdi })}</bdi>
+  ) : (
+    t.rich('matchExistingClient', { name: match.matched_name, bdi })
+  )
 }
 
 export function ClientForm(props: Props) {

@@ -25,10 +25,17 @@ function matchLabel(
   currentCaseId: string,
   t: ReturnType<typeof useTranslations>
 ) {
+  // matchSameCase/matchOtherCase are held (English) pending the firm's term
+  // for "opposing party" - the surrounding sentence, not just the
+  // interpolated name, needs its own outer <bdi> so its trailing
+  // punctuation doesn't reorder under the page's RTL base direction.
+  // matchExistingClient is already translated Arabic and needs none.
   if (match.source === 'opposing_party') {
-    return match.case_id === currentCaseId
-      ? t.rich('matchSameCase', { name: match.matched_name, bdi })
-      : t.rich('matchOtherCase', { name: match.matched_name, bdi })
+    return match.case_id === currentCaseId ? (
+      <bdi>{t.rich('matchSameCase', { name: match.matched_name, bdi })}</bdi>
+    ) : (
+      <bdi>{t.rich('matchOtherCase', { name: match.matched_name, bdi })}</bdi>
+    )
   }
   return t.rich('matchExistingClient', { name: match.matched_name, bdi })
 }
@@ -82,7 +89,9 @@ export function OpposingPartiesSection({
 
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-opposing-parties-section">
-      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
+      <h2 className="font-heading text-lg text-fg">
+        <bdi>{t('heading')}</bdi>
+      </h2>
 
       {parties.length === 0 ? (
         <p className="text-sm text-fg-muted">{t('noneAddedYet')}</p>

@@ -3,8 +3,11 @@ export function EmptyState({
   description,
   action,
 }: {
-  title: string
-  description?: string
+  // ReactNode, not string - a held-English title/description needs its
+  // caller to wrap it in <bdi> (see e.g. dashboard/fees/page.tsx), which a
+  // string-only prop can't carry.
+  title: React.ReactNode
+  description?: React.ReactNode
   action?: React.ReactNode
 }) {
   return (

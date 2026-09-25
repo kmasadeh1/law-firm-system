@@ -30,7 +30,9 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
     return (
       <div className="flex flex-col gap-6">
         <BackLink href="/dashboard/fees" label={t('backToFees')} />
-        <p className="text-sm text-fg-muted">{t('notFound')}</p>
+        <p className="text-sm text-fg-muted">
+          <bdi>{t('notFound')}</bdi>
+        </p>
       </div>
     )
   }
@@ -115,7 +117,7 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
       <div>
         <BackLink href="/dashboard/fees" label={t('backToFees')} />
         <PageHeader
-          title={engagement.clients?.full_name ?? t('engagementFallback')}
+          title={engagement.clients?.full_name ?? <bdi>{t('engagementFallback')}</bdi>}
           description={
             <>
               {tType(engagement.fee_type)}

@@ -195,7 +195,7 @@ function InstallmentRow({
         confirmLabel={t('delete')}
         pendingLabel={t('deleting')}
         pending={isPending}
-        note={hasPayments ? t('deleteNoteHasPayments') : t('deleteNoteNoPayments')}
+        note={<bdi>{hasPayments ? t('deleteNoteHasPayments') : t('deleteNoteNoPayments')}</bdi>}
       />
 
       {expanded && (
@@ -302,10 +302,14 @@ export function InstallmentsSection({
 
   return (
     <Panel className="flex flex-col gap-3">
-      <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
+      <h2 className="font-heading text-lg text-fg">
+        <bdi>{t('heading')}</bdi>
+      </h2>
 
       {installments.length === 0 ? (
-        <p className="text-sm text-fg-muted">{t('noneYet')}</p>
+        <p className="text-sm text-fg-muted">
+          <bdi>{t('noneYet')}</bdi>
+        </p>
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {installments.map((i) => (
@@ -347,7 +351,7 @@ export function InstallmentsSection({
           <input id="new-payer" name="payer_name" placeholder={t('payerAddPlaceholder')} className={controlClass} />
         </Field>
         <Button type="submit" variant="secondary" disabled={isPending}>
-          {isPending ? t('adding') : t('addInstallment')}
+          {isPending ? t('adding') : <bdi>{t('addInstallment')}</bdi>}
         </Button>
       </form>
 

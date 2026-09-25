@@ -44,7 +44,11 @@ export function TeamSection({
     <Panel className="flex flex-col gap-3" data-testid="case-team-section">
       <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
 
-      {!hasLead && <Banner kind="warning">{t('noLeadWarning')}</Banner>}
+      {!hasLead && (
+        <Banner kind="warning">
+          <bdi>{t('noLeadWarning')}</bdi>
+        </Banner>
+      )}
 
       {team.length === 0 ? (
         <p className="text-sm text-fg-muted">{t('nobodyAssigned')}</p>
@@ -54,7 +58,11 @@ export function TeamSection({
             <li key={m.staff_id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
               <span className="flex items-center gap-2 text-fg">
                 {m.full_name}
-                {m.is_lead && <Badge variant="accent">{t('lead')}</Badge>}
+                {m.is_lead && (
+                  <Badge variant="accent">
+                    <bdi>{t('lead')}</bdi>
+                  </Badge>
+                )}
               </span>
               <span className="flex gap-3">
                 {m.is_lead ? (
@@ -64,7 +72,7 @@ export function TeamSection({
                     disabled={isPending}
                     onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, false))}
                   >
-                    {t('removeAsLead')}
+                    <bdi>{t('removeAsLead')}</bdi>
                   </Button>
                 ) : (
                   <Button
@@ -73,7 +81,7 @@ export function TeamSection({
                     disabled={isPending}
                     onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, true))}
                   >
-                    {t('makeLead')}
+                    <bdi>{t('makeLead')}</bdi>
                   </Button>
                 )}
                 <Button
@@ -114,7 +122,7 @@ export function TeamSection({
           </div>
           <label className="flex items-center gap-1.5 pb-2 text-sm text-fg-muted">
             <input type="checkbox" checked={addAsLead} onChange={(e) => setAddAsLead(e.target.checked)} />
-            {t('asLead')}
+            <bdi>{t('asLead')}</bdi>
           </label>
           <Button
             type="button"

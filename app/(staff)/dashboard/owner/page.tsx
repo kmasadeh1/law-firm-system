@@ -107,7 +107,7 @@ export default async function OwnerDashboardPage() {
             {casesNeedingLead.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-fg">
-                  {t('openCasesNoLead', { count: casesNeedingLead.length })}
+                  <bdi>{t('openCasesNoLead', { count: casesNeedingLead.length })}</bdi>
                 </p>
                 <ul className="mt-2 flex flex-col gap-1">
                   {casesNeedingLead.slice(0, 5).map((c) => (

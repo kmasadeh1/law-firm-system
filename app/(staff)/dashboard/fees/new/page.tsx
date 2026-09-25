@@ -12,7 +12,7 @@ export default async function NewEngagementPage() {
     <div className="flex max-w-lg flex-col gap-6">
       <div>
         <BackLink href="/dashboard/fees" label={t('backToFees')} />
-        <PageHeader title={t('title')} />
+        <PageHeader title={<bdi>{t('title')}</bdi>} />
       </div>
       <EngagementForm />
     </div>

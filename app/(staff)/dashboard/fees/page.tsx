@@ -33,18 +33,18 @@ export default async function FeesListPage() {
         title={t('title')}
         action={
           <LinkButton href="/dashboard/fees/new" variant="primary">
-            {t('newEngagement')}
+            <bdi>{t('newEngagement')}</bdi>
           </LinkButton>
         }
       />
 
       {!engagements || engagements.length === 0 ? (
         <EmptyState
-          title={t('noneYet')}
-          description={t('noneYetDescription')}
+          title={<bdi>{t('noneYet')}</bdi>}
+          description={<bdi>{t('noneYetDescription')}</bdi>}
           action={
             <LinkButton href="/dashboard/fees/new" variant="secondary">
-              {t('newEngagement')}
+              <bdi>{t('newEngagement')}</bdi>
             </LinkButton>
           }
         />

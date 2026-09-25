@@ -100,14 +100,18 @@ export function EngagementForm() {
             required
             className={controlClass}
           />
-          <HelpText>{t('percentageHelp')}</HelpText>
+          <HelpText>
+            <bdi>{t('percentageHelp')}</bdi>
+          </HelpText>
         </Field>
       )}
 
       <Field>
         <Label htmlFor="case_ids">{t('linkedCasesLabel')}</Label>
         {cases.length === 0 ? (
-          <HelpText>{t('linkedCasesHelp')}</HelpText>
+          <HelpText>
+            <bdi>{t('linkedCasesHelp')}</bdi>
+          </HelpText>
         ) : (
           <ul className="flex flex-col gap-1.5 rounded-md border border-line p-2">
             {cases.map((c) => (
@@ -139,7 +143,7 @@ export function EngagementForm() {
       {error && <FieldError>{error}</FieldError>}
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
-        {isPending ? t('creating') : t('createEngagement')}
+        {isPending ? t('creating') : <bdi>{t('createEngagement')}</bdi>}
       </Button>
     </form>
   )
