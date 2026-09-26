@@ -9,12 +9,17 @@ const variants: Record<Variant, string> = {
 export function Badge({
   children,
   variant = 'neutral',
+  'data-testid': dataTestId,
 }: {
   children: React.ReactNode
   variant?: Variant
+  'data-testid'?: string
 }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${variants[variant]}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${variants[variant]}`}
+      data-testid={dataTestId}
+    >
       {children}
     </span>
   )

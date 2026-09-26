@@ -148,6 +148,7 @@
       "rolesAndPermissions": "Roles & permissions",
       "deadlinePeriodTypes": "Deadline period types",
       "activityLog": "Activity log",
+      "siteContent": "Site content",
       "settings": "Settings",
       "reports": "Reports",
       "roleOwner": "Owner",
@@ -958,6 +959,68 @@
         "staff_manage": {
           "label": "Add or deactivate staff accounts"
         }
+      },
+      "siteContent": {
+      "title": "Site content",
+      "description": "The firm-authored text on the public marketing site. Changes appear there immediately after you save.",
+      "back": "Back to site content",
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "statusComplete": "Complete",
+      "statusMissingEnglish": "Missing English",
+      "missingEnglishNote": "This field will appear empty for English-language visitors until English text is added.",
+      "missingEnglishNoteTitle": "English visitors will see the firm's default name here instead until English text is added.",
+      "sectionTitleEnLabel": "Heading — English",
+      "sectionTitleArLabel": "Heading — Arabic",
+      "sectionIntroEnLabel": "Intro — English",
+      "sectionIntroArLabel": "Intro — Arabic",
+      "cards": {
+        "firmDetails": {
+          "title": "Firm details",
+          "description": "Address, phone, email, and business hours shown under Contact."
+        },
+        "hero": {
+          "title": "Homepage introduction",
+          "description": "The opening heading and text visitors see first."
+        },
+        "practiceAreas": {
+          "title": "Practice areas — section text",
+          "description": "The heading and intro above the list of practice areas."
+        },
+        "lawyers": {
+          "title": "Lawyers — section text",
+          "description": "The heading and intro above the list of lawyer profiles."
+        },
+        "contact": {
+          "title": "Contact — section text",
+          "description": "The heading and intro above the contact details."
+        }
+      },
+      "firmDetails": {
+        "addressEnLabel": "Address — English",
+        "addressArLabel": "Address — Arabic",
+        "phoneLabel": "Phone",
+        "emailLabel": "Email",
+        "hoursEnLabel": "Business hours — English",
+        "hoursArLabel": "Business hours — Arabic"
+      },
+      "hero": {
+        "eyebrowEnLabel": "Eyebrow — English",
+        "eyebrowArLabel": "Eyebrow — Arabic",
+        "titleEnLabel": "Headline — English",
+        "titleArLabel": "Headline — Arabic",
+        "titleHelp": "Leave both blank to use the firm's name (set under Settings) as the headline.",
+        "introEnLabel": "Tagline — English",
+        "introArLabel": "Tagline — Arabic",
+        "bodyEnLabel": "Body text — English",
+        "bodyArLabel": "Body text — Arabic"
+      },
+      "errors": {
+        "save_failed": "Could not save the changes. Please try again.",
+        "generic": "Something went wrong. Please try again."
+      }
       }
     },
     "settings": {

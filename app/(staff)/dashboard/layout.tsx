@@ -78,6 +78,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       icon: 'period-types',
     })
     administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
+    administration.push({
+      href: '/dashboard/owner/site-content',
+      label: t('siteContent'),
+      icon: 'site-content',
+    })
   }
   if (isOwner || reportsView) {
     administration.push({ href: '/dashboard/reports', label: t('reports'), icon: 'reports' })

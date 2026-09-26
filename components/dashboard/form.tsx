@@ -21,12 +21,32 @@ export function HelpText({ children }: { children: React.ReactNode }) {
   return <p className="text-xs text-fg-muted">{children}</p>
 }
 
-export function FieldError({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-danger-text">{children}</p>
+export function FieldError({
+  children,
+  'data-testid': dataTestId,
+}: {
+  children: React.ReactNode
+  'data-testid'?: string
+}) {
+  return (
+    <p className="text-sm text-danger-text" data-testid={dataTestId}>
+      {children}
+    </p>
+  )
 }
 
-export function FieldSuccess({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-success-text">{children}</p>
+export function FieldSuccess({
+  children,
+  'data-testid': dataTestId,
+}: {
+  children: React.ReactNode
+  'data-testid'?: string
+}) {
+  return (
+    <p className="text-sm text-success-text" data-testid={dataTestId}>
+      {children}
+    </p>
+  )
 }
 
 export function Field({ children }: { children: React.ReactNode }) {
