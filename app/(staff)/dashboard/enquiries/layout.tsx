@@ -2,12 +2,12 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 /**
- * Guards everything under /dashboard/enquiries on enquiries_manage/owner,
- * same pattern as /dashboard/clients. RLS separately lets someone read an
- * enquiry assigned to them even without enquiries_manage - but the nav
- * entry only appears for enquiries_manage/owner (dashboard/layout.tsx), so
- * gating the whole screen the same way here means the nav and the guard
- * always agree: nobody sees a link that then bounces them.
+ * Guards everything under /dashboard/enquiries on enquiries_manage/owner
+ * (has_permission() returns true for the owner already, so that single
+ * check covers both) OR having at least one enquiry assigned - RLS already
+ * lets someone read an enquiry assigned to them even without
+ * enquiries_manage, so the guard has to ask the same question RLS does
+ * before bouncing them, same as the nav entry in dashboard/layout.tsx.
  */
 export default async function EnquiriesLayout({ children }: LayoutProps<'/dashboard/enquiries'>) {
   const supabase = await createClient()
@@ -22,8 +22,19 @@ export default async function EnquiriesLayout({ children }: LayoutProps<'/dashbo
     p_key: 'enquiries_manage',
   })
 
-  if (error || !allowed) {
+  if (error) {
     redirect('/dashboard/staff')
+  }
+
+  if (!allowed) {
+    const { count } = await supabase
+      .from('enquiries')
+      .select('id', { count: 'exact', head: true })
+      .eq('assigned_to', user.sub as string)
+
+    if (!count) {
+      redirect('/dashboard/staff')
+    }
   }
 
   return <>{children}</>

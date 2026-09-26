@@ -26,6 +26,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     { data: clientsManage },
     { data: feesView },
     { data: enquiriesManage },
+    { count: assignedEnquiryCount },
     { data: reportsView },
     initialTheme,
   ] = await Promise.all([
@@ -37,6 +38,10 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     supabase.rpc('has_permission', { p_key: 'clients_manage' }),
     supabase.rpc('has_permission', { p_key: 'fees_view' }),
     supabase.rpc('has_permission', { p_key: 'enquiries_manage' }),
+    // Someone with an enquiry assigned to them can read it under RLS even
+    // without enquiries_manage - the nav has to offer the same link the
+    // enquiries layout guard will actually let them through to.
+    supabase.from('enquiries').select('id', { count: 'exact', head: true }).eq('assigned_to', user.sub as string),
     supabase.rpc('has_permission', { p_key: 'reports_view' }),
     getThemeCookie(),
   ])
@@ -52,7 +57,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   if (isOwner || clientsManage) {
     dailyWork.push({ href: '/dashboard/clients', label: t('clients'), icon: 'clients' })
   }
-  if (isOwner || enquiriesManage) {
+  if (isOwner || enquiriesManage || (assignedEnquiryCount ?? 0) > 0) {
     dailyWork.push({ href: '/dashboard/enquiries', label: t('enquiries'), icon: 'enquiries' })
   }
   dailyWork.push({ href: '/dashboard/cases', label: t('cases'), icon: 'cases' })
