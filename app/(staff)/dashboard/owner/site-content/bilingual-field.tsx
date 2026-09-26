@@ -19,6 +19,7 @@ export function BilingualField({
   warningLabel,
   warningNote,
   help,
+  idSuffix,
 }: {
   nameEn: string
   nameAr: string
@@ -30,9 +31,17 @@ export function BilingualField({
   warningLabel: string
   warningNote: string
   help?: React.ReactNode
+  // The `name` attribute stays the plain field key (what the server action
+  // reads via formData.get) - this only disambiguates `id`/data-testid when
+  // more than one instance of the same field renders on one page, e.g. one
+  // per row of a list (duplicate ids are invalid HTML and would break
+  // <label htmlFor> association and testid lookups alike).
+  idSuffix?: string
 }) {
   const [en, setEn] = useState(defaultValueEn)
   const [ar, setAr] = useState(defaultValueAr)
+  const idEn = idSuffix ? `${nameEn}-${idSuffix}` : nameEn
+  const idAr = idSuffix ? `${nameAr}-${idSuffix}` : nameAr
   // Empty Arabic gracefully falls back to English on the Arabic page
   // (localizedField), so that direction needs no warning. There is no
   // fallback the other way - Arabic filled with English left blank renders
@@ -44,51 +53,51 @@ export function BilingualField({
     <div className="flex flex-col gap-1.5">
       <div className="grid gap-3 sm:grid-cols-2">
         <Field>
-          <Label htmlFor={nameAr}>{labelAr}</Label>
+          <Label htmlFor={idAr}>{labelAr}</Label>
           {multiline ? (
             <textarea
-              id={nameAr}
+              id={idAr}
               name={nameAr}
               dir="rtl"
               rows={3}
               value={ar}
               onChange={(e) => setAr(e.target.value)}
-              data-testid={nameAr}
+              data-testid={idAr}
               className={controlClass}
             />
           ) : (
             <input
-              id={nameAr}
+              id={idAr}
               name={nameAr}
               dir="rtl"
               value={ar}
               onChange={(e) => setAr(e.target.value)}
-              data-testid={nameAr}
+              data-testid={idAr}
               className={controlClass}
             />
           )}
         </Field>
         <Field>
-          <Label htmlFor={nameEn}>{labelEn}</Label>
+          <Label htmlFor={idEn}>{labelEn}</Label>
           {multiline ? (
             <textarea
-              id={nameEn}
+              id={idEn}
               name={nameEn}
               dir="ltr"
               rows={3}
               value={en}
               onChange={(e) => setEn(e.target.value)}
-              data-testid={nameEn}
+              data-testid={idEn}
               className={controlClass}
             />
           ) : (
             <input
-              id={nameEn}
+              id={idEn}
               name={nameEn}
               dir="ltr"
               value={en}
               onChange={(e) => setEn(e.target.value)}
-              data-testid={nameEn}
+              data-testid={idEn}
               className={controlClass}
             />
           )}
@@ -96,7 +105,7 @@ export function BilingualField({
       </div>
       {help}
       {showWarning && (
-        <p className="flex items-center gap-1.5 text-xs text-fg-muted" data-testid={`${nameEn}-missing-english-warning`}>
+        <p className="flex items-center gap-1.5 text-xs text-fg-muted" data-testid={`${idEn}-missing-english-warning`}>
           <Badge variant="accent">{warningLabel}</Badge>
           <bdi>{warningNote}</bdi>
         </p>

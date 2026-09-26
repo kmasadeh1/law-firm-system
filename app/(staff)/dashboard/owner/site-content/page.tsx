@@ -21,12 +21,15 @@ export default async function SiteContentPage() {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.admin.siteContent' })
 
-  const [{ data: firmSettings }, { data: sections }] = await Promise.all([
-    supabase.from('firm_settings').select('address_en, address_ar, hours_en, hours_ar').maybeSingle(),
-    supabase
-      .from('site_sections')
-      .select('key, eyebrow_en, eyebrow_ar, title_en, title_ar, intro_en, intro_ar, body_en, body_ar'),
-  ])
+  const [{ data: firmSettings }, { data: sections }, { data: practiceAreaItems }, { data: lawyerItems }] =
+    await Promise.all([
+      supabase.from('firm_settings').select('address_en, address_ar, hours_en, hours_ar').maybeSingle(),
+      supabase
+        .from('site_sections')
+        .select('key, eyebrow_en, eyebrow_ar, title_en, title_ar, intro_en, intro_ar, body_en, body_ar'),
+      supabase.from('practice_areas').select('name_en, name_ar, description_en, description_ar'),
+      supabase.from('lawyer_profiles').select('name_en, name_ar, role_en, role_ar, bio_en, bio_ar'),
+    ])
 
   const sectionByKey = new Map((sections ?? []).map((row) => [row.key, row]))
   const hero = sectionByKey.get('hero') ?? null
@@ -34,9 +37,6 @@ export default async function SiteContentPage() {
   const lawyers = sectionByKey.get('lawyers') ?? null
   const contact = sectionByKey.get('contact') ?? null
 
-  // Part two adds two more cards here (practice-area items, lawyer
-  // profiles) - this list and the grid below are already built to take
-  // more entries.
   const cards = [
     {
       key: 'firmDetails',
@@ -79,6 +79,27 @@ export default async function SiteContentPage() {
         [contact?.title_ar ?? null, contact?.title_en ?? null],
         [contact?.intro_ar ?? null, contact?.intro_en ?? null],
       ]),
+    },
+    {
+      key: 'practiceAreaItems',
+      href: '/dashboard/owner/site-content/practice-area-items',
+      missingEnglish: isMissingEnglish(
+        (practiceAreaItems ?? []).flatMap((row) => [
+          [row.name_ar, row.name_en] as Pair,
+          [row.description_ar, row.description_en] as Pair,
+        ])
+      ),
+    },
+    {
+      key: 'lawyerProfiles',
+      href: '/dashboard/owner/site-content/lawyer-profiles',
+      missingEnglish: isMissingEnglish(
+        (lawyerItems ?? []).flatMap((row) => [
+          [row.name_ar, row.name_en] as Pair,
+          [row.role_ar, row.role_en] as Pair,
+          [row.bio_ar, row.bio_en] as Pair,
+        ])
+      ),
     },
   ] as const
 

@@ -993,6 +993,14 @@
         "contact": {
           "title": "Contact — section text",
           "description": "The heading and intro above the contact details."
+        },
+        "practiceAreaItems": {
+          "title": "Practice areas — the list",
+          "description": "Add, reorder, hide, or delete the practice areas shown on the public site."
+        },
+        "lawyerProfiles": {
+          "title": "Lawyers — profiles",
+          "description": "Add, reorder, hide, or delete the lawyer profiles shown on the public site."
         }
       },
       "firmDetails": {
@@ -1014,8 +1022,36 @@
         "bodyEnLabel": "Body text — English",
         "bodyArLabel": "Body text — Arabic"
       },
+      "items": {
+        "noneYet": "None yet",
+        "noneYetDescription": "Add one below to get started.",
+        "addPracticeArea": "Add a practice area",
+        "addLawyerProfile": "Add a lawyer profile",
+        "nameEnLabel": "Name — English",
+        "nameArLabel": "Name — Arabic",
+        "descriptionEnLabel": "Description — English",
+        "descriptionArLabel": "Description — Arabic",
+        "roleEnLabel": "Role — English",
+        "roleArLabel": "Role — Arabic",
+        "bioEnLabel": "Bio — English",
+        "bioArLabel": "Bio — Arabic",
+        "add": "Add",
+        "adding": "Adding…",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "hiddenBadge": "Hidden from the site",
+        "publishedLabel": "Visible on the site",
+        "hiddenLabel": "Hidden from the site",
+        "publishedSwitchLabel": "Visible on the site: {name}",
+        "delete": "Delete",
+        "deleting": "Deleting…"
+      },
       "errors": {
         "save_failed": "Could not save the changes. Please try again.",
+        "add_failed": "Could not add the new entry. Please try again.",
+        "delete_failed": "Could not delete this entry. Please try again.",
+        "reorder_failed": "Could not reorder these entries. Please try again.",
+        "publish_failed": "Could not update visibility. Please try again.",
         "generic": "Something went wrong. Please try again."
       }
       }

@@ -8,11 +8,13 @@ export function Switch({
   disabled = false,
   onChange,
   label,
+  'data-testid': dataTestId,
 }: {
   checked: boolean
   disabled?: boolean
   onChange?: (checked: boolean) => void
   label?: string
+  'data-testid'?: string
 }) {
   return (
     <button
@@ -22,6 +24,7 @@ export function Switch({
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
+      data-testid={dataTestId}
       className={`relative mt-0.5 inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60 ${
         checked ? 'border-accent-border bg-accent' : 'border-control-border bg-surface'
       }`}
