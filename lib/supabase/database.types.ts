@@ -50,6 +50,13 @@ export type Database = {
             foreignKeyName: "activity_log_actor_id_fkey"
             columns: ["actor_id"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "activity_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -128,6 +135,13 @@ export type Database = {
             foreignKeyName: "appointments_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "appointments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -137,6 +151,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "appointments_staff_id_fkey"
@@ -187,6 +208,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "expense_totals"
             referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_lawyers_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "case_lawyers_staff_id_fkey"
@@ -254,6 +282,13 @@ export type Database = {
             foreignKeyName: "case_notes_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_notes_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -263,6 +298,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "case_notes_staff_id_fkey"
@@ -372,6 +414,13 @@ export type Database = {
             foreignKeyName: "case_share_links_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_share_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -460,6 +509,13 @@ export type Database = {
             foreignKeyName: "cases_closed_by_fkey"
             columns: ["closed_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "cases_closed_by_fkey"
+            columns: ["closed_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -469,6 +525,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cases_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "cases_created_by_fkey"
@@ -529,6 +592,13 @@ export type Database = {
             foreignKeyName: "clients_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "clients_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -570,6 +640,13 @@ export type Database = {
           searched_national_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "conflict_checks_ran_by_fkey"
+            columns: ["ran_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
           {
             foreignKeyName: "conflict_checks_ran_by_fkey"
             columns: ["ran_by"]
@@ -681,6 +758,13 @@ export type Database = {
             foreignKeyName: "deadlines_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "deadlines_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -690,6 +774,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deadlines_extended_by_fkey"
+            columns: ["extended_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "deadlines_extended_by_fkey"
@@ -764,6 +855,13 @@ export type Database = {
             foreignKeyName: "documents_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "documents_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -773,6 +871,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "documents_uploaded_by_fkey"
@@ -922,6 +1027,13 @@ export type Database = {
             foreignKeyName: "engagements_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "engagements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -973,6 +1085,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["enquiry_status"]
         }
         Relationships: [
+          {
+            foreignKeyName: "enquiries_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
           {
             foreignKeyName: "enquiries_assigned_to_fkey"
             columns: ["assigned_to"]
@@ -1042,6 +1161,13 @@ export type Database = {
             foreignKeyName: "expenses_recorded_by_fkey"
             columns: ["recorded_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "expenses_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -1053,6 +1179,87 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      firm_settings: {
+        Row: {
+          address_ar: string | null
+          address_en: string | null
+          email: string | null
+          hours_ar: string | null
+          hours_en: string | null
+          id: string
+          map_embed_url: string | null
+          phone: string | null
+          singleton: boolean
+          updated_at: string
+        }
+        Insert: {
+          address_ar?: string | null
+          address_en?: string | null
+          email?: string | null
+          hours_ar?: string | null
+          hours_en?: string | null
+          id?: string
+          map_embed_url?: string | null
+          phone?: string | null
+          singleton?: boolean
+          updated_at?: string
+        }
+        Update: {
+          address_ar?: string | null
+          address_en?: string | null
+          email?: string | null
+          hours_ar?: string | null
+          hours_en?: string | null
+          id?: string
+          map_embed_url?: string | null
+          phone?: string | null
+          singleton?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lawyer_profiles: {
+        Row: {
+          bio_ar: string | null
+          bio_en: string | null
+          id: string
+          is_published: boolean
+          name_ar: string | null
+          name_en: string | null
+          photo_path: string | null
+          role_ar: string | null
+          role_en: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          bio_ar?: string | null
+          bio_en?: string | null
+          id?: string
+          is_published?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          photo_path?: string | null
+          role_ar?: string | null
+          role_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          bio_ar?: string | null
+          bio_en?: string | null
+          id?: string
+          is_published?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          photo_path?: string | null
+          role_ar?: string | null
+          role_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       leave_requests: {
         Row: {
@@ -1087,6 +1294,13 @@ export type Database = {
             foreignKeyName: "leave_requests_approved_by_fkey"
             columns: ["approved_by"]
             isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "leave_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
           },
@@ -1096,6 +1310,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
           },
           {
             foreignKeyName: "leave_requests_staff_id_fkey"
@@ -1157,6 +1378,20 @@ export type Database = {
             referencedColumns: ["installment_id"]
           },
           {
+            foreignKeyName: "payments_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "overdue_installments"
+            referencedColumns: ["installment_id"]
+          },
+          {
+            foreignKeyName: "payments_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
             foreignKeyName: "payments_recorded_by_fkey"
             columns: ["recorded_by"]
             isOneToOne: false
@@ -1190,6 +1425,39 @@ export type Database = {
           key?: string
           label?: string
           owner_only?: boolean
+        }
+        Relationships: []
+      }
+      practice_areas: {
+        Row: {
+          description_ar: string | null
+          description_en: string | null
+          id: string
+          is_published: boolean
+          name_ar: string | null
+          name_en: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          is_published?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          is_published?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1244,6 +1512,51 @@ export type Database = {
           id?: string
           name?: string
           name_ar?: string | null
+        }
+        Relationships: []
+      }
+      site_sections: {
+        Row: {
+          body_ar: string | null
+          body_en: string | null
+          eyebrow_ar: string | null
+          eyebrow_en: string | null
+          id: string
+          intro_ar: string | null
+          intro_en: string | null
+          key: string
+          sort_order: number
+          title_ar: string | null
+          title_en: string | null
+          updated_at: string
+        }
+        Insert: {
+          body_ar?: string | null
+          body_en?: string | null
+          eyebrow_ar?: string | null
+          eyebrow_en?: string | null
+          id?: string
+          intro_ar?: string | null
+          intro_en?: string | null
+          key: string
+          sort_order?: number
+          title_ar?: string | null
+          title_en?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body_ar?: string | null
+          body_en?: string | null
+          eyebrow_ar?: string | null
+          eyebrow_en?: string | null
+          id?: string
+          intro_ar?: string | null
+          intro_en?: string | null
+          key?: string
+          sort_order?: number
+          title_ar?: string | null
+          title_en?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1323,6 +1636,13 @@ export type Database = {
           start_time?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "working_hours_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
           {
             foreignKeyName: "working_hours_staff_id_fkey"
             columns: ["staff_id"]
@@ -1452,7 +1772,29 @@ export type Database = {
           paid_amount: number | null
           payer_name: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "engagement_installments_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_balances"
+            referencedColumns: ["engagement_id"]
+          },
+          {
+            foreignKeyName: "engagement_installments_engagement_id_fkey"
+            columns: ["engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       staff_directory: {
         Row: {

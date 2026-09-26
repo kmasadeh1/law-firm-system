@@ -1,23 +1,86 @@
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import NextLink from 'next/link'
 import Image from 'next/image'
+import { createClient } from '@/lib/supabase/server'
+import { localizedField } from '@/lib/localized-field'
 import { Crest } from '@/components/crest'
 import { Link } from '@/i18n/navigation'
 import { LanguageSwitcher } from './components/language-switcher'
 import { ContactForm } from './contact-form'
 
-export default function PublicHomePage() {
-  const t = useTranslations()
+// This page was fully static (prerendered at build time via the [locale]
+// layout's generateStaticParams) before it read from the database. A plain
+// Supabase call doesn't hook into Next's fetch-based data cache the way
+// fetch() does, so left alone it would still run exactly once at build
+// time and freeze whatever was in the tables then - the owner would edit
+// content, see nothing change, and reasonably conclude the editor was
+// broken. `revalidate` turns this into ISR: visitors get the cached page
+// instantly, and the first request after 60s re-runs this function (one
+// round trip across four small tables) and swaps in fresh HTML for
+// everyone after. Cost: an edit can take up to ~60s to appear. The
+// alternative, `dynamic = 'force-dynamic'`, guarantees zero staleness but
+// costs that same round trip on every single visitor, not once a minute -
+// not worth it for a marketing page with no live-editing UX yet. Once an
+// owner-facing editor exists, its save action should call
+// revalidatePath on this route so edits appear immediately; this interval
+// then becomes a safety net rather than the only mechanism.
+export const revalidate = 60
 
-  const practiceAreas = t.raw('practiceAreas.items') as {
-    name: string
-    description: string
-  }[]
-  const lawyers = t.raw('lawyers.items') as {
-    name: string
-    role: string
-    bio: string
-  }[]
+export default async function PublicHomePage({ params }: PageProps<'/[locale]'>) {
+  const { locale } = await params
+  const t = await getTranslations()
+  const supabase = await createClient()
+
+  const [{ data: firmSettings }, { data: sectionRows }, { data: practiceAreaRows }, { data: lawyerRows }] =
+    await Promise.all([
+      supabase
+        .from('firm_settings')
+        .select('address_en, address_ar, phone, email, hours_en, hours_ar')
+        .maybeSingle(),
+      supabase
+        .from('site_sections')
+        .select('key, eyebrow_en, eyebrow_ar, title_en, title_ar, intro_en, intro_ar, body_en, body_ar')
+        .order('sort_order'),
+      // is_published is filtered here explicitly, even though anon RLS
+      // already enforces it - a signed-in owner previewing this page would
+      // otherwise see unpublished rows a real visitor can't, which is
+      // exactly the kind of divergence that's easy to miss until it isn't.
+      supabase
+        .from('practice_areas')
+        .select('name_en, name_ar, description_en, description_ar')
+        .eq('is_published', true)
+        .order('sort_order'),
+      supabase
+        .from('lawyer_profiles')
+        .select('name_en, name_ar, role_en, role_ar, bio_en, bio_ar')
+        .eq('is_published', true)
+        .order('sort_order'),
+    ])
+
+  const sections = new Map((sectionRows ?? []).map((row) => [row.key, row]))
+  const hero = sections.get('hero') ?? null
+  const practiceAreasSection = sections.get('practice_areas') ?? null
+  const lawyersSection = sections.get('lawyers') ?? null
+  const contactSection = sections.get('contact') ?? null
+
+  // hero.title_en/ar are deliberately null in the seed data - the firm's
+  // name already lives in layout.firmName, and keeping two sources for one
+  // name is how they drift. Fall back to the message-file name when unset;
+  // once an owner sets a distinct headline, that takes over instead.
+  const heroTitle = (hero ? localizedField(hero, 'title', locale) : null) ?? t('layout.firmName')
+  const heroEyebrow = hero ? localizedField(hero, 'eyebrow', locale) : null
+  const heroTagline = hero ? localizedField(hero, 'intro', locale) : null
+  const heroBody = hero ? localizedField(hero, 'body', locale) : null
+
+  const practiceAreas = (practiceAreaRows ?? []).map((row) => ({
+    name: localizedField(row, 'name', locale) ?? '',
+    description: localizedField(row, 'description', locale) ?? '',
+  }))
+  const lawyers = (lawyerRows ?? []).map((row) => ({
+    name: localizedField(row, 'name', locale) ?? '',
+    role: localizedField(row, 'role', locale) ?? '',
+    bio: localizedField(row, 'bio', locale) ?? '',
+  }))
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -61,18 +124,18 @@ export default function PublicHomePage() {
         <section className="w-full px-6 py-20 sm:px-10 sm:py-28 lg:px-16">
           <Image
             src="/brand/logo_lockup.png"
-            alt={t('layout.firmName')}
+            alt={heroTitle}
             width={599}
             height={434}
             className="h-auto w-48 sm:w-64"
             priority
           />
-          <p className="mt-8 text-sm text-brass">{t('hero.eyebrow')}</p>
+          <p className="mt-8 text-sm text-brass">{heroEyebrow}</p>
           <h1 className="mt-3 max-w-2xl font-heading text-4xl leading-tight text-paper sm:text-5xl">
-            {t('hero.tagline')}
+            {heroTagline}
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-paper-dim">
-            {t('hero.body')}
+            {heroBody}
           </p>
           <a
             href="#appointment"
@@ -85,8 +148,12 @@ export default function PublicHomePage() {
         {/* 2.2 Practice areas */}
         <section id="practice-areas" className="border-t border-warm-grey/25">
           <div className="w-full px-6 py-20 sm:px-10 lg:px-16">
-            <h2 className="font-heading text-3xl text-paper">{t('practiceAreas.title')}</h2>
-            <p className="mt-3 max-w-xl text-sm text-paper-dim">{t('practiceAreas.intro')}</p>
+            <h2 className="font-heading text-3xl text-paper">
+              {practiceAreasSection && localizedField(practiceAreasSection, 'title', locale)}
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-paper-dim">
+              {practiceAreasSection && localizedField(practiceAreasSection, 'intro', locale)}
+            </p>
 
             <ul className="mt-10 divide-y divide-warm-grey/20 border-y border-warm-grey/20">
               {practiceAreas.map((area) => (
@@ -102,8 +169,12 @@ export default function PublicHomePage() {
         {/* 2.3 Lawyer profiles */}
         <section id="lawyers" className="border-t border-warm-grey/25">
           <div className="w-full px-6 py-20 sm:px-10 lg:px-16">
-            <h2 className="font-heading text-3xl text-paper">{t('lawyers.title')}</h2>
-            <p className="mt-3 max-w-xl text-sm text-paper-dim">{t('lawyers.intro')}</p>
+            <h2 className="font-heading text-3xl text-paper">
+              {lawyersSection && localizedField(lawyersSection, 'title', locale)}
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-paper-dim">
+              {lawyersSection && localizedField(lawyersSection, 'intro', locale)}
+            </p>
 
             <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
               {lawyers.map((lawyer, i) => (
@@ -178,22 +249,26 @@ export default function PublicHomePage() {
 
             {/* 2.5 Contact and location */}
             <div id="contact">
-              <h2 className="font-heading text-3xl text-paper">{t('contact.title')}</h2>
-              <p className="mt-3 text-sm text-paper-dim">{t('contact.intro')}</p>
+              <h2 className="font-heading text-3xl text-paper">
+                {contactSection && localizedField(contactSection, 'title', locale)}
+              </h2>
+              <p className="mt-3 text-sm text-paper-dim">
+                {contactSection && localizedField(contactSection, 'intro', locale)}
+              </p>
 
               <dl className="mt-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
                 <dt className="text-paper-dim">{t('contact.addressLabel')}</dt>
-                <dd className="text-paper">{t('contact.address')}</dd>
+                <dd className="text-paper">{firmSettings && localizedField(firmSettings, 'address', locale)}</dd>
                 <dt className="text-paper-dim">{t('contact.phoneLabel')}</dt>
                 <dd className="text-paper" dir="ltr">
-                  {t('contact.phone')}
+                  {firmSettings?.phone}
                 </dd>
                 <dt className="text-paper-dim">{t('contact.emailLabel')}</dt>
                 <dd className="text-paper" dir="ltr">
-                  {t('contact.email')}
+                  {firmSettings?.email}
                 </dd>
                 <dt className="text-paper-dim">{t('contact.hoursLabel')}</dt>
-                <dd className="text-paper">{t('contact.hours')}</dd>
+                <dd className="text-paper">{firmSettings && localizedField(firmSettings, 'hours', locale)}</dd>
               </dl>
 
               <div
