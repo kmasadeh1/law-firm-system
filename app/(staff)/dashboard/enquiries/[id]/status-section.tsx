@@ -12,7 +12,15 @@ type EnquiryStatus = Database['public']['Enums']['enquiry_status']
 
 const STATUS_VALUES: EnquiryStatus[] = ['new', 'assigned', 'resolved']
 
-export function StatusSection({ enquiryId, currentStatus }: { enquiryId: string; currentStatus: EnquiryStatus }) {
+export function StatusSection({
+  enquiryId,
+  currentStatus,
+  canAccess,
+}: {
+  enquiryId: string
+  currentStatus: EnquiryStatus
+  canAccess: boolean
+}) {
   const t = useTranslations('dashboard.enquiries')
   const tStatus = useTranslations('dashboard.enquiries.status')
   const [status, setStatus] = useState<EnquiryStatus>(currentStatus)
@@ -34,6 +42,15 @@ export function StatusSection({ enquiryId, currentStatus }: { enquiryId: string;
       }
       setSaved(true)
     })
+  }
+
+  if (!canAccess) {
+    return (
+      <Panel className="flex flex-col gap-3">
+        <h2 className="font-heading text-lg text-fg">{t('detail.status.heading')}</h2>
+        <p className="text-sm text-fg">{tStatus(currentStatus)}</p>
+      </Panel>
+    )
   }
 
   return (

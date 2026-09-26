@@ -1108,6 +1108,89 @@ export type Database = {
           },
         ]
       }
+      enquiry_notes: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          edited_at: string | null
+          enquiry_id: string
+          id: string
+          note: string
+          staff_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
+          enquiry_id: string
+          id?: string
+          note: string
+          staff_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
+          enquiry_id?: string
+          id?: string
+          note?: string
+          staff_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enquiry_notes_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "enquiry_notes_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiry_notes_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiry_notes_enquiry_id_fkey"
+            columns: ["enquiry_id"]
+            isOneToOne: false
+            referencedRelation: "enquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiry_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "enquiry_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiry_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount: number
@@ -1816,6 +1899,7 @@ export type Database = {
       }
     }
     Functions: {
+      can_access_enquiry: { Args: { p_enquiry_id: string }; Returns: boolean }
       case_timeline: {
         Args: { p_case_id: string }
         Returns: {
@@ -1874,6 +1958,13 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      set_enquiry_status: {
+        Args: {
+          p_enquiry_id: string
+          p_status: Database["public"]["Enums"]["enquiry_status"]
+        }
+        Returns: undefined
       }
     }
     Enums: {

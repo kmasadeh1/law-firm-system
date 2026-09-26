@@ -12,11 +12,15 @@ type StaffOption = { id: string; full_name: string }
 export function AssignSection({
   enquiryId,
   currentAssignedTo,
+  currentAssignedName,
   staffOptions,
+  canManage,
 }: {
   enquiryId: string
   currentAssignedTo: string | null
+  currentAssignedName: string | null
   staffOptions: StaffOption[]
+  canManage: boolean
 }) {
   const t = useTranslations('dashboard.enquiries')
   const [assignedTo, setAssignedTo] = useState(currentAssignedTo ?? '')
@@ -38,6 +42,19 @@ export function AssignSection({
       }
       setSaved(true)
     })
+  }
+
+  if (!canManage) {
+    return (
+      <Panel className="flex flex-col gap-3">
+        <h2 className="font-heading text-lg text-fg">{t('detail.assignment.heading')}</h2>
+        <p className="text-sm text-fg">
+          {currentAssignedName
+            ? t('detail.assignment.assignedToLabel', { name: currentAssignedName })
+            : t('list.unassigned')}
+        </p>
+      </Panel>
+    )
   }
 
   return (

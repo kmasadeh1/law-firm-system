@@ -43,20 +43,101 @@ export async function setEnquiryStatus(enquiryId: string, status: EnquiryStatus)
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.errors' })
 
-  const { data, error } = await supabase
-    .from('enquiries')
-    .update({ status })
-    .eq('id', enquiryId)
-    .select('id')
+  // Goes through the RPC, never a direct table update - the enquiries
+  // UPDATE policy is owner/enquiries_manage only, so an assigned Lawyer's
+  // direct update would affect zero rows. set_enquiry_status is the one
+  // path that also accepts the assignee, via can_access_enquiry.
+  const { error } = await supabase.rpc('set_enquiry_status', {
+    p_enquiry_id: enquiryId,
+    p_status: status,
+  })
 
   if (error) {
+    if (error.code === '42501') {
+      return { error: t('noPermissionChange') }
+    }
     return { error: t('updateStatusFailed') }
-  }
-  if (!data || data.length === 0) {
-    return { error: t('noPermissionChange') }
   }
 
   revalidatePath(enquiryPath(enquiryId))
   revalidatePath(ENQUIRIES_PATH)
+  return {}
+}
+
+// --- Notes ---------------------------------------------------------------
+
+export async function addEnquiryNote(enquiryId: string, formData: FormData): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.detail.notes.errors' })
+  const note = formData.get('note')
+  if (typeof note !== 'string' || !note.trim()) {
+    return { error: t('writeSomething') }
+  }
+
+  const supabase = await createClient()
+
+  // enquiry_id and note only - staff_id defaults to auth.uid() at the
+  // database level, and a client-sent value would be rejected by RLS
+  // anyway (insert requires staff_id = auth.uid()).
+  const { error } = await supabase.from('enquiry_notes').insert({
+    enquiry_id: enquiryId,
+    note: note.trim(),
+  })
+
+  if (error) {
+    if (error.code === '42501') {
+      return { error: t('noPermissionAdd') }
+    }
+    return { error: t('addFailed') }
+  }
+
+  revalidatePath(enquiryPath(enquiryId))
+  return {}
+}
+
+export async function deleteEnquiryNote(enquiryId: string, noteId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.detail.notes.errors' })
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getClaims()
+
+  const { data, error } = await supabase
+    .from('enquiry_notes')
+    .update({ deleted_at: new Date().toISOString(), deleted_by: userData?.claims?.sub })
+    .eq('id', noteId)
+    .eq('enquiry_id', enquiryId)
+    .select('id')
+
+  if (error) {
+    return { error: t('deleteFailed') }
+  }
+  if (!data || data.length === 0) {
+    return { error: t('noPermissionDelete') }
+  }
+
+  revalidatePath(enquiryPath(enquiryId))
+  return {}
+}
+
+export async function restoreEnquiryNote(enquiryId: string, noteId: string): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.detail.notes.errors' })
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('enquiry_notes')
+    .update({ deleted_at: null, deleted_by: null })
+    .eq('id', noteId)
+    .eq('enquiry_id', enquiryId)
+    .select('id')
+
+  if (error) {
+    return { error: t('restoreFailed') }
+  }
+  if (!data || data.length === 0) {
+    return { error: t('noPermissionRestore') }
+  }
+
+  revalidatePath(enquiryPath(enquiryId))
   return {}
 }

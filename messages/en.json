@@ -1273,6 +1273,7 @@
         "emailLabel": "Email",
         "assignment": {
           "heading": "Assignment",
+          "assignedToLabel": "Assigned to: {name}",
           "saving": "Saving…",
           "save": "Save",
           "saved": "Saved"
@@ -1282,6 +1283,29 @@
           "saving": "Saving…",
           "saveStatus": "Save status",
           "saved": "Saved"
+        },
+        "notes": {
+          "heading": "Notes",
+          "noNotesYet": "No notes yet.",
+          "addNotePlaceholder": "Add a note about this enquiry…",
+          "adding": "Adding…",
+          "addNote": "Add note",
+          "deletedNotesHeading": "Deleted notes",
+          "deleting": "Deleting…",
+          "delete": "Delete",
+          "restoring": "Restoring…",
+          "restore": "Restore",
+          "authorLine": "<bdi>{author}</bdi> · <bdi>{date}</bdi>",
+          "deletedByLine": "Deleted by <bdi>{name}</bdi> · <bdi>{date}</bdi>",
+          "errors": {
+            "writeSomething": "Write something before adding the note.",
+            "noPermissionAdd": "You don't have permission to add notes to this enquiry.",
+            "addFailed": "Could not add the note. Please try again.",
+            "deleteFailed": "Could not delete the note. Please try again.",
+            "noPermissionDelete": "You don't have permission to delete this note.",
+            "restoreFailed": "Could not restore the note. Please try again.",
+            "noPermissionRestore": "You don't have permission to restore this note."
+          }
         }
       },
       "errors": {

@@ -1223,6 +1223,7 @@
         "emailLabel": "البريد الإلكتروني",
         "assignment": {
           "heading": "الإسناد",
+          "assignedToLabel": "مُسند إلى: {name}",
           "saving": "جارٍ الحفظ…",
           "save": "حفظ",
           "saved": "تم الحفظ"
@@ -1232,6 +1233,29 @@
           "saving": "جارٍ الحفظ…",
           "saveStatus": "حفظ الحالة",
           "saved": "تم الحفظ"
+        },
+        "notes": {
+          "heading": "الملاحظات",
+          "noNotesYet": "لا توجد ملاحظات بعد.",
+          "addNotePlaceholder": "أضف ملاحظة حول هذا الاستفسار…",
+          "adding": "جارٍ الإضافة…",
+          "addNote": "إضافة ملاحظة",
+          "deletedNotesHeading": "الملاحظات المحذوفة",
+          "deleting": "جارٍ الحذف…",
+          "delete": "حذف",
+          "restoring": "جارٍ الاستعادة…",
+          "restore": "استعادة",
+          "authorLine": "<bdi>{author}</bdi> · <bdi>{date}</bdi>",
+          "deletedByLine": "حُذفت بواسطة <bdi>{name}</bdi> · <bdi>{date}</bdi>",
+          "errors": {
+            "writeSomething": "اكتب شيئاً قبل إضافة الملاحظة.",
+            "noPermissionAdd": "ليس لديك صلاحية إضافة ملاحظات إلى هذا الاستفسار.",
+            "addFailed": "تعذّرت إضافة الملاحظة. يرجى المحاولة مرة أخرى.",
+            "deleteFailed": "تعذّر حذف الملاحظة. يرجى المحاولة مرة أخرى.",
+            "noPermissionDelete": "ليس لديك صلاحية حذف هذه الملاحظة.",
+            "restoreFailed": "تعذّرت استعادة الملاحظة. يرجى المحاولة مرة أخرى.",
+            "noPermissionRestore": "ليس لديك صلاحية استعادة هذه الملاحظة."
+          }
         }
       },
       "errors": {
