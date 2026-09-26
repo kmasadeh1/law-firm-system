@@ -23,13 +23,22 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
   // No access gate here either - a row RLS hides looks identical to one
   // that doesn't exist, same as the Clients edit page.
-  const { data: caseRow } = await supabase
-    .from('cases')
-    .select(
-      'id, case_number, title, case_type, status_id, opened_at, closed_at, clients(id, full_name)'
-    )
-    .eq('id', id)
-    .maybeSingle()
+  const [{ data: caseRow }, { data: claimsData }] = await Promise.all([
+    supabase
+      .from('cases')
+      .select(
+        'id, case_number, title, case_type, status_id, opened_at, closed_at, clients(id, full_name)'
+      )
+      .eq('id', id)
+      .maybeSingle(),
+    supabase.auth.getClaims(),
+  ])
+
+  const viewerId = claimsData?.claims?.sub as string | undefined
+  const { data: viewerStaffRow } = viewerId
+    ? await supabase.from('staff').select('user_type').eq('id', viewerId).maybeSingle()
+    : { data: null }
+  const isOwner = viewerStaffRow?.user_type === 'owner'
 
   if (!caseRow) {
     return (
@@ -135,7 +144,21 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .map((s) => [s.id, s.full_name])
   )
 
-  const notes: CaseNote[] = (noteRows ?? []).map((n) => ({
+  // Explicit application-layer filter, not just RLS: the "Deleted notes"
+  // section below this page's notes/documents lists is owner-only by
+  // design (restoring a deleted note or document is an owner capability),
+  // and its entire gate used to be "RLS never returns a deleted row to
+  // anyone but the owner in the first place" - a query-level assumption,
+  // not a check this code made itself. Keeping that gate here too means
+  // this page still hides deleted rows from a non-owner even if the RLS
+  // policy that used to do it changes for an unrelated reason (e.g. to
+  // stop blocking the delete action itself, per the deleted_at IS NULL OR
+  // is_owner() clause's dual role as both a read-visibility rule and an
+  // accidental write-blocker).
+  const visibleNoteRows = isOwner ? (noteRows ?? []) : (noteRows ?? []).filter((n) => !n.deleted_at)
+  const visibleDocumentRows = isOwner ? (documentRows ?? []) : (documentRows ?? []).filter((d) => !d.deleted_at)
+
+  const notes: CaseNote[] = visibleNoteRows.map((n) => ({
     id: n.id,
     note: n.note,
     created_at: n.created_at,
@@ -145,7 +168,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     deleted_by_name: n.deleted_by ? (allNameById.get(n.deleted_by) ?? tCommon('unknownStaff')) : null,
   }))
 
-  const documents: DocumentRow[] = (documentRows ?? []).map((d) => ({
+  const documents: DocumentRow[] = visibleDocumentRows.map((d) => ({
     id: d.id,
     filename: d.filename,
     uploaded_at: d.uploaded_at,

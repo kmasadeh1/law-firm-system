@@ -198,7 +198,12 @@ export async function setSignedAgreement(
     // linked cases, the same way linkCase guards the client match - a
     // client-side picker built from the right list is a UX nicety, not a
     // security boundary, so this is re-checked server-side.
-    const { data: doc } = await supabase.from('documents').select('case_id').eq('id', documentId).maybeSingle()
+    const { data: doc } = await supabase
+      .from('documents')
+      .select('case_id')
+      .eq('id', documentId)
+      .is('deleted_at', null)
+      .maybeSingle()
     if (!doc || !doc.case_id) {
       return { error: 'document_not_found' }
     }
