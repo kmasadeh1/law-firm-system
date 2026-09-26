@@ -895,9 +895,6 @@
         "payments_record": {
           "label": "تسجيل دفعة"
         },
-        "public_content_manage": {
-          "label": "تعديل محتوى الموقع العام"
-        },
         "reports_view": {
           "label": "عرض التقارير"
         },

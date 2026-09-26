@@ -30,7 +30,7 @@ export const PERMISSION_GROUPS: { titleKey: string; keys: string[] }[] = [
   },
   {
     titleKey: 'frontOffice',
-    keys: ['enquiries_manage', 'public_content_manage'],
+    keys: ['enquiries_manage'],
   },
   {
     titleKey: 'reporting',

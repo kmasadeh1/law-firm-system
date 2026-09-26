@@ -947,9 +947,6 @@
         "payments_record": {
           "label": "Record a payment"
         },
-        "public_content_manage": {
-          "label": "Edit public site content"
-        },
         "reports_view": {
           "label": "View reports"
         },
