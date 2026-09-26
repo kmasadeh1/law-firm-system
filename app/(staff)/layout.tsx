@@ -47,9 +47,16 @@ export default async function StaffRootLayout({ children }: { children: React.Re
 
   // Arabic dashboard translations arrive in phases, key by key - a missing
   // key falls back to English rather than the whole namespace doing so (see
-  // i18n/messages.ts). Only the dashboard slice is sent to the client here;
-  // the public site's namespaces aren't relevant to this route tree.
-  const messages = { dashboard: getMessagesForLocale(locale).dashboard }
+  // i18n/messages.ts). Only dashboard + staffAuth are sent to the client
+  // here - the public site's namespaces aren't relevant to this route tree.
+  // staffAuth has to be included, not just dashboard: change-password-form.tsx
+  // is a Client Component reading staffAuth.changePassword.* via
+  // useTranslations, and NextIntlClientProvider only resolves messages that
+  // were actually included in this object - a key can be fully present in
+  // both message files and still come back MISSING_MESSAGE on the client if
+  // its namespace was left out of this slice.
+  const localeMessages = getMessagesForLocale(locale)
+  const messages = { dashboard: localeMessages.dashboard, staffAuth: localeMessages.staffAuth }
 
   return (
     <html
