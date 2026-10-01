@@ -591,6 +591,7 @@
           "endRequired": "وقت الانتهاء مطلوب.",
           "selectStatus": "اختر حالة صالحة.",
           "courtDateNeedsCase": "يجب ربط موعد المحكمة بقضية.",
+          "endBeforeStart": "يجب أن يكون وقت الانتهاء بعد وقت البدء.",
           "noPermissionCreate": "ليس لديك صلاحية إنشاء هذا الموعد.",
           "createFailed": "تعذّر إنشاء الموعد. يرجى المحاولة مرة أخرى.",
           "noPermissionUpdate": "ليس لديك صلاحية تعديل هذا الموعد.",

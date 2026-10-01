@@ -1,9 +1,9 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { createAppointment, updateAppointment } from './actions'
+import { createAppointment, updateAppointment, type AppointmentErrorCode } from './actions'
 import { ClientPicker } from './client-picker'
 import { CasePicker } from './case-picker'
 import type { ClientOption } from '../cases/actions'
@@ -16,11 +16,41 @@ type StaffOption = { id: string; full_name: string }
 type AppointmentType = 'consultation' | 'court_date'
 type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'
 
-function toLocalInputValue(iso: string) {
-  const d = new Date(iso)
+const ONE_HOUR_MS = 60 * 60 * 1000
+
+function formatLocalInput(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
+
+function toLocalInputValue(iso: string) {
+  return formatLocalInput(new Date(iso))
+}
+
+// datetime-local's value is already "YYYY-MM-DDTHH:mm" in local time, which
+// `new Date(...)` parses as local time too - round-trips cleanly without a
+// timezone library.
+function addOneHour(localValue: string): string {
+  const d = new Date(localValue)
+  if (Number.isNaN(d.getTime())) return localValue
+  return formatLocalInput(new Date(d.getTime() + ONE_HOUR_MS))
+}
+
+// Closed set the server can return - anything else falls back to a generic
+// translated message rather than passing an arbitrary value to t() as a key.
+const APPOINTMENT_ERROR_CODES: AppointmentErrorCode[] = [
+  'selectType',
+  'selectClient',
+  'startRequired',
+  'endRequired',
+  'selectStatus',
+  'courtDateNeedsCase',
+  'endBeforeStart',
+  'noPermissionCreate',
+  'createFailed',
+  'noPermissionUpdate',
+  'updateFailed',
+]
 
 export function AppointmentForm({
   mode,
@@ -52,28 +82,72 @@ export function AppointmentForm({
 }) {
   const router = useRouter()
   const t = useTranslations('dashboard.appointments.form')
+  const tErrors = useTranslations('dashboard.appointments.form.errors')
   const tType = useTranslations('dashboard.appointments.type')
   const tStatus = useTranslations('dashboard.appointments.status')
   const formRef = useRef<HTMLFormElement>(null)
+  const startRef = useRef<HTMLInputElement>(null)
+  const endRef = useRef<HTMLInputElement>(null)
   const [type, setType] = useState<AppointmentType>(initial?.type ?? 'consultation')
+  // Editing an existing appointment never auto-shifts its end time just
+  // because the start changed - its existing gap was a deliberate choice.
+  // Only a brand-new form's still-untouched end field gets kept in sync.
+  const endTouchedRef = useRef(mode === 'edit')
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [isPending, startTransition] = useTransition()
 
+  // Both datetime fields are uncontrolled (defaultValue, not value) - "now"
+  // is only known on the client, and a controlled input fed a client-only
+  // computation would make the server-rendered and first client-rendered
+  // value disagree. This effect sets the two starting values together, once,
+  // straight on the DOM via refs - not React state - right after mount, the
+  // same way any "synchronize with a value React doesn't own" effect would.
+  useEffect(() => {
+    if (mode === 'create' && startRef.current && endRef.current) {
+      const now = new Date()
+      startRef.current.value = formatLocalInput(now)
+      endRef.current.value = formatLocalInput(new Date(now.getTime() + ONE_HOUR_MS))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const canAssignNow = canAssignAll || (canAssignCourtDates && type === 'court_date')
   const assignedStaffId = initial?.staff_id ?? currentStaffId
+
+  function resolveError(code: AppointmentErrorCode) {
+    if ((APPOINTMENT_ERROR_CODES as string[]).includes(code)) return tErrors(code)
+    return mode === 'create' ? tErrors('createFailed') : tErrors('updateFailed')
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     setSaved(false)
+
     const formData = new FormData(formRef.current!)
+
+    // Fail-fast UX on top of the database's own ends_after_starts check,
+    // never a replacement for it - the server action maps the same
+    // violation by constraint name if this ever gets bypassed.
+    const startsValue = formData.get('starts_at')
+    const endsValue = formData.get('ends_at')
+    if (
+      typeof startsValue === 'string' &&
+      typeof endsValue === 'string' &&
+      startsValue &&
+      endsValue &&
+      new Date(endsValue).getTime() <= new Date(startsValue).getTime()
+    ) {
+      setError(resolveError('endBeforeStart'))
+      return
+    }
 
     startTransition(async () => {
       if (mode === 'create') {
         const result = await createAppointment(formData)
         if (result.error) {
-          setError(result.error)
+          setError(resolveError(result.error))
           return
         }
         if (result.appointmentId) {
@@ -84,7 +158,7 @@ export function AppointmentForm({
 
       const result = await updateAppointment(appointmentId!, formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveError(result.error))
         return
       }
       setSaved(true)
@@ -140,11 +214,18 @@ export function AppointmentForm({
             {t('startsLabel')}
           </Label>
           <input
+            ref={startRef}
             id="starts_at"
             name="starts_at"
             type="datetime-local"
             required
             defaultValue={initial ? toLocalInputValue(initial.starts_at) : undefined}
+            onChange={(e) => {
+              if (!endTouchedRef.current && endRef.current) {
+                endRef.current.value = addOneHour(e.target.value)
+              }
+            }}
+            data-testid="appointment-starts-at"
             className={controlClass}
           />
         </Field>
@@ -153,11 +234,16 @@ export function AppointmentForm({
             {t('endsLabel')}
           </Label>
           <input
+            ref={endRef}
             id="ends_at"
             name="ends_at"
             type="datetime-local"
             required
             defaultValue={initial ? toLocalInputValue(initial.ends_at) : undefined}
+            onChange={() => {
+              endTouchedRef.current = true
+            }}
+            data-testid="appointment-ends-at"
             className={controlClass}
           />
         </Field>

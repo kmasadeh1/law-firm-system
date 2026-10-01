@@ -1,11 +1,37 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
-import { getStaffLocale } from '@/lib/get-staff-locale'
 
-type ActionResult = { error?: string }
+// A caller-controlled value never reaches next-intl's t() directly - the
+// render site validates against a whitelist, same as TeamErrorCode in
+// cases/actions.ts. courtDateNeedsCase and endBeforeStart map to two
+// distinct CHECK constraints (court_date_requires_case, ends_after_starts)
+// and must never share a slot - matched by constraint name in the error
+// message, never guessed from which field looks wrong.
+export type AppointmentErrorCode =
+  | 'selectType'
+  | 'selectClient'
+  | 'startRequired'
+  | 'endRequired'
+  | 'selectStatus'
+  | 'courtDateNeedsCase'
+  | 'endBeforeStart'
+  | 'noPermissionCreate'
+  | 'createFailed'
+  | 'noPermissionUpdate'
+  | 'updateFailed'
+
+type ActionResult = { error?: AppointmentErrorCode }
+
+// Both constraints raise the same SQLSTATE (23514) - Postgres's own message
+// names the constraint it was ("violates check constraint \"<name>\""), so
+// this reads that instead of guessing from form state which rule failed.
+function mapCheckViolation(message: string): AppointmentErrorCode | null {
+  if (message.includes('ends_after_starts')) return 'endBeforeStart'
+  if (message.includes('court_date_requires_case')) return 'courtDateNeedsCase'
+  return null
+}
 
 function appointmentPath(id: string) {
   return `/dashboard/appointments/${id}`
@@ -38,8 +64,6 @@ export async function searchCases(term: string): Promise<CaseOption[]> {
 export async function createAppointment(
   formData: FormData
 ): Promise<ActionResult & { appointmentId?: string }> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.appointments.form.errors' })
   const type = formData.get('type')
   const client_id = formData.get('client_id')
   const case_id = formData.get('case_id')
@@ -49,21 +73,21 @@ export async function createAppointment(
   const notes = formData.get('notes')
 
   if (type !== 'consultation' && type !== 'court_date') {
-    return { error: t('selectType') }
+    return { error: 'selectType' }
   }
   if (typeof client_id !== 'string' || !client_id) {
-    return { error: t('selectClient') }
+    return { error: 'selectClient' }
   }
   if (typeof starts_at !== 'string' || !starts_at) {
-    return { error: t('startRequired') }
+    return { error: 'startRequired' }
   }
   if (typeof ends_at !== 'string' || !ends_at) {
-    return { error: t('endRequired') }
+    return { error: 'endRequired' }
   }
-  // case_id-required-for-court_date is a DB check constraint, not
-  // reimplemented here - the required attribute on the case picker covers
-  // the normal UX, and the insert below catches the DB's rejection if that
-  // gets bypassed.
+  // case_id-required-for-court_date and ends_after_starts are both DB check
+  // constraints, not reimplemented here - the form's own client-side checks
+  // cover the normal UX, and the insert below maps the DB's rejection by
+  // constraint name if either gets bypassed.
 
   const supabase = await createClient()
   const { data: user } = await supabase.auth.getClaims()
@@ -86,16 +110,13 @@ export async function createAppointment(
     .single()
 
   if (error) {
-    // The DB check constraint (case_id required for court_date) surfaces as
-    // a check-violation - the client already requires a case for that type,
-    // so this only fires if that constraint is ever tightened further.
     if (error.code === '23514') {
-      return { error: t('courtDateNeedsCase') }
+      return { error: mapCheckViolation(error.message) ?? 'createFailed' }
     }
     if (error.code === '42501') {
-      return { error: t('noPermissionCreate') }
+      return { error: 'noPermissionCreate' }
     }
-    return { error: t('createFailed') }
+    return { error: 'createFailed' }
   }
 
   revalidatePath('/dashboard/appointments')
@@ -108,8 +129,6 @@ export async function updateAppointment(
   id: string,
   formData: FormData
 ): Promise<ActionResult> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.appointments.form.errors' })
   const type = formData.get('type')
   const client_id = formData.get('client_id')
   const case_id = formData.get('case_id')
@@ -120,26 +139,26 @@ export async function updateAppointment(
   const status = formData.get('status')
 
   if (type !== 'consultation' && type !== 'court_date') {
-    return { error: t('selectType') }
+    return { error: 'selectType' }
   }
   if (typeof client_id !== 'string' || !client_id) {
-    return { error: t('selectClient') }
+    return { error: 'selectClient' }
   }
   if (typeof starts_at !== 'string' || !starts_at) {
-    return { error: t('startRequired') }
+    return { error: 'startRequired' }
   }
   if (typeof ends_at !== 'string' || !ends_at) {
-    return { error: t('endRequired') }
+    return { error: 'endRequired' }
   }
-  // Same as createAppointment - case_id-required-for-court_date is left to
-  // the DB check constraint, not duplicated here.
+  // Same as createAppointment - both check constraints are left to the DB,
+  // not duplicated here.
   if (
     status !== 'scheduled' &&
     status !== 'completed' &&
     status !== 'cancelled' &&
     status !== 'no_show'
   ) {
-    return { error: t('selectStatus') }
+    return { error: 'selectStatus' }
   }
 
   const supabase = await createClient()
@@ -160,14 +179,14 @@ export async function updateAppointment(
 
   if (error) {
     if (error.code === '23514') {
-      return { error: t('courtDateNeedsCase') }
+      return { error: mapCheckViolation(error.message) ?? 'updateFailed' }
     }
-    return { error: t('updateFailed') }
+    return { error: 'updateFailed' }
   }
 
   // UPDATE blocked by RLS matches zero rows rather than erroring.
   if (!data || data.length === 0) {
-    return { error: t('noPermissionUpdate') }
+    return { error: 'noPermissionUpdate' }
   }
 
   revalidatePath(appointmentPath(id))

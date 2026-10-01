@@ -550,6 +550,7 @@
           "endRequired": "End time is required.",
           "selectStatus": "Select a valid status.",
           "courtDateNeedsCase": "A court date must be linked to a case.",
+          "endBeforeStart": "The end time must be after the start time.",
           "noPermissionCreate": "You don't have permission to create this appointment.",
           "createFailed": "Could not create the appointment. Please try again.",
           "noPermissionUpdate": "You don't have permission to change this appointment.",
