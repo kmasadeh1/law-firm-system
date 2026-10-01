@@ -190,3 +190,13 @@ export function ArrowDownIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function LeaveRequestsIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3" y="4.5" width="14" height="12" rx="1.5" />
+      <path d="M3 8h14M7 2.5v3M13 2.5v3" />
+      <path d="M7.5 12.5l1.8 1.8L12.7 11" />
+    </svg>
+  )
+}

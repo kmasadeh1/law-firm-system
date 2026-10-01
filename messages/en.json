@@ -21,7 +21,10 @@
       "errors": {
         "tooShort": "Password must be at least 8 characters.",
         "mismatch": "Passwords don't match.",
-        "expired": "This temporary password has expired."
+        "weakPassword": "Password must be at least 12 characters, with an uppercase letter, a lowercase letter, a number, and a symbol.",
+        "expired": "This temporary password has expired.",
+        "updateFailed": "Could not set the password. Please try again.",
+        "completeFailed": "The password was set, but finishing the change failed. Please try again."
       }
     },
     "login": {
@@ -73,7 +76,7 @@
     "phoneLabel": "Phone",
     "emailLabel": "Email",
     "hoursLabel": "Office hours",
-    "mapPlaceholder": "Map placeholder",
+    "mapTitle": "Map showing the firm's office location",
     "formNameLabel": "Full name",
     "formPhoneLabel": "Phone",
     "formEmailLabel": "Email",
@@ -143,6 +146,7 @@
       "cases": "Cases",
       "appointments": "Appointments",
       "deadlines": "Deadlines",
+      "leaveRequests": "Leave requests",
       "feesAndPayments": "Fees & payments",
       "staffAccounts": "Staff accounts",
       "rolesAndPermissions": "Roles & permissions",
@@ -196,6 +200,7 @@
       "new": {
         "backToCases": "Cases",
         "title": "New case",
+        "noAccess": "You don't have permission to create cases.",
         "clientLabel": "Client",
         "clientSearchPlaceholder": "Search existing clients by name or national ID",
         "noMatchingClient": "No matching client. Add them in Clients first.",
@@ -213,6 +218,7 @@
           "caseNumberRequired": "Case number is required.",
           "statusLookupFailed": "Could not determine the starting status. Please try again.",
           "caseNumberInUse": "That case number is already in use.",
+          "noPermission": "You don't have permission to create cases.",
           "createFailed": "Could not create the case. Please try again."
         }
       },
@@ -472,6 +478,8 @@
         "saved": "Saved",
         "matchExistingOpposingParty": "<bdi>{name}</bdi> — existing opposing party in a case",
         "matchExistingClient": "<bdi>{name}</bdi> — existing client",
+        "noAccess": "You don't have permission to create clients.",
+        "noAccessConflictChecks": "You don't have permission to view conflict-check history.",
         "errors": {
           "fullNameRequired": "Full name is required.",
           "conflictCheckFailed": "Could not run the conflict check. Please try again.",
@@ -813,13 +821,15 @@
           "deactivate": "Deactivate"
         },
         "errors": {
+          "notPermitted": "You don't have permission to manage staff accounts.",
           "fullNameRequired": "Full name is required.",
           "emailRequired": "Email is required.",
           "chooseRole": "Choose a role.",
-          "couldNotCreateLogin": "Could not create the login.",
-          "staffRecordFailedWithCleanup": "Could not create the staff record ({staffMessage}), and cleanup of the orphaned login also failed ({cleanupMessage}). Auth user {userId} needs manual removal.",
-          "staffRecordFailedRolledBack": "Could not create the staff record: {staffMessage}. The login was rolled back.",
-          "passwordResetButRecordFailed": "The password was reset, but updating the staff record failed: {message}. The account may not be flagged to require a change.",
+          "emailInUse": "That email address is already registered.",
+          "couldNotCreateLogin": "Could not create the login. Please try again.",
+          "staffRecordFailedWithCleanup": "Could not create the staff record, and cleanup of the orphaned login also failed. Auth user {userId} needs manual removal.",
+          "staffRecordFailedRolledBack": "Could not create the staff record. The login was rolled back - please try again.",
+          "passwordResetButRecordFailed": "The password was reset, but updating the staff record failed. The account may not be flagged to require a change.",
           "updateAccountFailed": "Could not update that account. Please try again."
         }
       },
@@ -1009,7 +1019,9 @@
         "phoneLabel": "Phone",
         "emailLabel": "Email",
         "hoursEnLabel": "Business hours — English",
-        "hoursArLabel": "Business hours — Arabic"
+        "hoursArLabel": "Business hours — Arabic",
+        "mapEmbedUrlLabel": "Map embed URL",
+        "mapEmbedUrlHelp": "Paste the URL from Google Maps' Share > Embed a map > copy HTML, the src=\"...\" value only. Leave blank to hide the map on the public site."
       },
       "hero": {
         "eyebrowEnLabel": "Eyebrow — English",
@@ -1074,6 +1086,30 @@
       "theme": {
         "heading": "Theme",
         "description": "Light or dark mode for the dashboard. This is the same control as the one in the header."
+      },
+      "workingHours": {
+        "heading": "Working hours",
+        "description": "Your regular schedule, used to work out availability. Sunday through Saturday.",
+        "dayOff": "Day off",
+        "to": "to",
+        "setByOffice": "set by the office",
+        "overrideHoursLine": "{start} – {end}",
+        "saving": "Saving…",
+        "save": "Save",
+        "saved": "Saved",
+        "day": {
+          "0": "Sunday",
+          "1": "Monday",
+          "2": "Tuesday",
+          "3": "Wednesday",
+          "4": "Thursday",
+          "5": "Friday",
+          "6": "Saturday"
+        },
+        "errors": {
+          "invalidTimes": "Each day needs either both a start and end time, with the end after the start, or neither (a day off).",
+          "saveFailed": "Could not save your working hours. Please try again."
+        }
       },
       "password": {
         "heading": "Password",
@@ -1312,6 +1348,51 @@
         "saveAssignmentFailed": "Could not save the assignment. Please try again.",
         "noPermissionChange": "You don't have permission to change this enquiry.",
         "updateStatusFailed": "Could not update the status. Please try again."
+      }
+    },
+    "leaveRequests": {
+      "title": "Leave requests",
+      "description": "Request time off, and track the status of your requests.",
+      "requestHeading": "Request leave",
+      "blockDaysOffHeading": "Block days off",
+      "myRequestsHeading": "Your requests",
+      "teamHeading": "Everyone else",
+      "pendingHeading": "Pending",
+      "answeredHeading": "Answered",
+      "noneYet": "No leave requests yet",
+      "noneYetDescription": "Submit a request above and it will show up here.",
+      "noPendingRequests": "No pending requests.",
+      "dateRange": "{start} – {end}",
+      "withdraw": "Withdraw",
+      "withdrawing": "Withdrawing…",
+      "removeBlock": "Remove",
+      "removingBlock": "Removing…",
+      "approve": "Approve",
+      "reject": "Reject",
+      "decidedByLine": "Decided by <bdi>{name}</bdi>",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "form": {
+        "startDateLabel": "Start date",
+        "endDateLabel": "End date",
+        "submit": "Submit request",
+        "submitting": "Submitting…",
+        "block": "Block days off",
+        "blocking": "Blocking…"
+      },
+      "errors": {
+        "startDateRequired": "Start date is required.",
+        "endDateRequired": "End date is required.",
+        "endBeforeStart": "End date must be on or after the start date.",
+        "notPermitted": "You don't have permission to do that.",
+        "requestFailed": "Could not submit your request. Please try again.",
+        "withdrawFailed": "Could not withdraw the request. Please try again.",
+        "noPermissionWithdraw": "This request has already been decided and can no longer be withdrawn.",
+        "decisionFailed": "Could not save your decision. Please try again.",
+        "noPermissionDecide": "You don't have permission to decide this request."
       }
     }
   }

@@ -128,7 +128,7 @@ function RevokeButton({ caseId, linkId, linkLabel }: { caseId: string; linkId: s
   )
 }
 
-function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
+function LinkRow({ caseId, link, canManage }: { caseId: string; link: ShareLink; canManage: boolean }) {
   const status = linkStatus(link)
   const locale = useLocale()
   const t = useTranslations('dashboard.cases.detail.shareLinks')
@@ -167,14 +167,22 @@ function LinkRow({ caseId, link }: { caseId: string; link: ShareLink }) {
           {t('viewCount', { count: link.access_count })}
         </p>
       </div>
-      {status === 'active' && (
+      {canManage && status === 'active' && (
         <RevokeButton caseId={caseId} linkId={link.id} linkLabel={link.label || t('untitledLink')} />
       )}
     </li>
   )
 }
 
-export function ShareLinksSection({ caseId, links }: { caseId: string; links: ShareLink[] }) {
+export function ShareLinksSection({
+  caseId,
+  links,
+  canManage,
+}: {
+  caseId: string
+  links: ShareLink[]
+  canManage: boolean
+}) {
   const t = useTranslations('dashboard.cases.detail.shareLinks')
   const [expiresDays, setExpiresDays] = useState('90')
   const [label, setLabel] = useState('')
@@ -210,40 +218,42 @@ export function ShareLinksSection({ caseId, links }: { caseId: string; links: Sh
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {links.map((l) => (
-            <LinkRow key={l.id} caseId={caseId} link={l} />
+            <LinkRow key={l.id} caseId={caseId} link={l} canManage={canManage} />
           ))}
         </ul>
       )}
 
-      <form onSubmit={handleGenerate} className="flex flex-wrap items-end gap-2">
-        <Field>
-          <Label htmlFor="share-label">{t('labelFieldLabel')}</Label>
-          <input
-            id="share-label"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            placeholder={t('labelPlaceholder')}
-            className={controlClass}
-          />
-        </Field>
-        <Field>
-          <Label htmlFor="share-expiry">{t('expiresAfterLabel')}</Label>
-          <select
-            id="share-expiry"
-            value={expiresDays}
-            onChange={(e) => setExpiresDays(e.target.value)}
-            className={controlClass}
-          >
-            <option value="30">{t('expiry30')}</option>
-            <option value="90">{t('expiry90')}</option>
-            <option value="180">{t('expiry180')}</option>
-            <option value="365">{t('expiry365')}</option>
-          </select>
-        </Field>
-        <Button type="submit" variant="secondary" disabled={isPending}>
-          {isPending ? t('generating') : t('generateLink')}
-        </Button>
-      </form>
+      {canManage && (
+        <form onSubmit={handleGenerate} className="flex flex-wrap items-end gap-2">
+          <Field>
+            <Label htmlFor="share-label">{t('labelFieldLabel')}</Label>
+            <input
+              id="share-label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder={t('labelPlaceholder')}
+              className={controlClass}
+            />
+          </Field>
+          <Field>
+            <Label htmlFor="share-expiry">{t('expiresAfterLabel')}</Label>
+            <select
+              id="share-expiry"
+              value={expiresDays}
+              onChange={(e) => setExpiresDays(e.target.value)}
+              className={controlClass}
+            >
+              <option value="30">{t('expiry30')}</option>
+              <option value="90">{t('expiry90')}</option>
+              <option value="180">{t('expiry180')}</option>
+              <option value="365">{t('expiry365')}</option>
+            </select>
+          </Field>
+          <Button type="submit" variant="secondary" disabled={isPending}>
+            {isPending ? t('generating') : t('generateLink')}
+          </Button>
+        </form>
+      )}
 
       {error && <FieldError>{error}</FieldError>}
     </Panel>

@@ -37,7 +37,10 @@
       "errors": {
         "tooShort": "يجب ألا تقل كلمة المرور عن 8 أحرف.",
         "mismatch": "كلمتا المرور غير متطابقتين.",
-        "expired": "انتهت صلاحية كلمة المرور المؤقتة."
+        "weakPassword": "يجب ألا تقل كلمة المرور عن 12 حرفاً، وأن تحتوي على حرف كبير وحرف صغير ورقم ورمز.",
+        "expired": "انتهت صلاحية كلمة المرور المؤقتة.",
+        "updateFailed": "تعذّر تعيين كلمة المرور. يرجى المحاولة مرة أخرى.",
+        "completeFailed": "تم تعيين كلمة المرور، لكن إتمام التغيير فشل. يرجى المحاولة مرة أخرى."
       }
     }
   },
@@ -73,7 +76,7 @@
     "phoneLabel": "الهاتف",
     "emailLabel": "البريد الإلكتروني",
     "hoursLabel": "ساعات العمل",
-    "mapPlaceholder": "عنصر نائب للخريطة",
+    "mapTitle": "خريطة تُظهر موقع مكتب المحاماة",
     "formNameLabel": "الاسم الكامل",
     "formPhoneLabel": "الهاتف",
     "formEmailLabel": "البريد الإلكتروني",
@@ -137,6 +140,7 @@
       "cases": "القضايا",
       "appointments": "المواعيد",
       "deadlines": "المهل",
+      "leaveRequests": "طلبات الإجازة",
       "feesAndPayments": "الأتعاب والمدفوعات",
       "staffAccounts": "حسابات الموظفين",
       "rolesAndPermissions": "الأدوار والصلاحيات",
@@ -188,6 +192,7 @@
       "new": {
         "backToCases": "القضايا",
         "title": "قضية جديدة",
+        "noAccess": "ليس لديك صلاحية إنشاء القضايا.",
         "clientLabel": "العميل",
         "clientSearchPlaceholder": "ابحث في العملاء الحاليين بالاسم أو الرقم الوطني",
         "noMatchingClient": "لا يوجد عميل مطابق. أضفه من قسم العملاء أولاً.",
@@ -204,6 +209,7 @@
           "caseNumberRequired": "رقم القضية مطلوب.",
           "statusLookupFailed": "تعذّر تحديد الحالة الابتدائية. يرجى المحاولة مرة أخرى.",
           "caseNumberInUse": "رقم القضية هذا مستخدم بالفعل.",
+          "noPermission": "ليس لديك صلاحية إنشاء القضايا.",
           "createFailed": "تعذّر إنشاء القضية. يرجى المحاولة مرة أخرى."
         }
       },
@@ -447,6 +453,8 @@
         "saveChanges": "حفظ التغييرات",
         "saved": "تم الحفظ",
         "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
+        "noAccess": "ليس لديك صلاحية إنشاء العملاء.",
+        "noAccessConflictChecks": "ليس لديك صلاحية عرض سجلّ فحوصات التعارض.",
         "errors": {
           "fullNameRequired": "الاسم الكامل مطلوب.",
           "createFailed": "تعذّر إنشاء العميل. يرجى المحاولة مرة أخرى.",
@@ -761,13 +769,15 @@
           "deactivate": "تعطيل"
         },
         "errors": {
+          "notPermitted": "ليس لديك صلاحية إدارة حسابات الموظفين.",
           "fullNameRequired": "الاسم الكامل مطلوب.",
           "emailRequired": "البريد الإلكتروني مطلوب.",
           "chooseRole": "اختر دوراً.",
-          "couldNotCreateLogin": "تعذّر إنشاء بيانات الدخول.",
-          "staffRecordFailedWithCleanup": "تعذّر إنشاء سجل الموظف ({staffMessage})، كما تعذّر تنظيف بيانات الدخول اليتيمة ({cleanupMessage}). يحتاج المستخدم {userId} إلى إزالة يدوية.",
-          "staffRecordFailedRolledBack": "تعذّر إنشاء سجل الموظف: {staffMessage}. تم التراجع عن بيانات الدخول.",
-          "passwordResetButRecordFailed": "أُعيد تعيين كلمة المرور، لكن تحديث سجل الموظف فشل: {message}. قد لا يكون الحساب مُعلَّماً باشتراط تغيير كلمة المرور.",
+          "emailInUse": "هذا البريد الإلكتروني مسجّل بالفعل.",
+          "couldNotCreateLogin": "تعذّر إنشاء بيانات الدخول. يرجى المحاولة مرة أخرى.",
+          "staffRecordFailedWithCleanup": "تعذّر إنشاء سجل الموظف، كما تعذّر تنظيف بيانات الدخول اليتيمة. يحتاج المستخدم {userId} إلى إزالة يدوية.",
+          "staffRecordFailedRolledBack": "تعذّر إنشاء سجل الموظف. تم التراجع عن بيانات الدخول - يرجى المحاولة مرة أخرى.",
+          "passwordResetButRecordFailed": "أُعيد تعيين كلمة المرور، لكن تحديث سجل الموظف فشل. قد لا يكون الحساب مُعلَّماً باشتراط تغيير كلمة المرور.",
           "updateAccountFailed": "تعذّر تحديث هذا الحساب. يرجى المحاولة مرة أخرى."
         }
       },
@@ -957,7 +967,9 @@
         "phoneLabel": "الهاتف",
         "emailLabel": "البريد الإلكتروني",
         "hoursEnLabel": "ساعات العمل — بالإنجليزية",
-        "hoursArLabel": "ساعات العمل — بالعربية"
+        "hoursArLabel": "ساعات العمل — بالعربية",
+        "mapEmbedUrlLabel": "رابط تضمين الخريطة",
+        "mapEmbedUrlHelp": "الصق الرابط من خرائط جوجل: مشاركة > تضمين خريطة > نسخ HTML، قيمة src=\"...\" فقط. اتركه فارغاً لإخفاء الخريطة في الموقع العام."
       },
       "hero": {
         "eyebrowEnLabel": "الشارة العلوية — بالإنجليزية",
@@ -1022,6 +1034,30 @@
       "theme": {
         "heading": "المظهر",
         "description": "الوضع الفاتح أو الداكن للوحة التحكم. وهو نفس عنصر التحكم الموجود في الترويسة."
+      },
+      "workingHours": {
+        "heading": "ساعات العمل",
+        "description": "جدولك المعتاد، يُستخدم لتحديد التوفر. من الأحد إلى السبت.",
+        "dayOff": "يوم إجازة",
+        "to": "إلى",
+        "setByOffice": "حدده المكتب",
+        "overrideHoursLine": "{start} – {end}",
+        "saving": "جارٍ الحفظ…",
+        "save": "حفظ",
+        "saved": "تم الحفظ",
+        "day": {
+          "0": "الأحد",
+          "1": "الاثنين",
+          "2": "الثلاثاء",
+          "3": "الأربعاء",
+          "4": "الخميس",
+          "5": "الجمعة",
+          "6": "السبت"
+        },
+        "errors": {
+          "invalidTimes": "يجب أن يحتوي كل يوم إما على وقتي بدء وانتهاء، بحيث يكون وقت الانتهاء بعد وقت البدء، أو لا شيء (يوم إجازة).",
+          "saveFailed": "تعذّر حفظ ساعات العمل. يرجى المحاولة مرة أخرى."
+        }
       },
       "password": {
         "heading": "كلمة المرور",
@@ -1262,6 +1298,51 @@
         "saveAssignmentFailed": "تعذّر حفظ الإسناد. يرجى المحاولة مرة أخرى.",
         "noPermissionChange": "ليس لديك صلاحية تعديل هذا الاستفسار.",
         "updateStatusFailed": "تعذّر تحديث الحالة. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "leaveRequests": {
+      "title": "طلبات الإجازة",
+      "description": "اطلب إجازة، وتابع حالة طلباتك.",
+      "requestHeading": "طلب إجازة",
+      "blockDaysOffHeading": "حجب أيام إجازة",
+      "myRequestsHeading": "طلباتك",
+      "teamHeading": "بقية الموظفين",
+      "pendingHeading": "قيد الانتظار",
+      "answeredHeading": "تم البت فيها",
+      "noneYet": "لا توجد طلبات إجازة بعد",
+      "noneYetDescription": "أرسل طلباً أعلاه وسيظهر هنا.",
+      "noPendingRequests": "لا توجد طلبات قيد الانتظار.",
+      "dateRange": "{start} – {end}",
+      "withdraw": "سحب الطلب",
+      "withdrawing": "جارٍ السحب…",
+      "removeBlock": "إزالة",
+      "removingBlock": "جارٍ الإزالة…",
+      "approve": "الموافقة",
+      "reject": "الرفض",
+      "decidedByLine": "قرره <bdi>{name}</bdi>",
+      "status": {
+        "pending": "قيد الانتظار",
+        "approved": "تمت الموافقة",
+        "rejected": "مرفوض"
+      },
+      "form": {
+        "startDateLabel": "تاريخ البدء",
+        "endDateLabel": "تاريخ الانتهاء",
+        "submit": "إرسال الطلب",
+        "submitting": "جارٍ الإرسال…",
+        "block": "حجب الأيام",
+        "blocking": "جارٍ الحجب…"
+      },
+      "errors": {
+        "startDateRequired": "تاريخ البدء مطلوب.",
+        "endDateRequired": "تاريخ الانتهاء مطلوب.",
+        "endBeforeStart": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء أو مساوياً له.",
+        "notPermitted": "ليس لديك صلاحية القيام بذلك.",
+        "requestFailed": "تعذّر إرسال الطلب. يرجى المحاولة مرة أخرى.",
+        "withdrawFailed": "تعذّر سحب الطلب. يرجى المحاولة مرة أخرى.",
+        "noPermissionWithdraw": "تم البت في هذا الطلب بالفعل ولم يعد بالإمكان سحبه.",
+        "decisionFailed": "تعذّر حفظ القرار. يرجى المحاولة مرة أخرى.",
+        "noPermissionDecide": "ليس لديك صلاحية البت في هذا الطلب."
       }
     }
   }

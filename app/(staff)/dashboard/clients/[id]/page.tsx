@@ -12,13 +12,17 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.clients.detail.page' })
 
-  const [{ data: client }, { data: balance }] = await Promise.all([
+  const [{ data: client }, { data: balance }, { data: canManage }] = await Promise.all([
     supabase.from('clients').select('id, full_name, national_id, phone, email, notes').eq('id', id).maybeSingle(),
     supabase
       .from('client_balances')
       .select('agreed_fixed_fee_total, percentage_engagement_count, scheduled_total, paid_total, scheduled_outstanding')
       .eq('client_id', id)
       .maybeSingle(),
+    // Read is broader than write - a Lawyer can reach this page for a
+    // client on their own case without clients_manage. Asked once here,
+    // never OR'd with is_owner() (has_permission already covers the owner).
+    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
   ])
 
   return (
@@ -30,7 +34,7 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
 
       {client ? (
         <>
-          <ClientForm mode="edit" client={client} />
+          <ClientForm mode="edit" client={client} canManage={canManage === true} />
           <BalanceSection balance={balance} />
         </>
       ) : (

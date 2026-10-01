@@ -57,7 +57,7 @@ function validateFile(file: File, t: ReturnType<typeof useTranslations>): string
   return null
 }
 
-function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow }) {
+function DeletedDocumentRow({ caseId, doc, canWrite }: { caseId: string; doc: DocumentRow; canWrite: boolean }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const locale = useLocale()
@@ -93,14 +93,16 @@ function DeletedDocumentRow({ caseId, doc }: { caseId: string; doc: DocumentRow 
         </p>
         {error && <FieldError>{error}</FieldError>}
       </div>
-      <Button type="button" variant="ghost" onClick={handleRestore} disabled={isPending}>
-        {isPending ? t('restoring') : t('restore')}
-      </Button>
+      {canWrite && (
+        <Button type="button" variant="ghost" onClick={handleRestore} disabled={isPending}>
+          {isPending ? t('restoring') : t('restore')}
+        </Button>
+      )}
     </li>
   )
 }
 
-function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) {
+function DocumentRowItem({ caseId, doc, canWrite }: { caseId: string; doc: DocumentRow; canWrite: boolean }) {
   const [error, setError] = useState<string | null>(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -150,26 +152,38 @@ function DocumentRowItem({ caseId, doc }: { caseId: string; doc: DocumentRow }) 
         <Button type="button" variant="secondary" onClick={handleView} disabled={isPending}>
           {isPending ? t('opening') : t('view')}
         </Button>
-        <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
-          {isPending ? t('removing') : t('remove')}
-        </Button>
+        {canWrite && (
+          <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
+            {isPending ? t('removing') : t('remove')}
+          </Button>
+        )}
       </div>
 
-      <DeleteConfirmDialog
-        open={confirmingDelete}
-        onCancel={() => setConfirmingDelete(false)}
-        onConfirm={handleConfirmDelete}
-        kind="soft"
-        itemLabel={doc.filename}
-        confirmLabel={t('remove')}
-        pendingLabel={t('removing')}
-        pending={isPending}
-      />
+      {canWrite && (
+        <DeleteConfirmDialog
+          open={confirmingDelete}
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={handleConfirmDelete}
+          kind="soft"
+          itemLabel={doc.filename}
+          confirmLabel={t('remove')}
+          pendingLabel={t('removing')}
+          pending={isPending}
+        />
+      )}
     </li>
   )
 }
 
-export function DocumentsSection({ caseId, documents }: { caseId: string; documents: DocumentRow[] }) {
+export function DocumentsSection({
+  caseId,
+  documents,
+  canWrite,
+}: {
+  caseId: string
+  documents: DocumentRow[]
+  canWrite: boolean
+}) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -212,22 +226,24 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {activeDocuments.map((doc) => (
-            <DocumentRowItem key={doc.id} caseId={caseId} doc={doc} />
+            <DocumentRowItem key={doc.id} caseId={caseId} doc={doc} canWrite={canWrite} />
           ))}
         </ul>
       )}
 
-      <form ref={formRef} onSubmit={handleUpload} className="flex flex-wrap items-center gap-2">
-        <input
-          ref={inputRef}
-          type="file"
-          name="file"
-          className="text-sm text-fg-muted file:mr-3 file:rounded-md file:border file:border-line file:bg-surface file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-fg hover:file:bg-line/40"
-        />
-        <Button type="submit" variant="secondary" disabled={isPending}>
-          {isPending ? t('uploading') : t('upload')}
-        </Button>
-      </form>
+      {canWrite && (
+        <form ref={formRef} onSubmit={handleUpload} className="flex flex-wrap items-center gap-2">
+          <input
+            ref={inputRef}
+            type="file"
+            name="file"
+            className="text-sm text-fg-muted file:mr-3 file:rounded-md file:border file:border-line file:bg-surface file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-fg hover:file:bg-line/40"
+          />
+          <Button type="submit" variant="secondary" disabled={isPending}>
+            {isPending ? t('uploading') : t('upload')}
+          </Button>
+        </form>
+      )}
       {error && <FieldError>{error}</FieldError>}
 
       {/* Only ever populated for the owner - RLS hides removed documents
@@ -238,7 +254,7 @@ export function DocumentsSection({ caseId, documents }: { caseId: string; docume
           <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">{t('removedDocumentsHeading')}</p>
           <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
             {deletedDocuments.map((doc) => (
-              <DeletedDocumentRow key={doc.id} caseId={caseId} doc={doc} />
+              <DeletedDocumentRow key={doc.id} caseId={caseId} doc={doc} canWrite={canWrite} />
             ))}
           </ul>
         </div>

@@ -3,17 +3,34 @@
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { createCase } from '../actions'
+import { createCase, type CreateCaseErrorCode } from '../actions'
 import { ClientPicker } from '../client-picker'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
 import { Button } from '@/components/dashboard/button'
 
+// Closed set the server can return - anything else falls back to a generic
+// translated message rather than passing an arbitrary value to t() as a key.
+const CREATE_CASE_ERROR_CODES: CreateCaseErrorCode[] = [
+  'selectClient',
+  'titleRequired',
+  'caseNumberRequired',
+  'statusLookupFailed',
+  'caseNumberInUse',
+  'noPermission',
+  'createFailed',
+]
+
 export function CaseForm() {
   const router = useRouter()
   const t = useTranslations('dashboard.cases.new')
+  const tErrors = useTranslations('dashboard.cases.new.errors')
   const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  function resolveError(code: CreateCaseErrorCode) {
+    return (CREATE_CASE_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('createFailed')
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -23,7 +40,7 @@ export function CaseForm() {
     startTransition(async () => {
       const result = await createCase(formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveError(result.error))
         return
       }
       if (result.caseId) {

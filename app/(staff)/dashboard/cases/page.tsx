@@ -15,10 +15,13 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.list' })
 
-  const { data: statuses } = await supabase
-    .from('case_statuses')
-    .select('id, name, name_ar, sort_order')
-    .order('sort_order')
+  const [{ data: statuses }, { data: canCreate }] = await Promise.all([
+    supabase.from('case_statuses').select('id, name, name_ar, sort_order').order('sort_order'),
+    // Server-side, not inferred from the list coming back empty - the Lawyer
+    // role sees its own assigned cases in an otherwise-empty list, which is
+    // not the same thing as "cannot create one."
+    supabase.rpc('has_permission', { p_key: 'cases_manage' }),
+  ])
 
   // No access gate here - this just renders whatever RLS returns for the
   // signed-in user (owner, cases_manage, or their own case assignments),
@@ -46,9 +49,11 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
       <PageHeader
         title={t('title')}
         action={
-          <LinkButton href="/dashboard/cases/new" variant="primary">
-            {t('newCase')}
-          </LinkButton>
+          canCreate === true ? (
+            <LinkButton href="/dashboard/cases/new" variant="primary">
+              {t('newCase')}
+            </LinkButton>
+          ) : undefined
         }
       />
 
@@ -86,7 +91,7 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
           title={term || status ? t('noCasesFiltered') : t('noCasesYet')}
           description={term || status ? undefined : t('noCasesYetDescription')}
           action={
-            !term && !status && (
+            !term && !status && canCreate === true && (
               <LinkButton href="/dashboard/cases/new" variant="secondary">
                 {t('newCase')}
               </LinkButton>

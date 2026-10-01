@@ -27,7 +27,15 @@ type Deadline = {
   period_days: number
 }
 
-function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline }) {
+function DeadlineRow({
+  caseId,
+  deadline,
+  canManage,
+}: {
+  caseId: string
+  deadline: Deadline
+  canManage: boolean
+}) {
   const locale = useLocale()
   const t = useTranslations('dashboard.deadlines.section')
   const tUrgency = useTranslations('dashboard.deadlines.urgency')
@@ -121,38 +129,39 @@ function DeadlineRow({ caseId, deadline }: { caseId: string; deadline: Deadline 
         </div>
       ) : null}
 
-      {extending ? (
-        <form ref={formRef} onSubmit={handleExtend} className="flex flex-wrap items-end gap-2">
-          <Field>
-            <Label htmlFor={`extended-${deadline.id}`} required>
-              {t('newDueDateLabel')}
-            </Label>
-            <input
-              id={`extended-${deadline.id}`}
-              name="extended_due_date"
-              type="date"
-              required
-              className={controlClass}
-            />
-          </Field>
-          <Field>
-            <Label htmlFor={`reason-${deadline.id}`} required>
-              {t('reasonLabel')}
-            </Label>
-            <input id={`reason-${deadline.id}`} name="extension_reason" required className={controlClass} />
-          </Field>
-          <Button type="submit" variant="secondary" disabled={isPending}>
-            {isPending ? t('saving') : t('saveExtension')}
+      {canManage &&
+        (extending ? (
+          <form ref={formRef} onSubmit={handleExtend} className="flex flex-wrap items-end gap-2">
+            <Field>
+              <Label htmlFor={`extended-${deadline.id}`} required>
+                {t('newDueDateLabel')}
+              </Label>
+              <input
+                id={`extended-${deadline.id}`}
+                name="extended_due_date"
+                type="date"
+                required
+                className={controlClass}
+              />
+            </Field>
+            <Field>
+              <Label htmlFor={`reason-${deadline.id}`} required>
+                {t('reasonLabel')}
+              </Label>
+              <input id={`reason-${deadline.id}`} name="extension_reason" required className={controlClass} />
+            </Field>
+            <Button type="submit" variant="secondary" disabled={isPending}>
+              {isPending ? t('saving') : t('saveExtension')}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => setExtending(false)} disabled={isPending}>
+              {t('cancel')}
+            </Button>
+          </form>
+        ) : (
+          <Button type="button" variant="ghost" onClick={() => setExtending(true)} className="self-start">
+            {deadline.extended_due_date ? t('changeExtension') : t('extend')}
           </Button>
-          <Button type="button" variant="ghost" onClick={() => setExtending(false)} disabled={isPending}>
-            {t('cancel')}
-          </Button>
-        </form>
-      ) : (
-        <Button type="button" variant="ghost" onClick={() => setExtending(true)} className="self-start">
-          {deadline.extended_due_date ? t('changeExtension') : t('extend')}
-        </Button>
-      )}
+        ))}
 
       {error && <FieldError>{error}</FieldError>}
     </li>
@@ -163,10 +172,12 @@ export function DeadlinesSection({
   caseId,
   deadlines,
   periodTypes,
+  canManage,
 }: {
   caseId: string
   deadlines: Deadline[]
   periodTypes: PeriodTypeOption[]
+  canManage: boolean
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.deadlines.section')
@@ -202,11 +213,12 @@ export function DeadlinesSection({
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {deadlines.map((d) => (
-            <DeadlineRow key={d.id} caseId={caseId} deadline={d} />
+            <DeadlineRow key={d.id} caseId={caseId} deadline={d} canManage={canManage} />
           ))}
         </ul>
       )}
 
+      {canManage && (
       <form ref={addFormRef} onSubmit={handleAdd} className="flex flex-col gap-3">
         <input type="hidden" name="case_id" value={caseId} />
         <div className="flex flex-wrap items-end gap-2">
@@ -243,6 +255,7 @@ export function DeadlinesSection({
         {selectedPeriod?.description && <Banner kind="warning">{selectedPeriod.description}</Banner>}
         <HelpText>{tForm('triggerDateHelp')}</HelpText>
       </form>
+      )}
 
       {error && <FieldError>{error}</FieldError>}
 

@@ -19,7 +19,7 @@ type ClientRow = {
 
 type Props =
   | { mode: 'create' }
-  | { mode: 'edit'; client: ClientRow }
+  | { mode: 'edit'; client: ClientRow; canManage: boolean }
 
 // Only two outcomes here (unlike the case-detail opposing-parties flow's
 // three) - this form has no "current case" to compare a matched opposing
@@ -52,6 +52,43 @@ export function ClientForm(props: Props) {
     props.mode === 'edit'
       ? props.client
       : { full_name: '', national_id: '', phone: '', email: '', notes: '' }
+
+  // Read is broader than write for a client - a Lawyer can reach this page
+  // for a client on their own case without clients_manage. No control at
+  // all here, not a disabled one: the database will refuse the write
+  // regardless, so nothing offers it.
+  if (props.mode === 'edit' && !props.canManage) {
+    return (
+      <dl className="flex flex-col gap-4">
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('fullNameLabel')}</dt>
+          <dd className="mt-1 text-sm text-fg">{initial.full_name}</dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('nationalIdLabel')}</dt>
+          <dd className="mt-1 text-sm text-fg">
+            <bdi>{initial.national_id || '—'}</bdi>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('phoneLabel')}</dt>
+          <dd className="mt-1 text-sm text-fg" dir="ltr">
+            {initial.phone || '—'}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('emailLabel')}</dt>
+          <dd className="mt-1 text-sm text-fg" dir="ltr">
+            {initial.email || '—'}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('notesLabel')}</dt>
+          <dd className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.notes || '—'}</dd>
+        </div>
+      </dl>
+    )
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

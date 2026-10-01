@@ -1,16 +1,28 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
-import { getStaffLocale } from '@/lib/get-staff-locale'
+import { getChangePasswordLocale, setStaffLocaleCookie } from '@/lib/get-staff-locale'
 
 type ActionResult = { error?: string; expired?: boolean }
+
+// Cookie-only, same mechanism as /login's setLoginLocale - picks which
+// message file this screen renders, never staff.locale, never auth/session.
+// See getChangePasswordLocale for why this page can't use the dashboard's
+// setLocale (which writes the DB column): is_owner()/has_permission() are
+// both false mid-forced-password-change, and the whole point is that this
+// switch must work independent of that gate.
+export async function setChangePasswordLocale(locale: 'en' | 'ar') {
+  await setStaffLocaleCookie(locale)
+  revalidatePath('/change-password')
+}
 
 export async function changePassword(formData: FormData): Promise<ActionResult> {
   const password = formData.get('password')
   const confirm = formData.get('confirm')
 
-  const locale = await getStaffLocale()
+  const locale = await getChangePasswordLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth.changePassword.errors' })
 
   if (typeof password !== 'string' || password.length < 8) {
@@ -24,10 +36,15 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
 
   const { error: updateError } = await supabase.auth.updateUser({ password })
   if (updateError) {
-    // Supabase's own validation message (e.g. a weak-password rule) - raw
-    // and English by construction, same structural limit as other
-    // server-generated error text on this project; not routed through t().
-    return { error: updateError.message }
+    // Supabase's own password-policy rejection is raw English text, not
+    // routed through our messages - rendered directly it broke bidi on the
+    // Arabic page (a trailing "." is bidi-neutral and lands at the left
+    // edge). Map the closed set of Auth error codes we can name to our own
+    // copy instead of ever passing error.message through.
+    if (updateError.code === 'weak_password') {
+      return { error: t('weakPassword') }
+    }
+    return { error: t('updateFailed') }
   }
 
   const { error: completeError } = await supabase.rpc('complete_password_change')
@@ -39,7 +56,7 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
     if (completeError.message.toLowerCase().includes('expired')) {
       return { error: t('expired'), expired: true }
     }
-    return { error: completeError.message }
+    return { error: t('completeFailed') }
   }
 
   return {}

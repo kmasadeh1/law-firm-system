@@ -5,16 +5,24 @@ import { addCaseNote, editCaseNote, deleteCaseNote, restoreCaseNote } from '../a
 
 export type CaseNote = NoteRow
 
-export function NotesSection({ caseId, notes }: { caseId: string; notes: CaseNote[] }) {
+export function NotesSection({
+  caseId,
+  notes,
+  canWrite,
+}: {
+  caseId: string
+  notes: CaseNote[]
+  canWrite: boolean
+}) {
   return (
     <SharedNotesSection
       notes={notes}
       namespace="dashboard.cases.detail.notes"
       testId="case-notes-section"
       actions={{
-        addNote: (formData) => addCaseNote(caseId, formData),
-        editNote: (noteId, formData) => editCaseNote(caseId, noteId, formData),
-        deleteNote: (noteId) => deleteCaseNote(caseId, noteId),
+        addNote: canWrite ? (formData) => addCaseNote(caseId, formData) : undefined,
+        editNote: canWrite ? (noteId, formData) => editCaseNote(caseId, noteId, formData) : undefined,
+        deleteNote: canWrite ? (noteId) => deleteCaseNote(caseId, noteId) : undefined,
         restoreNote: (noteId) => restoreCaseNote(caseId, noteId),
       }}
     />

@@ -2,9 +2,11 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 /**
- * Creating a case is a hard binary gate (owner or cases_manage), unlike the
- * case list/detail pages which just render whatever RLS returns. Checked
- * explicitly here, not inferred from anything downstream.
+ * Only the auth check redirects. Whether the signed-in user can actually
+ * create a case (cases_manage) is asked in page.tsx itself, which renders a
+ * "you don't have access" state instead of the form rather than bouncing
+ * back to /dashboard/cases - the URL is reachable directly, so silently
+ * redirecting away reads as a broken link rather than an explained refusal.
  */
 export default async function NewCaseLayout({ children }: LayoutProps<'/dashboard/cases/new'>) {
   const supabase = await createClient()
@@ -13,14 +15,6 @@ export default async function NewCaseLayout({ children }: LayoutProps<'/dashboar
 
   if (!user) {
     redirect('/login')
-  }
-
-  const { data: allowed, error } = await supabase.rpc('has_permission', {
-    p_key: 'cases_manage',
-  })
-
-  if (error || !allowed) {
-    redirect('/dashboard/cases')
   }
 
   return <>{children}</>

@@ -42,6 +42,7 @@ export async function updateFirmSettings(formData: FormData): Promise<ActionResu
       email: readString(formData, 'email'),
       hours_en: readString(formData, 'hours_en'),
       hours_ar: readString(formData, 'hours_ar'),
+      map_embed_url: readString(formData, 'map_embed_url'),
     })
     .eq('singleton', true)
 

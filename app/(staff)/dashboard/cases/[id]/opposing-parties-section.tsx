@@ -51,9 +51,11 @@ function matchLabel(
 export function OpposingPartiesSection({
   caseId,
   parties,
+  canManage,
 }: {
   caseId: string
   parties: OpposingParty[]
+  canManage: boolean
 }) {
   const t = useTranslations('dashboard.cases.detail.opposingParties')
   const tErrors = useTranslations('dashboard.cases.detail.opposingParties.errors')
@@ -119,27 +121,29 @@ export function OpposingPartiesSection({
         </ul>
       )}
 
-      <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="op-name" className="text-sm text-fg-muted">
-            {t('nameLabel')}
-          </label>
-          <input id="op-name" name="name" required className={controlClass} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="op-national-id" className="text-sm text-fg-muted">
-            {t('nationalIdLabel')}
-          </label>
-          <input id="op-national-id" name="national_id" className={controlClass} />
-        </div>
-        {!matches && (
-          <Button type="submit" variant="secondary" data-testid="opposing-party-add-button" disabled={isPending}>
-            {isPending ? t('checking') : t('add')}
-          </Button>
-        )}
-      </form>
+      {canManage && (
+        <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="op-name" className="text-sm text-fg-muted">
+              {t('nameLabel')}
+            </label>
+            <input id="op-name" name="name" required className={controlClass} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="op-national-id" className="text-sm text-fg-muted">
+              {t('nationalIdLabel')}
+            </label>
+            <input id="op-national-id" name="national_id" className={controlClass} />
+          </div>
+          {!matches && (
+            <Button type="submit" variant="secondary" data-testid="opposing-party-add-button" disabled={isPending}>
+              {isPending ? t('checking') : t('add')}
+            </Button>
+          )}
+        </form>
+      )}
 
-      {matches && matches.length > 0 && (
+      {canManage && matches && matches.length > 0 && (
         <ConflictWarning
           labels={matches.map((m) => matchLabel(m, caseId, t))}
           onConfirm={handleConfirmAnyway}

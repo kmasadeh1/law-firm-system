@@ -28,15 +28,17 @@ export type NoteRow = {
 
 type ActionResult = { error?: string }
 
-// editNote/restoreNote are optional - a caller that doesn't offer editing
-// (e.g. enquiry notes) simply omits editNote, and the Edit control and its
-// form never render. Same for restoreNote: pass it only when the deleted
-// rows in `notes` are meant to be restorable (the owner's view), never as a
-// way to hide a control from someone who otherwise could use it.
+// All four are optional - a caller omits whichever action the viewer isn't
+// permitted to take, and that control never renders (never a disabled one).
+// addNote absent hides the add-note form entirely; deleteNote absent hides
+// Delete on every note; editNote absent hides Edit; restoreNote is passed
+// only when the deleted rows in `notes` are meant to be restorable (the
+// owner's view). None of this is the caller hiding the whole section - the
+// notes list itself still renders regardless of which actions are present.
 type NotesSectionActions = {
-  addNote: (formData: FormData) => Promise<ActionResult>
+  addNote?: (formData: FormData) => Promise<ActionResult>
   editNote?: (noteId: string, formData: FormData) => Promise<ActionResult>
-  deleteNote: (noteId: string) => Promise<ActionResult>
+  deleteNote?: (noteId: string) => Promise<ActionResult>
   restoreNote?: (noteId: string) => Promise<ActionResult>
 }
 
@@ -100,7 +102,7 @@ function NoteItem({
   note: NoteRow
   namespace: string
   editNote?: (noteId: string, formData: FormData) => Promise<ActionResult>
-  deleteNote: (noteId: string) => Promise<ActionResult>
+  deleteNote?: (noteId: string) => Promise<ActionResult>
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -126,6 +128,7 @@ function NoteItem({
   }
 
   function handleConfirmDelete() {
+    if (!deleteNote) return
     setError(null)
     startTransition(async () => {
       const result = await deleteNote(note.id)
@@ -178,28 +181,34 @@ function NoteItem({
         )}
       </p>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
-      <div className="flex items-center gap-2">
-        {editNote && (
-          <Button type="button" variant="ghost" onClick={() => setIsEditing(true)}>
-            {t('edit')}
-          </Button>
-        )}
-        <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
-          {isPending ? t('deleting') : t('delete')}
-        </Button>
-      </div>
+      {(editNote || deleteNote) && (
+        <div className="flex items-center gap-2">
+          {editNote && (
+            <Button type="button" variant="ghost" onClick={() => setIsEditing(true)}>
+              {t('edit')}
+            </Button>
+          )}
+          {deleteNote && (
+            <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
+              {isPending ? t('deleting') : t('delete')}
+            </Button>
+          )}
+        </div>
+      )}
       {error && <FieldError>{error}</FieldError>}
 
-      <DeleteConfirmDialog
-        open={confirmingDelete}
-        onCancel={() => setConfirmingDelete(false)}
-        onConfirm={handleConfirmDelete}
-        kind="soft"
-        itemLabel={firstLine(note.note)}
-        confirmLabel={t('delete')}
-        pendingLabel={t('deleting')}
-        pending={isPending}
-      />
+      {deleteNote && (
+        <DeleteConfirmDialog
+          open={confirmingDelete}
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={handleConfirmDelete}
+          kind="soft"
+          itemLabel={firstLine(note.note)}
+          confirmLabel={t('delete')}
+          pendingLabel={t('deleting')}
+          pending={isPending}
+        />
+      )}
     </li>
   )
 }
@@ -222,10 +231,11 @@ export function NotesSection({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!actions.addNote) return
     setError(null)
     const formData = new FormData(formRef.current!)
     startTransition(async () => {
-      const result = await actions.addNote(formData)
+      const result = await actions.addNote!(formData)
       if (result.error) {
         setError(result.error)
         return
@@ -257,19 +267,21 @@ export function NotesSection({
         </ul>
       )}
 
-      <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <textarea
-          name="note"
-          rows={3}
-          placeholder={t('addNotePlaceholder')}
-          className={`${controlClass} resize-y`}
-        />
-        <div className="flex justify-end">
-          <Button type="submit" variant="secondary" disabled={isPending}>
-            {isPending ? t('adding') : t('addNote')}
-          </Button>
-        </div>
-      </form>
+      {actions.addNote && (
+        <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <textarea
+            name="note"
+            rows={3}
+            placeholder={t('addNotePlaceholder')}
+            className={`${controlClass} resize-y`}
+          />
+          <div className="flex justify-end">
+            <Button type="submit" variant="secondary" disabled={isPending}>
+              {isPending ? t('adding') : t('addNote')}
+            </Button>
+          </div>
+        </form>
+      )}
       {error && <FieldError>{error}</FieldError>}
 
       {/* Only ever populated when the caller means for this viewer to see

@@ -64,6 +64,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: expenseRows },
     { data: expenseTotalsRow },
     { data: timelineRows, error: timelineError },
+    { data: canManageCaseDetails },
+    { data: canManageShareLinks },
+    { data: canWriteDocuments },
+    { data: canWriteNotes },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order'),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
@@ -107,6 +111,14 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     // security_invoker so it respects the same RLS as expenses itself.
     supabase.from('expense_totals').select('total_incurred, total_reimbursed, total_outstanding').eq('case_id', id).maybeSingle(),
     supabase.rpc('case_timeline', { p_case_id: id }),
+    // Each of these is asked once, here, rather than inside its section or
+    // per row - all four are STABLE and already return true for the owner
+    // on their own, so nothing here ORs them with isOwner (that's the
+    // exact anti-pattern this task exists to remove).
+    supabase.rpc('can_manage_case_details', { p_case_id: id }),
+    supabase.rpc('can_manage_case_share_links', { p_case_id: id }),
+    supabase.rpc('can_write_case_documents', { p_case_id: id }),
+    supabase.rpc('can_write_case_notes', { p_case_id: id }),
   ])
 
   // staff_directory is a view, so its columns come back nullable in the
@@ -218,17 +230,31 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
       <StatusSection caseId={caseRow.id} currentStatusId={caseRow.status_id} statuses={statuses ?? []} />
 
-      <TeamSection caseId={caseRow.id} team={team} availableStaff={activeStaff} />
+      <TeamSection
+        caseId={caseRow.id}
+        team={team}
+        availableStaff={activeStaff}
+        canManage={canManageCaseDetails === true}
+      />
 
-      <OpposingPartiesSection caseId={caseRow.id} parties={opposingParties ?? []} />
+      <OpposingPartiesSection
+        caseId={caseRow.id}
+        parties={opposingParties ?? []}
+        canManage={canManageCaseDetails === true}
+      />
 
-      <DeadlinesSection caseId={caseRow.id} deadlines={deadlines} periodTypes={periodTypes ?? []} />
+      <DeadlinesSection
+        caseId={caseRow.id}
+        deadlines={deadlines}
+        periodTypes={periodTypes ?? []}
+        canManage={canManageCaseDetails === true}
+      />
 
-      <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} />
+      <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} canManage={canManageShareLinks === true} />
 
-      <DocumentsSection caseId={caseRow.id} documents={documents} />
+      <DocumentsSection caseId={caseRow.id} documents={documents} canWrite={canWriteDocuments === true} />
 
-      <NotesSection caseId={caseRow.id} notes={notes} />
+      <NotesSection caseId={caseRow.id} notes={notes} canWrite={canWriteNotes === true} />
 
       {/* Not gated on "the query came back empty" - lawyers don't hold
           expenses_manage in the seeded roles, so this checks the permission

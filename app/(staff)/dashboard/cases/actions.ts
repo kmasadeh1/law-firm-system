@@ -37,25 +37,33 @@ export async function searchClients(term: string): Promise<ClientOption[]> {
 
 // --- Create case --------------------------------------------------------
 
-export async function createCase(
-  formData: FormData
-): Promise<ActionResult & { caseId?: string }> {
+// A caller-controlled value never reaches next-intl's t() directly - the
+// render site validates against a whitelist, same as TeamErrorCode above.
+export type CreateCaseErrorCode =
+  | 'selectClient'
+  | 'titleRequired'
+  | 'caseNumberRequired'
+  | 'statusLookupFailed'
+  | 'caseNumberInUse'
+  | 'noPermission'
+  | 'createFailed'
+
+type CreateCaseActionResult = { error?: CreateCaseErrorCode; caseId?: string }
+
+export async function createCase(formData: FormData): Promise<CreateCaseActionResult> {
   const client_id = formData.get('client_id')
   const title = formData.get('title')
   const case_number = formData.get('case_number')
   const case_type = formData.get('case_type')
 
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.cases.new.errors' })
-
   if (typeof client_id !== 'string' || !client_id) {
-    return { error: t('selectClient') }
+    return { error: 'selectClient' }
   }
   if (typeof title !== 'string' || !title.trim()) {
-    return { error: t('titleRequired') }
+    return { error: 'titleRequired' }
   }
   if (typeof case_number !== 'string' || !case_number.trim()) {
-    return { error: t('caseNumberRequired') }
+    return { error: 'caseNumberRequired' }
   }
 
   const supabase = await createClient()
@@ -71,7 +79,7 @@ export async function createCase(
     .single()
 
   if (statusError || !firstStatus) {
-    return { error: t('statusLookupFailed') }
+    return { error: 'statusLookupFailed' }
   }
 
   const { data: user } = await supabase.auth.getClaims()
@@ -91,9 +99,12 @@ export async function createCase(
 
   if (error) {
     if (error.code === '23505') {
-      return { error: t('caseNumberInUse') }
+      return { error: 'caseNumberInUse' }
     }
-    return { error: t('createFailed') }
+    if (error.code === '42501') {
+      return { error: 'noPermission' }
+    }
+    return { error: 'createFailed' }
   }
 
   revalidatePath('/dashboard/cases')

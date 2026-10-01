@@ -1772,6 +1772,38 @@ export type Database = {
         }
         Relationships: []
       }
+      effective_working_hours: {
+        Row: {
+          day_of_week: number | null
+          end_time: string | null
+          is_override: boolean | null
+          staff_id: string | null
+          start_time: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "working_hours_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "working_hours_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "working_hours_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       engagement_balances: {
         Row: {
           agreed_fixed_fee: number | null
@@ -1900,6 +1932,20 @@ export type Database = {
     }
     Functions: {
       can_access_enquiry: { Args: { p_enquiry_id: string }; Returns: boolean }
+      can_manage_case_details: { Args: { p_case_id: string }; Returns: boolean }
+      can_manage_case_share_links: {
+        Args: { p_case_id: string }
+        Returns: boolean
+      }
+      can_withdraw: {
+        Args: { lr: Database["public"]["Tables"]["leave_requests"]["Row"] }
+        Returns: boolean
+      }
+      can_write_case_documents: {
+        Args: { p_case_id: string }
+        Returns: boolean
+      }
+      can_write_case_notes: { Args: { p_case_id: string }; Returns: boolean }
       case_timeline: {
         Args: { p_case_id: string }
         Returns: {

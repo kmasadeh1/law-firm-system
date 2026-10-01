@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { updateFirmSettings } from '../actions'
 import { resolveSiteContentError } from '../error-codes'
 import { BilingualField } from '../bilingual-field'
-import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { Field, Label, HelpText, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { Button } from '@/components/dashboard/button'
 
 type FirmSettings = {
@@ -15,6 +15,7 @@ type FirmSettings = {
   email: string | null
   hours_en: string | null
   hours_ar: string | null
+  map_embed_url: string | null
 }
 
 export function FirmDetailsForm({ settings }: { settings: FirmSettings | null }) {
@@ -96,6 +97,21 @@ export function FirmDetailsForm({ settings }: { settings: FirmSettings | null })
         warningLabel={t('statusMissingEnglish')}
         warningNote={t('missingEnglishNote')}
       />
+
+      <Field>
+        <Label htmlFor="site-content-map-embed-url">{t('firmDetails.mapEmbedUrlLabel')}</Label>
+        <input
+          id="site-content-map-embed-url"
+          name="map_embed_url"
+          type="url"
+          dir="ltr"
+          defaultValue={settings?.map_embed_url ?? ''}
+          onChange={() => setSaved(false)}
+          data-testid="map-embed-url"
+          className={controlClass}
+        />
+        <HelpText>{t('firmDetails.mapEmbedUrlHelp')}</HelpText>
+      </Field>
 
       <div className="flex items-center gap-3">
         <Button type="submit" variant="primary" disabled={isPending} className="self-start" data-testid="site-content-save">

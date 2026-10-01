@@ -46,3 +46,67 @@ export async function updateOwnProfile(formData: FormData): Promise<ActionResult
   revalidatePath('/dashboard', 'layout')
   return {}
 }
+
+export type WorkingHoursDay = {
+  day_of_week: number
+  start_time: string | null
+  end_time: string | null
+}
+
+const WORKING_HOURS_CHECK_VIOLATION = '23514'
+const NO_MATCHING_UNIQUE_CONSTRAINT = '42P10'
+
+// Closed code, not prose - the server decides what happened, the frontend
+// (resolveWorkingHoursError, in working-hours-section.tsx) decides how to
+// say it. Same reasoning as /login's error codes.
+export type SaveWorkingHoursErrorCode = 'invalidTimes' | 'saveFailed'
+
+// One upsert for the whole week, keyed on the working_hours unique index
+// (staff_id, day_of_week, is_override). is_override is never sent as true -
+// the insert/update policies refuse that for anyone but the owner, and this
+// action is only ever called from the caller's own settings page, editing
+// their own non-override rows. A day whose effective row came from an
+// override never reaches here at all - the section renders it read-only
+// and doesn't include it in the form that calls this.
+export async function saveWorkingHours(
+  days: WorkingHoursDay[]
+): Promise<{ error?: SaveWorkingHoursErrorCode }> {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const user = data?.claims
+  if (!user) {
+    return { error: 'saveFailed' }
+  }
+
+  const { error } = await supabase.from('working_hours').upsert(
+    days.map((day) => ({
+      staff_id: user.sub as string,
+      day_of_week: day.day_of_week,
+      start_time: day.start_time,
+      end_time: day.end_time,
+      is_override: false,
+    })),
+    { onConflict: 'staff_id,day_of_week,is_override' }
+  )
+
+  if (error) {
+    // working_hours_valid_times: rejects an end before/equal to the start,
+    // and one time set without the other. Both-null (a day off) is fine -
+    // the form already only ever sends that shape for a day marked off,
+    // never equal times, so this is a real invalid range whenever it fires.
+    if (error.code === WORKING_HOURS_CHECK_VIOLATION) {
+      return { error: 'invalidTimes' }
+    }
+    // onConflict above already names all three unique columns, so this
+    // shouldn't fire - but if it ever does (e.g. the constraint itself
+    // changes shape), it's still mapped to a code explicitly rather than
+    // falling through to the generic branch by accident.
+    if (error.code === NO_MATCHING_UNIQUE_CONSTRAINT) {
+      return { error: 'saveFailed' }
+    }
+    return { error: 'saveFailed' }
+  }
+
+  revalidatePath('/dashboard/settings')
+  return {}
+}

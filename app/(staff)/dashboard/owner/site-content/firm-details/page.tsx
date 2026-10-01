@@ -13,7 +13,7 @@ export default async function FirmDetailsPage() {
 
   const { data: settings } = await supabase
     .from('firm_settings')
-    .select('address_en, address_ar, phone, email, hours_en, hours_ar')
+    .select('address_en, address_ar, phone, email, hours_en, hours_ar, map_embed_url')
     .maybeSingle()
 
   return (

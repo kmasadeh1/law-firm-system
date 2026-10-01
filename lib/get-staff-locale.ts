@@ -32,24 +32,54 @@ export const STAFF_LOCALE_COOKIE = 'staff-locale'
  * to that existing select instead of calling this - it's a second round
  * trip otherwise.
  */
+async function readLocaleCookie(): Promise<'en' | 'ar'> {
+  const store = await cookies()
+  return store.get(STAFF_LOCALE_COOKIE)?.value === 'en' ? 'en' : 'ar'
+}
+
 export const getStaffLocale = cache(async (): Promise<'en' | 'ar'> => {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
   if (!user) {
-    const store = await cookies()
-    return store.get(STAFF_LOCALE_COOKIE)?.value === 'en' ? 'en' : 'ar'
+    return readLocaleCookie()
   }
 
   const { data: staffRow } = await supabase
     .from('staff')
-    .select('locale')
+    .select('locale, must_change_password')
     .eq('id', user.sub as string)
     .maybeSingle()
 
+  // Mid-forced-password-change, /change-password is the only route this
+  // account can reach (proxy.ts), and that page's own switcher deliberately
+  // never writes staff.locale - see getChangePasswordLocale below. Without
+  // this, the root layout (app/(staff)/layout.tsx, which calls this
+  // function for <html lang dir> and the client message slice) would keep
+  // resolving the old DB value after a switch, splitting the page between
+  // an English body and an Arabic dir/shell.
+  if (staffRow?.must_change_password) {
+    return readLocaleCookie()
+  }
+
   return staffRow?.locale === 'ar' ? 'ar' : 'en'
 })
+
+/**
+ * /change-password only. That screen is reachable while signed in (both the
+ * forced first-login flow and the voluntary one from Settings), so the
+ * ordinary getStaffLocale() above would always take its DB branch and never
+ * see this cookie. That's correct everywhere else - staff.locale is the
+ * source of truth for a signed-in user - but this screen's own language
+ * switcher deliberately never writes staff.locale (is_owner() and
+ * has_permission() both return false mid-forced-password-change, and this
+ * cookie-only write is presentation, not a change to the account - it must
+ * never touch auth, the session, or the database). So this reads the same
+ * cookie /login reads, unconditionally, regardless of sign-in state - the
+ * one deliberate exception to "DB wins when signed in."
+ */
+export const getChangePasswordLocale = cache(readLocaleCookie)
 
 /**
  * Server Action / Route Handler only (cookies() is read-only elsewhere).

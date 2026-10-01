@@ -25,3 +25,12 @@ export function formatFullDate(iso: string, locale: string) {
 export function formatTime(iso: string, locale: string) {
   return new Date(iso).toLocaleTimeString(localeTag(locale), { timeStyle: 'short' })
 }
+
+// For a bare Postgres `time` value ("14:30:00"), which isn't a valid Date
+// string on its own - working_hours.start_time/end_time, not a timestamp.
+export function formatTimeOfDay(time: string, locale: string) {
+  const [hours, minutes] = time.split(':')
+  return new Date(1970, 0, 1, Number(hours), Number(minutes)).toLocaleTimeString(localeTag(locale), {
+    timeStyle: 'short',
+  })
+}

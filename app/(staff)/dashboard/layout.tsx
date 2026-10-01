@@ -23,7 +23,6 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
 
   const [
     { data: staffRow },
-    { data: clientsManage },
     { data: feesView },
     { data: enquiriesManage },
     { count: assignedEnquiryCount },
@@ -35,7 +34,6 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       .select('full_name, user_type, locale, roles(name, name_ar)')
       .eq('id', user.sub as string)
       .maybeSingle(),
-    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
     supabase.rpc('has_permission', { p_key: 'fees_view' }),
     supabase.rpc('has_permission', { p_key: 'enquiries_manage' }),
     // Someone with an enquiry assigned to them can read it under RLS even
@@ -54,13 +52,20 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   const tShell = await getTranslations({ locale, namespace: 'dashboard.shell' })
 
   const dailyWork: NavItem[] = [{ href: homeHref, label: t('home'), icon: 'home' }]
-  if (isOwner || clientsManage) {
-    dailyWork.push({ href: '/dashboard/clients', label: t('clients'), icon: 'clients' })
-  }
+  // Unconditional, like Cases/Deadlines/Appointments below - the clients
+  // SELECT policy now has three qualifying branches (owner, clients_manage,
+  // or being on a case for that client), the same shape as those, so there's
+  // no single permission left to gate the nav entry on. RLS scopes what the
+  // list actually contains.
+  dailyWork.push({ href: '/dashboard/clients', label: t('clients'), icon: 'clients' })
   if (isOwner || enquiriesManage || (assignedEnquiryCount ?? 0) > 0) {
     dailyWork.push({ href: '/dashboard/enquiries', label: t('enquiries'), icon: 'enquiries' })
   }
   dailyWork.push({ href: '/dashboard/cases', label: t('cases'), icon: 'cases' })
+  // Unconditional - there's no permission key for this deliberately. The
+  // page renders whatever RLS returns: your own requests, or everyone's if
+  // you're the owner.
+  dailyWork.push({ href: '/dashboard/leave-requests', label: t('leaveRequests'), icon: 'leave-requests' })
   dailyWork.push({ href: '/dashboard/appointments', label: t('appointments'), icon: 'appointments' })
   // Deadlines has no single gating permission (owner, cases_manage,
   // court_dates_manage, or just being on the case's team all qualify), so

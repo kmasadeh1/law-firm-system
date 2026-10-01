@@ -30,10 +30,12 @@ export function TeamSection({
   caseId,
   team,
   availableStaff,
+  canManage,
 }: {
   caseId: string
   team: TeamMember[]
   availableStaff: StaffOption[]
+  canManage: boolean
 }) {
   const t = useTranslations('dashboard.cases.detail.team')
   const tErrors = useTranslations('dashboard.cases.detail.team.errors')
@@ -80,35 +82,37 @@ export function TeamSection({
                   </Badge>
                 )}
               </span>
-              <span className="flex gap-3">
-                {m.is_lead ? (
+              {canManage && (
+                <span className="flex gap-3">
+                  {m.is_lead ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={isPending}
+                      onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, false))}
+                    >
+                      <bdi>{t('removeAsLead')}</bdi>
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={isPending}
+                      onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, true))}
+                    >
+                      <bdi>{t('makeLead')}</bdi>
+                    </Button>
+                  )}
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="danger"
                     disabled={isPending}
-                    onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, false))}
+                    onClick={() => setConfirmingRemove(m)}
                   >
-                    <bdi>{t('removeAsLead')}</bdi>
+                    {t('remove')}
                   </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={isPending}
-                    onClick={() => runAction(() => setTeamMemberLead(caseId, m.staff_id, true))}
-                  >
-                    <bdi>{t('makeLead')}</bdi>
-                  </Button>
-                )}
-                <Button
-                  type="button"
-                  variant="danger"
-                  disabled={isPending}
-                  onClick={() => setConfirmingRemove(m)}
-                >
-                  {t('remove')}
-                </Button>
-              </span>
+                </span>
+              )}
             </li>
           ))}
         </ul>
@@ -120,7 +124,7 @@ export function TeamSection({
         </FieldError>
       )}
 
-      {candidates.length > 0 && (
+      {canManage && candidates.length > 0 && (
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-col gap-1">
             <label htmlFor="add-staff" className="text-sm text-fg-muted">
@@ -165,19 +169,21 @@ export function TeamSection({
         </div>
       )}
 
-      <DeleteConfirmDialog
-        open={confirmingRemove !== null}
-        onCancel={() => setConfirmingRemove(null)}
-        onConfirm={() => {
-          if (!confirmingRemove) return
-          const staffId = confirmingRemove.staff_id
-          setConfirmingRemove(null)
-          runAction(() => removeTeamMember(caseId, staffId))
-        }}
-        kind="hard"
-        itemLabel={confirmingRemove?.full_name ?? ''}
-        confirmLabel={t('remove')}
-      />
+      {canManage && (
+        <DeleteConfirmDialog
+          open={confirmingRemove !== null}
+          onCancel={() => setConfirmingRemove(null)}
+          onConfirm={() => {
+            if (!confirmingRemove) return
+            const staffId = confirmingRemove.staff_id
+            setConfirmingRemove(null)
+            runAction(() => removeTeamMember(caseId, staffId))
+          }}
+          kind="hard"
+          itemLabel={confirmingRemove?.full_name ?? ''}
+          confirmLabel={t('remove')}
+        />
+      )}
     </Panel>
   )
 }

@@ -2,15 +2,41 @@
 
 import { randomInt } from 'crypto'
 import { revalidatePath } from 'next/cache'
-import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getStaffLocale } from '@/lib/get-staff-locale'
 
 const STAFF_PATH = '/dashboard/owner/staff'
 const TEMP_PASSWORD_VALID_DAYS = 7
 
-type ActionResult = { error?: string }
+// A caller-controlled value never reaches next-intl's t() directly - the
+// render site validates against a whitelist, same as TeamErrorCode in
+// cases/actions.ts. staffRecordFailedWithCleanup is the one code that
+// carries a parameter, and it's a safe one (the orphaned auth user's id,
+// needed so the owner can remove it manually) - never a raw Postgres/Auth
+// error message, which used to leak internal detail to the client.
+export type StaffErrorCode =
+  | 'notPermitted'
+  | 'fullNameRequired'
+  | 'emailRequired'
+  | 'chooseRole'
+  | 'emailInUse'
+  | 'couldNotCreateLogin'
+  | 'staffRecordFailedRolledBack'
+  | 'staffRecordFailedWithCleanup'
+  | 'passwordResetButRecordFailed'
+  | 'updateAccountFailed'
+
+type ActionResult = { error?: StaffErrorCode; userId?: string }
+
+// The service key bypasses RLS entirely, so this is asked first, on the
+// caller's own session, before the admin client is ever touched - never
+// inferred from the OwnerLayout route guard, which doesn't protect a
+// Server Action invoked directly by its action id.
+async function callerCanManageStaff(): Promise<boolean> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.rpc('has_permission', { p_key: 'staff_manage' })
+  return !error && data === true
+}
 
 // Excludes visually ambiguous characters (0/O, 1/l/I) since this is read off
 // a screen and typed back in by someone else, not autofilled.
@@ -31,20 +57,22 @@ function expiryFromNow(): { setAt: string; expiresAt: string } {
 }
 
 export async function addStaff(formData: FormData): Promise<ActionResult & { password?: string }> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.admin.staff.errors' })
+  if (!(await callerCanManageStaff())) {
+    return { error: 'notPermitted' }
+  }
+
   const fullName = formData.get('full_name')
   const email = formData.get('email')
   const roleId = formData.get('role_id')
 
   if (typeof fullName !== 'string' || !fullName.trim()) {
-    return { error: t('fullNameRequired') }
+    return { error: 'fullNameRequired' }
   }
   if (typeof email !== 'string' || !email.trim()) {
-    return { error: t('emailRequired') }
+    return { error: 'emailRequired' }
   }
   if (typeof roleId !== 'string' || !roleId) {
-    return { error: t('chooseRole') }
+    return { error: 'chooseRole' }
   }
 
   const admin = createAdminClient()
@@ -57,18 +85,22 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
   })
 
   if (createError || !created.user) {
-    return { error: createError?.message ?? t('couldNotCreateLogin') }
+    if (createError?.code === 'email_exists') {
+      return { error: 'emailInUse' }
+    }
+    return { error: 'couldNotCreateLogin' }
   }
 
   const { setAt, expiresAt } = expiryFromNow()
   const supabase = await createClient()
 
+  // must_change_password takes its column default (true) - never passed
+  // explicitly here.
   const { error: staffError } = await supabase.from('staff').insert({
     id: created.user.id,
     full_name: fullName.trim(),
     role_id: roleId,
     user_type: 'staff',
-    must_change_password: true,
     temp_password_set_at: setAt,
     temp_password_expires_at: expiresAt,
   })
@@ -78,15 +110,9 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
     // back rather than leave it silent; report clearly if even that fails.
     const { error: cleanupError } = await admin.auth.admin.deleteUser(created.user.id)
     if (cleanupError) {
-      return {
-        error: t('staffRecordFailedWithCleanup', {
-          staffMessage: staffError.message,
-          cleanupMessage: cleanupError.message,
-          userId: created.user.id,
-        }),
-      }
+      return { error: 'staffRecordFailedWithCleanup', userId: created.user.id }
     }
-    return { error: t('staffRecordFailedRolledBack', { staffMessage: staffError.message }) }
+    return { error: 'staffRecordFailedRolledBack' }
   }
 
   revalidatePath(STAFF_PATH)
@@ -96,14 +122,16 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
 export async function regenerateTempPassword(
   staffId: string
 ): Promise<ActionResult & { password?: string }> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.admin.staff.errors' })
+  if (!(await callerCanManageStaff())) {
+    return { error: 'notPermitted' }
+  }
+
   const admin = createAdminClient()
   const password = generateTempPassword()
 
   const { error: authError } = await admin.auth.admin.updateUserById(staffId, { password })
   if (authError) {
-    return { error: authError.message }
+    return { error: 'couldNotCreateLogin' }
   }
 
   const { setAt, expiresAt } = expiryFromNow()
@@ -118,9 +146,7 @@ export async function regenerateTempPassword(
     .eq('id', staffId)
 
   if (error) {
-    return {
-      error: t('passwordResetButRecordFailed', { message: error.message }),
-    }
+    return { error: 'passwordResetButRecordFailed' }
   }
 
   revalidatePath(STAFF_PATH)
@@ -128,13 +154,15 @@ export async function regenerateTempPassword(
 }
 
 export async function setStaffActive(staffId: string, isActive: boolean): Promise<ActionResult> {
-  const locale = await getStaffLocale()
-  const t = await getTranslations({ locale, namespace: 'dashboard.admin.staff.errors' })
+  if (!(await callerCanManageStaff())) {
+    return { error: 'notPermitted' }
+  }
+
   const supabase = await createClient()
   const { error } = await supabase.from('staff').update({ is_active: isActive }).eq('id', staffId)
 
   if (error) {
-    return { error: t('updateAccountFailed') }
+    return { error: 'updateAccountFailed' }
   }
 
   revalidatePath(STAFF_PATH)

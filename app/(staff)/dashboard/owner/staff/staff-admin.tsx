@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { addStaff, regenerateTempPassword, setStaffActive } from './actions'
+import { addStaff, regenerateTempPassword, setStaffActive, type StaffErrorCode } from './actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
@@ -27,6 +27,34 @@ type RoleOption = { id: string; name: string; name_ar: string | null }
 
 function isExpired(iso: string | null) {
   return Boolean(iso && new Date(iso) < new Date())
+}
+
+// Closed set the server can return - anything else falls back to a generic
+// translated message rather than passing an arbitrary value to t() as a
+// key. staffRecordFailedWithCleanup is the one code with a parameter, and
+// it's a safe one (the orphaned auth user's id) - never a raw server error
+// message.
+const STAFF_ERROR_CODES: StaffErrorCode[] = [
+  'notPermitted',
+  'fullNameRequired',
+  'emailRequired',
+  'chooseRole',
+  'emailInUse',
+  'couldNotCreateLogin',
+  'staffRecordFailedRolledBack',
+  'staffRecordFailedWithCleanup',
+  'passwordResetButRecordFailed',
+  'updateAccountFailed',
+]
+
+function resolveStaffError(
+  code: StaffErrorCode,
+  userId: string | undefined,
+  tErrors: ReturnType<typeof useTranslations>
+): string {
+  if (!(STAFF_ERROR_CODES as string[]).includes(code)) return tErrors('couldNotCreateLogin')
+  if (code === 'staffRecordFailedWithCleanup') return tErrors(code, { userId: userId ?? '' })
+  return tErrors(code)
 }
 
 // Same treatment as the case share-link panel: bold, persistent, no dismiss
@@ -71,6 +99,7 @@ function GeneratedPasswordPanel({ password }: { password: string }) {
 function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (password: string) => void }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.admin.staff.addForm')
+  const tErrors = useTranslations('dashboard.admin.staff.errors')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -82,7 +111,7 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
     startTransition(async () => {
       const result = await addStaff(formData)
       if (result.error) {
-        setError(result.error)
+        setError(resolveStaffError(result.error, result.userId, tErrors))
         return
       }
       if (result.password) {
@@ -141,6 +170,7 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
 
 function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (password: string) => void }) {
   const t = useTranslations('dashboard.admin.staff.regenerate')
+  const tErrors = useTranslations('dashboard.admin.staff.errors')
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -154,7 +184,7 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
     startTransition(async () => {
       const result = await regenerateTempPassword(staffId)
       if (result.error) {
-        setError(result.error)
+        setError(resolveStaffError(result.error, result.userId, tErrors))
         setConfirming(false)
         return
       }
@@ -182,6 +212,7 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
 
 function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullName: string; isActive: boolean }) {
   const t = useTranslations('dashboard.admin.staff.row')
+  const tErrors = useTranslations('dashboard.admin.staff.errors')
   const [checked, setChecked] = useState(isActive)
   const [error, setError] = useState<string | null>(null)
   const [confirmingDeactivate, setConfirmingDeactivate] = useState(false)
@@ -195,7 +226,7 @@ function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullNa
       const result = await setStaffActive(staffId, next)
       if (result.error) {
         setChecked(previous)
-        setError(result.error)
+        setError(resolveStaffError(result.error, result.userId, tErrors))
       }
     })
   }

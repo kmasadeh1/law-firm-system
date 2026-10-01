@@ -16,23 +16,30 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
 
   const term = q?.trim()
 
-  const { data: clients } = await supabase
-    .rpc('search_clients', { p_query: term })
-    .select('id, full_name, phone, national_id')
+  const [{ data: clients }, { data: canManage }] = await Promise.all([
+    supabase.rpc('search_clients', { p_query: term }).select('id, full_name, phone, national_id'),
+    // Read is broader than write now (owner, clients_manage, or being on a
+    // case for that client) - asked once here for the write-only controls
+    // below, never OR'd with is_owner() since has_permission already
+    // returns true for the owner internally.
+    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title={t('title')}
         action={
-          <div className="flex flex-wrap gap-2">
-            <LinkButton href="/dashboard/clients/conflict-checks" variant="secondary">
-              <bdi>{t('conflictCheckHistory')}</bdi>
-            </LinkButton>
-            <LinkButton href="/dashboard/clients/new" variant="primary">
-              {t('addClient')}
-            </LinkButton>
-          </div>
+          canManage === true ? (
+            <div className="flex flex-wrap gap-2">
+              <LinkButton href="/dashboard/clients/conflict-checks" variant="secondary">
+                <bdi>{t('conflictCheckHistory')}</bdi>
+              </LinkButton>
+              <LinkButton href="/dashboard/clients/new" variant="primary">
+                {t('addClient')}
+              </LinkButton>
+            </div>
+          ) : undefined
         }
       />
 
@@ -62,7 +69,7 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
           title={term ? t('noClientsFiltered') : t('noClientsYet')}
           description={term ? undefined : t('noClientsYetDescription')}
           action={
-            !term && (
+            !term && canManage === true && (
               <LinkButton href="/dashboard/clients/new" variant="secondary">
                 {t('addClient')}
               </LinkButton>

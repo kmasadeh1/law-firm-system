@@ -35,7 +35,7 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
     await Promise.all([
       supabase
         .from('firm_settings')
-        .select('address_en, address_ar, phone, email, hours_en, hours_ar')
+        .select('address_en, address_ar, phone, email, hours_en, hours_ar, map_embed_url')
         .maybeSingle(),
       supabase
         .from('site_sections')
@@ -271,12 +271,17 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
                 <dd className="text-paper">{firmSettings && localizedField(firmSettings, 'hours', locale)}</dd>
               </dl>
 
-              <div
-                className="mt-8 flex h-40 w-full items-center justify-center border border-warm-grey/25 bg-ink text-sm text-warm-grey"
-                aria-hidden="true"
-              >
-                {t('contact.mapPlaceholder')}
-              </div>
+              {firmSettings?.map_embed_url && (
+                <div className="mt-8 aspect-[4/3] w-full overflow-hidden border border-warm-grey/25 sm:aspect-video" data-testid="contact-map">
+                  <iframe
+                    src={firmSettings.map_embed_url}
+                    title={t('contact.mapTitle')}
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    className="h-full w-full border-0"
+                  />
+                </div>
+              )}
 
               <ContactForm />
             </div>

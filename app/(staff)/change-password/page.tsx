@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
-import { getStaffLocale } from '@/lib/get-staff-locale'
+import { getChangePasswordLocale } from '@/lib/get-staff-locale'
 import { Crest } from '@/components/crest'
+import { ChangePasswordLocaleSwitcher } from '@/components/change-password-locale-switcher'
 import { ChangePasswordForm } from './change-password-form'
 
 export default async function ChangePasswordPage() {
@@ -26,18 +27,21 @@ export default async function ChangePasswordPage() {
   // case - proxy.ts only forces you TO this page, never away from it.
   const homeHref = staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
 
-  const locale = await getStaffLocale()
+  const locale = await getChangePasswordLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth' })
 
   return (
     <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
       <div className="relative flex flex-col justify-between overflow-hidden bg-ink-raised px-8 py-10 text-paper sm:px-12 md:py-16">
-        <div className="flex items-center gap-3">
-          <Crest className="h-9 w-9" />
-          <span className="flex flex-col">
-            <span className="font-heading text-lg leading-tight tracking-wide">{t('firmName')}</span>
-            <span className="text-xs text-paper-dim">{t('firmTagline')}</span>
-          </span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Crest className="h-9 w-9" />
+            <span className="flex flex-col">
+              <span className="font-heading text-lg leading-tight tracking-wide">{t('firmName')}</span>
+              <span className="text-xs text-paper-dim">{t('firmTagline')}</span>
+            </span>
+          </div>
+          <ChangePasswordLocaleSwitcher variant="desktop" />
         </div>
 
         <div className="max-w-sm">
@@ -51,11 +55,12 @@ export default async function ChangePasswordPage() {
       </div>
 
       <div className="flex flex-col items-center justify-center bg-ink px-6 py-16 sm:px-12">
-        <div className="mb-2 w-full max-w-sm md:hidden">
+        <div className="mb-2 flex w-full max-w-sm items-center justify-between gap-2 md:hidden">
           <div className="flex items-center gap-2">
             <Crest className="h-6 w-6" />
             <span className="font-heading text-base text-paper">{t('firmName')}</span>
           </div>
+          <ChangePasswordLocaleSwitcher variant="mobile" />
         </div>
         <h1 className="mb-5 w-full max-w-sm font-heading text-2xl text-paper">{t('changePassword.formHeading')}</h1>
         <ChangePasswordForm homeHref={homeHref} />

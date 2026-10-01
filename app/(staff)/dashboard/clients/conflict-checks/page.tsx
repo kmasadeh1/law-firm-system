@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -18,6 +19,25 @@ type ConflictMatch = {
 export default async function ConflictCheckHistoryPage() {
   const supabase = await createClient()
   const locale = await getStaffLocale()
+
+  // This page's own gate, not inherited from the parent layout - that layout
+  // used to gate all of /dashboard/clients on clients_manage, but the list
+  // and detail pages no longer need that (RLS scopes them more broadly now).
+  // conflict_checks' own SELECT policy is still owner-or-clients_manage
+  // only, unlike clients itself, so this route keeps requiring it.
+  const { data: allowed, error: permError } = await supabase.rpc('has_permission', {
+    p_key: 'clients_manage',
+  })
+
+  if (permError || !allowed) {
+    const t = await getTranslations({ locale, namespace: 'dashboard.clients.form' })
+    return (
+      <div className="flex flex-col gap-6">
+        <BackLink href="/dashboard/clients" label="Clients" />
+        <EmptyState title={t('noAccessConflictChecks')} />
+      </div>
+    )
+  }
 
   const [{ data: checks }, { data: staffDirectory }] = await Promise.all([
     supabase
