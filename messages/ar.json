@@ -173,7 +173,8 @@
       "unknownClient": "عميل غير معروف",
       "recentActivity": "آخر النشاط",
       "noActivityYet": "لم يُسجَّل أي نشاط بعد",
-      "unknownStaff": "موظف غير معروف"
+      "unknownStaff": "موظف غير معروف",
+      "moreCount": "+{count} أخرى"
     },
     "staff": {
       "title": "مستجدات اليوم",

@@ -180,7 +180,8 @@
       "unknownClient": "Unknown client",
       "recentActivity": "Recent activity",
       "noActivityYet": "No activity recorded yet",
-      "unknownStaff": "Unknown staff"
+      "unknownStaff": "Unknown staff",
+      "moreCount": "+{count} more"
     },
     "staff": {
       "title": "What's on today",
