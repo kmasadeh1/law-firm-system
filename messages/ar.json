@@ -107,6 +107,15 @@
   "dashboard": {
     "common": {
       "unknownStaff": "موظف غير معروف",
+      "pagination": {
+        "showing": "عرض {from}–{to} من {total}",
+        "navLabel": "ترقيم الصفحات",
+        "first": "الأولى",
+        "previous": "السابقة",
+        "next": "التالية",
+        "last": "الأخيرة",
+        "pageLabel": "الانتقال إلى الصفحة {page}"
+      },
       "deleteConfirm": {
         "title": "{verb} <item></item>؟",
         "softNote": "يمكن استعادته لاحقاً.",

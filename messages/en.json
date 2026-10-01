@@ -107,6 +107,15 @@
   "dashboard": {
     "common": {
       "unknownStaff": "Unknown staff",
+      "pagination": {
+        "showing": "Showing {from}–{to} of {total}",
+        "navLabel": "Pagination",
+        "first": "First",
+        "previous": "Previous",
+        "next": "Next",
+        "last": "Last",
+        "pageLabel": "Go to page {page}"
+      },
       "deleteConfirm": {
         "title": "{verb} <item></item>?",
         "softNote": "This can be restored afterward.",

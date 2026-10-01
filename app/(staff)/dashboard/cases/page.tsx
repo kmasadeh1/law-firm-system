@@ -4,16 +4,24 @@ import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
+import { Pagination } from '@/components/dashboard/pagination'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
+import { PAGE_SIZE, parsePage, pageRange } from '@/lib/pagination'
 
 export default async function CasesListPage({ searchParams }: PageProps<'/dashboard/cases'>) {
-  const { q, status } = (await searchParams) as { q?: string; status?: string }
+  const { q, status, page: pageParam } = (await searchParams) as {
+    q?: string
+    status?: string
+    page?: string
+  }
   const supabase = await createClient()
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.list' })
+  const page = parsePage(pageParam)
+  const { from, to } = pageRange(page, PAGE_SIZE)
 
   const [{ data: statuses }, { data: canCreate }] = await Promise.all([
     supabase.from('case_statuses').select('id, name, name_ar, sort_order').order('sort_order'),
@@ -31,18 +39,31 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
     .select('id, case_number, title, case_type, clients(full_name), case_statuses(name, name_ar)')
     .order('created_at', { ascending: false })
 
+  // Counted separately (head: true, no rows returned) with the exact same
+  // filters as the row query below - RLS applies to both, so this is the
+  // filtered, permission-scoped total, never a client-side count and never
+  // the whole table's count.
+  let countQuery = supabase.from('cases').select('id', { count: 'exact', head: true })
+
   const term = q?.trim()
   if (term) {
     const safe = term.replace(/[,()]/g, '')
     if (safe) {
       query = query.or(`case_number.ilike.%${safe}%,title.ilike.%${safe}%`)
+      countQuery = countQuery.or(`case_number.ilike.%${safe}%,title.ilike.%${safe}%`)
     }
   }
   if (status) {
     query = query.eq('status_id', status)
+    countQuery = countQuery.eq('status_id', status)
   }
 
-  const { data: cases } = await query
+  // Paging is ordering and limiting, so it belongs in the query - .range()
+  // on the already-filtered, already-ordered query, not a fetch-everything-
+  // then-slice in JavaScript.
+  query = query.range(from, to)
+
+  const [{ data: cases }, { count: total }] = await Promise.all([query, countQuery])
 
   return (
     <div className="flex flex-col gap-6">
@@ -99,32 +120,44 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
           }
         />
       ) : (
-        <Panel className="p-0">
-          <ul className="flex flex-col divide-y divide-line">
-            {cases.map((c) => (
-              <li key={c.id}>
-                <Link
-                  href={`/dashboard/cases/${c.id}`}
-                  className="flex flex-wrap items-center justify-between gap-1 px-5 py-3 text-sm transition-colors hover:bg-line/30"
-                >
-                  <span>
-                    <span className="font-medium text-fg">
-                      <bdi>{c.case_number}</bdi>
+        <>
+          <Panel className="p-0">
+            <ul className="flex flex-col divide-y divide-line">
+              {cases.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    href={`/dashboard/cases/${c.id}`}
+                    className="flex flex-wrap items-center justify-between gap-1 px-5 py-3 text-sm transition-colors hover:bg-line/30"
+                  >
+                    <span>
+                      <span className="font-medium text-fg">
+                        <bdi>{c.case_number}</bdi>
+                      </span>
+                      <span className="text-fg-muted">
+                        {' — '}
+                        <bdi>{c.title}</bdi>
+                      </span>
                     </span>
                     <span className="text-fg-muted">
-                      {' — '}
-                      <bdi>{c.title}</bdi>
+                      <bdi>{c.clients?.full_name ?? '—'}</bdi> ·{' '}
+                      {c.case_statuses ? localizedName(c.case_statuses, locale) : '—'}
                     </span>
-                  </span>
-                  <span className="text-fg-muted">
-                    <bdi>{c.clients?.full_name ?? '—'}</bdi> ·{' '}
-                    {c.case_statuses ? localizedName(c.case_statuses, locale) : '—'}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </Panel>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={total ?? 0}
+            locale={locale}
+            basePath="/dashboard/cases"
+            searchParams={{ q: term, status }}
+            testId="cases-pagination"
+          />
+        </>
       )}
     </div>
   )
