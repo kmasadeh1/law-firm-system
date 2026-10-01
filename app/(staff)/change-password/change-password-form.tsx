@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { changePassword } from './actions'
+import { MIN_PASSWORD_LENGTH } from '@/lib/password-policy'
 
 export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
   const router = useRouter()
@@ -47,7 +48,7 @@ export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
           name="password"
           type="password"
           required
-          minLength={8}
+          minLength={MIN_PASSWORD_LENGTH}
           autoComplete="new-password"
           className="rounded-sm border border-warm-grey/40 bg-ink-raised px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
         />
@@ -62,7 +63,7 @@ export function ChangePasswordForm({ homeHref }: { homeHref: string }) {
           name="confirm"
           type="password"
           required
-          minLength={8}
+          minLength={MIN_PASSWORD_LENGTH}
           autoComplete="new-password"
           className="rounded-sm border border-warm-grey/40 bg-ink-raised px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
         />

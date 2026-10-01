@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getChangePasswordLocale, setStaffLocaleCookie } from '@/lib/get-staff-locale'
+import { MIN_PASSWORD_LENGTH } from '@/lib/password-policy'
+import { formatNumber } from '@/lib/format-number'
 
 type ActionResult = { error?: string; expired?: boolean }
 
@@ -25,8 +27,8 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
   const locale = await getChangePasswordLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth.changePassword.errors' })
 
-  if (typeof password !== 'string' || password.length < 8) {
-    return { error: t('tooShort') }
+  if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
+    return { error: t('tooShort', { min: formatNumber(MIN_PASSWORD_LENGTH, locale) }) }
   }
   if (password !== confirm) {
     return { error: t('mismatch') }
