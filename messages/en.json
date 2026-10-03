@@ -155,6 +155,7 @@
       "cases": "Cases",
       "appointments": "Appointments",
       "deadlines": "Deadlines",
+      "tasks": "Tasks",
       "leaveRequests": "Leave requests",
       "feesAndPayments": "Fees & payments",
       "staffAccounts": "Staff accounts",
@@ -1639,6 +1640,56 @@
         "noPermissionWithdraw": "This request has already been decided and can no longer be withdrawn.",
         "decisionFailed": "Could not save your decision. Please try again.",
         "noPermissionDecide": "You don't have permission to decide this request."
+      }
+    },
+    "tasks": {
+      "list": {
+        "title": "Tasks",
+        "caseSectionHeading": "Tasks",
+        "assignHeading": "Assign a task",
+        "noneYet": "No tasks to show.",
+        "showAll": "Show done and cancelled",
+        "showActiveOnly": "Show open and in-progress only",
+        "overdue": "Overdue",
+        "assignedToLine": "Assigned to <bdi>{name}</bdi>",
+        "createdByLine": "Assigned by <bdi>{name}</bdi>",
+        "dueLine": "Due <bdi>{date}</bdi>",
+        "onCaseLine": "On <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>"
+      },
+      "status": {
+        "open": "Open",
+        "in_progress": "In progress",
+        "done": "Done",
+        "cancelled": "Cancelled"
+      },
+      "priority": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High"
+      },
+      "form": {
+        "titleLabel": "Title",
+        "detailsLabel": "Details",
+        "assigneeLabel": "Assign to",
+        "selectAssigneePlaceholder": "Select a person…",
+        "dueDateLabel": "Due date",
+        "priorityLabel": "Priority",
+        "caseLabel": "Case",
+        "caseSearchPlaceholder": "Search cases by number or title",
+        "noMatchingCase": "No matching case.",
+        "selectedCase": "Selected: <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "adding": "Assigning…",
+        "add": "Assign task",
+        "errors": {
+          "titleRequired": "Title is required.",
+          "titleBlank": "Title can't be blank.",
+          "selectAssignee": "Select who this task is assigned to.",
+          "statusMismatch": "A done task needs a completion date, and no other status can have one.",
+          "noPermissionAssign": "You don't have permission to assign tasks.",
+          "noPermissionUpdate": "You don't have permission to change that task.",
+          "addFailed": "Could not assign the task. Please try again.",
+          "updateFailed": "Could not update the task. Please try again."
+        }
       }
     }
   }

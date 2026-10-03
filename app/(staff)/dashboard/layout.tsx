@@ -72,6 +72,10 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   // - like Cases and Appointments - it's always shown and RLS scopes what's
   // actually visible.
   dailyWork.push({ href: '/dashboard/deadlines', label: t('deadlines'), icon: 'deadlines' })
+  // Unconditional, same reasoning as Cases/Appointments/Deadlines above -
+  // the read policy (owner, assignee, or creator) has no single permission
+  // to gate the nav entry on, and RLS scopes what the list actually shows.
+  dailyWork.push({ href: '/dashboard/tasks', label: t('tasks'), icon: 'tasks' })
 
   const money: NavItem[] = []
   if (isOwner || feesView) {

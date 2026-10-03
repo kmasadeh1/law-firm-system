@@ -211,3 +211,12 @@ export function CourtsIcon({ className }: IconProps) {
   )
 }
 
+export function TasksIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <rect x="3.5" y="3.5" width="13" height="13" rx="1.5" />
+      <path d="M6.5 10.3 8.6 12.4 13.5 7.6" />
+    </svg>
+  )
+}
+

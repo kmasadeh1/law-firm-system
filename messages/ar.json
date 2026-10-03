@@ -149,6 +149,7 @@
       "cases": "القضايا",
       "appointments": "المواعيد",
       "deadlines": "المهل",
+      "tasks": "المهام",
       "leaveRequests": "طلبات الإجازة",
       "feesAndPayments": "الأتعاب والمدفوعات",
       "staffAccounts": "حسابات الموظفين",
@@ -1589,6 +1590,56 @@
         "noPermissionWithdraw": "تم البت في هذا الطلب بالفعل ولم يعد بالإمكان سحبه.",
         "decisionFailed": "تعذّر حفظ القرار. يرجى المحاولة مرة أخرى.",
         "noPermissionDecide": "ليس لديك صلاحية البت في هذا الطلب."
+      }
+    },
+    "tasks": {
+      "list": {
+        "title": "المهام",
+        "caseSectionHeading": "المهام",
+        "assignHeading": "تكليف بمهمة",
+        "noneYet": "لا توجد مهام لعرضها.",
+        "showAll": "إظهار المنجزة والملغاة",
+        "showActiveOnly": "إظهار المفتوحة وقيد التنفيذ فقط",
+        "overdue": "متأخرة",
+        "assignedToLine": "مكلَّف بها <bdi>{name}</bdi>",
+        "createdByLine": "كلَّفه بها <bdi>{name}</bdi>",
+        "dueLine": "تاريخ الاستحقاق <bdi>{date}</bdi>",
+        "onCaseLine": "على القضية <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>"
+      },
+      "status": {
+        "open": "مفتوحة",
+        "in_progress": "قيد التنفيذ",
+        "done": "منجزة",
+        "cancelled": "ملغاة"
+      },
+      "priority": {
+        "low": "منخفضة",
+        "normal": "عادية",
+        "high": "عالية"
+      },
+      "form": {
+        "titleLabel": "العنوان",
+        "detailsLabel": "التفاصيل",
+        "assigneeLabel": "تكليف إلى",
+        "selectAssigneePlaceholder": "اختر شخصاً…",
+        "dueDateLabel": "تاريخ الاستحقاق",
+        "priorityLabel": "الأولوية",
+        "caseLabel": "القضية",
+        "caseSearchPlaceholder": "البحث عن قضية بالرقم أو العنوان",
+        "noMatchingCase": "لا توجد قضية مطابقة.",
+        "selectedCase": "المحددة: <bdi>{caseNumber}</bdi> — <bdi>{title}</bdi>",
+        "adding": "جارٍ التكليف…",
+        "add": "تكليف بمهمة",
+        "errors": {
+          "titleRequired": "العنوان مطلوب.",
+          "titleBlank": "لا يمكن أن يكون العنوان فارغاً.",
+          "selectAssignee": "اختر من ستُكلَّف إليه هذه المهمة.",
+          "statusMismatch": "المهمة المنجزة تحتاج تاريخ إنجاز، ولا يجوز أن يكون لأي حالة أخرى تاريخ إنجاز.",
+          "noPermissionAssign": "ليس لديك صلاحية تكليف المهام.",
+          "noPermissionUpdate": "ليس لديك صلاحية تعديل هذه المهمة.",
+          "addFailed": "تعذّر تكليف المهمة. يرجى المحاولة مرة أخرى.",
+          "updateFailed": "تعذّر تحديث المهمة. يرجى المحاولة مرة أخرى."
+        }
       }
     }
   }
