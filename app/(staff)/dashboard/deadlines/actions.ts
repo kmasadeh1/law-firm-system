@@ -78,6 +78,7 @@ export async function createDeadline(
   const period_type_id = formData.get('period_type_id')
   const trigger_date = formData.get('trigger_date')
   const description = formData.get('description')
+  const source_hearing_id = formData.get('source_hearing_id')
 
   if (typeof case_id !== 'string' || !case_id) {
     return { error: t('selectCase') }
@@ -101,6 +102,7 @@ export async function createDeadline(
       period_type_id,
       trigger_date: trigger_date.trim(),
       description: typeof description === 'string' && description.trim() ? description.trim() : null,
+      source_hearing_id: typeof source_hearing_id === 'string' && source_hearing_id ? source_hearing_id : null,
     })
     .select('id, case_id, period_type_id, trigger_date, due_date, unadjusted_due_date, effective_due_date, description')
     .single()

@@ -12,7 +12,7 @@ import { Field, Label, HelpText, FieldError, controlClass } from '@/components/d
 import { localizedName } from '@/lib/localized-name'
 import { formatDate } from '@/lib/format-date-time'
 
-type Deadline = {
+export type Deadline = {
   id: string
   trigger_date: string
   due_date: string | null
@@ -173,11 +173,25 @@ export function DeadlinesSection({
   deadlines,
   periodTypes,
   canManage,
+  // Hearings' "create appeal deadline" action reuses this same form instead
+  // of building a second one - the draft lives in the shared parent
+  // (CourtAndDeadlines) because it's set from a different section
+  // (CourtSection) after this one has already mounted, so it has to be a
+  // controlled value from above rather than a defaultValue this component
+  // could only read once.
+  triggerDate,
+  onTriggerDateChange,
+  sourceHearingId,
+  onSubmitted,
 }: {
   caseId: string
   deadlines: Deadline[]
   periodTypes: PeriodTypeOption[]
   canManage: boolean
+  triggerDate: string
+  onTriggerDateChange: (value: string) => void
+  sourceHearingId: string | null
+  onSubmitted: () => void
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.deadlines.section')
@@ -201,6 +215,7 @@ export function DeadlinesSection({
       }
       addFormRef.current?.reset()
       setPeriodTypeId('')
+      onSubmitted()
     })
   }
 
@@ -221,6 +236,8 @@ export function DeadlinesSection({
       {canManage && (
       <form ref={addFormRef} onSubmit={handleAdd} className="flex flex-col gap-3">
         <input type="hidden" name="case_id" value={caseId} />
+        {sourceHearingId && <input type="hidden" name="source_hearing_id" value={sourceHearingId} />}
+        {sourceHearingId && <p className="text-xs text-fg-muted">{tForm('fromHearingNote')}</p>}
         <div className="flex flex-wrap items-end gap-2">
           <Field>
             <Label htmlFor="dl-period" required>
@@ -246,7 +263,15 @@ export function DeadlinesSection({
             <Label htmlFor="dl-trigger" required>
               {tForm('triggerDateLabel')}
             </Label>
-            <input id="dl-trigger" name="trigger_date" type="date" required className={controlClass} />
+            <input
+              id="dl-trigger"
+              name="trigger_date"
+              type="date"
+              required
+              value={triggerDate}
+              onChange={(e) => onTriggerDateChange(e.target.value)}
+              className={controlClass}
+            />
           </Field>
           <Button type="submit" variant="secondary" disabled={isPending}>
             {isPending ? tForm('adding') : tForm('addDeadline')}

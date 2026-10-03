@@ -400,6 +400,181 @@ export async function removeCourtFiling(caseId: string, filingId: string): Promi
   return {}
 }
 
+// --- Hearings ----------------------------------------------------------
+
+// A hearing hangs off a court filing (hearings.filing_id), not off the case
+// directly - a case at first instance and the same case on appeal are
+// separate proceedings with separate session histories, so there's no
+// single "hearings for this case" list, only "hearings for this filing".
+export type HearingOutcome =
+  | 'adjourned'
+  | 'evidence'
+  | 'pleadings'
+  | 'reserved_for_judgment'
+  | 'judgment'
+  | 'settled'
+  | 'withdrawn'
+  | 'struck_out'
+  | 'other'
+
+const HEARING_OUTCOMES: HearingOutcome[] = [
+  'adjourned',
+  'evidence',
+  'pleadings',
+  'reserved_for_judgment',
+  'judgment',
+  'settled',
+  'withdrawn',
+  'struck_out',
+  'other',
+]
+
+// Closed set the server can return - same convention as CourtFilingErrorCode
+// above. hearings_notified_after_session and hearings_next_session_after_session
+// both raise 23514 - they're different mistakes (a notification date before
+// the session; a "next session" that isn't actually after this one) and are
+// disambiguated by constraint name, never guessed from which field looks
+// wrong, same as appointments/actions.ts's mapCheckViolation.
+export type HearingErrorCode =
+  | 'sessionDateRequired'
+  | 'notifiedBeforeSession'
+  | 'nextSessionNotAfterSession'
+  | 'noPermission'
+  | 'addFailed'
+  | 'updateFailed'
+  | 'removeFailed'
+
+type HearingActionResult = { error?: HearingErrorCode }
+
+function mapHearingCheckViolation(message: string): HearingErrorCode | null {
+  if (message.includes('hearings_notified_after_session')) return 'notifiedBeforeSession'
+  if (message.includes('hearings_next_session_after_session')) return 'nextSessionNotAfterSession'
+  return null
+}
+
+type HearingFields = {
+  session_date: string
+  session_time: string | null
+  outcome: HearingOutcome | null
+  what_happened: string | null
+  decision: string | null
+  next_session_date: string | null
+  attended_by: string | null
+  notified_at: string | null
+}
+
+function readHearingFields(formData: FormData): HearingFields | { error: HearingErrorCode } {
+  const session_date = formData.get('session_date')
+  const session_time = formData.get('session_time')
+  const outcome = formData.get('outcome')
+  const what_happened = formData.get('what_happened')
+  const decision = formData.get('decision')
+  const next_session_date = formData.get('next_session_date')
+  const attended_by = formData.get('attended_by')
+  const notified_at = formData.get('notified_at')
+
+  if (typeof session_date !== 'string' || !session_date) {
+    return { error: 'sessionDateRequired' }
+  }
+
+  return {
+    session_date,
+    session_time: typeof session_time === 'string' && session_time ? session_time : null,
+    outcome:
+      typeof outcome === 'string' && (HEARING_OUTCOMES as string[]).includes(outcome)
+        ? (outcome as HearingOutcome)
+        : null,
+    what_happened: typeof what_happened === 'string' && what_happened.trim() ? what_happened.trim() : null,
+    decision: typeof decision === 'string' && decision.trim() ? decision.trim() : null,
+    next_session_date: typeof next_session_date === 'string' && next_session_date ? next_session_date : null,
+    attended_by: typeof attended_by === 'string' && attended_by.trim() ? attended_by.trim() : null,
+    notified_at: typeof notified_at === 'string' && notified_at ? notified_at : null,
+  }
+}
+
+export async function addHearing(
+  caseId: string,
+  filingId: string,
+  formData: FormData
+): Promise<HearingActionResult> {
+  const fields = readHearingFields(formData)
+  if ('error' in fields) return fields
+
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getClaims()
+  const { error } = await supabase
+    .from('hearings')
+    .insert({ filing_id: filingId, ...fields, created_by: userData?.claims?.sub })
+
+  if (error) {
+    if (error.code === '23514') {
+      return { error: mapHearingCheckViolation(error.message) ?? 'addFailed' }
+    }
+    if (error.code === '42501') {
+      return { error: 'noPermission' }
+    }
+    return { error: 'addFailed' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function updateHearing(
+  caseId: string,
+  filingId: string,
+  hearingId: string,
+  formData: FormData
+): Promise<HearingActionResult> {
+  const fields = readHearingFields(formData)
+  if ('error' in fields) return fields
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('hearings')
+    .update(fields)
+    .eq('id', hearingId)
+    .eq('filing_id', filingId)
+    .select('id')
+
+  if (error) {
+    if (error.code === '23514') {
+      return { error: mapHearingCheckViolation(error.message) ?? 'updateFailed' }
+    }
+    return { error: 'updateFailed' }
+  }
+  if (!data || data.length === 0) {
+    return { error: 'noPermission' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function removeHearing(
+  caseId: string,
+  filingId: string,
+  hearingId: string
+): Promise<HearingActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('hearings')
+    .delete()
+    .eq('id', hearingId)
+    .eq('filing_id', filingId)
+    .select('id')
+
+  if (error) {
+    return { error: 'removeFailed' }
+  }
+  if (!data || data.length === 0) {
+    return { error: 'noPermission' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
 // --- Share links -------------------------------------------------------
 
 export async function createShareLink(
