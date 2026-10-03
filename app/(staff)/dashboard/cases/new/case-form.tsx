@@ -2,11 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { createCase, type CreateCaseErrorCode } from '../actions'
 import { ClientPicker } from '../client-picker'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
 import { Button } from '@/components/dashboard/button'
+import { localizedName } from '@/lib/localized-name'
+
+type CaseTypeOption = { id: string; name_en: string | null; name_ar: string | null }
 
 // Closed set the server can return - anything else falls back to a generic
 // translated message rather than passing an arbitrary value to t() as a key.
@@ -20,8 +23,9 @@ const CREATE_CASE_ERROR_CODES: CreateCaseErrorCode[] = [
   'createFailed',
 ]
 
-export function CaseForm() {
+export function CaseForm({ caseTypes }: { caseTypes: CaseTypeOption[] }) {
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('dashboard.cases.new')
   const tErrors = useTranslations('dashboard.cases.new.errors')
   const formRef = useRef<HTMLFormElement>(null)
@@ -69,8 +73,15 @@ export function CaseForm() {
       </Field>
 
       <Field>
-        <Label htmlFor="case_type">{t('caseTypeLabel')}</Label>
-        <input id="case_type" name="case_type" placeholder={t('caseTypePlaceholder')} className={controlClass} />
+        <Label htmlFor="case_type_id">{t('caseTypeLabel')}</Label>
+        <select id="case_type_id" name="case_type_id" defaultValue="" className={controlClass}>
+          <option value="">{t('selectCaseTypePlaceholder')}</option>
+          {caseTypes.map((ct) => (
+            <option key={ct.id} value={ct.id}>
+              {localizedName({ name: ct.name_en ?? '', name_ar: ct.name_ar }, locale)}
+            </option>
+          ))}
+        </select>
       </Field>
 
       {error && <FieldError>{error}</FieldError>}

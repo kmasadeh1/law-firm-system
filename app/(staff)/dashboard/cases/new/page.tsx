@@ -11,9 +11,16 @@ export default async function NewCasePage() {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.new' })
 
-  // Asked here, not inferred from anything - has_permission already returns
-  // true for the owner internally, so this is never OR'd with is_owner().
-  const { data: canCreate } = await supabase.rpc('has_permission', { p_key: 'cases_manage' })
+  const [{ data: canCreate }, { data: caseTypes }] = await Promise.all([
+    // Asked here, not inferred from anything - has_permission already
+    // returns true for the owner internally, so this is never OR'd with
+    // is_owner().
+    supabase.rpc('has_permission', { p_key: 'cases_manage' }),
+    // Active only - a deactivated case type must not be pickable for a new
+    // case, even though an existing case that already uses one keeps
+    // showing it (see the case detail page's own display).
+    supabase.from('case_types').select('id, name_en, name_ar').eq('is_active', true).order('sort_order', { nullsFirst: false }).order('name_en'),
+  ])
 
   return (
     <div className="flex max-w-lg flex-col gap-6">
@@ -22,7 +29,7 @@ export default async function NewCasePage() {
         <PageHeader title={t('title')} />
       </div>
 
-      {canCreate === true ? <CaseForm /> : <EmptyState title={t('noAccess')} />}
+      {canCreate === true ? <CaseForm caseTypes={caseTypes ?? []} /> : <EmptyState title={t('noAccess')} />}
     </div>
   )
 }

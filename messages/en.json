@@ -162,6 +162,7 @@
       "rolesAndPermissions": "Roles & permissions",
       "deadlinePeriodTypes": "Deadline period types",
       "courts": "Courts",
+      "caseTypes": "Case types",
       "activityLog": "Activity log",
       "siteContent": "Site content",
       "settings": "Settings",
@@ -221,7 +222,7 @@
         "caseNumberLabel": "Case number",
         "caseNumberHelp": "Entered manually - no numbering convention is enforced yet.",
         "caseTypeLabel": "Case type",
-        "caseTypePlaceholder": "e.g. Litigation, Real Estate",
+        "selectCaseTypePlaceholder": "Select a case type…",
         "creating": "Creating…",
         "submit": "Create case",
         "errors": {
@@ -1158,6 +1159,35 @@
           "noName": "Enter a name in English or Arabic.",
           "noPermission": "You don't have permission to manage courts.",
           "createFailed": "Could not create the court. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
+        }
+      },
+      "caseTypes": {
+        "title": "Case types",
+        "noneYet": "No case types yet",
+        "createForm": {
+          "heading": "New case type",
+          "nameLabel": "Name",
+          "nameArLabel": "Name (Arabic)",
+          "creating": "Creating…",
+          "createCaseType": "Create case type"
+        },
+        "card": {
+          "nameEnAriaLabel": "Name",
+          "nameArAriaLabel": "Name (Arabic)",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved",
+          "activeAriaLabel": "Active",
+          "inactiveAriaLabel": "Inactive",
+          "activeText": "Active",
+          "deactivatedText": "Deactivated",
+          "deactivate": "Deactivate"
+        },
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noPermission": "You don't have permission to manage case types.",
+          "createFailed": "Could not create the case type. Please try again.",
           "saveFailed": "Could not save the changes. Please try again."
         }
       },

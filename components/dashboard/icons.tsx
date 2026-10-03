@@ -220,3 +220,12 @@ export function TasksIcon({ className }: IconProps) {
   )
 }
 
+export function CaseTypesIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M3 10 10 3h5a2 2 0 0 1 2 2v5l-7 7a2 2 0 0 1-2.8 0L3 12.8A2 2 0 0 1 3 10Z" />
+      <circle cx="13.2" cy="6.8" r="1" />
+    </svg>
+  )
+}
+

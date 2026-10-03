@@ -54,7 +54,7 @@ export async function createCase(formData: FormData): Promise<CreateCaseActionRe
   const client_id = formData.get('client_id')
   const title = formData.get('title')
   const case_number = formData.get('case_number')
-  const case_type = formData.get('case_type')
+  const case_type_id = formData.get('case_type_id')
 
   if (typeof client_id !== 'string' || !client_id) {
     return { error: 'selectClient' }
@@ -90,7 +90,7 @@ export async function createCase(formData: FormData): Promise<CreateCaseActionRe
       client_id,
       title: title.trim(),
       case_number: case_number.trim(),
-      case_type: typeof case_type === 'string' && case_type.trim() ? case_type.trim() : null,
+      case_type_id: typeof case_type_id === 'string' && case_type_id ? case_type_id : null,
       status_id: firstStatus.id,
       created_by: user?.claims?.sub,
     })

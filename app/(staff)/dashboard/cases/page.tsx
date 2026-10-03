@@ -36,7 +36,7 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   // including a legitimately empty list.
   let query = supabase
     .from('cases')
-    .select('id, case_number, title, case_type, clients(full_name), case_statuses(name, name_ar)')
+    .select('id, case_number, title, clients(full_name), case_statuses(name, name_ar)')
     .order('created_at', { ascending: false })
 
   // Counted separately (head: true, no rows returned) with the exact same

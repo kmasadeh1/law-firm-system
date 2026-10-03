@@ -156,6 +156,7 @@
       "rolesAndPermissions": "الأدوار والصلاحيات",
       "deadlinePeriodTypes": "أنواع المهل",
       "courts": "المحاكم",
+      "caseTypes": "أنواع القضايا",
       "activityLog": "سجل النشاط",
       "siteContent": "محتوى الموقع",
       "settings": "الإعدادات",
@@ -213,6 +214,7 @@
         "caseNumberLabel": "رقم القضية",
         "caseNumberHelp": "يُدخل يدوياً - لا يُفرض نظام ترقيم محدد بعد.",
         "caseTypeLabel": "نوع القضية",
+        "selectCaseTypePlaceholder": "اختر نوع القضية…",
         "creating": "جارٍ الإنشاء…",
         "submit": "إنشاء القضية",
         "errors": {
@@ -1106,6 +1108,35 @@
           "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
           "noPermission": "ليس لديك صلاحية إدارة المحاكم.",
           "createFailed": "تعذّر إنشاء المحكمة. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "caseTypes": {
+        "title": "أنواع القضايا",
+        "noneYet": "لا توجد أنواع قضايا بعد",
+        "createForm": {
+          "heading": "نوع قضية جديد",
+          "nameLabel": "الاسم",
+          "nameArLabel": "الاسم (بالعربية)",
+          "creating": "جارٍ الإنشاء…",
+          "createCaseType": "إنشاء نوع القضية"
+        },
+        "card": {
+          "nameEnAriaLabel": "الاسم",
+          "nameArAriaLabel": "الاسم (بالعربية)",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ",
+          "activeAriaLabel": "نشط",
+          "inactiveAriaLabel": "غير نشط",
+          "activeText": "نشط",
+          "deactivatedText": "معطّل",
+          "deactivate": "تعطيل"
+        },
+        "errors": {
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة أنواع القضايا.",
+          "createFailed": "تعذّر إنشاء نوع القضية. يرجى المحاولة مرة أخرى.",
           "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
         }
       },
