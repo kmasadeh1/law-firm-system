@@ -7,7 +7,12 @@ import { localizedName } from '@/lib/localized-name'
 import { StatusSection } from './status-section'
 import { TeamSection } from './team-section'
 import { OpposingPartiesSection } from './opposing-parties-section'
-import { DeadlinesSection } from './deadlines-section'
+import { CourtAndDeadlines } from './court-and-deadlines'
+import type { CourtFiling } from './court-section'
+import { PowerOfAttorneyLine } from './power-of-attorney-line'
+import { mostRelevantPoa } from '@/lib/poa-status'
+import { TasksSection } from './tasks-section'
+import type { Task } from '../../tasks/task-list'
 import { ShareLinksSection } from './share-links-section'
 import { DocumentsSection, type DocumentRow } from './documents-section'
 import { NotesSection, type CaseNote } from './notes-section'
@@ -27,7 +32,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase
       .from('cases')
       .select(
-        'id, case_number, title, case_type, status_id, opened_at, closed_at, clients(id, full_name)'
+        'id, case_number, title, case_type_id, case_types(name_en, name_ar), status_id, opened_at, closed_at, clients(id, full_name)'
       )
       .eq('id', id)
       .maybeSingle(),
@@ -54,6 +59,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: teamRows },
     { data: staffDirectory },
     { data: opposingParties },
+    { data: activeCourts },
+    { data: courtFilingRows },
     { data: deadlineRows },
     { data: periodTypes },
     { data: shareLinks },
@@ -68,11 +75,34 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: canManageShareLinks },
     { data: canWriteDocuments },
     { data: canWriteNotes },
+    { data: poaRows },
+    { data: canAssignTasks },
+    { data: taskRows },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order'),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
     supabase.from('staff_directory').select('id, full_name').eq('is_active', true).order('full_name'),
-    supabase.from('case_opposing_parties').select('id, name, national_id').eq('case_id', id),
+    supabase
+      .from('case_opposing_parties')
+      .select('id, name, national_id, counsel_name, counsel_phone')
+      .eq('case_id', id),
+    // Picker options for the add form - inactive courts are excluded here
+    // but an existing filing's own court still comes through the join below
+    // regardless of is_active, so an already-recorded filing never loses its
+    // court just because that court was later deactivated.
+    supabase
+      .from('courts')
+      .select('id, name_en, name_ar')
+      .eq('is_active', true)
+      .order('sort_order', { nullsFirst: false })
+      .order('name_en'),
+    supabase
+      .from('case_court_filings')
+      .select(
+        'id, court_id, court_case_number, chamber, judge_name, filed_at, is_current, notes, courts(id, name_en, name_ar), hearings(id, filing_id, session_date, session_time, outcome, what_happened, decision, next_session_date, attended_by, notified_at)'
+      )
+      .eq('case_id', id)
+      .order('filed_at', { ascending: false, nullsFirst: false }),
     supabase
       .from('deadlines')
       .select(
@@ -119,6 +149,27 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase.rpc('can_manage_case_share_links', { p_case_id: id }),
     supabase.rpc('can_write_case_documents', { p_case_id: id }),
     supabase.rpc('can_write_case_notes', { p_case_id: id }),
+    // Every PoA this case could be covered by: this case's own
+    // case-specific rows, plus the client's general ones (case_id IS NULL).
+    // RLS already scopes this to what the viewer may see; which one
+    // actually covers the case is picked below from what comes back.
+    caseRow.clients?.id
+      ? supabase
+          .from('powers_of_attorney')
+          .select('id, case_id, poa_number, issued_at, expires_at, is_revoked')
+          .or(`case_id.eq.${id},and(case_id.is.null,client_id.eq.${caseRow.clients.id})`)
+      : Promise.resolve({ data: null, error: null }),
+    // STABLE, already true for the owner internally - resolved once here,
+    // never OR'd with isOwner.
+    supabase.rpc('can_assign_tasks'),
+    // RLS already limits this to owner/assignee/creator rows for this case -
+    // no status filter here, unlike the standalone Tasks page: a case's own
+    // task list is small enough that showing everything is the point.
+    supabase
+      .from('tasks')
+      .select('id, title, details, case_id, assigned_to, due_date, status, priority, created_by')
+      .eq('case_id', id)
+      .order('due_date', { ascending: true, nullsFirst: false }),
   ])
 
   // staff_directory is a view, so its columns come back nullable in the
@@ -134,6 +185,39 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     is_lead: row.is_lead,
     full_name: nameById.get(row.staff_id) ?? tCommon('unknownStaff'),
   }))
+
+  // Case-specific wins over the client's general وكالة, never the other way
+  // - "otherwise" chain over rows already fetched, not a second query.
+  const caseSpecificPoa = mostRelevantPoa((poaRows ?? []).filter((p) => p.case_id === id))
+  const generalPoa = mostRelevantPoa((poaRows ?? []).filter((p) => p.case_id === null))
+  const coveringPoaRow = caseSpecificPoa ?? generalPoa
+  const coveringPoa = coveringPoaRow
+    ? {
+        poa_number: coveringPoaRow.poa_number,
+        issued_at: coveringPoaRow.issued_at,
+        expires_at: coveringPoaRow.expires_at,
+        is_revoked: coveringPoaRow.is_revoked,
+        is_general: coveringPoaRow.case_id === null,
+      }
+    : null
+
+  const courtFilings: CourtFiling[] = (courtFilingRows ?? [])
+    .filter((f) => f.courts !== null)
+    .map((f) => ({
+      id: f.id,
+      court_id: f.court_id,
+      court: f.courts!,
+      court_case_number: f.court_case_number,
+      chamber: f.chamber,
+      judge_name: f.judge_name,
+      filed_at: f.filed_at,
+      is_current: f.is_current,
+      notes: f.notes,
+      // Embedded collections come back in no guaranteed order - sorted here
+      // (oldest first, a chronological log) rather than relying on Postgres
+      // to have returned them that way.
+      hearings: [...(f.hearings ?? [])].sort((a, b) => a.session_date.localeCompare(b.session_date)),
+    }))
 
   const deadlines = (deadlineRows ?? []).map((d) => ({
     id: d.id,
@@ -155,6 +239,22 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .filter((s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null)
       .map((s) => [s.id, s.full_name])
   )
+
+  const tasks: Task[] = (taskRows ?? []).map((row) => ({
+    id: row.id,
+    title: row.title,
+    details: row.details,
+    case_id: row.case_id,
+    case_number: null,
+    case_title: null,
+    assigned_to: row.assigned_to,
+    assignee_name: allNameById.get(row.assigned_to) ?? tCommon('unknownStaff'),
+    due_date: row.due_date,
+    status: row.status,
+    priority: row.priority,
+    created_by: row.created_by,
+    creator_name: allNameById.get(row.created_by) ?? tCommon('unknownStaff'),
+  }))
 
   // Explicit application-layer filter, not just RLS: the "Deleted notes"
   // section below this page's notes/documents lists is owner-only by
@@ -209,6 +309,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     detail_redacted: row.detail_redacted,
   }))
 
+  const caseTypeName = caseRow.case_types
+    ? localizedName({ name: caseRow.case_types.name_en ?? '', name_ar: caseRow.case_types.name_ar }, locale)
+    : null
+
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -220,9 +324,9 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
             </>
           }
           description={t.rich('description', {
-            hasType: caseRow.case_type ? 'yes' : 'other',
+            hasType: caseTypeName ? 'yes' : 'other',
             name: caseRow.clients?.full_name ?? '—',
-            caseType: caseRow.case_type ?? '',
+            caseType: caseTypeName ?? '',
             bdi: (chunks) => <bdi>{chunks}</bdi>,
           })}
         />
@@ -243,12 +347,18 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         canManage={canManageCaseDetails === true}
       />
 
-      <DeadlinesSection
+      <PowerOfAttorneyLine poa={coveringPoa} />
+
+      <CourtAndDeadlines
         caseId={caseRow.id}
+        filings={courtFilings}
+        courts={activeCourts ?? []}
         deadlines={deadlines}
         periodTypes={periodTypes ?? []}
         canManage={canManageCaseDetails === true}
       />
+
+      <TasksSection caseId={caseRow.id} tasks={tasks} staffOptions={activeStaff} canAssign={canAssignTasks === true} />
 
       <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} canManage={canManageShareLinks === true} />
 

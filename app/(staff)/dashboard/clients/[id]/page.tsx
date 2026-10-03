@@ -5,14 +5,28 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { BalanceSection } from './balance-section'
+import { PowerOfAttorneySection, type Poa } from './power-of-attorney-section'
+import { ClientFundsSection, type FundBalance, type FundEntry } from './client-funds-section'
 
 export default async function EditClientPage({ params }: PageProps<'/dashboard/clients/[id]'>) {
   const { id } = await params
   const supabase = await createClient()
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.clients.detail.page' })
+  const tCommon = await getTranslations({ locale, namespace: 'dashboard.common' })
 
-  const [{ data: client }, { data: balance }, { data: canManage }] = await Promise.all([
+  const [
+    { data: client },
+    { data: balance },
+    { data: canManage },
+    { data: canViewPoa },
+    { data: canManagePoa },
+    { data: poaRows },
+    { data: cases },
+    { data: activeStaff },
+    { data: allStaff },
+    { data: canAccessFunds },
+  ] = await Promise.all([
     supabase.from('clients').select('id, full_name, national_id, phone, email, notes').eq('id', id).maybeSingle(),
     supabase
       .from('client_balances')
@@ -23,7 +37,106 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
     // client on their own case without clients_manage. Asked once here,
     // never OR'd with is_owner() (has_permission already covers the owner).
     supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+    // Both STABLE, both already true for the owner internally - resolved
+    // once here, never OR'd with isOwner, same reasoning as
+    // can_manage_case_details on the case detail page.
+    supabase.rpc('can_view_client', { p_client_id: id }),
+    supabase.rpc('can_manage_power_of_attorney', { p_client_id: id }),
+    supabase
+      .from('powers_of_attorney')
+      .select(
+        'id, case_id, poa_number, issued_at, expires_at, scope, registered_at_office, notes, is_revoked, revoked_at, cases(case_number, title), power_of_attorney_lawyers(staff_id)'
+      )
+      .eq('client_id', id)
+      .order('issued_at', { ascending: false, nullsFirst: false }),
+    supabase.from('cases').select('id, case_number, title').eq('client_id', id).order('case_number'),
+    supabase.from('staff_directory').select('id, full_name').eq('is_active', true).order('full_name'),
+    // Unfiltered - a lawyer named on a وكالة should still show their name
+    // after they've left the firm, same reasoning as the case timeline's
+    // allStaffDirectory.
+    supabase.from('staff_directory').select('id, full_name'),
+    // Owner, or a role holding client_funds_access - already covers the
+    // owner internally, never OR'd with isOwner.
+    supabase.rpc('can_access_client_funds'),
   ])
+
+  // Not fetched at all unless the gate passes - someone without access
+  // should not be able to tell from this page's own requests that the firm
+  // holds money for this client, not just see it hidden in the markup.
+  const [{ data: fundBalanceRow }, { data: fundEntryRows }] =
+    canAccessFunds === true
+      ? await Promise.all([
+          supabase
+            .from('client_fund_balances')
+            .select('balance_held, total_in, total_out, last_movement_on, entry_count')
+            .eq('client_id', id)
+            .maybeSingle(),
+          supabase
+            .from('client_fund_entries')
+            .select(
+              'id, entry_type, direction, amount, occurred_on, method, reference, description, case_id, reverses_entry_id, cases(case_number, title)'
+            )
+            .eq('client_id', id)
+            .order('occurred_on', { ascending: false }),
+        ])
+      : [{ data: null }, { data: null }]
+
+  const allNameById = new Map(
+    (allStaff ?? [])
+      .filter((s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null)
+      .map((s) => [s.id, s.full_name])
+  )
+  const activeStaffOptions = (activeStaff ?? []).filter(
+    (s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null
+  )
+
+  const poas: Poa[] = (poaRows ?? []).map((p) => ({
+    id: p.id,
+    case_id: p.case_id,
+    case_number: p.cases?.case_number ?? null,
+    case_title: p.cases?.title ?? null,
+    poa_number: p.poa_number,
+    issued_at: p.issued_at,
+    expires_at: p.expires_at,
+    scope: p.scope,
+    registered_at_office: p.registered_at_office,
+    notes: p.notes,
+    is_revoked: p.is_revoked,
+    revoked_at: p.revoked_at,
+    lawyers: (p.power_of_attorney_lawyers ?? []).map((l) => ({
+      staff_id: l.staff_id,
+      full_name: allNameById.get(l.staff_id) ?? tCommon('unknownStaff'),
+    })),
+  }))
+
+  const entryById = new Map((fundEntryRows ?? []).map((e) => [e.id, e]))
+  const reversedByEntryId = new Map(
+    (fundEntryRows ?? [])
+      .filter((e) => e.reverses_entry_id !== null)
+      .map((e) => [e.reverses_entry_id as string, e])
+  )
+  const fundEntries: FundEntry[] = (fundEntryRows ?? []).map((e) => {
+    const reverses = e.reverses_entry_id ? entryById.get(e.reverses_entry_id) ?? null : null
+    const reversedBy = reversedByEntryId.get(e.id) ?? null
+    return {
+      id: e.id,
+      entry_type: e.entry_type,
+      direction: e.direction,
+      amount: e.amount,
+      occurred_on: e.occurred_on,
+      method: e.method,
+      reference: e.reference,
+      description: e.description,
+      case_id: e.case_id,
+      case_number: e.cases?.case_number ?? null,
+      case_title: e.cases?.title ?? null,
+      reverses_entry_id: e.reverses_entry_id,
+      reverses: reverses ? { id: reverses.id, occurred_on: reverses.occurred_on, amount: reverses.amount } : null,
+      reversed_by: reversedBy ? { id: reversedBy.id, occurred_on: reversedBy.occurred_on, amount: reversedBy.amount } : null,
+    }
+  })
+
+  const fundBalance: FundBalance | null = fundBalanceRow ?? null
 
   return (
     <div className="flex max-w-lg flex-col gap-6">
@@ -36,6 +149,17 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
         <>
           <ClientForm mode="edit" client={client} canManage={canManage === true} />
           <BalanceSection balance={balance} />
+          {canAccessFunds === true && (
+            <ClientFundsSection clientId={client.id} balance={fundBalance} entries={fundEntries} cases={cases ?? []} />
+          )}
+          <PowerOfAttorneySection
+            clientId={client.id}
+            poas={poas}
+            cases={cases ?? []}
+            staffOptions={activeStaffOptions}
+            canView={canViewPoa === true}
+            canManage={canManagePoa === true}
+          />
         </>
       ) : (
         <p className="text-sm text-fg-muted">{t('clientNotFoundDescription')}</p>
