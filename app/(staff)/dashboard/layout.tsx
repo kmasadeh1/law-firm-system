@@ -87,6 +87,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       label: t('deadlinePeriodTypes'),
       icon: 'period-types',
     })
+    administration.push({ href: '/dashboard/owner/courts', label: t('courts'), icon: 'courts' })
     administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
     administration.push({
       href: '/dashboard/owner/site-content',

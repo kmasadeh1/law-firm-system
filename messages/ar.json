@@ -154,6 +154,7 @@
       "staffAccounts": "حسابات الموظفين",
       "rolesAndPermissions": "الأدوار والصلاحيات",
       "deadlinePeriodTypes": "أنواع المهل",
+      "courts": "المحاكم",
       "activityLog": "سجل النشاط",
       "siteContent": "محتوى الموقع",
       "settings": "الإعدادات",
@@ -360,12 +361,44 @@
           "noneAddedYet": "لم يُضف أحد بعد.",
           "nameLabel": "الاسم",
           "nationalIdLabel": "الرقم الوطني",
+          "counselNameLabel": "اسم المحامي",
+          "counselPhoneLabel": "هاتف المحامي",
+          "counselLine": "يمثله <bdi>{name}</bdi>",
           "checking": "جارٍ التحقق…",
           "add": "إضافة",
           "addAnyway": "إضافة على أي حال",
           "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
           "errors": {
             "name_required": "الاسم مطلوب.",
+            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+          }
+        },
+        "courtFilings": {
+          "heading": "المحكمة",
+          "noneYet": "لا توجد قيود بعد.",
+          "courtLabel": "المحكمة",
+          "selectCourtPlaceholder": "اختر محكمة…",
+          "courtCaseNumberLabel": "رقم الدعوى",
+          "chamberLabel": "الدائرة",
+          "judgeNameLabel": "القاضي",
+          "filedAtLabel": "تاريخ التقديم",
+          "notesLabel": "ملاحظات",
+          "currentLabel": "قيد قائم حالياً",
+          "current": "قائم حالياً",
+          "filedOn": "قُدّمت بتاريخ <bdi>{date}</bdi>",
+          "adding": "جارٍ الإضافة…",
+          "add": "إضافة قيد",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ",
+          "removing": "جارٍ الإزالة…",
+          "remove": "إزالة",
+          "errors": {
+            "selectCourt": "اختر محكمة.",
+            "noPermission": "ليس لديك صلاحية تعديل قيود المحكمة لهذه القضية.",
+            "addFailed": "تعذّرت إضافة القيد. يرجى المحاولة مرة أخرى.",
+            "updateFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+            "removeFailed": "تعذّرت إزالة القيد. يرجى المحاولة مرة أخرى.",
             "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
           }
         },
@@ -871,6 +904,53 @@
           "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
           "inUse": "لا يمكن حذف نوع مهلة بينما تستخدمه إحدى المهل.",
           "deleteFailed": "تعذّر حذف نوع المهلة. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "courts": {
+        "title": "المحاكم",
+        "noneYet": "لا توجد محاكم بعد",
+        "createForm": {
+          "heading": "محكمة جديدة",
+          "nameLabel": "الاسم",
+          "nameArLabel": "الاسم (بالعربية)",
+          "cityLabel": "المدينة",
+          "cityArLabel": "المدينة (بالعربية)",
+          "typeLabel": "نوع المحكمة",
+          "selectTypePlaceholder": "اختر نوع المحكمة…",
+          "creating": "جارٍ الإنشاء…",
+          "createCourt": "إنشاء محكمة"
+        },
+        "card": {
+          "nameEnAriaLabel": "الاسم",
+          "nameArAriaLabel": "الاسم (بالعربية)",
+          "cityEnAriaLabel": "المدينة",
+          "cityArAriaLabel": "المدينة (بالعربية)",
+          "typeAriaLabel": "نوع المحكمة",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ",
+          "activeAriaLabel": "نشطة",
+          "inactiveAriaLabel": "غير نشطة",
+          "activeText": "نشطة",
+          "deactivatedText": "معطّلة",
+          "deactivate": "تعطيل"
+        },
+        "type": {
+          "conciliation": "محكمة الصلح",
+          "first_instance": "محكمة البداية",
+          "appeal": "محكمة الاستئناف",
+          "cassation": "محكمة التمييز",
+          "administrative": "المحكمة الإدارية",
+          "sharia": "المحكمة الشرعية",
+          "execution": "دائرة التنفيذ",
+          "other": "أخرى"
+        },
+        "errors": {
+          "selectType": "اختر نوع المحكمة.",
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة المحاكم.",
+          "createFailed": "تعذّر إنشاء المحكمة. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
         }
       },
       "permissions": {

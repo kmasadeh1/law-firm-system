@@ -160,6 +160,7 @@
       "staffAccounts": "Staff accounts",
       "rolesAndPermissions": "Roles & permissions",
       "deadlinePeriodTypes": "Deadline period types",
+      "courts": "Courts",
       "activityLog": "Activity log",
       "siteContent": "Site content",
       "settings": "Settings",
@@ -376,6 +377,9 @@
           "noneAddedYet": "None added yet.",
           "nameLabel": "Name",
           "nationalIdLabel": "National ID",
+          "counselNameLabel": "Counsel name",
+          "counselPhoneLabel": "Counsel phone",
+          "counselLine": "Represented by <bdi>{name}</bdi>",
           "checking": "Checking…",
           "add": "Add",
           "addAnyway": "Add anyway",
@@ -386,6 +390,35 @@
             "name_required": "Name is required.",
             "conflict_check_failed": "Could not run the conflict check. Please try again.",
             "add_failed": "Could not add the opposing party. Please try again.",
+            "generic": "Something went wrong. Please try again."
+          }
+        },
+        "courtFilings": {
+          "heading": "Court",
+          "noneYet": "No filings recorded yet.",
+          "courtLabel": "Court",
+          "selectCourtPlaceholder": "Select a court…",
+          "courtCaseNumberLabel": "Court case number",
+          "chamberLabel": "Chamber",
+          "judgeNameLabel": "Judge",
+          "filedAtLabel": "Filed on",
+          "notesLabel": "Notes",
+          "currentLabel": "Current filing",
+          "current": "Current",
+          "filedOn": "Filed <bdi>{date}</bdi>",
+          "adding": "Adding…",
+          "add": "Add filing",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved",
+          "removing": "Removing…",
+          "remove": "Remove",
+          "errors": {
+            "selectCourt": "Select a court.",
+            "noPermission": "You don't have permission to change this case's court filings.",
+            "addFailed": "Could not add the filing. Please try again.",
+            "updateFailed": "Could not save the changes. Please try again.",
+            "removeFailed": "Could not remove the filing. Please try again.",
             "generic": "Something went wrong. Please try again."
           }
         },
@@ -923,6 +956,53 @@
           "saveFailed": "Could not save the changes. Please try again.",
           "inUse": "Can't delete a period type while a deadline uses it.",
           "deleteFailed": "Could not delete the period type. Please try again."
+        }
+      },
+      "courts": {
+        "title": "Courts",
+        "noneYet": "No courts yet",
+        "createForm": {
+          "heading": "New court",
+          "nameLabel": "Name",
+          "nameArLabel": "Name (Arabic)",
+          "cityLabel": "City",
+          "cityArLabel": "City (Arabic)",
+          "typeLabel": "Court type",
+          "selectTypePlaceholder": "Select a court type…",
+          "creating": "Creating…",
+          "createCourt": "Create court"
+        },
+        "card": {
+          "nameEnAriaLabel": "Name",
+          "nameArAriaLabel": "Name (Arabic)",
+          "cityEnAriaLabel": "City",
+          "cityArAriaLabel": "City (Arabic)",
+          "typeAriaLabel": "Court type",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved",
+          "activeAriaLabel": "Active",
+          "inactiveAriaLabel": "Inactive",
+          "activeText": "Active",
+          "deactivatedText": "Deactivated",
+          "deactivate": "Deactivate"
+        },
+        "type": {
+          "conciliation": "Conciliation",
+          "first_instance": "Court of First Instance",
+          "appeal": "Court of Appeal",
+          "cassation": "Court of Cassation",
+          "administrative": "Administrative Court",
+          "sharia": "Sharia Court",
+          "execution": "Execution Department",
+          "other": "Other"
+        },
+        "errors": {
+          "selectType": "Select a court type.",
+          "noName": "Enter a name in English or Arabic.",
+          "noPermission": "You don't have permission to manage courts.",
+          "createFailed": "Could not create the court. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
         }
       },
       "permissions": {

@@ -200,3 +200,14 @@ export function LeaveRequestsIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function CourtsIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M3 8 10 3l7 5" />
+      <path d="M4.5 8.5v7M8 8.5v7M12 8.5v7M15.5 8.5v7" />
+      <path d="M3 17h14" />
+    </svg>
+  )
+}
+

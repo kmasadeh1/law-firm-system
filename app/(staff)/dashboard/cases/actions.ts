@@ -243,6 +243,8 @@ export async function addOpposingParty(
 ): Promise<OpposingPartyActionResult & { matches?: ConflictMatch[] }> {
   const name = formData.get('name')
   const national_id = formData.get('national_id')
+  const counsel_name = formData.get('counsel_name')
+  const counsel_phone = formData.get('counsel_phone')
 
   if (typeof name !== 'string' || !name.trim()) {
     return { error: 'name_required' }
@@ -250,6 +252,10 @@ export async function addOpposingParty(
   const trimmedName = name.trim()
   const trimmedNationalId =
     typeof national_id === 'string' && national_id.trim() ? national_id.trim() : null
+  const trimmedCounselName =
+    typeof counsel_name === 'string' && counsel_name.trim() ? counsel_name.trim() : null
+  const trimmedCounselPhone =
+    typeof counsel_phone === 'string' && counsel_phone.trim() ? counsel_phone.trim() : null
 
   const supabase = await createClient()
 
@@ -267,12 +273,127 @@ export async function addOpposingParty(
     }
   }
 
-  const { error } = await supabase
-    .from('case_opposing_parties')
-    .insert({ case_id: caseId, name: trimmedName, national_id: trimmedNationalId })
+  const { error } = await supabase.from('case_opposing_parties').insert({
+    case_id: caseId,
+    name: trimmedName,
+    national_id: trimmedNationalId,
+    counsel_name: trimmedCounselName,
+    counsel_phone: trimmedCounselPhone,
+  })
 
   if (error) {
     return { error: 'add_failed' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+// --- Court filings -----------------------------------------------------
+
+// Closed set the server can return - same convention as TeamErrorCode /
+// OpposingPartyErrorCode above. RLS write access is can_manage_case_details,
+// the same function this page already resolves once for Team/Opposing
+// parties/Deadlines - a denied write comes back as 42501 or (for
+// update/delete) zero affected rows, never a thrown error the UI has to
+// guess at.
+export type CourtFilingErrorCode = 'selectCourt' | 'noPermission' | 'addFailed' | 'updateFailed' | 'removeFailed'
+
+type CourtFilingActionResult = { error?: CourtFilingErrorCode }
+
+type CourtFilingFields = {
+  court_id: string
+  court_case_number: string | null
+  chamber: string | null
+  judge_name: string | null
+  filed_at: string | null
+  is_current: boolean
+  notes: string | null
+}
+
+function readCourtFilingFields(formData: FormData): CourtFilingFields | { error: CourtFilingErrorCode } {
+  const court_id = formData.get('court_id')
+  const court_case_number = formData.get('court_case_number')
+  const chamber = formData.get('chamber')
+  const judge_name = formData.get('judge_name')
+  const filed_at = formData.get('filed_at')
+  const notes = formData.get('notes')
+
+  if (typeof court_id !== 'string' || !court_id) {
+    return { error: 'selectCourt' }
+  }
+
+  return {
+    court_id,
+    court_case_number:
+      typeof court_case_number === 'string' && court_case_number.trim() ? court_case_number.trim() : null,
+    chamber: typeof chamber === 'string' && chamber.trim() ? chamber.trim() : null,
+    judge_name: typeof judge_name === 'string' && judge_name.trim() ? judge_name.trim() : null,
+    filed_at: typeof filed_at === 'string' && filed_at ? filed_at : null,
+    is_current: formData.get('is_current') === 'on',
+    notes: typeof notes === 'string' && notes.trim() ? notes.trim() : null,
+  }
+}
+
+export async function addCourtFiling(caseId: string, formData: FormData): Promise<CourtFilingActionResult> {
+  const fields = readCourtFilingFields(formData)
+  if ('error' in fields) return fields
+
+  const supabase = await createClient()
+  const { error } = await supabase.from('case_court_filings').insert({ case_id: caseId, ...fields })
+
+  if (error) {
+    if (error.code === '42501') {
+      return { error: 'noPermission' }
+    }
+    return { error: 'addFailed' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function updateCourtFiling(
+  caseId: string,
+  filingId: string,
+  formData: FormData
+): Promise<CourtFilingActionResult> {
+  const fields = readCourtFilingFields(formData)
+  if ('error' in fields) return fields
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('case_court_filings')
+    .update(fields)
+    .eq('id', filingId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'updateFailed' }
+  }
+  if (!data || data.length === 0) {
+    return { error: 'noPermission' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+export async function removeCourtFiling(caseId: string, filingId: string): Promise<CourtFilingActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('case_court_filings')
+    .delete()
+    .eq('id', filingId)
+    .eq('case_id', caseId)
+    .select('id')
+
+  if (error) {
+    return { error: 'removeFailed' }
+  }
+  if (!data || data.length === 0) {
+    return { error: 'noPermission' }
   }
 
   revalidatePath(casePath(caseId))

@@ -8,7 +8,13 @@ import { Button } from '@/components/dashboard/button'
 import { FieldError, controlClass } from '@/components/dashboard/form'
 import { ConflictWarning } from '@/components/dashboard/conflict-warning'
 
-type OpposingParty = { id: string; name: string; national_id: string | null }
+type OpposingParty = {
+  id: string
+  name: string
+  national_id: string | null
+  counsel_name: string | null
+  counsel_phone: string | null
+}
 
 // Closed set the server can return - anything else falls back to a generic
 // translated message rather than passing an arbitrary value to t() as a key.
@@ -116,6 +122,18 @@ export function OpposingPartiesSection({
             <li key={p.id} className="px-3 py-2 text-sm text-fg">
               <bdi>{p.name}</bdi>
               {p.national_id && <span className="text-fg-muted"> · <bdi>{p.national_id}</bdi></span>}
+              {p.counsel_name && (
+                <span className="text-fg-muted">
+                  {' · '}
+                  {t.rich('counselLine', { name: p.counsel_name, bdi: (chunks) => <bdi>{chunks}</bdi> })}
+                </span>
+              )}
+              {p.counsel_phone && (
+                <span className="text-fg-muted">
+                  {' · '}
+                  <span dir="ltr">{p.counsel_phone}</span>
+                </span>
+              )}
             </li>
           ))}
         </ul>
@@ -134,6 +152,18 @@ export function OpposingPartiesSection({
               {t('nationalIdLabel')}
             </label>
             <input id="op-national-id" name="national_id" className={controlClass} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="op-counsel-name" className="text-sm text-fg-muted">
+              {t('counselNameLabel')}
+            </label>
+            <input id="op-counsel-name" name="counsel_name" className={controlClass} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="op-counsel-phone" className="text-sm text-fg-muted">
+              {t('counselPhoneLabel')}
+            </label>
+            <input id="op-counsel-phone" name="counsel_phone" dir="ltr" className={controlClass} />
           </div>
           {!matches && (
             <Button type="submit" variant="secondary" data-testid="opposing-party-add-button" disabled={isPending}>
