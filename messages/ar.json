@@ -588,6 +588,54 @@
             "unassignFailed": "تعذّرت إزالة هذا المحامي. يرجى المحاولة مرة أخرى.",
             "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
           }
+        },
+        "funds": {
+          "heading": "أمانات العميل",
+          "notFeeMoneyNote": "أموال يحتفظ بها المكتب لحساب هذا العميل — عائدات تسوية، ودائع، تحصيلات. ليست إطلاقاً من دخل أتعاب المكتب.",
+          "balanceHeld": "المحتفظ به: <bdi>{amount}</bdi>",
+          "totalIn": "إجمالي الوارد: <bdi>{amount}</bdi>",
+          "totalOut": "إجمالي الصادر: <bdi>{amount}</bdi>",
+          "noneYet": "لا توجد قيود مسجَّلة بعد.",
+          "recordHeading": "تسجيل قيد",
+          "typeLabel": "النوع",
+          "selectTypePlaceholder": "اختر نوعاً…",
+          "amountLabel": "المبلغ",
+          "occurredOnLabel": "التاريخ",
+          "caseLabel": "القضية",
+          "generalCaseOption": "عام (غير مرتبط بقضية)",
+          "methodLabel": "الطريقة",
+          "referenceLabel": "المرجع",
+          "descriptionLabel": "الوصف",
+          "adding": "جارٍ الإضافة…",
+          "add": "تسجيل القيد",
+          "methodLine": "الطريقة: <bdi>{method}</bdi>",
+          "reversesEntryNote": "يعكس قيد <bdi>{amount}</bdi> المسجَّل في <bdi>{date}</bdi>.",
+          "reversedByNote": "عُكس بقيد <bdi>{amount}</bdi> المسجَّل في <bdi>{date}</bdi>.",
+          "reverse": "عكس القيد",
+          "reversing": "جارٍ العكس…",
+          "confirmReverse": "تأكيد العكس",
+          "cancel": "إلغاء",
+          "type": {
+            "deposit": "إيداع",
+            "disbursement": "دفعة",
+            "fee_transfer": "تحويل إلى الأتعاب",
+            "refund": "استرداد",
+            "reversal": "عكس قيد"
+          },
+          "errors": {
+            "typeRequired": "اختر نوعاً.",
+            "invalidAmount": "أدخل مبلغاً صحيحاً.",
+            "amountNotPositive": "يجب أن يكون المبلغ أكبر من صفر.",
+            "directionMismatch": "هذا الاتجاه لا يطابق نوع القيد.",
+            "paymentOnlyOnTransfer": "لا يمكن ربط دفعة إلا بقيد من نوع تحويل إلى الأتعاب.",
+            "reversalNeedsTarget": "يجب أن يحدد قيد العكس القيد الذي يعكسه.",
+            "caseMismatch": "تلك القضية لا تخص هذا العميل.",
+            "insufficientBalance": "هذا سيخفض الرصيد المحتفظ به للعميل إلى أقل من صفر.",
+            "reversalTargetNotFound": "تعذّر العثور على القيد المطلوب عكسه.",
+            "noPermission": "ليس لديك صلاحية تسجيل قيود أمانات العميل.",
+            "addFailed": "تعذّر تسجيل القيد. يرجى المحاولة مرة أخرى.",
+            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+          }
         }
       },
       "form": {

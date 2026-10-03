@@ -612,6 +612,54 @@
             "unassignFailed": "Could not remove that lawyer. Please try again.",
             "generic": "Something went wrong. Please try again."
           }
+        },
+        "funds": {
+          "heading": "Client funds",
+          "notFeeMoneyNote": "Money the firm holds on this client's behalf — settlement proceeds, deposits, collections. Never the firm's own fee income.",
+          "balanceHeld": "Held: <bdi>{amount}</bdi>",
+          "totalIn": "Total in: <bdi>{amount}</bdi>",
+          "totalOut": "Total out: <bdi>{amount}</bdi>",
+          "noneYet": "No entries recorded yet.",
+          "recordHeading": "Record an entry",
+          "typeLabel": "Type",
+          "selectTypePlaceholder": "Select a type…",
+          "amountLabel": "Amount",
+          "occurredOnLabel": "Date",
+          "caseLabel": "Case",
+          "generalCaseOption": "General (not case-specific)",
+          "methodLabel": "Method",
+          "referenceLabel": "Reference",
+          "descriptionLabel": "Description",
+          "adding": "Adding…",
+          "add": "Record entry",
+          "methodLine": "Method: <bdi>{method}</bdi>",
+          "reversesEntryNote": "Reverses the <bdi>{amount}</bdi> entry of <bdi>{date}</bdi>.",
+          "reversedByNote": "Reversed by the <bdi>{amount}</bdi> entry of <bdi>{date}</bdi>.",
+          "reverse": "Reverse",
+          "reversing": "Reversing…",
+          "confirmReverse": "Confirm reversal",
+          "cancel": "Cancel",
+          "type": {
+            "deposit": "Deposit",
+            "disbursement": "Disbursement",
+            "fee_transfer": "Fee transfer",
+            "refund": "Refund",
+            "reversal": "Reversal"
+          },
+          "errors": {
+            "typeRequired": "Select a type.",
+            "invalidAmount": "Enter a valid amount.",
+            "amountNotPositive": "Amount must be greater than zero.",
+            "directionMismatch": "That direction doesn't match the entry type.",
+            "paymentOnlyOnTransfer": "Only a fee transfer can link to a payment.",
+            "reversalNeedsTarget": "A reversal must name the entry it reverses.",
+            "caseMismatch": "That case doesn't belong to this client.",
+            "insufficientBalance": "This would take the client's held balance below zero.",
+            "reversalTargetNotFound": "Could not find the entry to reverse.",
+            "noPermission": "You don't have permission to record client fund entries.",
+            "addFailed": "Could not record the entry. Please try again.",
+            "generic": "Something went wrong. Please try again."
+          }
         }
       },
       "form": {
