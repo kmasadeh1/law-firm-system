@@ -196,6 +196,8 @@
         "newCase": "قضية جديدة",
         "searchPlaceholder": "البحث برقم القضية أو عنوانها",
         "allStatuses": "جميع الحالات",
+        "allTypes": "جميع الأنواع",
+        "typeFilterLabel": "نوع القضية",
         "filter": "تصفية",
         "clear": "مسح",
         "noCasesFiltered": "لا توجد قضايا تطابق عوامل التصفية هذه.",

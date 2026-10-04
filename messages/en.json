@@ -204,6 +204,8 @@
         "newCase": "New case",
         "searchPlaceholder": "Search by case number or title",
         "allStatuses": "All statuses",
+        "allTypes": "All types",
+        "typeFilterLabel": "Case type",
         "filter": "Filter",
         "clear": "Clear",
         "noCasesFiltered": "No cases match those filters.",

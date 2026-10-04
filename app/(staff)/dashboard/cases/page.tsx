@@ -12,9 +12,10 @@ import { localizedName } from '@/lib/localized-name'
 import { PAGE_SIZE, parsePage, pageRange } from '@/lib/pagination'
 
 export default async function CasesListPage({ searchParams }: PageProps<'/dashboard/cases'>) {
-  const { q, status, page: pageParam } = (await searchParams) as {
+  const { q, status, type, page: pageParam } = (await searchParams) as {
     q?: string
     status?: string
+    type?: string
     page?: string
   }
   const supabase = await createClient()
@@ -23,20 +24,33 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   const page = parsePage(pageParam)
   const { from, to } = pageRange(page, PAGE_SIZE)
 
-  const [{ data: statuses }, { data: canCreate }] = await Promise.all([
+  const [{ data: statuses }, { data: caseTypes }, { data: canCreate }] = await Promise.all([
     supabase.from('case_statuses').select('id, name, name_ar, sort_order').order('sort_order'),
+    // Every case type, active or not - the picker below shows active ones
+    // only, plus the current `type` param's row if it names an inactive
+    // one, so a deactivated type never silently vanishes out from under a
+    // filter the user is already applying.
+    supabase
+      .from('case_types')
+      .select('id, name_en, name_ar, is_active')
+      .order('sort_order', { nullsFirst: false })
+      .order('name_en'),
     // Server-side, not inferred from the list coming back empty - the Lawyer
     // role sees its own assigned cases in an otherwise-empty list, which is
     // not the same thing as "cannot create one."
     supabase.rpc('has_permission', { p_key: 'cases_manage' }),
   ])
 
+  const typeOptions = (caseTypes ?? []).filter((ct) => ct.is_active || ct.id === type)
+
   // No access gate here - this just renders whatever RLS returns for the
   // signed-in user (owner, cases_manage, or their own case assignments),
   // including a legitimately empty list.
   let query = supabase
     .from('cases')
-    .select('id, case_number, title, clients(full_name), case_statuses(name, name_ar)')
+    .select(
+      'id, case_number, title, clients(full_name), case_statuses(name, name_ar), case_types(name_en, name_ar)'
+    )
     .order('created_at', { ascending: false })
 
   // Counted separately (head: true, no rows returned) with the exact same
@@ -56,6 +70,10 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
   if (status) {
     query = query.eq('status_id', status)
     countQuery = countQuery.eq('status_id', status)
+  }
+  if (type) {
+    query = query.eq('case_type_id', type)
+    countQuery = countQuery.eq('case_type_id', type)
   }
 
   // Paging is ordering and limiting, so it belongs in the query - .range()
@@ -94,10 +112,23 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
             </option>
           ))}
         </select>
+        <select
+          name="type"
+          defaultValue={type ?? ''}
+          aria-label={t('typeFilterLabel')}
+          className={controlClass}
+        >
+          <option value="">{t('allTypes')}</option>
+          {typeOptions.map((ct) => (
+            <option key={ct.id} value={ct.id}>
+              {localizedName({ name: ct.name_en ?? '', name_ar: ct.name_ar }, locale)}
+            </option>
+          ))}
+        </select>
         <Button type="submit" variant="secondary">
           {t('filter')}
         </Button>
-        {(term || status) && (
+        {(term || status || type) && (
           <Link
             href="/dashboard/cases"
             className="flex items-center text-sm text-fg-muted underline-offset-2 hover:underline"
@@ -109,10 +140,10 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
 
       {!cases || cases.length === 0 ? (
         <EmptyState
-          title={term || status ? t('noCasesFiltered') : t('noCasesYet')}
-          description={term || status ? undefined : t('noCasesYetDescription')}
+          title={term || status || type ? t('noCasesFiltered') : t('noCasesYet')}
+          description={term || status || type ? undefined : t('noCasesYetDescription')}
           action={
-            !term && !status && canCreate === true && (
+            !term && !status && !type && canCreate === true && (
               <LinkButton href="/dashboard/cases/new" variant="secondary">
                 {t('newCase')}
               </LinkButton>
@@ -141,6 +172,12 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
                     <span className="text-fg-muted">
                       <bdi>{c.clients?.full_name ?? '—'}</bdi> ·{' '}
                       {c.case_statuses ? localizedName(c.case_statuses, locale) : '—'}
+                      {c.case_types && (
+                        <>
+                          {' · '}
+                          {localizedName({ name: c.case_types.name_en ?? '', name_ar: c.case_types.name_ar }, locale)}
+                        </>
+                      )}
                     </span>
                   </Link>
                 </li>
@@ -154,7 +191,7 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
             total={total ?? 0}
             locale={locale}
             basePath="/dashboard/cases"
-            searchParams={{ q: term, status }}
+            searchParams={{ q: term, status, type }}
             testId="cases-pagination"
           />
         </>
