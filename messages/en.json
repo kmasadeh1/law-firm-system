@@ -984,6 +984,10 @@
         "owner": "Owner",
         "staff": "Staff"
       },
+      "noAccess": {
+        "title": "Owner access only",
+        "description": "You don't have permission to view this page."
+      },
       "staff": {
         "title": "Staff accounts",
         "description": "Create logins, reissue temporary passwords, and activate or deactivate staff. Accounts are never deleted.",
