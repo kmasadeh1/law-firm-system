@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { todayInFirmZone } from '@/lib/format-date-time'
 
 export type ConflictMatch = {
   source: string
@@ -991,7 +992,9 @@ export async function setExpenseReimbursed(
     .from('expenses')
     .update({
       reimbursed,
-      reimbursed_at: reimbursed ? new Date().toISOString().slice(0, 10) : null,
+      // Today in Amman - toISOString() would give the UTC date, which is
+      // still yesterday until 03:00.
+      reimbursed_at: reimbursed ? todayInFirmZone() : null,
     })
     .eq('id', expenseId)
     .eq('case_id', caseId)

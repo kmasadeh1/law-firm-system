@@ -1,3 +1,5 @@
+import { todayInFirmZone } from '@/lib/format-date-time'
+
 // "Overdue" / "due soon" is a display-only comparison against today's
 // date - it is never stored, and it never decides which date wins
 // (Postgres already resolved that into effective_due_date). Purely for
@@ -8,10 +10,9 @@ const DUE_SOON_DAYS = 7
 
 export function urgencyOf(effectiveDueDate: string | null): Urgency {
   if (!effectiveDueDate) return 'later'
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const due = new Date(effectiveDueDate + 'T00:00:00')
-  const diffDays = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  // Whole calendar days between today in Amman and the date - both as
+  // UTC-midnight instants, so no host zone or DST enters the arithmetic.
+  const diffDays = Math.round((Date.parse(effectiveDueDate) - Date.parse(todayInFirmZone())) / (1000 * 60 * 60 * 24))
   if (diffDays < 0) return 'overdue'
   if (diffDays <= DUE_SOON_DAYS) return 'soon'
   return 'later'

@@ -10,31 +10,18 @@ import type { ClientOption } from '../cases/actions'
 import type { CaseOption } from './actions'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { Button } from '@/components/dashboard/button'
+import { shiftFirmDateTimeInput, toFirmDateTimeInput } from '@/lib/format-date-time'
 
 type StaffOption = { id: string; full_name: string }
 
 type AppointmentType = 'consultation' | 'court_date'
 type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'
 
-const ONE_HOUR_MS = 60 * 60 * 1000
-
-function formatLocalInput(d: Date) {
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
-function toLocalInputValue(iso: string) {
-  return formatLocalInput(new Date(iso))
-}
-
-// datetime-local's value is already "YYYY-MM-DDTHH:mm" in local time, which
-// `new Date(...)` parses as local time too - round-trips cleanly without a
-// timezone library.
-function addOneHour(localValue: string): string {
-  const d = new Date(localValue)
-  if (Number.isNaN(d.getTime())) return localValue
-  return formatLocalInput(new Date(d.getTime() + ONE_HOUR_MS))
-}
+// Every datetime-local value here is Amman wall-clock time, converted only
+// through lib/format-date-time.ts - never through the browser's or the
+// server's own zone, which differ from each other and from Amman on a UTC
+// host (and also differ between server render and hydration).
+const ONE_HOUR_MINUTES = 60
 
 // Closed set the server can return - anything else falls back to a generic
 // translated message rather than passing an arbitrary value to t() as a key.
@@ -105,9 +92,9 @@ export function AppointmentForm({
   // same way any "synchronize with a value React doesn't own" effect would.
   useEffect(() => {
     if (mode === 'create' && startRef.current && endRef.current) {
-      const now = new Date()
-      startRef.current.value = formatLocalInput(now)
-      endRef.current.value = formatLocalInput(new Date(now.getTime() + ONE_HOUR_MS))
+      const now = toFirmDateTimeInput(new Date().toISOString())
+      startRef.current.value = now
+      endRef.current.value = shiftFirmDateTimeInput(now, ONE_HOUR_MINUTES)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -137,7 +124,9 @@ export function AppointmentForm({
       typeof endsValue === 'string' &&
       startsValue &&
       endsValue &&
-      new Date(endsValue).getTime() <= new Date(startsValue).getTime()
+      // Both are "YYYY-MM-DDTHH:mm" in the same (Amman) frame, so a plain
+      // string comparison orders them - no Date, no zone.
+      endsValue <= startsValue
     ) {
       setError(resolveError('endBeforeStart'))
       return
@@ -219,10 +208,10 @@ export function AppointmentForm({
             name="starts_at"
             type="datetime-local"
             required
-            defaultValue={initial ? toLocalInputValue(initial.starts_at) : undefined}
+            defaultValue={initial ? toFirmDateTimeInput(initial.starts_at) : undefined}
             onChange={(e) => {
               if (!endTouchedRef.current && endRef.current) {
-                endRef.current.value = addOneHour(e.target.value)
+                endRef.current.value = shiftFirmDateTimeInput(e.target.value, ONE_HOUR_MINUTES)
               }
             }}
             data-testid="appointment-starts-at"
@@ -239,7 +228,7 @@ export function AppointmentForm({
             name="ends_at"
             type="datetime-local"
             required
-            defaultValue={initial ? toLocalInputValue(initial.ends_at) : undefined}
+            defaultValue={initial ? toFirmDateTimeInput(initial.ends_at) : undefined}
             onChange={() => {
               endTouchedRef.current = true
             }}

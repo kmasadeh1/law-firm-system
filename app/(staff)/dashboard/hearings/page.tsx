@@ -5,23 +5,10 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
-import { FIRM_TIME_ZONE, formatFullDate, formatTimeOfDay } from '@/lib/format-date-time'
+import { addDaysToDate, formatFullDate, formatTimeOfDay, todayInFirmZone } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
 import { PrintButton } from './print-button'
-
-// The firm's own calendar day, not the server's - "today" on a UTC host
-// would still be yesterday in Amman until 03:00.
-function todayInFirmZone() {
-  // en-CA formats as YYYY-MM-DD, the same shape as session_date and the
-  // date input's value.
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: FIRM_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
-}
 
 // Parses ?date= defensively: anything that isn't a real YYYY-MM-DD calendar
 // date (typo'd URL, 2026-02-30) falls back to today rather than erroring.
@@ -32,17 +19,14 @@ function parseDateParam(value: string | undefined) {
   return date.toISOString().slice(0, 10) === value ? value : null
 }
 
-function shiftDay(value: string, days: number) {
-  const [y, m, d] = value.split('-').map(Number)
-  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10)
-}
-
 function dayHref(value: string) {
   return `/dashboard/hearings?date=${value}`
 }
 
 export default async function HearingCalendarPage({ searchParams }: PageProps<'/dashboard/hearings'>) {
   const { date: dateParam } = (await searchParams) as { date?: string }
+  // The firm's own calendar day, not the server's - on a UTC host the
+  // server's "today" would still be yesterday in Amman until 03:00.
   const today = todayInFirmZone()
   const date = parseDateParam(dateParam) ?? today
 
@@ -113,7 +97,7 @@ export default async function HearingCalendarPage({ searchParams }: PageProps<'/
 
       <div className="flex flex-col gap-3 print:hidden" data-testid="hearing-calendar-controls">
         <div className="flex flex-wrap items-end gap-2">
-          <LinkButton href={dayHref(shiftDay(date, -1))} variant="secondary" data-testid="hearing-calendar-previous">
+          <LinkButton href={dayHref(addDaysToDate(date, -1))} variant="secondary" data-testid="hearing-calendar-previous">
             {t('previousDay')}
           </LinkButton>
           {date !== today && (
@@ -121,7 +105,7 @@ export default async function HearingCalendarPage({ searchParams }: PageProps<'/
               {t('today')}
             </LinkButton>
           )}
-          <LinkButton href={dayHref(shiftDay(date, 1))} variant="secondary" data-testid="hearing-calendar-next">
+          <LinkButton href={dayHref(addDaysToDate(date, 1))} variant="secondary" data-testid="hearing-calendar-next">
             {t('nextDay')}
           </LinkButton>
 

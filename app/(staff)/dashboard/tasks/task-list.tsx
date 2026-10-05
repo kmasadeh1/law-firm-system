@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { setTaskStatus, type TaskErrorCode, type TaskPriority, type TaskStatus } from './actions'
 import { Badge } from '@/components/dashboard/badge'
 import { FieldError, controlClass } from '@/components/dashboard/form'
-import { formatDate } from '@/lib/format-date-time'
+import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
 
 export type Task = {
   id: string
@@ -50,9 +50,9 @@ const TASK_ERROR_CODES: TaskErrorCode[] = [
 function isOverdue(task: Pick<Task, 'due_date' | 'status'>): boolean {
   if (!task.due_date) return false
   if (task.status === 'done' || task.status === 'cancelled') return false
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return new Date(task.due_date + 'T00:00:00') < today
+  // Both are 'YYYY-MM-DD'; compared as strings against today in Amman,
+  // not the host's (or browser's) own date.
+  return task.due_date < todayInFirmZone()
 }
 
 function StatusSelect({ taskId, status }: { taskId: string; status: TaskStatus }) {

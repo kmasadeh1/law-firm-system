@@ -16,7 +16,7 @@ import { Banner } from '@/components/dashboard/banner'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatAmount } from '@/lib/format-money'
-import { formatDate } from '@/lib/format-date-time'
+import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
 
 type Payment = { id: string; amount: number; paid_at: string; method: string | null }
 
@@ -255,7 +255,7 @@ function InstallmentRow({
                     name="paid_at"
                     type="date"
                     required
-                    defaultValue={new Date().toISOString().slice(0, 10)}
+                    defaultValue={todayInFirmZone()}
                     className={controlClass}
                   />
                 </Field>
