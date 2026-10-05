@@ -937,7 +937,9 @@
           "extendedDateRequired": "Extended date is required.",
           "extensionReasonRequired": "A reason is required for an extension.",
           "bothExtensionFieldsRequired": "Both an extended date and a reason are required.",
-          "extendFailed": "Could not save the extension. Please try again."
+          "extendFailed": "Could not save the extension. Please try again.",
+          "markMetFailed": "Could not mark the deadline as met. Please try again.",
+          "unmarkMetFailed": "Could not mark the deadline as not met. Please try again."
         }
       },
       "section": {
@@ -955,12 +957,17 @@
         "cancel": "Cancel",
         "changeExtension": "Change extension",
         "extend": "Extend",
+        "markMet": "Mark as met",
+        "unmarkMet": "Mark as not met",
+        "metLine": "Met — marked on <bdi>{date}</bdi> by <bdi>{name}</bdi>.",
+        "metLineNoName": "Met — marked on <bdi>{date}</bdi>.",
         "viewAllDeadlines": "View all deadlines"
       },
       "urgency": {
         "overdue": "Overdue",
         "soon": "Due soon",
-        "later": "Upcoming"
+        "later": "Upcoming",
+        "met": "Met"
       }
     },
     "fees": {

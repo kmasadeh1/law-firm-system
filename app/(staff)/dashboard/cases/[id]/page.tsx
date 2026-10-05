@@ -135,7 +135,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase
       .from('deadlines')
       .select(
-        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, description, deadline_period_types(name, name_ar, period_days)'
+        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, completed_at, completed_by, description, deadline_period_types(name, name_ar, period_days)'
       )
       .eq('case_id', id)
       .order('effective_due_date', { ascending: true, nullsFirst: false }),
@@ -278,6 +278,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     extension_reason: d.extension_reason,
     extended_by_name: d.extended_by ? (nameById.get(d.extended_by) ?? tCommon('unknownStaff')) : null,
     extended_at: d.extended_at,
+    completed_at: d.completed_at,
+    // Any staff member, active or not - who marked it met must still show
+    // after they leave the firm.
+    completed_by_name: d.completed_by
+      ? (allStaffDirectory?.find((s) => s.id === d.completed_by)?.full_name ?? tCommon('unknownStaff'))
+      : null,
     description: d.description,
     period_type_name: d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : t('unknownPeriod'),
     period_days: d.deadline_period_types?.period_days ?? 0,

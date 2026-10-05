@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
-import { createDeadline, extendDeadline, type PeriodTypeOption } from '../../deadlines/actions'
+import { createDeadline, extendDeadline, setDeadlineMet, type PeriodTypeOption } from '../../deadlines/actions'
 import { urgencyOf, urgencyClass } from '../../deadlines/urgency'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
@@ -22,6 +22,8 @@ export type Deadline = {
   extension_reason: string | null
   extended_by_name: string | null
   extended_at: string | null
+  completed_at: string | null
+  completed_by_name: string | null
   description: string | null
   period_type_name: string
   period_days: number
@@ -45,7 +47,17 @@ function DeadlineRow({
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
 
-  const urgency = urgencyOf(deadline.effective_due_date)
+  const urgency = urgencyOf(deadline.effective_due_date, deadline.completed_at)
+  const met = deadline.completed_at !== null
+  const [isMarking, startMarking] = useTransition()
+
+  function handleMet(next: boolean) {
+    setError(null)
+    startMarking(async () => {
+      const result = await setDeadlineMet(caseId, deadline.id, next)
+      if (result.error) setError(result.error)
+    })
+  }
   const rolledForward =
     deadline.unadjusted_due_date !== null &&
     deadline.due_date !== null &&
@@ -66,10 +78,17 @@ function DeadlineRow({
   }
 
   return (
-    <li className="flex flex-col gap-2 px-3 py-3 text-sm">
+    // id is the bell's link target (#deadline-<id>); scroll-mt clears the
+    // sticky header, and :target highlights the row it lands on.
+    <li
+      id={`deadline-${deadline.id}`}
+      className={`flex scroll-mt-20 flex-col gap-2 px-3 py-3 text-sm target:bg-accent-border/10 ${met ? 'bg-line/20' : ''}`}
+      data-testid="deadline-row"
+      data-met={met}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <span className="font-medium text-fg">{deadline.period_type_name}</span>
+          <span className={`font-medium ${met ? 'text-fg-muted' : 'text-fg'}`}>{deadline.period_type_name}</span>
           <span className="text-fg-muted">
             {' '}
             {t.rich('periodDaysLine', {
@@ -129,7 +148,54 @@ function DeadlineRow({
         </div>
       ) : null}
 
+      {met && (
+        <p className="text-xs text-fg-muted" data-testid="deadline-met-line">
+          {deadline.completed_by_name
+            ? t.rich('metLine', {
+                date: formatDate(deadline.completed_at!, locale),
+                name: deadline.completed_by_name,
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })
+            : t.rich('metLineNoName', {
+                date: formatDate(deadline.completed_at!, locale),
+                bdi: (chunks) => <bdi>{chunks}</bdi>,
+              })}
+        </p>
+      )}
+
+      {/* Marking met records a fact for everyone on the case - not the
+          bell's Dismiss, which only hides an alert for one person. Same
+          gate as the rest of this section: can_manage_case_details. */}
+      {canManage && (
+        <div className="flex flex-wrap items-center gap-2">
+          {met ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => handleMet(false)}
+              disabled={isMarking}
+              data-testid="deadline-unmark-met"
+            >
+              {isMarking ? t('saving') : t('unmarkMet')}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => handleMet(true)}
+              disabled={isMarking || isPending}
+              data-testid="deadline-mark-met"
+            >
+              {isMarking ? t('saving') : t('markMet')}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Extending a deadline that's already been met means nothing, so
+          the control is only offered while it's pending. */}
       {canManage &&
+        !met &&
         (extending ? (
           <form ref={formRef} onSubmit={handleExtend} className="flex flex-wrap items-end gap-2">
             <Field>

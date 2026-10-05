@@ -840,7 +840,9 @@
           "extendedDateRequired": "تاريخ التمديد مطلوب.",
           "extensionReasonRequired": "سبب التمديد مطلوب.",
           "bothExtensionFieldsRequired": "يجب إدخال تاريخ التمديد والسبب معاً.",
-          "extendFailed": "تعذّر حفظ التمديد. يرجى المحاولة مرة أخرى."
+          "extendFailed": "تعذّر حفظ التمديد. يرجى المحاولة مرة أخرى.",
+          "markMetFailed": "تعذّر تعليم المهلة كمُستوفاة. يرجى المحاولة مرة أخرى.",
+          "unmarkMetFailed": "تعذّر إلغاء استيفاء المهلة. يرجى المحاولة مرة أخرى."
         }
       },
       "section": {
@@ -858,12 +860,17 @@
         "cancel": "إلغاء",
         "changeExtension": "تغيير التمديد",
         "extend": "تمديد",
+        "markMet": "تعليم كمُستوفاة",
+        "unmarkMet": "إلغاء الاستيفاء",
+        "metLine": "مُستوفاة — عُلِّمت في <bdi>{date}</bdi> بواسطة <bdi>{name}</bdi>.",
+        "metLineNoName": "مُستوفاة — عُلِّمت في <bdi>{date}</bdi>.",
         "viewAllDeadlines": "عرض جميع المهل"
       },
       "urgency": {
         "overdue": "متأخرة",
         "soon": "تستحق قريباً",
-        "later": "قادمة"
+        "later": "قادمة",
+        "met": "مُستوفاة"
       }
     },
     "appointments": {

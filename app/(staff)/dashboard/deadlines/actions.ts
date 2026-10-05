@@ -170,3 +170,31 @@ export async function extendDeadline(
   revalidatePath(casePath(caseId))
   return {}
 }
+
+// --- Mark a deadline met ----------------------------------------------------
+
+// Records a fact for everyone on the case - unlike dismissing the bell's
+// alert, which only hides it for one person. Sets completed_at (null
+// un-marks it); completed_by is stamped and cleared by a trigger, so it is
+// never sent. A met deadline drops out of pending_alerts.
+export async function setDeadlineMet(caseId: string, deadlineId: string, met: boolean): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.deadlines.form.errors' })
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('deadlines')
+    .update({ completed_at: met ? new Date().toISOString() : null })
+    .eq('id', deadlineId)
+    .select('id')
+
+  // Same policy as extending: a refusal is zero rows, not an error, and
+  // zero rows can also mean the deadline is gone - a failed save either way.
+  if (error || !data || data.length === 0) {
+    return { error: t(met ? 'markMetFailed' : 'unmarkMetFailed') }
+  }
+
+  revalidatePath(DEADLINES_PATH)
+  revalidatePath(casePath(caseId))
+  return {}
+}

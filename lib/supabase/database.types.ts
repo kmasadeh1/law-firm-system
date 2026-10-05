@@ -1273,6 +1273,8 @@ export type Database = {
       deadlines: {
         Row: {
           case_id: string
+          completed_at: string | null
+          completed_by: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -1290,6 +1292,8 @@ export type Database = {
         }
         Insert: {
           case_id: string
+          completed_at?: string | null
+          completed_by?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1307,6 +1311,8 @@ export type Database = {
         }
         Update: {
           case_id?: string
+          completed_at?: string | null
+          completed_by?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1343,6 +1349,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "deadlines_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "deadlines_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deadlines_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "deadlines_created_by_fkey"

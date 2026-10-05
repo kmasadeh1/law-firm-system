@@ -22,7 +22,7 @@ export default async function DeadlinesListPage() {
   const { data: deadlines } = await supabase
     .from('deadlines')
     .select(
-      'id, case_id, trigger_date, effective_due_date, extended_due_date, cases(case_number, title), deadline_period_types(name, name_ar)'
+      'id, case_id, trigger_date, effective_due_date, extended_due_date, completed_at, cases(case_number, title), deadline_period_types(name, name_ar)'
     )
     .order('effective_due_date', { ascending: true, nullsFirst: false })
 
@@ -51,7 +51,7 @@ export default async function DeadlinesListPage() {
         <Panel className="p-0">
           <ul className="flex flex-col divide-y divide-line">
             {deadlines.map((d) => {
-              const urgency = urgencyOf(d.effective_due_date)
+              const urgency = urgencyOf(d.effective_due_date, d.completed_at)
               return (
                 <li key={d.id}>
                   <Link

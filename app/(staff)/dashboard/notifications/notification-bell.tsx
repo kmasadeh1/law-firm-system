@@ -184,9 +184,19 @@ export function NotificationBell({ initial }: { initial: BellData }) {
   )
 }
 
+// A deadline alert opens the deadline itself on its case page (the row
+// carries id="deadline-<id>"), where it can be marked met - a fact for
+// everyone, unlike Dismiss here, which only hides the alert for this
+// reader. A hearing alert opens the case.
+function alertHref(alert: BellAlert, caseId: string) {
+  return alert.kind === 'deadline_approaching'
+    ? `/dashboard/cases/${caseId}#deadline-${alert.subjectId}`
+    : `/dashboard/cases/${caseId}`
+}
+
 // Urgency from the view's days_away - a reading of a number already
-// computed, not date arithmetic. The view only returns today onwards, so
-// "overdue" is defensive.
+// computed, not date arithmetic. The view returns overdue deadlines however
+// old, so all four states occur.
 function urgencyOf(daysAway: number | null): 'overdue' | 'today' | 'week' | 'later' {
   if (daysAway === null) return 'later'
   if (daysAway < 0) return 'overdue'
@@ -272,7 +282,7 @@ function AlertItem({
       data-urgency={urgency}
     >
       {alert.caseId ? (
-        <Link href={`/dashboard/cases/${alert.caseId}`} onClick={onNavigate} className="min-w-0 flex-1 hover:underline">
+        <Link href={alertHref(alert, alert.caseId)} onClick={onNavigate} className="min-w-0 flex-1 hover:underline">
           {body}
         </Link>
       ) : (
