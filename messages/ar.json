@@ -420,6 +420,7 @@
           "nextSessionDateLabel": "تاريخ الجلسة القادمة",
           "nextSessionLine": "الجلسة القادمة <bdi>{date}</bdi>",
           "attendedByLabel": "الحاضرون",
+          "attendedByPlaceholder": "غير مسجَّل",
           "notifiedAtLabel": "تاريخ التبليغ",
           "adding": "جارٍ الإضافة…",
           "add": "إضافة جلسة",
@@ -446,11 +447,12 @@
             "sessionDateRequired": "تاريخ الجلسة مطلوب.",
             "notifiedBeforeSession": "لا يمكن أن يسبق تاريخ التبليغ تاريخ الجلسة.",
             "nextSessionNotAfterSession": "يجب أن يكون تاريخ الجلسة القادمة بعد تاريخ هذه الجلسة.",
+            "invalidAttendee": "اختيار الحاضر غير صالح. اختر شخصاً من القائمة، أو اتركه بلا اختيار.",
             "noPermission": "ليس لديك صلاحية تعديل جلسات هذا القيد.",
-            "addFailed": "تعذّرت إضافة الجلسة. يرجى المحاولة مرة أخرى.",
-            "updateFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+            "addFailed": "تعذّرت إضافة الجلسة.",
+            "updateFailed": "تعذّر حفظ التغييرات.",
             "removeFailed": "تعذّرت إزالة الجلسة. يرجى المحاولة مرة أخرى.",
-            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+            "generic": "حدث خطأ ما."
           }
         },
         "timeline": {

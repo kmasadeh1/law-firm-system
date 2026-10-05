@@ -439,6 +439,7 @@
           "nextSessionDateLabel": "Next session date",
           "nextSessionLine": "Next session <bdi>{date}</bdi>",
           "attendedByLabel": "Attended by",
+          "attendedByPlaceholder": "Not recorded",
           "notifiedAtLabel": "Notification date (التبليغ)",
           "adding": "Adding…",
           "add": "Add hearing",
@@ -465,11 +466,12 @@
             "sessionDateRequired": "Session date is required.",
             "notifiedBeforeSession": "The notification date can't be before the session date.",
             "nextSessionNotAfterSession": "The next session date must be after this session's date.",
+            "invalidAttendee": "That attendee selection isn't valid. Choose someone from the list, or leave it blank.",
             "noPermission": "You don't have permission to change this filing's hearings.",
-            "addFailed": "Could not add the hearing. Please try again.",
-            "updateFailed": "Could not save the changes. Please try again.",
+            "addFailed": "Could not add the hearing.",
+            "updateFailed": "Could not save the changes.",
             "removeFailed": "Could not remove the hearing. Please try again.",
-            "generic": "Something went wrong. Please try again."
+            "generic": "Something went wrong."
           }
         },
         "timeline": {

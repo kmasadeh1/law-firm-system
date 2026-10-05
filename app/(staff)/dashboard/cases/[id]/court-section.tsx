@@ -12,6 +12,8 @@ import { localizedName } from '@/lib/localized-name'
 import { formatDate } from '@/lib/format-date-time'
 import { HearingsList, type Hearing } from './hearings-list'
 
+type StaffOption = { id: string; full_name: string }
+
 export type CourtOption = { id: string; name_en: string | null; name_ar: string | null }
 
 export type CourtFiling = {
@@ -79,12 +81,14 @@ function FilingRow({
   filing,
   courts,
   canManage,
+  staffOptions,
   onCreateAppealDeadline,
 }: {
   caseId: string
   filing: CourtFiling
   courts: CourtOption[]
   canManage: boolean
+  staffOptions: StaffOption[]
   onCreateAppealDeadline: (prefill: AppealDeadlinePrefill) => void
 }) {
   const locale = useLocale()
@@ -162,6 +166,7 @@ function FilingRow({
           filingId={filing.id}
           hearings={filing.hearings}
           canManage={false}
+          staffOptions={staffOptions}
           onCreateAppealDeadline={onCreateAppealDeadline}
         />
       </li>
@@ -256,6 +261,7 @@ function FilingRow({
         filingId={filing.id}
         hearings={filing.hearings}
         canManage={canManage}
+        staffOptions={staffOptions}
         onCreateAppealDeadline={onCreateAppealDeadline}
       />
     </li>
@@ -267,12 +273,14 @@ export function CourtSection({
   filings,
   courts,
   canManage,
+  staffOptions,
   onCreateAppealDeadline,
 }: {
   caseId: string
   filings: CourtFiling[]
   courts: CourtOption[]
   canManage: boolean
+  staffOptions: StaffOption[]
   onCreateAppealDeadline: (prefill: AppealDeadlinePrefill) => void
 }) {
   const locale = useLocale()
@@ -315,6 +323,7 @@ export function CourtSection({
               filing={f}
               courts={courts}
               canManage={canManage}
+              staffOptions={staffOptions}
               onCreateAppealDeadline={onCreateAppealDeadline}
             />
           ))}

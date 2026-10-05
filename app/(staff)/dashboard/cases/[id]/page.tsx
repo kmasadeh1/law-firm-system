@@ -356,6 +356,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         deadlines={deadlines}
         periodTypes={periodTypes ?? []}
         canManage={canManageCaseDetails === true}
+        staffOptions={activeStaff}
       />
 
       <TasksSection caseId={caseRow.id} tasks={tasks} staffOptions={activeStaff} canAssign={canAssignTasks === true} />

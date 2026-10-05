@@ -5,6 +5,8 @@ import { CourtSection, type CourtFiling, type CourtOption, type AppealDeadlinePr
 import { DeadlinesSection, type Deadline } from './deadlines-section'
 import type { PeriodTypeOption } from '../../deadlines/actions'
 
+type StaffOption = { id: string; full_name: string }
+
 // Hearings (inside CourtSection) and the add-deadline form (inside
 // DeadlinesSection) are separate sections that both already exist on this
 // page - "create appeal deadline" has to hand a trigger_date and a
@@ -17,6 +19,7 @@ export function CourtAndDeadlines({
   deadlines,
   periodTypes,
   canManage,
+  staffOptions,
 }: {
   caseId: string
   filings: CourtFiling[]
@@ -24,6 +27,7 @@ export function CourtAndDeadlines({
   deadlines: Deadline[]
   periodTypes: PeriodTypeOption[]
   canManage: boolean
+  staffOptions: StaffOption[]
 }) {
   const [triggerDate, setTriggerDate] = useState('')
   const [sourceHearingId, setSourceHearingId] = useState<string | null>(null)
@@ -45,6 +49,7 @@ export function CourtAndDeadlines({
         filings={filings}
         courts={courts}
         canManage={canManage}
+        staffOptions={staffOptions}
         onCreateAppealDeadline={handleCreateAppealDeadline}
       />
 

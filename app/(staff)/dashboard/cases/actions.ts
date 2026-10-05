@@ -439,6 +439,7 @@ export type HearingErrorCode =
   | 'sessionDateRequired'
   | 'notifiedBeforeSession'
   | 'nextSessionNotAfterSession'
+  | 'invalidAttendee'
   | 'noPermission'
   | 'addFailed'
   | 'updateFailed'
@@ -510,6 +511,13 @@ export async function addHearing(
     if (error.code === '23514') {
       return { error: mapHearingCheckViolation(error.message) ?? 'addFailed' }
     }
+    // attended_by is a uuid column - a stale client sending anything that
+    // isn't one of the select's own option values (or empty) lands here.
+    // The <select> built from active staff never produces this from normal
+    // use; this is the defensive backstop, not the primary fix.
+    if (error.code === '22P02') {
+      return { error: 'invalidAttendee' }
+    }
     if (error.code === '42501') {
       return { error: 'noPermission' }
     }
@@ -540,6 +548,9 @@ export async function updateHearing(
   if (error) {
     if (error.code === '23514') {
       return { error: mapHearingCheckViolation(error.message) ?? 'updateFailed' }
+    }
+    if (error.code === '22P02') {
+      return { error: 'invalidAttendee' }
     }
     return { error: 'updateFailed' }
   }

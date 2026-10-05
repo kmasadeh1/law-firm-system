@@ -21,6 +21,8 @@ export type Hearing = {
   notified_at: string | null
 }
 
+type StaffOption = { id: string; full_name: string }
+
 const HEARING_OUTCOMES: HearingOutcome[] = [
   'adjourned',
   'evidence',
@@ -39,6 +41,7 @@ const HEARING_ERROR_CODES: HearingErrorCode[] = [
   'sessionDateRequired',
   'notifiedBeforeSession',
   'nextSessionNotAfterSession',
+  'invalidAttendee',
   'noPermission',
   'addFailed',
   'updateFailed',
@@ -76,11 +79,39 @@ function OutcomeSelect({
   )
 }
 
+// Same shape as the Team section's own staff <select> (team-section.tsx) -
+// a real empty option, since attended_by is nullable and optional, rather
+// than a free-text box a user could type an unrelated name into. Mirrors
+// OutcomeSelect above.
+function AttendedBySelect({
+  id,
+  staffOptions,
+  defaultValue,
+  placeholder,
+}: {
+  id: string
+  staffOptions: StaffOption[]
+  defaultValue?: string
+  placeholder: string
+}) {
+  return (
+    <select id={id} name="attended_by" defaultValue={defaultValue ?? ''} className={controlClass}>
+      <option value="">{placeholder}</option>
+      {staffOptions.map((s) => (
+        <option key={s.id} value={s.id}>
+          {s.full_name}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 function HearingRow({
   caseId,
   filingId,
   hearing,
   canManage,
+  staffOptions,
   onCreateAppealDeadline,
   onAddNextHearing,
 }: {
@@ -88,6 +119,7 @@ function HearingRow({
   filingId: string
   hearing: Hearing
   canManage: boolean
+  staffOptions: StaffOption[]
   onCreateAppealDeadline: (prefill: { trigger_date: string; source_hearing_id: string }) => void
   onAddNextHearing: (sessionDate: string) => void
 }) {
@@ -231,11 +263,11 @@ function HearingRow({
           </Field>
           <Field>
             <Label htmlFor={`h-attended-${hearing.id}`}>{t('attendedByLabel')}</Label>
-            <input
+            <AttendedBySelect
               id={`h-attended-${hearing.id}`}
-              name="attended_by"
+              staffOptions={staffOptions}
               defaultValue={hearing.attended_by ?? ''}
-              className={controlClass}
+              placeholder={t('attendedByPlaceholder')}
             />
           </Field>
           {showNotifiedField && (
@@ -309,12 +341,14 @@ export function HearingsList({
   filingId,
   hearings,
   canManage,
+  staffOptions,
   onCreateAppealDeadline,
 }: {
   caseId: string
   filingId: string
   hearings: Hearing[]
   canManage: boolean
+  staffOptions: StaffOption[]
   onCreateAppealDeadline: (prefill: { trigger_date: string; source_hearing_id: string }) => void
 }) {
   const t = useTranslations('dashboard.cases.detail.hearings')
@@ -363,6 +397,7 @@ export function HearingsList({
               filingId={filingId}
               hearing={h}
               canManage={canManage}
+              staffOptions={staffOptions}
               onCreateAppealDeadline={onCreateAppealDeadline}
               onAddNextHearing={(date) => setSessionDate(date)}
             />
@@ -417,7 +452,11 @@ export function HearingsList({
             </Field>
             <Field>
               <Label htmlFor={`new-h-attended-${filingId}`}>{t('attendedByLabel')}</Label>
-              <input id={`new-h-attended-${filingId}`} name="attended_by" className={controlClass} />
+              <AttendedBySelect
+                id={`new-h-attended-${filingId}`}
+                staffOptions={staffOptions}
+                placeholder={t('attendedByPlaceholder')}
+              />
             </Field>
             {showNotifiedField && (
               <Field>

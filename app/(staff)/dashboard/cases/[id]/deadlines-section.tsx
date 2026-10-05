@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { createDeadline, extendDeadline, type PeriodTypeOption } from '../../deadlines/actions'
@@ -197,11 +197,25 @@ export function DeadlinesSection({
   const t = useTranslations('dashboard.deadlines.section')
   const tForm = useTranslations('dashboard.deadlines.form')
   const addFormRef = useRef<HTMLFormElement>(null)
+  const periodSelectRef = useRef<HTMLSelectElement>(null)
   const [periodTypeId, setPeriodTypeId] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   const selectedPeriod = periodTypes.find((p) => p.id === periodTypeId) ?? null
+
+  // "Create appeal deadline" (CourtSection, via the shared parent) sets
+  // sourceHearingId to hand this form a prefilled trigger date - this form
+  // is further down the page than the hearing that triggered it, so without
+  // this the only visible effect is off-screen and the button reads as
+  // dead. Brings the one field still left to choose into view and focuses
+  // it, rather than opening a dialog or relocating the section.
+  useEffect(() => {
+    if (!sourceHearingId) return
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    periodSelectRef.current?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' })
+    periodSelectRef.current?.focus()
+  }, [sourceHearingId])
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -244,6 +258,7 @@ export function DeadlinesSection({
               {tForm('periodTypeLabel')}
             </Label>
             <select
+              ref={periodSelectRef}
               id="dl-period"
               name="period_type_id"
               required
