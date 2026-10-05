@@ -67,6 +67,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   // you're the owner.
   dailyWork.push({ href: '/dashboard/leave-requests', label: t('leaveRequests'), icon: 'leave-requests' })
   dailyWork.push({ href: '/dashboard/appointments', label: t('appointments'), icon: 'appointments' })
+  // Unconditional, same reasoning as Cases/Appointments/Deadlines - the
+  // firm_hearing_schedule view is security_invoker, so it already returns
+  // only the hearings on cases this user can see. An empty day for a role
+  // with no visible cases is a normal state, not an access failure.
+  dailyWork.push({ href: '/dashboard/hearings', label: t('hearings'), icon: 'hearings' })
   // Deadlines has no single gating permission (owner, cases_manage,
   // court_dates_manage, or just being on the case's team all qualify), so
   // - like Cases and Appointments - it's always shown and RLS scopes what's

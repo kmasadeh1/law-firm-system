@@ -235,3 +235,35 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Print: always black on white, whatever the screen theme. Without this a
+ * dark-theme print comes out as light text on blank paper, since browsers
+ * drop background colours by default. :root:root out-ranks the
+ * prefers-color-scheme block and [data-theme="dark"] above (same
+ * specificity, later in the file) so this wins in every theme state.
+ * Greys are kept dark enough to survive a mono laser printer. A4 portrait
+ * is the paper size for every printed page - the firm prints on A4, and
+ * the hearing calendar's daily sheet (dashboard/hearings) is laid out for it.
+ */
+@media print {
+  :root:root {
+    --dash-canvas: #ffffff;
+    --dash-surface: #ffffff;
+    --dash-line: #000000;
+    --dash-control-border: #000000;
+    --dash-fg: #000000;
+    --dash-fg-muted: #333333;
+    --dash-accent: #000000;
+    --dash-accent-fg: #ffffff;
+    --dash-accent-border: #000000;
+    --dash-danger-text: #000000;
+    --dash-success-text: #000000;
+    --dash-focus: #000000;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+}

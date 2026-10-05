@@ -211,6 +211,16 @@ export function CourtsIcon({ className }: IconProps) {
   )
 }
 
+export function HearingsIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="m10.5 3.5 4 4M8.5 5.5l4 4M9.5 4.5 7.5 6.5l4 4 2-2" />
+      <path d="M9.5 8.5 4 14" />
+      <path d="M3 17h8" />
+    </svg>
+  )
+}
+
 export function TasksIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>
