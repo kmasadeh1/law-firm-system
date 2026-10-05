@@ -253,7 +253,9 @@
           "saveStatus": "Save status",
           "saved": "Saved",
           "errors": {
-            "updateFailed": "Could not update the status. Please try again."
+            "updateFailed": "Could not update the status. Please try again.",
+            "noPermissionClose": "Only the case's lead lawyer or the owner can close a case.",
+            "noPermissionChange": "You don't have permission to change this case's status."
           }
         },
         "team": {

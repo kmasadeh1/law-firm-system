@@ -118,18 +118,25 @@ export async function setCaseStatus(caseId: string, statusId: string): Promise<A
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.status.errors' })
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('cases')
     .update({ status_id: statusId })
     .eq('id', caseId)
+    .select('id')
 
+  // Never error.message - it's English Postgres text. Two refusals, two
+  // messages: the close-permission trigger (moving an open case INTO a
+  // terminal status as anyone but the lead lawyer or the owner) raises
+  // 42501 naming itself; the update policy refusing the change altogether
+  // raises nothing and matches zero rows.
   if (error) {
-    // The close-permission trigger raises a plain exception whose message
-    // is already the friendly text we want - just surface it.
-    if (error.code === 'P0001') {
-      return { error: error.message }
+    if (error.code === '42501' && error.message.includes('enforce_case_close_permission')) {
+      return { error: t('noPermissionClose') }
     }
     return { error: t('updateFailed') }
+  }
+  if (!data || data.length === 0) {
+    return { error: t('noPermissionChange') }
   }
 
   revalidatePath(casePath(caseId))
