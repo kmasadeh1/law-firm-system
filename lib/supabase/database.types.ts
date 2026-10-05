@@ -2757,6 +2757,89 @@ export type Database = {
           },
         ]
       }
+      write_offs: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          id: string
+          installment_id: string
+          reason: string
+          reverses_write_off_id: string | null
+          written_off_on: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          id?: string
+          installment_id: string
+          reason: string
+          reverses_write_off_id?: string | null
+          written_off_on?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          installment_id?: string
+          reason?: string
+          reverses_write_off_id?: string | null
+          written_off_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "write_offs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "write_offs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "write_offs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "write_offs_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_installments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "write_offs_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "installment_balances"
+            referencedColumns: ["installment_id"]
+          },
+          {
+            foreignKeyName: "write_offs_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "overdue_installments"
+            referencedColumns: ["installment_id"]
+          },
+          {
+            foreignKeyName: "write_offs_reverses_write_off_id_fkey"
+            columns: ["reverses_write_off_id"]
+            isOneToOne: false
+            referencedRelation: "write_offs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       client_balances: {
@@ -2767,6 +2850,7 @@ export type Database = {
           percentage_engagement_count: number | null
           scheduled_outstanding: number | null
           scheduled_total: number | null
+          written_off_total: number | null
         }
         Relationships: [
           {
@@ -2856,6 +2940,7 @@ export type Database = {
           scheduled_outstanding: number | null
           scheduled_total: number | null
           unscheduled_amount: number | null
+          written_off_total: number | null
         }
         Relationships: [
           {
@@ -2972,6 +3057,23 @@ export type Database = {
           installment_amount: number | null
           installment_id: string | null
           paid_amount: number | null
+          written_off_amount: number | null
+        }
+        Insert: {
+          balance_due?: never
+          engagement_id?: string | null
+          installment_amount?: number | null
+          installment_id?: string | null
+          paid_amount?: never
+          written_off_amount?: never
+        }
+        Update: {
+          balance_due?: never
+          engagement_id?: string | null
+          installment_amount?: number | null
+          installment_id?: string | null
+          paid_amount?: never
+          written_off_amount?: never
         }
         Relationships: [
           {

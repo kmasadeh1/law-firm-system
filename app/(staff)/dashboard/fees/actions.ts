@@ -417,3 +417,105 @@ export async function recordPayment(
   revalidatePath(engagementPath(engagementId))
   return {}
 }
+
+// --- Write-offs (append-only) -------------------------------------------
+//
+// A write-off forgives part of an instalment's outstanding balance with a
+// recorded reason. write_offs has no UPDATE or DELETE grant: a mistake is
+// corrected by a reversing row (reverses_write_off_id), never an edit. The
+// INSERT policy is owner-only with created_by = the signed-in user. Every
+// rule - amount > 0, a non-blank reason, not more than is outstanding, one
+// reversal per write-off - is the database's; this only maps its refusals.
+
+function mapWriteOffError(error: { code: string; message: string }, fallback: FeesErrorCode): FeesErrorCode {
+  if (error.code === CHECK_VIOLATION) {
+    if (error.message.includes('write_offs_amount_positive')) return 'write_off_amount_not_positive'
+    if (error.message.includes('write_offs_reason_not_blank')) return 'write_off_reason_required'
+    if (error.message.includes('write_off_within_balance')) return 'write_off_exceeds_balance'
+  }
+  if (error.code === UNIQUE_VIOLATION) return 'write_off_already_reversed'
+  if (error.code === INSUFFICIENT_PRIVILEGE) return 'no_permission_write_off'
+  return fallback
+}
+
+function readWriteOffDate(formData: FormData) {
+  const value = formData.get('written_off_on')
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+export async function writeOffInstallment(
+  engagementId: string,
+  installmentId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const amount = parseAmount(formData.get('amount'))
+  if (amount === null) {
+    return { error: 'invalid_amount' }
+  }
+  const reason = formData.get('reason')
+  const writtenOffOn = readWriteOffDate(formData)
+  if (!writtenOffOn) {
+    return { error: 'date_required' }
+  }
+
+  const supabase = await createClient()
+  const { data: user } = await supabase.auth.getClaims()
+
+  const { error } = await supabase.from('write_offs').insert({
+    installment_id: installmentId,
+    amount,
+    // Sent as typed - write_offs_reason_not_blank decides what's blank.
+    reason: typeof reason === 'string' ? reason : '',
+    written_off_on: writtenOffOn,
+    created_by: user?.claims?.sub as string,
+  })
+
+  if (error) {
+    return { error: mapWriteOffError(error, 'write_off_failed') }
+  }
+
+  revalidatePath(engagementPath(engagementId))
+  return {}
+}
+
+// The reversing row carries the original's instalment and amount (read
+// back here, never sent by the browser) and its own reason and date.
+export async function reverseWriteOff(
+  engagementId: string,
+  writeOffId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const reason = formData.get('reason')
+  const writtenOffOn = readWriteOffDate(formData)
+  if (!writtenOffOn) {
+    return { error: 'date_required' }
+  }
+
+  const supabase = await createClient()
+  const { data: original } = await supabase
+    .from('write_offs')
+    .select('installment_id, amount')
+    .eq('id', writeOffId)
+    .is('reverses_write_off_id', null)
+    .maybeSingle()
+  if (!original) {
+    return { error: 'write_off_reverse_failed' }
+  }
+
+  const { data: user } = await supabase.auth.getClaims()
+  const { error } = await supabase.from('write_offs').insert({
+    installment_id: original.installment_id,
+    amount: original.amount,
+    reason: typeof reason === 'string' ? reason : '',
+    written_off_on: writtenOffOn,
+    reverses_write_off_id: writeOffId,
+    created_by: user?.claims?.sub as string,
+  })
+
+  if (error) {
+    return { error: mapWriteOffError(error, 'write_off_reverse_failed') }
+  }
+
+  revalidatePath(engagementPath(engagementId))
+  return {}
+}

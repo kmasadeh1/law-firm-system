@@ -539,6 +539,7 @@
         "balance": {
           "heading": "موقف الأتعاب",
           "agreedFixedFees": "المتفق عليه (أتعاب مقطوعة): <bdi>{amount}</bdi>",
+          "writtenOff": "المُعفى منه: <bdi>{amount}</bdi>",
           "scheduled": "المجدول: <bdi>{amount}</bdi>",
           "paid": "المدفوع: <bdi>{amount}</bdi>",
           "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>"
@@ -926,6 +927,7 @@
         "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>",
         "unscheduledPositive": "<bdi>{amount}</bdi> من الأتعاب المتفق عليها لم تُجدوَل بعد.",
         "unscheduledNegative": "يتجاوز الجدول الأتعاب المتفق عليها بمقدار <bdi>{amount}</bdi>.",
+        "writtenOff": "المُعفى منه: <bdi>{amount}</bdi>",
         "cases": {
           "heading": "القضايا المرتبطة",
           "noneYet": "لا توجد قضايا مرتبطة بعد.",
@@ -964,6 +966,26 @@
           "payerFragment": " · الدافع: <bdi>{name}</bdi>",
           "paidBadge": "المدفوع: <bdi>{amount}</bdi>",
           "balanceBadge": "الرصيد: <bdi>{amount}</bdi>",
+          "writtenOffBadge": "المُعفى منه: <bdi>{amount}</bdi>",
+          "writeOffs": {
+            "heading": "الإعفاءات",
+            "open": "إعفاء",
+            "immutableBanner": "الإعفاء دائم. لا يمكن تعديله أو حذفه - يُصحَّح الخطأ بعكسه، ويبقى العكس مسجّلاً إلى جانبه.",
+            "amountLabel": "المبلغ المُعفى منه",
+            "dateLabel": "التاريخ",
+            "reasonLabel": "السبب",
+            "reasonPlaceholder": "سبب الإعفاء من هذا المبلغ",
+            "submit": "تسجيل الإعفاء",
+            "recording": "جارٍ التسجيل…",
+            "cancel": "إلغاء",
+            "recordedLine": "<bdi>{date}</bdi> · سجّله <bdi>{name}</bdi>",
+            "recordedLineNoName": "<bdi>{date}</bdi>",
+            "reversedBadge": "معكوس",
+            "reverse": "عكس",
+            "reverseReasonLabel": "سبب العكس",
+            "confirmReverse": "تسجيل العكس",
+            "reversing": "جارٍ العكس…"
+          },
           "hidePayments": "إخفاء المدفوعات",
           "showPayments": "المدفوعات",
           "edit": "تعديل",
@@ -1015,6 +1037,13 @@
         "date_required": "التاريخ مطلوب.",
         "no_permission_record_payment": "ليس لديك صلاحية تسجيل المدفوعات.",
         "record_payment_failed": "تعذّر تسجيل الدفعة. يرجى المحاولة مرة أخرى.",
+        "write_off_amount_not_positive": "يجب أن يكون المبلغ المُعفى منه أكبر من صفر.",
+        "write_off_reason_required": "سبب الإعفاء مطلوب.",
+        "write_off_exceeds_balance": "هذا المبلغ أكبر مما تبقّى مستحقاً على هذا القسط.",
+        "write_off_already_reversed": "سبق عكس هذا الإعفاء.",
+        "no_permission_write_off": "لا يمكن تسجيل الإعفاءات إلا للمالك.",
+        "write_off_failed": "تعذّر تسجيل الإعفاء. يرجى المحاولة مرة أخرى.",
+        "write_off_reverse_failed": "تعذّر عكس الإعفاء. يرجى المحاولة مرة أخرى.",
         "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
       }
     },

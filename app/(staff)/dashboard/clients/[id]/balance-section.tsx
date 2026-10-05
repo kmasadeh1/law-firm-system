@@ -10,6 +10,7 @@ type Balance = {
   scheduled_total: number | null
   paid_total: number | null
   scheduled_outstanding: number | null
+  written_off_total: number | null
 }
 
 export async function BalanceSection({ balance }: { balance: Balance | null }) {
@@ -44,6 +45,10 @@ export async function BalanceSection({ balance }: { balance: Balance | null }) {
         )}
         <Badge variant="neutral">{t.rich('scheduled', { amount: formatAmount(balance.scheduled_total, locale), bdi })}</Badge>
         <Badge variant="neutral">{t.rich('paid', { amount: formatAmount(balance.paid_total, locale), bdi })}</Badge>
+        {/* Its own figure - money forgiven is never added to money paid. */}
+        <Badge variant="neutral" data-testid="client-written-off-total">
+          {t.rich('writtenOff', { amount: formatAmount(balance.written_off_total, locale), bdi })}
+        </Badge>
         <Badge variant={(balance.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
           {t.rich('outstandingScheduled', { amount: formatAmount(balance.scheduled_outstanding, locale), bdi })}
         </Badge>

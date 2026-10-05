@@ -34,6 +34,13 @@ export type FeesErrorCode =
   | 'date_required'
   | 'no_permission_record_payment'
   | 'record_payment_failed'
+  | 'write_off_amount_not_positive'
+  | 'write_off_reason_required'
+  | 'write_off_exceeds_balance'
+  | 'write_off_already_reversed'
+  | 'no_permission_write_off'
+  | 'write_off_failed'
+  | 'write_off_reverse_failed'
 
 export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'select_client',
@@ -65,6 +72,13 @@ export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'date_required',
   'no_permission_record_payment',
   'record_payment_failed',
+  'write_off_amount_not_positive',
+  'write_off_reason_required',
+  'write_off_exceeds_balance',
+  'write_off_already_reversed',
+  'no_permission_write_off',
+  'write_off_failed',
+  'write_off_reverse_failed',
 ]
 
 // A caller-controlled value never reaches t() as a message key - validate

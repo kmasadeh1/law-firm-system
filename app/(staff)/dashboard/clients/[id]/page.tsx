@@ -44,7 +44,9 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
       .maybeSingle(),
     supabase
       .from('client_balances')
-      .select('agreed_fixed_fee_total, percentage_engagement_count, scheduled_total, paid_total, scheduled_outstanding')
+      .select(
+        'agreed_fixed_fee_total, percentage_engagement_count, scheduled_total, paid_total, scheduled_outstanding, written_off_total'
+      )
       .eq('client_id', id)
       .maybeSingle(),
     // Read is broader than write - a Lawyer can reach this page for a

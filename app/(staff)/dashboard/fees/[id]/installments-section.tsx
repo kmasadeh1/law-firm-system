@@ -6,7 +6,9 @@ import {
   createInstallment,
   deleteInstallment,
   recordPayment,
+  reverseWriteOff,
   updateInstallment,
+  writeOffInstallment,
 } from '../actions'
 import { resolveFeesError } from '../error-codes'
 import { Panel } from '@/components/dashboard/panel'
@@ -20,34 +22,286 @@ import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
 
 type Payment = { id: string; amount: number; paid_at: string; method: string | null }
 
+// One write-off as recorded, paired for display with the row that reverses
+// it, if there is one. Both stay visible - neither is ever edited away.
+export type WriteOff = {
+  id: string
+  amount: number
+  reason: string
+  written_off_on: string
+  recorded_by_name: string | null
+  reversal: {
+    id: string
+    reason: string
+    written_off_on: string
+    recorded_by_name: string | null
+  } | null
+}
+
+// The installment_balances row for this instalment - every figure shown on
+// the row comes from here, none is computed in this file.
+type InstallmentBalance = {
+  installment_amount: number | null
+  paid_amount: number | null
+  written_off_amount: number | null
+  balance_due: number | null
+}
+
 type Installment = {
   id: string
   description: string
   due_date: string | null
   amount: number
   payer_name: string | null
-  paid_amount: number
-  balance_due: number
+  balance: InstallmentBalance | null
   payments: Payment[]
+  writeOffs: WriteOff[]
+}
+
+function ReverseWriteOffForm({
+  engagementId,
+  writeOffId,
+  onDone,
+}: {
+  engagementId: string
+  writeOffId: string
+  onDone: () => void
+}) {
+  const t = useTranslations('dashboard.fees.detail.installments.writeOffs')
+  const tErrors = useTranslations('dashboard.fees.errors')
+  const formRef = useRef<HTMLFormElement>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    const formData = new FormData(formRef.current!)
+    startTransition(async () => {
+      const result = await reverseWriteOff(engagementId, writeOffId, formData)
+      if (result.error) {
+        setError(resolveFeesError(result.error, tErrors))
+        return
+      }
+      onDone()
+    })
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="mt-2 flex flex-col gap-2" data-testid="write-off-reverse-form">
+      <div className="flex flex-wrap items-end gap-2">
+        <Field>
+          <Label htmlFor={`reverse-reason-${writeOffId}`} required>
+            {t('reverseReasonLabel')}
+          </Label>
+          <input id={`reverse-reason-${writeOffId}`} name="reason" required className={controlClass} />
+        </Field>
+        <Field>
+          <Label htmlFor={`reverse-date-${writeOffId}`} required>
+            {t('dateLabel')}
+          </Label>
+          <input
+            id={`reverse-date-${writeOffId}`}
+            name="written_off_on"
+            type="date"
+            required
+            defaultValue={todayInFirmZone()}
+            className={controlClass}
+          />
+        </Field>
+        <Button type="submit" variant="secondary" disabled={isPending} data-testid="write-off-reverse-submit">
+          {isPending ? t('reversing') : t('confirmReverse')}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone} disabled={isPending}>
+          {t('cancel')}
+        </Button>
+      </div>
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
+    </form>
+  )
+}
+
+function WriteOffItem({
+  engagementId,
+  writeOff,
+  canWriteOff,
+}: {
+  engagementId: string
+  writeOff: WriteOff
+  canWriteOff: boolean
+}) {
+  const locale = useLocale()
+  const t = useTranslations('dashboard.fees.detail.installments.writeOffs')
+  const [reversing, setReversing] = useState(false)
+  const reversed = writeOff.reversal !== null
+
+  return (
+    <li className="flex flex-col gap-1 py-2 text-sm" data-testid="write-off-row" data-reversed={reversed ? 'true' : undefined}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className={reversed ? 'text-fg-muted line-through' : 'font-medium text-fg'}>
+          <bdi>{formatAmount(writeOff.amount, locale)}</bdi>
+        </span>
+        <span className="text-xs text-fg-muted">
+          {t.rich(writeOff.recorded_by_name ? 'recordedLine' : 'recordedLineNoName', {
+            date: formatDate(writeOff.written_off_on, locale),
+            name: writeOff.recorded_by_name ?? '',
+            bdi: (chunks) => <bdi>{chunks}</bdi>,
+          })}
+        </span>
+      </div>
+      <p className="whitespace-pre-wrap text-fg">{writeOff.reason}</p>
+
+      {writeOff.reversal ? (
+        <div className="ms-4 flex flex-col gap-0.5 border-s-2 border-line ps-3" data-testid="write-off-reversal">
+          <Badge variant="muted">{t('reversedBadge')}</Badge>
+          <span className="text-xs text-fg-muted">
+            {t.rich(writeOff.reversal.recorded_by_name ? 'recordedLine' : 'recordedLineNoName', {
+              date: formatDate(writeOff.reversal.written_off_on, locale),
+              name: writeOff.reversal.recorded_by_name ?? '',
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
+          </span>
+          <p className="whitespace-pre-wrap text-fg">{writeOff.reversal.reason}</p>
+        </div>
+      ) : (
+        canWriteOff &&
+        (reversing ? (
+          <ReverseWriteOffForm engagementId={engagementId} writeOffId={writeOff.id} onDone={() => setReversing(false)} />
+        ) : (
+          <div>
+            <Button type="button" variant="ghost" onClick={() => setReversing(true)} data-testid="write-off-reverse">
+              {t('reverse')}
+            </Button>
+          </div>
+        ))
+      )}
+    </li>
+  )
+}
+
+function WriteOffForm({
+  engagementId,
+  installmentId,
+  outstanding,
+  onDone,
+}: {
+  engagementId: string
+  installmentId: string
+  outstanding: number
+  onDone: () => void
+}) {
+  const t = useTranslations('dashboard.fees.detail.installments.writeOffs')
+  const tErrors = useTranslations('dashboard.fees.errors')
+  const formRef = useRef<HTMLFormElement>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    const formData = new FormData(formRef.current!)
+    startTransition(async () => {
+      const result = await writeOffInstallment(engagementId, installmentId, formData)
+      if (result.error) {
+        setError(resolveFeesError(result.error, tErrors))
+        return
+      }
+      onDone()
+    })
+  }
+
+  return (
+    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2" data-testid="write-off-form">
+      <Banner kind="warning">{t('immutableBanner')}</Banner>
+      <div className="flex flex-wrap items-end gap-2">
+        <Field>
+          <Label htmlFor={`write-off-amount-${installmentId}`} required>
+            {t('amountLabel')}
+          </Label>
+          {/* Pre-filled with the view's balance_due - forgiving the
+              remainder is the common case - but editable. */}
+          <input
+            id={`write-off-amount-${installmentId}`}
+            name="amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+            defaultValue={outstanding}
+            className={controlClass}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor={`write-off-date-${installmentId}`} required>
+            {t('dateLabel')}
+          </Label>
+          <input
+            id={`write-off-date-${installmentId}`}
+            name="written_off_on"
+            type="date"
+            required
+            defaultValue={todayInFirmZone()}
+            className={controlClass}
+          />
+        </Field>
+      </div>
+      <Field>
+        <Label htmlFor={`write-off-reason-${installmentId}`} required>
+          {t('reasonLabel')}
+        </Label>
+        <textarea
+          id={`write-off-reason-${installmentId}`}
+          name="reason"
+          rows={2}
+          required
+          placeholder={t('reasonPlaceholder')}
+          className={`${controlClass} resize-y`}
+        />
+      </Field>
+      <div className="flex gap-2">
+        <Button type="submit" variant="primary" disabled={isPending} data-testid="write-off-submit">
+          {isPending ? t('recording') : t('submit')}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone} disabled={isPending}>
+          {t('cancel')}
+        </Button>
+      </div>
+      {error && (
+        <FieldError>
+          <bdi>{error}</bdi>
+        </FieldError>
+      )}
+    </form>
+  )
 }
 
 function InstallmentRow({
   engagementId,
   installment,
   canRecordPayments,
+  canWriteOff,
 }: {
   engagementId: string
   installment: Installment
   canRecordPayments: boolean
+  canWriteOff: boolean
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.fees.detail.installments')
   const tErrors = useTranslations('dashboard.fees.errors')
+  const tWriteOffs = useTranslations('dashboard.fees.detail.installments.writeOffs')
   const [editing, setEditing] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [writingOff, setWritingOff] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const balance = installment.balance
+  const money = (value: number | null | undefined) => (value === null || value === undefined ? '—' : formatAmount(value, locale))
   const editFormRef = useRef<HTMLFormElement>(null)
   const paymentFormRef = useRef<HTMLFormElement>(null)
 
@@ -161,7 +415,7 @@ function InstallmentRow({
         <div className="text-sm">
           <span className="font-medium text-fg">{installment.description}</span>
           <span className="text-fg-muted">
-            {t.rich('amountLine', { amount: formatAmount(installment.amount, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+            {t.rich('amountLine', { amount: money(balance?.installment_amount), bdi: (chunks) => <bdi>{chunks}</bdi> })}
             {installment.due_date &&
               t.rich('dueDateFragment', {
                 date: formatDate(installment.due_date, locale),
@@ -173,10 +427,14 @@ function InstallmentRow({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="muted">
-            {t.rich('paidBadge', { amount: formatAmount(installment.paid_amount, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+            {t.rich('paidBadge', { amount: money(balance?.paid_amount), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
-          <Badge variant={installment.balance_due > 0 ? 'accent' : 'muted'}>
-            {t.rich('balanceBadge', { amount: formatAmount(installment.balance_due, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+          {/* Its own figure, never folded into paid. */}
+          <Badge variant="muted" data-testid="installment-written-off">
+            {t.rich('writtenOffBadge', { amount: money(balance?.written_off_amount), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+          </Badge>
+          <Badge variant={(balance?.balance_due ?? 0) > 0 ? 'accent' : 'muted'}>
+            {t.rich('balanceBadge', { amount: money(balance?.balance_due), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
           <Button type="button" variant="ghost" onClick={() => setExpanded((v) => !v)}>
             {expanded ? t('hidePayments') : t('showPayments')}
@@ -194,6 +452,40 @@ function InstallmentRow({
         <FieldError>
           <bdi>{error}</bdi>
         </FieldError>
+      )}
+
+      {(installment.writeOffs.length > 0 || canWriteOff) && (
+        <div className="flex flex-col gap-2 rounded-md border border-line p-3" data-testid="installment-write-offs">
+          <p className="text-xs font-medium text-fg-muted">{tWriteOffs('heading')}</p>
+          {installment.writeOffs.length > 0 && (
+            <ul className="flex flex-col divide-y divide-line">
+              {installment.writeOffs.map((w) => (
+                <WriteOffItem key={w.id} engagementId={engagementId} writeOff={w} canWriteOff={canWriteOff} />
+              ))}
+            </ul>
+          )}
+          {/* Owner only (the INSERT policy), and only while the view says
+              something is still due - a write-off of anything against a
+              zero balance would be refused. */}
+          {canWriteOff &&
+            balance?.balance_due !== null &&
+            balance?.balance_due !== undefined &&
+            balance.balance_due > 0 &&
+            (writingOff ? (
+              <WriteOffForm
+                engagementId={engagementId}
+                installmentId={installment.id}
+                outstanding={balance.balance_due}
+                onDone={() => setWritingOff(false)}
+              />
+            ) : (
+              <div>
+                <Button type="button" variant="secondary" onClick={() => setWritingOff(true)} data-testid="write-off-open">
+                  {tWriteOffs('open')}
+                </Button>
+              </div>
+            ))}
+        </div>
       )}
 
       <DeleteConfirmDialog
@@ -286,10 +578,13 @@ export function InstallmentsSection({
   engagementId,
   installments,
   canRecordPayments,
+  canWriteOff,
 }: {
   engagementId: string
   installments: Installment[]
   canRecordPayments: boolean
+  /** is_owner() - write-offs and reversals are owner-only to record. */
+  canWriteOff: boolean
 }) {
   const t = useTranslations('dashboard.fees.detail.installments')
   const tErrors = useTranslations('dashboard.fees.errors')
@@ -329,6 +624,7 @@ export function InstallmentsSection({
               engagementId={engagementId}
               installment={i}
               canRecordPayments={canRecordPayments}
+              canWriteOff={canWriteOff}
             />
           ))}
         </ul>
