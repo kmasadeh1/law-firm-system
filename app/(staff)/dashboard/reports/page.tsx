@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount } from '@/lib/format-money'
 import { formatDate as formatDateWithLocale } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { ProfitabilityPanel } from './profitability-panel'
 
 function formatPercent(value: number | null, notYetAvailable: string) {
   if (value === null) return notYetAvailable
@@ -28,8 +29,20 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
     workloadQuery = workloadQuery.eq('is_active', true)
   }
 
-  const [{ data: summary }, { data: overdue }, { data: workload }] = await Promise.all([
+  const [{ data: summary }, { data: profitability }, { data: overdue }, { data: workload }] = await Promise.all([
     supabase.from('collection_summary').select('*').maybeSingle(),
+    // Ordered in the query: the mixed row (is_mixed true) always last, never
+    // ranked among the types; the types by net received, highest first -
+    // the figure this report exists to compare - then by name for ties.
+    supabase
+      .from('case_type_profitability')
+      .select(
+        'case_type_id, name_en, name_ar, is_mixed, case_count, open_cases, closed_cases, scheduled_total, paid_total, written_off_total, outstanding_total, expenses_total, expenses_unreimbursed, net_received'
+      )
+      .order('is_mixed', { ascending: true })
+      .order('net_received', { ascending: false })
+      .order(locale === 'ar' ? 'name_ar' : 'name_en', { ascending: true, nullsFirst: false })
+      .order('name_en', { ascending: true, nullsFirst: false }),
     supabase.from('overdue_installments').select('*').order('days_overdue', { ascending: false }),
     workloadQuery,
   ])
@@ -67,6 +80,8 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
           </div>
         </dl>
       </Panel>
+
+      <ProfitabilityPanel rows={profitability ?? []} locale={locale} />
 
       <Panel className="flex flex-col gap-4">
         <h2 className="font-heading text-lg text-fg">{t('overdue.heading')}</h2>

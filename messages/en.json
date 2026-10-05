@@ -1734,6 +1734,25 @@
         "upcomingDeadlinesHeader": "Upcoming deadlines",
         "overdueDeadlinesHeader": "Overdue deadlines",
         "nextDeadlineHeader": "Next deadline"
+      },
+      "profitability": {
+        "heading": "Profitability by case type",
+        "description": "Fees, payments and expenses grouped by case type. A fee agreement's money is counted under a case type only when every case it covers is that type.",
+        "noneTitle": "No case types yet",
+        "noneDescription": "Add case types under Administration → Case types to see this report.",
+        "caseTypeHeader": "Case type",
+        "casesHeader": "Cases",
+        "openClosed": "{open} open · {closed} closed",
+        "scheduledHeader": "Scheduled",
+        "paidHeader": "Paid",
+        "writtenOffHeader": "Written off",
+        "outstandingHeader": "Outstanding",
+        "expensesHeader": "Expenses",
+        "unreimbursed": "<bdi>{amount}</bdi> not reimbursed",
+        "netReceivedHeader": "Net received",
+        "netReceivedNote": "Net received is the amount paid minus expenses not yet reimbursed.",
+        "mixedLabel": "Fee agreements covering more than one case type",
+        "mixedExplanation": "These agreements cover cases of different types, so their money can't be split between them. It is shown here instead, with no case count or expenses — those are counted under each case's own type above."
       }
     },
     "enquiries": {

@@ -2842,6 +2842,26 @@ export type Database = {
       }
     }
     Views: {
+      case_type_profitability: {
+        Row: {
+          case_count: number | null
+          case_type_id: string | null
+          closed_cases: number | null
+          expenses_reimbursed: number | null
+          expenses_total: number | null
+          expenses_unreimbursed: number | null
+          is_mixed: boolean | null
+          name_ar: string | null
+          name_en: string | null
+          net_received: number | null
+          open_cases: number | null
+          outstanding_total: number | null
+          paid_total: number | null
+          scheduled_total: number | null
+          written_off_total: number | null
+        }
+        Relationships: []
+      }
       client_balances: {
         Row: {
           agreed_fixed_fee_total: number | null

@@ -1686,6 +1686,25 @@
         "upcomingDeadlinesHeader": "المهل القادمة",
         "overdueDeadlinesHeader": "المهل المتأخرة",
         "nextDeadlineHeader": "المهلة التالية"
+      },
+      "profitability": {
+        "heading": "الربحية حسب نوع القضية",
+        "description": "الأتعاب والدفعات والمصاريف مجمّعة حسب نوع القضية. لا تُحتسب أموال اتفاقية أتعاب ضمن نوع قضية إلا إذا كانت جميع القضايا التي تشملها من ذلك النوع.",
+        "noneTitle": "لا توجد أنواع قضايا بعد",
+        "noneDescription": "أضف أنواع القضايا من الإدارة ← أنواع القضايا لعرض هذا التقرير.",
+        "caseTypeHeader": "نوع القضية",
+        "casesHeader": "القضايا",
+        "openClosed": "{open} مفتوحة · {closed} مغلقة",
+        "scheduledHeader": "المجدول",
+        "paidHeader": "المسدد",
+        "writtenOffHeader": "المُعفى منه",
+        "outstandingHeader": "المتبقي",
+        "expensesHeader": "المصاريف",
+        "unreimbursed": "<bdi>{amount}</bdi> غير مستردّة",
+        "netReceivedHeader": "صافي المقبوض",
+        "netReceivedNote": "صافي المقبوض هو المبلغ المسدد مطروحاً منه المصاريف التي لم تُسترد بعد.",
+        "mixedLabel": "اتفاقيات أتعاب تشمل أكثر من نوع قضية",
+        "mixedExplanation": "تشمل هذه الاتفاقيات قضايا من أنواع مختلفة، فلا يمكن تقسيم أموالها بينها، لذا تظهر هنا بدلاً من ذلك دون عدد قضايا أو مصاريف — فهذه محتسبة ضمن نوع كل قضية في الأعلى."
       }
     },
     "enquiries": {
