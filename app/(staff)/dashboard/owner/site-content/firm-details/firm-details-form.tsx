@@ -12,6 +12,7 @@ type FirmSettings = {
   address_en: string | null
   address_ar: string | null
   phone: string | null
+  whatsapp_phone: string | null
   email: string | null
   hours_en: string | null
   hours_ar: string | null
@@ -70,6 +71,30 @@ export function FirmDetailsForm({ settings }: { settings: FirmSettings | null })
             data-testid="phone"
             className={controlClass}
           />
+        </Field>
+        {/* Blank is stored as NULL by the table's trigger, and NULL means the
+            public site's WhatsApp button uses the main phone number. */}
+        <Field>
+          <Label htmlFor="site-content-whatsapp-phone">{t('firmDetails.whatsappPhoneLabel')}</Label>
+          <input
+            id="site-content-whatsapp-phone"
+            name="whatsapp_phone"
+            type="tel"
+            dir="ltr"
+            defaultValue={settings?.whatsapp_phone ?? ''}
+            onChange={() => setSaved(false)}
+            data-testid="whatsapp-phone"
+            className={controlClass}
+          />
+          <HelpText>
+            {t.rich('firmDetails.whatsappPhoneHelp', {
+              ltr: (chunks) => (
+                <bdi dir="ltr" className="whitespace-nowrap">
+                  {chunks}
+                </bdi>
+              ),
+            })}
+          </HelpText>
         </Field>
         <Field>
           <Label htmlFor="site-content-email">{t('firmDetails.emailLabel')}</Label>

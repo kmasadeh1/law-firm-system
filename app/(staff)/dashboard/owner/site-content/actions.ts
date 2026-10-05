@@ -39,6 +39,7 @@ export async function updateFirmSettings(formData: FormData): Promise<ActionResu
       address_en: readString(formData, 'address_en'),
       address_ar: readString(formData, 'address_ar'),
       phone: readString(formData, 'phone'),
+      whatsapp_phone: readString(formData, 'whatsapp_phone'),
       email: readString(formData, 'email'),
       hours_en: readString(formData, 'hours_en'),
       hours_ar: readString(formData, 'hours_ar'),

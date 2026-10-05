@@ -1889,6 +1889,7 @@ export type Database = {
           phone: string | null
           singleton: boolean
           updated_at: string
+          whatsapp_phone: string | null
         }
         Insert: {
           address_ar?: string | null
@@ -1901,6 +1902,7 @@ export type Database = {
           phone?: string | null
           singleton?: boolean
           updated_at?: string
+          whatsapp_phone?: string | null
         }
         Update: {
           address_ar?: string | null
@@ -1913,6 +1915,7 @@ export type Database = {
           phone?: string | null
           singleton?: boolean
           updated_at?: string
+          whatsapp_phone?: string | null
         }
         Relationships: []
       }

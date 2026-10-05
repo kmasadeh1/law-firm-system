@@ -1,7 +1,16 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
+import { routing } from '@/i18n/routing'
+import {
+  getSiteOrigin,
+  legalServiceJsonLd,
+  openGraphLocale,
+  serializeJsonLd,
+  whatsappHref,
+} from '@/lib/public-site'
 import { localizedField } from '@/lib/localized-field'
 import { Crest } from '@/components/crest'
 import { Link } from '@/i18n/navigation'
@@ -26,6 +35,31 @@ import { ContactForm } from './contact-form'
 // then becomes a safety net rather than the only mechanism.
 export const revalidate = 60
 
+// The homepage's own URL facts, layered on the [locale] layout's metadata:
+// canonical, the other-language alternate, and og:url. Page-level openGraph
+// replaces the layout's rather than merging, so it is restated in full.
+// Emitted only when the site's origin is known - see getSiteOrigin().
+export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
+  const { locale } = await params
+  if (!getSiteOrigin()) return {}
+  const t = await getTranslations({ locale, namespace: 'layout' })
+  return {
+    alternates: {
+      canonical: `/${locale}`,
+      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+    },
+    openGraph: {
+      type: 'website',
+      url: `/${locale}`,
+      siteName: t('firmName'),
+      title: t('firmName'),
+      description: t('metaDescription'),
+      locale: openGraphLocale(locale),
+      alternateLocale: routing.locales.filter((l) => l !== locale).map(openGraphLocale),
+    },
+  }
+}
+
 export default async function PublicHomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params
   const t = await getTranslations()
@@ -35,7 +69,7 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
     await Promise.all([
       supabase
         .from('firm_settings')
-        .select('address_en, address_ar, phone, email, hours_en, hours_ar, map_embed_url')
+        .select('address_en, address_ar, phone, whatsapp_phone, email, hours_en, hours_ar, map_embed_url')
         .maybeSingle(),
       supabase
         .from('site_sections')
@@ -82,8 +116,21 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
     bio: localizedField(row, 'bio', locale) ?? '',
   }))
 
+  const whatsapp = whatsappHref(firmSettings?.whatsapp_phone ?? null, firmSettings?.phone ?? null)
+  const jsonLd = legalServiceJsonLd({
+    settings: firmSettings,
+    name: t('layout.firmName'),
+    locale,
+    origin: getSiteOrigin(),
+  })
+
   return (
     <div className="flex min-h-screen flex-col">
+      <script
+        type="application/ld+json"
+        data-testid="legal-service-jsonld"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
       {/* Header */}
       <header className="border-b border-warm-grey/25">
         <div className="flex w-full flex-wrap items-center justify-between gap-4 px-6 py-5 sm:px-10 lg:px-16">
@@ -271,6 +318,19 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
                 <dd className="text-paper">{firmSettings && localizedField(firmSettings, 'hours', locale)}</dd>
               </dl>
 
+              {whatsapp && (
+                <a
+                  href={whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="contact-whatsapp"
+                  className="mt-6 inline-flex items-center gap-2.5 rounded-sm bg-[#25D366] px-5 py-2.5 text-sm font-medium text-[#0b141a] transition-opacity hover:opacity-90"
+                >
+                  <WhatsAppIcon className="h-5 w-5 shrink-0" />
+                  {t('contact.whatsapp')}
+                </a>
+              )}
+
               {firmSettings?.map_embed_url && (
                 <div className="mt-8 aspect-[4/3] w-full overflow-hidden border border-warm-grey/25 sm:aspect-video" data-testid="contact-map">
                   <iframe
@@ -320,5 +380,16 @@ function Field({
         className="rounded-sm border border-warm-grey/40 bg-ink px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
       />
     </div>
+  )
+}
+
+// WhatsApp's glyph, so the button reads as a WhatsApp action at a glance
+// rather than as another phone number. Decorative: the label carries the
+// meaning.
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.48.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.04 21.5h-.01a9.4 9.4 0 0 1-4.8-1.32l-.34-.2-3.57.94.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.23-9.43 9.44-9.43 2.52 0 4.89.98 6.67 2.77a9.37 9.37 0 0 1 2.76 6.67c0 5.2-4.24 9.43-9.44 9.43m8.03-17.46A11.28 11.28 0 0 0 12.04.72C5.78.72.69 5.8.69 12.06c0 2 .52 3.95 1.52 5.67L.6 23.28l5.68-1.49a11.33 11.33 0 0 0 5.75 1.47h.01c6.25 0 11.34-5.09 11.35-11.35 0-3.03-1.18-5.88-3.32-8.02" />
+    </svg>
   )
 }
