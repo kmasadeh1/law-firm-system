@@ -40,9 +40,12 @@ function readFields(formData: FormData): Fields {
 
 const ROW = 'id, name_en, name_ar, is_active'
 
+// Only the CHECK is mapped here. 42501 is handled at the insert call alone:
+// the owner-only INSERT policy refusing raises it, but an UPDATE refused by
+// RLS raises nothing (zero rows, checked at each update call), so a 42501
+// branch on the update paths could never run.
 function mapWriteError(code: string, message: string, fallback: CaseTypeErrorCode): CaseTypeErrorCode {
   if (code === '23514' && message.includes('case_types_has_a_name')) return 'noName'
-  if (code === '42501') return 'noPermission'
   return fallback
 }
 
@@ -50,8 +53,10 @@ export async function createCaseType(formData: FormData): Promise<ActionResult &
   const supabase = await createClient()
   const { data, error } = await supabase.from('case_types').insert(readFields(formData)).select(ROW).single()
 
-  // An insert the owner-only policy refuses is a real 42501.
-  if (error) return { error: mapWriteError(error.code, error.message, 'createFailed') }
+  if (error) {
+    if (error.code === '42501') return { error: 'noPermission' }
+    return { error: mapWriteError(error.code, error.message, 'createFailed') }
+  }
 
   revalidatePath(PATH)
   return { caseType: data }

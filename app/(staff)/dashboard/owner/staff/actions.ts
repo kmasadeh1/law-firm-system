@@ -136,7 +136,15 @@ export async function regenerateTempPassword(
 
   const { setAt, expiresAt } = expiryFromNow()
   const supabase = await createClient()
-  const { error } = await supabase
+  // Runs AFTER the Auth password has already changed - deliberately: the
+  // flag can't be written first, or temp_password_set_at would predate
+  // Auth's updated_at and complete_password_change would treat the reset
+  // itself as the user's own change. So a failure here leaves a reset
+  // password on an account that isn't flagged to change it; zero rows
+  // (refused by RLS, which raises nothing) is that same failure and is
+  // reported the same way, never as success. What the owner should get
+  // back in that case is an open decision - see the commit message.
+  const { data, error } = await supabase
     .from('staff')
     .update({
       must_change_password: true,
@@ -144,8 +152,9 @@ export async function regenerateTempPassword(
       temp_password_expires_at: expiresAt,
     })
     .eq('id', staffId)
+    .select('id')
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     return { error: 'passwordResetButRecordFailed' }
   }
 
@@ -159,9 +168,10 @@ export async function setStaffActive(staffId: string, isActive: boolean): Promis
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.from('staff').update({ is_active: isActive }).eq('id', staffId)
+  const { data, error } = await supabase.from('staff').update({ is_active: isActive }).eq('id', staffId).select('id')
 
-  if (error) {
+  // Zero rows: refused by RLS (raises nothing) or the account is gone.
+  if (error || !data || data.length === 0) {
     return { error: 'updateAccountFailed' }
   }
 

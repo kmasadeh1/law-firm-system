@@ -91,12 +91,17 @@ export async function updatePeriodType(id: string, formData: FormData): Promise<
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { error } = await supabase.from('deadline_period_types').update(fields).eq('id', id)
+  const { data, error } = await supabase.from('deadline_period_types').update(fields).eq('id', id).select('id')
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
       return { error: t('nameExists') }
     }
+    return { error: t('saveFailed') }
+  }
+  // Zero rows: refused by RLS (raises nothing) or the row is gone. Either
+  // way nothing was saved - never report success.
+  if (!data || data.length === 0) {
     return { error: t('saveFailed') }
   }
 
@@ -108,12 +113,16 @@ export async function deletePeriodType(id: string): Promise<ActionResult> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes.errors' })
   const supabase = await createClient()
-  const { error } = await supabase.from('deadline_period_types').delete().eq('id', id)
+  const { data, error } = await supabase.from('deadline_period_types').delete().eq('id', id).select('id')
 
   if (error) {
     if (error.code === FOREIGN_KEY_VIOLATION) {
       return { error: t('inUse') }
     }
+    return { error: t('deleteFailed') }
+  }
+  // Zero rows: refused by RLS or already deleted - not a success.
+  if (!data || data.length === 0) {
     return { error: t('deleteFailed') }
   }
 

@@ -33,7 +33,7 @@ export async function updateFirmSettings(formData: FormData): Promise<ActionResu
   // table converts '' to NULL on write, the same convention already used by
   // deadline_period_types' name_ar/description_ar. Nothing here reimplements
   // that.
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('firm_settings')
     .update({
       address_en: readString(formData, 'address_en'),
@@ -45,8 +45,12 @@ export async function updateFirmSettings(formData: FormData): Promise<ActionResu
       map_embed_url: readString(formData, 'map_embed_url'),
     })
     .eq('singleton', true)
+    .select('id')
 
   if (error) return { error: 'save_failed' }
+  // Zero rows: refused by RLS (an UPDATE refusal raises nothing) or the
+  // row is gone - nothing was saved, so never report success.
+  if (!data || data.length === 0) return { error: 'save_failed' }
 
   revalidatePath(LANDING_PATH)
   revalidatePath(`${LANDING_PATH}/firm-details`)
@@ -57,7 +61,7 @@ export async function updateFirmSettings(formData: FormData): Promise<ActionResu
 export async function updateHero(formData: FormData): Promise<ActionResult> {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('site_sections')
     .update({
       eyebrow_en: readString(formData, 'eyebrow_en'),
@@ -70,8 +74,12 @@ export async function updateHero(formData: FormData): Promise<ActionResult> {
       body_ar: readString(formData, 'body_ar'),
     })
     .eq('key', 'hero')
+    .select('id')
 
   if (error) return { error: 'save_failed' }
+  // Zero rows: refused by RLS (an UPDATE refusal raises nothing) or the
+  // row is gone - nothing was saved, so never report success.
+  if (!data || data.length === 0) return { error: 'save_failed' }
 
   revalidatePath(LANDING_PATH)
   revalidatePath(`${LANDING_PATH}/hero`)
@@ -87,7 +95,7 @@ export async function updateSectionText(slug: SectionTextSlug, formData: FormDat
   const supabase = await createClient()
   const key = SECTION_TEXT_KEY[slug]
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('site_sections')
     .update({
       title_en: readString(formData, 'title_en'),
@@ -96,8 +104,12 @@ export async function updateSectionText(slug: SectionTextSlug, formData: FormDat
       intro_ar: readString(formData, 'intro_ar'),
     })
     .eq('key', key)
+    .select('id')
 
   if (error) return { error: 'save_failed' }
+  // Zero rows: refused by RLS (an UPDATE refusal raises nothing) or the
+  // row is gone - nothing was saved, so never report success.
+  if (!data || data.length === 0) return { error: 'save_failed' }
 
   revalidatePath(LANDING_PATH)
   revalidatePath(`${LANDING_PATH}/${slug}`)
@@ -153,11 +165,18 @@ async function moveListItem(table: ListTable, id: string, direction: 'up' | 'dow
 
   const current = rows[index]
   const neighbor = rows[neighborIndex]
-  const [{ error: e1 }, { error: e2 }] = await Promise.all([
-    supabase.from(table).update({ sort_order: neighbor.sort_order }).eq('id', current.id),
-    supabase.from(table).update({ sort_order: current.sort_order }).eq('id', neighbor.id),
+  // Two separate statements, so NOT atomic: one can land and the other
+  // fail, leaving two rows sharing a sort_order. Making the swap atomic
+  // needs a database function (a two-row upsert would resurrect a row
+  // deleted in the meantime as a blank, published entry) - until then,
+  // both results are checked so a half-done move is at least reported
+  // instead of passed off as success.
+  const [first, second] = await Promise.all([
+    supabase.from(table).update({ sort_order: neighbor.sort_order }).eq('id', current.id).select('id'),
+    supabase.from(table).update({ sort_order: current.sort_order }).eq('id', neighbor.id).select('id'),
   ])
-  if (e1 || e2) return { error: 'reorder_failed' }
+  if (first.error || second.error) return { error: 'reorder_failed' }
+  if (!first.data?.length || !second.data?.length) return { error: 'reorder_failed' }
 
   revalidateList(table)
   return {}
@@ -165,8 +184,10 @@ async function moveListItem(table: ListTable, id: string, direction: 'up' | 'dow
 
 async function setListItemPublished(table: ListTable, id: string, published: boolean): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase.from(table).update({ is_published: published }).eq('id', id)
+  const { data, error } = await supabase.from(table).update({ is_published: published }).eq('id', id).select('id')
   if (error) return { error: 'publish_failed' }
+  // Zero rows: refused by RLS or the entry was deleted.
+  if (!data || data.length === 0) return { error: 'publish_failed' }
 
   revalidateList(table)
   return {}
@@ -174,8 +195,10 @@ async function setListItemPublished(table: ListTable, id: string, published: boo
 
 async function deleteListItem(table: ListTable, id: string): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase.from(table).delete().eq('id', id)
+  const { data, error } = await supabase.from(table).delete().eq('id', id).select('id')
   if (error) return { error: 'delete_failed' }
+  // Zero rows: refused by RLS or already deleted - not a success.
+  if (!data || data.length === 0) return { error: 'delete_failed' }
 
   revalidateList(table)
   return {}
@@ -216,7 +239,7 @@ export async function addPracticeArea(formData: FormData): Promise<ActionResult 
 
 export async function updatePracticeArea(id: string, formData: FormData): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('practice_areas')
     .update({
       name_en: readString(formData, 'name_en'),
@@ -225,8 +248,11 @@ export async function updatePracticeArea(id: string, formData: FormData): Promis
       description_ar: readString(formData, 'description_ar'),
     })
     .eq('id', id)
+    .select('id')
 
   if (error) return { error: 'save_failed' }
+  // Zero rows: refused by RLS or the entry was deleted - not a save.
+  if (!data || data.length === 0) return { error: 'save_failed' }
 
   revalidateList('practice_areas')
   return {}
@@ -286,7 +312,7 @@ export async function addLawyerProfile(formData: FormData): Promise<ActionResult
 
 export async function updateLawyerProfile(id: string, formData: FormData): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('lawyer_profiles')
     .update({
       name_en: readString(formData, 'name_en'),
@@ -297,8 +323,11 @@ export async function updateLawyerProfile(id: string, formData: FormData): Promi
       bio_ar: readString(formData, 'bio_ar'),
     })
     .eq('id', id)
+    .select('id')
 
   if (error) return { error: 'save_failed' }
+  // Zero rows: refused by RLS or the entry was deleted - not a save.
+  if (!data || data.length === 0) return { error: 'save_failed' }
 
   revalidateList('lawyer_profiles')
   return {}

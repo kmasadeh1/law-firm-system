@@ -38,9 +38,12 @@ function readFields(formData: FormData): Fields {
   }
 }
 
+// Only the CHECK is mapped here. 42501 is handled at the insert call alone:
+// the owner-only INSERT policy refusing raises it, but an UPDATE refused by
+// RLS raises nothing (zero rows, checked at each update call), so a 42501
+// branch on the update paths could never run.
 function mapWriteError(code: string, message: string, fallback: ReferralSourceErrorCode): ReferralSourceErrorCode {
   if (code === '23514' && message.includes('referral_sources_has_a_name')) return 'noName'
-  if (code === '42501') return 'noPermission'
   return fallback
 }
 
@@ -48,8 +51,10 @@ export async function createReferralSource(formData: FormData): Promise<ActionRe
   const supabase = await createClient()
   const { data, error } = await supabase.from('referral_sources').insert(readFields(formData)).select(ROW).single()
 
-  // An insert the owner-only policy refuses is a real 42501.
-  if (error) return { error: mapWriteError(error.code, error.message, 'createFailed') }
+  if (error) {
+    if (error.code === '42501') return { error: 'noPermission' }
+    return { error: mapWriteError(error.code, error.message, 'createFailed') }
+  }
 
   revalidatePath(PATH)
   return { source: data }

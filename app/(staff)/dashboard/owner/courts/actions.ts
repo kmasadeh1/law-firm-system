@@ -77,9 +77,12 @@ function readFields(formData: FormData): Fields | { error: CourtErrorCode } {
 
 const ROW = 'id, name_en, name_ar, city_en, city_ar, court_type, is_active'
 
+// Only the CHECK is mapped here. 42501 is handled at the insert call alone:
+// the owner-only INSERT policy refusing raises it, but an UPDATE refused by
+// RLS raises nothing (zero rows, checked at each update call), so a 42501
+// branch on the update paths could never run.
 function mapWriteError(code: string, message: string, fallback: CourtErrorCode): CourtErrorCode {
   if (code === '23514' && message.includes('courts_has_a_name')) return 'noName'
-  if (code === '42501') return 'noPermission'
   return fallback
 }
 
@@ -90,8 +93,10 @@ export async function createCourt(formData: FormData): Promise<ActionResult & { 
   const supabase = await createClient()
   const { data, error } = await supabase.from('courts').insert(fields).select(ROW).single()
 
-  // An insert the owner-only policy refuses is a real 42501.
-  if (error) return { error: mapWriteError(error.code, error.message, 'createFailed') }
+  if (error) {
+    if (error.code === '42501') return { error: 'noPermission' }
+    return { error: mapWriteError(error.code, error.message, 'createFailed') }
+  }
 
   revalidatePath(PATH)
   return { court: data }
