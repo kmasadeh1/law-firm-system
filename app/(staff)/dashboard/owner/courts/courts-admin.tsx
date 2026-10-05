@@ -26,38 +26,35 @@ const COURT_TYPES: CourtType[] = [
 // translated message rather than passing an arbitrary value to t() as a key.
 const COURT_ERROR_CODES: CourtErrorCode[] = ['selectType', 'noName', 'noPermission', 'createFailed', 'saveFailed']
 
-export function CourtsAdmin({ courts: initial }: { courts: CourtRow[] }) {
+// The list is rendered straight from the server's rows, in the query's
+// order (sort_order, then name). Every action revalidates this page, so a
+// created, edited or (de)activated court arrives as fresh props - no
+// client-side copy of the list, and no client-side re-sort.
+export function CourtsAdmin({ courts }: { courts: CourtRow[] }) {
   const t = useTranslations('dashboard.admin.courts')
-  const [courts, setCourts] = useState(initial)
-
-  function sorted(list: CourtRow[]) {
-    return [...list].sort((a, b) => localizedName({ name: a.name_en ?? '', name_ar: a.name_ar }, 'en').localeCompare(localizedName({ name: b.name_en ?? '', name_ar: b.name_ar }, 'en')))
-  }
 
   return (
     <div className="flex flex-col gap-8">
-      <CreateForm onCreated={(c) => setCourts((prev) => sorted([...prev, c]))} />
+      <CreateForm />
 
       {courts.length === 0 && <EmptyState title={t('noneYet')} />}
 
       <div className="flex flex-col gap-4">
         {courts.map((c) => (
-          <CourtCard
-            key={c.id}
-            court={c}
-            onUpdated={(updated) => setCourts((prev) => sorted(prev.map((p) => (p.id === updated.id ? updated : p))))}
-          />
+          <CourtCard key={c.id} court={c} />
         ))}
       </div>
     </div>
   )
 }
 
-function resolveError(code: CourtErrorCode, tErrors: ReturnType<typeof useTranslations>) {
-  return (COURT_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('createFailed')
+// The fallback is the caller's - a failed save says "save failed", not
+// "create failed".
+function resolveError(code: CourtErrorCode, fallback: CourtErrorCode, tErrors: ReturnType<typeof useTranslations>) {
+  return tErrors((COURT_ERROR_CODES as string[]).includes(code) ? code : fallback)
 }
 
-function CreateForm({ onCreated }: { onCreated: (c: CourtRow) => void }) {
+function CreateForm() {
   const t = useTranslations('dashboard.admin.courts.createForm')
   const tType = useTranslations('dashboard.admin.courts.type')
   const tErrors = useTranslations('dashboard.admin.courts.errors')
@@ -72,13 +69,10 @@ function CreateForm({ onCreated }: { onCreated: (c: CourtRow) => void }) {
     startTransition(async () => {
       const result = await createCourt(formData)
       if (result.error) {
-        setError(resolveError(result.error, tErrors))
+        setError(resolveError(result.error, 'createFailed', tErrors))
         return
       }
-      if (result.court) {
-        onCreated(result.court)
-        formRef.current?.reset()
-      }
+      formRef.current?.reset()
     })
   }
 
@@ -130,7 +124,7 @@ function CreateForm({ onCreated }: { onCreated: (c: CourtRow) => void }) {
   )
 }
 
-function CourtCard({ court, onUpdated }: { court: CourtRow; onUpdated: (c: CourtRow) => void }) {
+function CourtCard({ court }: { court: CourtRow }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.admin.courts.card')
   const tType = useTranslations('dashboard.admin.courts.type')
@@ -164,18 +158,16 @@ function CourtCard({ court, onUpdated }: { court: CourtRow; onUpdated: (c: Court
     const formData = new FormData(formRef.current!)
     startSave(async () => {
       const result = await updateCourt(court.id, formData)
-      if (result.error) {
-        setError(resolveError(result.error, tErrors))
+      if (result.error || !result.court) {
+        setError(resolveError(result.error ?? 'saveFailed', 'saveFailed', tErrors))
         return
       }
-      onUpdated({
-        ...court,
-        name_en: nameEn.trim() || null,
-        name_ar: nameAr.trim() ? nameAr : null,
-        city_en: cityEn.trim() || null,
-        city_ar: cityAr.trim() ? cityAr : null,
-        court_type: courtType,
-      })
+      // Show what the database kept, not a re-derivation of its rules.
+      setNameEn(result.court.name_en ?? '')
+      setNameAr(result.court.name_ar ?? '')
+      setCityEn(result.court.city_en ?? '')
+      setCityAr(result.court.city_ar ?? '')
+      setCourtType(result.court.court_type)
       setSaved(true)
     })
   }
@@ -186,12 +178,12 @@ function CourtCard({ court, onUpdated }: { court: CourtRow; onUpdated: (c: Court
     setChecked(next)
     startToggleActive(async () => {
       const result = await setCourtActive(court.id, next)
-      if (result.error) {
+      if (result.error || !result.court) {
         setChecked(previous)
-        setActiveError(resolveError(result.error, tErrors))
+        setActiveError(resolveError(result.error ?? 'saveFailed', 'saveFailed', tErrors))
         return
       }
-      onUpdated({ ...court, is_active: next })
+      setChecked(result.court.is_active)
     })
   }
 

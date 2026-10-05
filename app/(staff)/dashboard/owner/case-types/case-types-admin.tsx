@@ -15,42 +15,39 @@ import { localizedName } from '@/lib/localized-name'
 // translated message rather than passing an arbitrary value to t() as a key.
 const CASE_TYPE_ERROR_CODES: CaseTypeErrorCode[] = ['noName', 'noPermission', 'createFailed', 'saveFailed']
 
-export function CaseTypesAdmin({ caseTypes: initial }: { caseTypes: CaseTypeRow[] }) {
+// The list is rendered straight from the server's rows, in the query's
+// order (sort_order, then name). Every action revalidates this page, so a
+// created, renamed or (de)activated case type arrives as fresh props - no
+// client-side copy of the list, and no client-side re-sort.
+export function CaseTypesAdmin({ caseTypes }: { caseTypes: CaseTypeRow[] }) {
   const t = useTranslations('dashboard.admin.caseTypes')
-  const [caseTypes, setCaseTypes] = useState(initial)
-
-  function sorted(list: CaseTypeRow[]) {
-    return [...list].sort((a, b) =>
-      localizedName({ name: a.name_en ?? '', name_ar: a.name_ar }, 'en').localeCompare(
-        localizedName({ name: b.name_en ?? '', name_ar: b.name_ar }, 'en')
-      )
-    )
-  }
 
   return (
     <div className="flex flex-col gap-8">
-      <CreateForm onCreated={(c) => setCaseTypes((prev) => sorted([...prev, c]))} />
+      <CreateForm />
 
       {caseTypes.length === 0 && <EmptyState title={t('noneYet')} />}
 
       <div className="flex flex-col gap-4">
         {caseTypes.map((c) => (
-          <CaseTypeCard
-            key={c.id}
-            caseType={c}
-            onUpdated={(updated) => setCaseTypes((prev) => sorted(prev.map((p) => (p.id === updated.id ? updated : p))))}
-          />
+          <CaseTypeCard key={c.id} caseType={c} />
         ))}
       </div>
     </div>
   )
 }
 
-function resolveError(code: CaseTypeErrorCode, tErrors: ReturnType<typeof useTranslations>) {
-  return (CASE_TYPE_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('createFailed')
+// The fallback is the caller's - a failed save says "save failed", not
+// "create failed".
+function resolveError(
+  code: CaseTypeErrorCode,
+  fallback: CaseTypeErrorCode,
+  tErrors: ReturnType<typeof useTranslations>
+) {
+  return tErrors((CASE_TYPE_ERROR_CODES as string[]).includes(code) ? code : fallback)
 }
 
-function CreateForm({ onCreated }: { onCreated: (c: CaseTypeRow) => void }) {
+function CreateForm() {
   const t = useTranslations('dashboard.admin.caseTypes.createForm')
   const tErrors = useTranslations('dashboard.admin.caseTypes.errors')
   const formRef = useRef<HTMLFormElement>(null)
@@ -64,13 +61,10 @@ function CreateForm({ onCreated }: { onCreated: (c: CaseTypeRow) => void }) {
     startTransition(async () => {
       const result = await createCaseType(formData)
       if (result.error) {
-        setError(resolveError(result.error, tErrors))
+        setError(resolveError(result.error, 'createFailed', tErrors))
         return
       }
-      if (result.caseType) {
-        onCreated(result.caseType)
-        formRef.current?.reset()
-      }
+      formRef.current?.reset()
     })
   }
 
@@ -97,7 +91,7 @@ function CreateForm({ onCreated }: { onCreated: (c: CaseTypeRow) => void }) {
   )
 }
 
-function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdated: (c: CaseTypeRow) => void }) {
+function CaseTypeCard({ caseType }: { caseType: CaseTypeRow }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.admin.caseTypes.card')
   const tErrors = useTranslations('dashboard.admin.caseTypes.errors')
@@ -122,15 +116,13 @@ function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdate
     const formData = new FormData(formRef.current!)
     startSave(async () => {
       const result = await updateCaseType(caseType.id, formData)
-      if (result.error) {
-        setError(resolveError(result.error, tErrors))
+      if (result.error || !result.caseType) {
+        setError(resolveError(result.error ?? 'saveFailed', 'saveFailed', tErrors))
         return
       }
-      onUpdated({
-        ...caseType,
-        name_en: nameEn.trim() || null,
-        name_ar: nameAr.trim() ? nameAr : null,
-      })
+      // Show what the database kept, not a re-derivation of its rules.
+      setNameEn(result.caseType.name_en ?? '')
+      setNameAr(result.caseType.name_ar ?? '')
       setSaved(true)
     })
   }
@@ -141,12 +133,12 @@ function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdate
     setChecked(next)
     startToggleActive(async () => {
       const result = await setCaseTypeActive(caseType.id, next)
-      if (result.error) {
+      if (result.error || !result.caseType) {
         setChecked(previous)
-        setActiveError(resolveError(result.error, tErrors))
+        setActiveError(resolveError(result.error ?? 'saveFailed', 'saveFailed', tErrors))
         return
       }
-      onUpdated({ ...caseType, is_active: next })
+      setChecked(result.caseType.is_active)
     })
   }
 

@@ -8,8 +8,8 @@ const PATH = '/dashboard/owner/case-types'
 // Closed set the server can return - the render site validates against a
 // whitelist before calling t(), same convention as CourtErrorCode in
 // owner/courts/actions.ts. 'noName' maps the case_types_has_a_name CHECK
-// (23514) by code, never by passing Postgres's own message text through to
-// the UI.
+// (23514) by constraint name, never by passing Postgres's own message text
+// through to the UI.
 export type CaseTypeErrorCode = 'noName' | 'noPermission' | 'createFailed' | 'saveFailed'
 
 type ActionResult = { error?: CaseTypeErrorCode }
@@ -38,61 +38,54 @@ function readFields(formData: FormData): Fields {
   }
 }
 
+const ROW = 'id, name_en, name_ar, is_active'
+
+function mapWriteError(code: string, message: string, fallback: CaseTypeErrorCode): CaseTypeErrorCode {
+  if (code === '23514' && message.includes('case_types_has_a_name')) return 'noName'
+  if (code === '42501') return 'noPermission'
+  return fallback
+}
+
 export async function createCaseType(formData: FormData): Promise<ActionResult & { caseType?: CaseTypeRow }> {
-  const fields = readFields(formData)
-
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('case_types')
-    .insert(fields)
-    .select('id, name_en, name_ar, is_active')
-    .single()
+  const { data, error } = await supabase.from('case_types').insert(readFields(formData)).select(ROW).single()
 
-  if (error) {
-    if (error.code === '23514') {
-      return { error: 'noName' }
-    }
-    if (error.code === '42501') {
-      return { error: 'noPermission' }
-    }
-    return { error: 'createFailed' }
-  }
+  // An insert the owner-only policy refuses is a real 42501.
+  if (error) return { error: mapWriteError(error.code, error.message, 'createFailed') }
 
   revalidatePath(PATH)
   return { caseType: data }
 }
 
-export async function updateCaseType(id: string, formData: FormData): Promise<ActionResult> {
-  const fields = readFields(formData)
-
+// An UPDATE that RLS refuses is not an error - it matches zero rows and
+// PostgREST returns an empty result. So the row is selected back and an
+// empty result is reported as noPermission, never as "Saved". The returned
+// row is what the database kept (blank Arabic stored as NULL by trigger).
+export async function updateCaseType(id: string, formData: FormData): Promise<ActionResult & { caseType?: CaseTypeRow }> {
   const supabase = await createClient()
-  const { error } = await supabase.from('case_types').update(fields).eq('id', id)
+  const { data, error } = await supabase.from('case_types').update(readFields(formData)).eq('id', id).select(ROW)
 
-  if (error) {
-    if (error.code === '23514') {
-      return { error: 'noName' }
-    }
-    if (error.code === '42501') {
-      return { error: 'noPermission' }
-    }
-    return { error: 'saveFailed' }
-  }
+  if (error) return { error: mapWriteError(error.code, error.message, 'saveFailed') }
+  if (!data || data.length === 0) return { error: 'noPermission' }
 
   revalidatePath(PATH)
-  return {}
+  return { caseType: data[0] }
 }
 
-export async function setCaseTypeActive(id: string, isActive: boolean): Promise<ActionResult> {
+export async function setCaseTypeActive(
+  id: string,
+  isActive: boolean
+): Promise<ActionResult & { caseType?: CaseTypeRow }> {
   const supabase = await createClient()
-  const { error } = await supabase.from('case_types').update({ is_active: isActive }).eq('id', id)
+  const { data, error } = await supabase
+    .from('case_types')
+    .update({ is_active: isActive })
+    .eq('id', id)
+    .select(ROW)
 
-  if (error) {
-    if (error.code === '42501') {
-      return { error: 'noPermission' }
-    }
-    return { error: 'saveFailed' }
-  }
+  if (error) return { error: mapWriteError(error.code, error.message, 'saveFailed') }
+  if (!data || data.length === 0) return { error: 'noPermission' }
 
   revalidatePath(PATH)
-  return {}
+  return { caseType: data[0] }
 }
