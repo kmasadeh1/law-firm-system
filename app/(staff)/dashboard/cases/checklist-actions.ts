@@ -27,7 +27,6 @@ export async function setChecklistStatus(caseId: string, itemId: string, formDat
   const documentId = formData.get('document_id')
 
   const supabase = await createClient()
-  const { data: claims } = await supabase.auth.getClaims()
 
   const { data, error } = await supabase
     .from('case_checklist_status')
@@ -38,11 +37,9 @@ export async function setChecklistStatus(caseId: string, itemId: string, formDat
         state: state as ChecklistState,
         note: typeof note === 'string' && note.trim() ? note.trim() : null,
         document_id: typeof documentId === 'string' && documentId ? documentId : null,
-        // Who recorded it and when, refreshed on every change. The table
-        // has no trigger stamping these, so they're set from the signed-in
-        // user here.
-        noted_by: claims?.claims?.sub as string,
-        noted_at: new Date().toISOString(),
+        // noted_by / noted_at are never sent: the case_checklist_status_stamp
+        // trigger sets both on every insert and update from the signed-in
+        // user and the current time, overwriting anything sent.
       },
       { onConflict: 'case_id,item_id' }
     )

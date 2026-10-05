@@ -104,8 +104,10 @@ export async function setChecklistItemRequired(id: string, required: boolean) {
   return updateItem(id, { is_required: required })
 }
 
-// No delete: deactivating hides the item from every case's checklist while
-// keeping any statuses already recorded against it.
+// No delete, by design and by the database: document_checklist_items has
+// no DELETE policy or grant (42501), because a deleted item would cascade
+// away every case's record of it. Deactivating hides the item from every
+// case's checklist while keeping those statuses.
 export async function setChecklistItemActive(id: string, active: boolean) {
   return updateItem(id, { is_active: active })
 }
