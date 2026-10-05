@@ -2857,6 +2857,7 @@ export type Database = {
           open_cases: number | null
           outstanding_total: number | null
           paid_total: number | null
+          row_kind: string | null
           scheduled_total: number | null
           written_off_total: number | null
         }

@@ -1737,7 +1737,7 @@
       },
       "profitability": {
         "heading": "Profitability by case type",
-        "description": "Fees, payments and expenses grouped by case type. A fee agreement's money is counted under a case type only when every case it covers is that type.",
+        "description": "Fees, payments and expenses grouped by case type. A fee agreement's money is counted under a case type only when it covers at least one case and every case it covers is that type.",
         "noneTitle": "No case types yet",
         "noneDescription": "Add case types under Administration → Case types to see this report.",
         "caseTypeHeader": "Case type",
@@ -1752,7 +1752,9 @@
         "netReceivedHeader": "Net received",
         "netReceivedNote": "Net received is the amount paid minus expenses not yet reimbursed.",
         "mixedLabel": "Fee agreements covering more than one case type",
-        "mixedExplanation": "These agreements cover cases of different types, so their money can't be split between them. It is shown here instead, with no case count or expenses — those are counted under each case's own type above."
+        "mixedExplanation": "Agreements whose money can't honestly be given to a single case type: those covering cases of more than one type, those where some cases have no type set, and those with no linked case at all. Their money is shown here instead, with no case count or expenses — those are counted under each case's own type, or as cases with no type, above.",
+        "untypedLabel": "Cases with no type set",
+        "untypedExplanation": "Their case count and expenses are real figures. The fee columns are empty because fee agreements are attributed by case type; agreements covering these cases appear in the last row instead."
       }
     },
     "enquiries": {
