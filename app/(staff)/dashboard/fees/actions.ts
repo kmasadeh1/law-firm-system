@@ -343,6 +343,9 @@ export async function updateInstallment(
   if (error?.code === CHECK_VIOLATION && error.message.includes('engagement_installments_description_not_blank')) {
     return { error: 'description_required' }
   }
+  if (error?.code === CHECK_VIOLATION && error.message.includes('installment_amount_covers_commitments')) {
+    return { error: 'installment_below_commitments' }
+  }
   // Zero rows: refused by RLS or the instalment was deleted.
   if (error || !data || data.length === 0) {
     return { error: 'save_installment_failed' }
@@ -360,8 +363,10 @@ export async function deleteInstallment(
   const { data, error } = await supabase.from('engagement_installments').delete().eq('id', installmentId).select('id')
 
   if (error) {
+    // Payments and write-offs both reference the instalment with RESTRICT;
+    // either one blocks the delete, and the message covers both.
     if (error.code === FOREIGN_KEY_VIOLATION) {
-      return { error: 'installment_has_payments' }
+      return { error: 'installment_has_records' }
     }
     return { error: 'delete_installment_failed' }
   }
@@ -432,6 +437,7 @@ function mapWriteOffError(error: { code: string; message: string }, fallback: Fe
     if (error.message.includes('write_offs_amount_positive')) return 'write_off_amount_not_positive'
     if (error.message.includes('write_offs_reason_not_blank')) return 'write_off_reason_required'
     if (error.message.includes('write_off_within_balance')) return 'write_off_exceeds_balance'
+    if (error.message.includes('write_off_reversal_matches_original')) return 'write_off_reversal_mismatch'
   }
   if (error.code === UNIQUE_VIOLATION) return 'write_off_already_reversed'
   if (error.code === INSUFFICIENT_PRIVILEGE) return 'no_permission_write_off'

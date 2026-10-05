@@ -29,7 +29,8 @@ export type FeesErrorCode =
   | 'payment_amount_not_positive'
   | 'add_installment_failed'
   | 'save_installment_failed'
-  | 'installment_has_payments'
+  | 'installment_has_records'
+  | 'installment_below_commitments'
   | 'delete_installment_failed'
   | 'date_required'
   | 'no_permission_record_payment'
@@ -38,6 +39,7 @@ export type FeesErrorCode =
   | 'write_off_reason_required'
   | 'write_off_exceeds_balance'
   | 'write_off_already_reversed'
+  | 'write_off_reversal_mismatch'
   | 'no_permission_write_off'
   | 'write_off_failed'
   | 'write_off_reverse_failed'
@@ -67,7 +69,8 @@ export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'payment_amount_not_positive',
   'add_installment_failed',
   'save_installment_failed',
-  'installment_has_payments',
+  'installment_has_records',
+  'installment_below_commitments',
   'delete_installment_failed',
   'date_required',
   'no_permission_record_payment',
@@ -76,6 +79,7 @@ export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'write_off_reason_required',
   'write_off_exceeds_balance',
   'write_off_already_reversed',
+  'write_off_reversal_mismatch',
   'no_permission_write_off',
   'write_off_failed',
   'write_off_reverse_failed',
