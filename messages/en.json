@@ -131,6 +131,52 @@
       "editDetailsInstead": "Edit details instead",
       "saving": "Saving…"
     },
+    "notifications": {
+      "open": "Notifications",
+      "openWithCount": "{count, plural, one {Notifications, # new} other {Notifications, # new}}",
+      "countOverflow": "99+",
+      "emptyTitle": "You're all caught up",
+      "emptyDescription": "Assignments, payments, approaching deadlines and hearings will appear here.",
+      "alertsHeading": "Needs attention",
+      "notificationsHeading": "Notifications",
+      "markAllRead": "Mark all read",
+      "dismiss": "Dismiss",
+      "unread": "Unread",
+      "someone": "Someone",
+      "unknownCase": "a case",
+      "updateFailed": "That didn't save. Please try again.",
+      "alert": {
+        "deadline": "Deadline on case <bdi>{caseNumber}</bdi>",
+        "deadlineWithType": "<bdi>{type}</bdi> deadline on case <bdi>{caseNumber}</bdi>",
+        "hearing": "Hearing on case <bdi>{caseNumber}</bdi>",
+        "hearingWithCourt": "Hearing at <bdi>{court}</bdi> on case <bdi>{caseNumber}</bdi>"
+      },
+      "when": {
+        "overdue": "{days, plural, one {Overdue by # day} other {Overdue by # days}}",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "inDays": "{days, plural, one {In # day} other {In # days}}"
+      },
+      "type": {
+        "case_assigned": {
+          "default": "<bdi>{actor}</bdi> assigned you to case <bdi>{subject}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> assigned you to a case you can no longer see"
+        },
+        "task_assigned": {
+          "default": "<bdi>{actor}</bdi> assigned you a task: <bdi>{subject}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> assigned you a task that is no longer available"
+        },
+        "enquiry_assigned": {
+          "default": "<bdi>{actor}</bdi> assigned you an enquiry from <bdi>{subject}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> assigned you an enquiry you can no longer see"
+        },
+        "payment_recorded": {
+          "default": "<bdi>{actor}</bdi> recorded a payment of <bdi>{amount}</bdi>",
+          "withClient": "<bdi>{actor}</bdi> recorded a payment of <bdi>{amount}</bdi> from <bdi>{client}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> recorded a payment you can no longer see"
+        }
+      }
+    },
     "shell": {
       "firmName": "Ahmad Al-Masadeh & Associates",
       "logOut": "Log out",

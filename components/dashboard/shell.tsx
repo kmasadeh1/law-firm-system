@@ -124,6 +124,7 @@ export function DashboardShell({
   roleLabel,
   logoutAction,
   initialTheme,
+  notificationBell,
   children,
 }: {
   firmName: string
@@ -134,6 +135,9 @@ export function DashboardShell({
   roleLabel: string
   logoutAction: () => Promise<void>
   initialTheme: Theme
+  // Rendered by the dashboard layout (it loads its own data server-side),
+  // passed in as a slot so this shell stays free of data fetching.
+  notificationBell: React.ReactNode
   children: React.ReactNode
 }) {
   const t = useTranslations('dashboard.shell')
@@ -254,6 +258,10 @@ export function DashboardShell({
             <ThemeToggle initialTheme={initialTheme} />
             <LocaleToggle />
           </div>
+
+          {/* Its own slot, after the preferences and before the account:
+              it's about your work, not a setting. */}
+          <div className="ms-1 sm:ms-2">{notificationBell}</div>
 
           <div className="ms-2 border-s border-line ps-3 sm:ms-3">
             <AccountDrawer userName={userName} roleLabel={roleLabel} logoutAction={logoutAction} />

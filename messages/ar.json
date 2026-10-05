@@ -125,6 +125,52 @@
         "cancel": "إلغاء"
       }
     },
+    "notifications": {
+      "open": "الإشعارات",
+      "openWithCount": "{count, plural, zero {الإشعارات} one {الإشعارات، إشعار جديد واحد} two {الإشعارات، إشعاران جديدان} few {الإشعارات، # إشعارات جديدة} many {الإشعارات، # إشعارًا جديدًا} other {الإشعارات، # إشعار جديد}}",
+      "countOverflow": "99+",
+      "emptyTitle": "لا جديد لديك",
+      "emptyDescription": "ستظهر هنا التكليفات والدفعات والمهل والجلسات القريبة.",
+      "alertsHeading": "تحتاج إلى متابعة",
+      "notificationsHeading": "الإشعارات",
+      "markAllRead": "تعليم الكل كمقروء",
+      "dismiss": "إخفاء",
+      "unread": "غير مقروء",
+      "someone": "أحد الزملاء",
+      "unknownCase": "قضية",
+      "updateFailed": "لم يُحفظ ذلك. يرجى المحاولة مرة أخرى.",
+      "alert": {
+        "deadline": "مهلة في القضية <bdi>{caseNumber}</bdi>",
+        "deadlineWithType": "مهلة <bdi>{type}</bdi> في القضية <bdi>{caseNumber}</bdi>",
+        "hearing": "جلسة في القضية <bdi>{caseNumber}</bdi>",
+        "hearingWithCourt": "جلسة في <bdi>{court}</bdi> للقضية <bdi>{caseNumber}</bdi>"
+      },
+      "when": {
+        "overdue": "{days, plural, one {متأخرة يومًا واحدًا} two {متأخرة يومين} few {متأخرة # أيام} many {متأخرة # يومًا} other {متأخرة # يوم}}",
+        "today": "اليوم",
+        "tomorrow": "غدًا",
+        "inDays": "{days, plural, one {خلال يوم واحد} two {خلال يومين} few {خلال # أيام} many {خلال # يومًا} other {خلال # يوم}}"
+      },
+      "type": {
+        "case_assigned": {
+          "default": "تم تكليفك بالقضية <bdi>{subject}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "تم تكليفك بقضية لم تعد متاحة لك بواسطة <bdi>{actor}</bdi>"
+        },
+        "task_assigned": {
+          "default": "تم تكليفك بمهمة: <bdi>{subject}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "تم تكليفك بمهمة لم تعد متاحة بواسطة <bdi>{actor}</bdi>"
+        },
+        "enquiry_assigned": {
+          "default": "تم تكليفك باستفسار من <bdi>{subject}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "تم تكليفك باستفسار لم يعد متاحًا لك بواسطة <bdi>{actor}</bdi>"
+        },
+        "payment_recorded": {
+          "default": "سُجّلت دفعة بقيمة <bdi>{amount}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "withClient": "سُجّلت دفعة بقيمة <bdi>{amount}</bdi> من <bdi>{client}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "سُجّلت دفعة لم تعد متاحة لك بواسطة <bdi>{actor}</bdi>"
+        }
+      }
+    },
     "shell": {
       "firmName": "أحمد المساعده ومشاركوه",
       "logOut": "تسجيل الخروج",

@@ -250,3 +250,12 @@ export function CaseTypesIcon({ className }: IconProps) {
   )
 }
 
+
+export function BellIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5.5 1.5 5.5h-13S5 12 5 8Z" />
+      <path d="M8.5 16.5a1.6 1.6 0 0 0 3 0" />
+    </svg>
+  )
+}

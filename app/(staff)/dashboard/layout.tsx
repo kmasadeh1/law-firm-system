@@ -5,6 +5,8 @@ import { DashboardShell, type NavGroup, type NavItem } from '@/components/dashbo
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
 import { localizedName } from '@/lib/localized-name'
 import { logout } from './actions'
+import { loadBellData } from './notifications/data'
+import { NotificationBell } from './notifications/notification-bell'
 
 /**
  * Persistent shell for every /dashboard/* page. Nav visibility is computed
@@ -29,6 +31,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     { data: reportsView },
     { data: manageReferenceData },
     initialTheme,
+    bellData,
   ] = await Promise.all([
     supabase
       .from('staff')
@@ -44,6 +47,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     supabase.rpc('has_permission', { p_key: 'reports_view' }),
     supabase.rpc('can_manage_reference_data'),
     getThemeCookie(),
+    // The bell is for everyone - no permission gates it. What each person
+    // sees is already limited by RLS and the pending_alerts view.
+    loadBellData(),
   ])
 
   const isOwner = staffRow?.user_type === 'owner'
@@ -151,6 +157,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       roleLabel={roleLabel}
       logoutAction={logout}
       initialTheme={initialTheme ?? 'light'}
+      notificationBell={<NotificationBell initial={bellData} />}
     >
       {children}
     </DashboardShell>

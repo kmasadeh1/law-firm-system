@@ -69,6 +69,49 @@ export type Database = {
           },
         ]
       }
+      alert_dismissals: {
+        Row: {
+          dismissed_at: string
+          kind: Database["public"]["Enums"]["alert_kind"]
+          staff_id: string
+          subject_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          kind: Database["public"]["Enums"]["alert_kind"]
+          staff_id: string
+          subject_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          kind?: Database["public"]["Enums"]["alert_kind"]
+          staff_id?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_dismissals_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "alert_dismissals_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_dismissals_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           case_id: string | null
@@ -2068,27 +2111,36 @@ export type Database = {
           approved_by: string | null
           created_at: string
           end_date: string
+          end_time: string | null
           id: string
+          kind: Database["public"]["Enums"]["leave_kind"]
           staff_id: string
           start_date: string
+          start_time: string | null
           status: Database["public"]["Enums"]["leave_status"]
         }
         Insert: {
           approved_by?: string | null
           created_at?: string
           end_date: string
+          end_time?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["leave_kind"]
           staff_id: string
           start_date: string
+          start_time?: string | null
           status?: Database["public"]["Enums"]["leave_status"]
         }
         Update: {
           approved_by?: string | null
           created_at?: string
           end_date?: string
+          end_time?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["leave_kind"]
           staff_id?: string
           start_date?: string
+          start_time?: string | null
           status?: Database["public"]["Enums"]["leave_status"]
         }
         Relationships: [
@@ -2130,6 +2182,82 @@ export type Database = {
           {
             foreignKeyName: "leave_requests_staff_id_fkey"
             columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          subject_id: string
+          subject_table: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          subject_id: string
+          subject_table: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          subject_id?: string
+          subject_table?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
@@ -3184,6 +3312,20 @@ export type Database = {
           },
         ]
       }
+      pending_alerts: {
+        Row: {
+          case_id: string | null
+          case_number: string | null
+          case_title: string | null
+          days_away: number | null
+          detail_ar: string | null
+          detail_en: string | null
+          due_on: string | null
+          kind: Database["public"]["Enums"]["alert_kind"] | null
+          subject_id: string | null
+        }
+        Relationships: []
+      }
       staff_directory: {
         Row: {
           full_name: string | null
@@ -3223,6 +3365,7 @@ export type Database = {
         Returns: boolean
       }
       can_manage_reference_data: { Args: never; Returns: boolean }
+      can_request_hourly_leave: { Args: never; Returns: boolean }
       can_view_client: { Args: { p_client_id: string }; Returns: boolean }
       can_withdraw: {
         Args: { lr: Database["public"]["Tables"]["leave_requests"]["Row"] }
@@ -3268,6 +3411,7 @@ export type Database = {
       is_active_staff: { Args: never; Returns: boolean }
       is_on_case: { Args: { p_case_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
+      mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       name_matches: {
         Args: { p_search: string; p_target: string }
         Returns: boolean
@@ -3306,6 +3450,7 @@ export type Database = {
     }
     Enums: {
       activity_action: "insert" | "update" | "delete"
+      alert_kind: "deadline_approaching" | "hearing_tomorrow"
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
       appointment_type: "consultation" | "court_date"
       client_fund_direction: "in" | "out"
@@ -3344,7 +3489,13 @@ export type Database = {
         | "withdrawn"
         | "struck_out"
         | "other"
+      leave_kind: "full_day" | "hourly"
       leave_status: "pending" | "approved" | "rejected"
+      notification_type:
+        | "case_assigned"
+        | "task_assigned"
+        | "enquiry_assigned"
+        | "payment_recorded"
       task_priority: "low" | "normal" | "high"
       task_status: "open" | "in_progress" | "done" | "cancelled"
       user_type: "owner" | "staff"
@@ -3476,6 +3627,7 @@ export const Constants = {
   public: {
     Enums: {
       activity_action: ["insert", "update", "delete"],
+      alert_kind: ["deadline_approaching", "hearing_tomorrow"],
       appointment_status: ["scheduled", "completed", "cancelled", "no_show"],
       appointment_type: ["consultation", "court_date"],
       client_fund_direction: ["in", "out"],
@@ -3518,7 +3670,14 @@ export const Constants = {
         "struck_out",
         "other",
       ],
+      leave_kind: ["full_day", "hourly"],
       leave_status: ["pending", "approved", "rejected"],
+      notification_type: [
+        "case_assigned",
+        "task_assigned",
+        "enquiry_assigned",
+        "payment_recorded",
+      ],
       task_priority: ["low", "normal", "high"],
       task_status: ["open", "in_progress", "done", "cancelled"],
       user_type: ["owner", "staff"],
