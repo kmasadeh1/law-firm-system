@@ -3078,6 +3078,8 @@ export type Database = {
       can_access_client_funds: { Args: never; Returns: boolean }
       can_access_enquiry: { Args: { p_enquiry_id: string }; Returns: boolean }
       can_assign_tasks: { Args: never; Returns: boolean }
+      can_change_case_status: { Args: { p_case_id: string }; Returns: boolean }
+      can_close_case: { Args: { p_case_id: string }; Returns: boolean }
       can_edit_client_contact: {
         Args: { c: Database["public"]["Tables"]["client_contacts"]["Row"] }
         Returns: boolean

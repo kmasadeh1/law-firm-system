@@ -30,7 +30,14 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
   // No access gate here either - a row RLS hides looks identical to one
   // that doesn't exist, same as the Clients edit page.
-  const [{ data: caseRow }, { data: claimsData }] = await Promise.all([
+  // can_change_case_status / can_close_case only need the route's id, so
+  // they ride in this first wave rather than the permission wave below:
+  // the status options query in that wave is filtered by their answers,
+  // which would otherwise cost a second sequential round trip. Both are
+  // the database's own rules (the cases UPDATE policy, and what
+  // enforce_case_close_permission enforces) and already include the owner -
+  // never OR'd with isOwner.
+  const [{ data: caseRow }, { data: claimsData }, { data: canChangeStatus }, { data: canCloseCase }] = await Promise.all([
     supabase
       .from('cases')
       .select(
@@ -39,6 +46,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .eq('id', id)
       .maybeSingle(),
     supabase.auth.getClaims(),
+    supabase.rpc('can_change_case_status', { p_case_id: id }),
+    supabase.rpc('can_close_case', { p_case_id: id }),
   ])
 
   const viewerId = claimsData?.claims?.sub as string | undefined
@@ -54,6 +63,21 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         <p className="text-sm text-fg-muted">{t('caseNotFound')}</p>
       </div>
     )
+  }
+
+  // The status options are filtered in the query by what the database will
+  // accept, never in the component:
+  // - can't change the status at all: only the current status, for display
+  //   as plain text;
+  // - can change but not close: non-terminal statuses only, plus the
+  //   current one so the picker shows the case's real status (re-saving an
+  //   already-closed case never fires the close check);
+  // - can close: every status.
+  function statusOptionsQuery() {
+    const query = supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order')
+    if (canChangeStatus !== true) return query.eq('id', caseRow!.status_id)
+    if (canCloseCase !== true) return query.or(`is_terminal.eq.false,id.eq.${caseRow!.status_id}`)
+    return query
   }
 
   const [
@@ -84,7 +108,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: canViewClient },
     { data: clientCases },
   ] = await Promise.all([
-    supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order'),
+    statusOptionsQuery(),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
     supabase.from('staff_directory').select('id, full_name').eq('is_active', true).order('full_name'),
     supabase
@@ -359,7 +383,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         />
       </div>
 
-      <StatusSection caseId={caseRow.id} currentStatusId={caseRow.status_id} statuses={statuses ?? []} />
+      <StatusSection
+        caseId={caseRow.id}
+        currentStatusId={caseRow.status_id}
+        statuses={statuses ?? []}
+        canChange={canChangeStatus === true}
+      />
 
       <TeamSection
         caseId={caseRow.id}

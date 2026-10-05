@@ -14,10 +14,16 @@ export function StatusSection({
   caseId,
   currentStatusId,
   statuses,
+  canChange,
 }: {
   caseId: string
   currentStatusId: string
+  /** Already filtered by the page's query to what the database will accept
+   *  for this viewer - this component never filters it. */
   statuses: StatusOption[]
+  /** can_change_case_status() - false renders the status as plain text,
+   *  not a disabled control. */
+  canChange: boolean
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.cases.detail.status')
@@ -42,6 +48,18 @@ export function StatusSection({
     })
   }
 
+  if (!canChange) {
+    const current = statuses.find((s) => s.id === currentStatusId)
+    return (
+      <Panel className="flex flex-col gap-3" data-testid="case-status-section">
+        <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
+        <p className="text-sm text-fg" data-testid="case-status-value">
+          {current ? localizedName(current, locale) : '—'}
+        </p>
+      </Panel>
+    )
+  }
+
   return (
     <Panel className="flex flex-col gap-3" data-testid="case-status-section">
       <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
@@ -54,6 +72,7 @@ export function StatusSection({
             setSaved(false)
           }}
           className={controlClass}
+          data-testid="case-status-picker"
         >
           {statuses.map((s) => (
             <option key={s.id} value={s.id}>
