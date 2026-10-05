@@ -8,6 +8,7 @@ import { controlClass } from '@/components/dashboard/form'
 import { formatFullDate, formatTimeOfDay } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
+import { PrintButton } from './print-button'
 
 // The firm's own calendar day, not the server's - "today" on a UTC host
 // would still be yesterday in Amman until 03:00. Same zone the staff
@@ -110,7 +111,7 @@ export default async function HearingCalendarPage({ searchParams }: PageProps<'/
       </div>
 
       <div className="print:hidden">
-        <PageHeader title={t('title')} description={fullDate} />
+        <PageHeader title={t('title')} description={fullDate} action={<PrintButton label={t('print')} />} />
       </div>
 
       <div className="flex flex-col gap-3 print:hidden" data-testid="hearing-calendar-controls">
@@ -147,7 +148,6 @@ export default async function HearingCalendarPage({ searchParams }: PageProps<'/
             </Button>
           </form>
         </div>
-        <p className="text-xs text-fg-muted">{t('printHint')}</p>
       </div>
 
       {groups.length === 0 ? (

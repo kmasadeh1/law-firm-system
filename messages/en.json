@@ -771,7 +771,7 @@
       "today": "Today",
       "dateLabel": "Date",
       "show": "Show",
-      "printHint": "To print this day's list, use your browser's Print command (Ctrl+P, or ⌘P on a Mac). The sidebar and controls are left off the printout.",
+      "print": "Print",
       "count": "{count, plural, one {# hearing} other {# hearings}}",
       "emptyTitle": "No hearings on this day.",
       "emptyDescription": "This calendar lists the hearings recorded on the cases you can see.",
