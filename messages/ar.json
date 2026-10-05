@@ -48,7 +48,6 @@
     "home": "الرئيسية",
     "practiceAreas": "مجالات الممارسة",
     "lawyers": "محامونا",
-    "appointment": "حجز موعد",
     "contact": "اتصل بنا",
     "staffSignIn": "دخول الموظفين"
   },
@@ -57,19 +56,7 @@
     "ar": "العربية"
   },
   "hero": {
-    "cta": "احجز استشارة"
-  },
-  "appointment": {
-    "title": "حجز موعد",
-    "intro": "هذا النموذج عرض مؤقت فقط ولا يقوم بإرسال البيانات بعد - الحجز الإلكتروني قريباً.",
-    "nameLabel": "الاسم الكامل",
-    "emailLabel": "البريد الإلكتروني",
-    "phoneLabel": "رقم الهاتف",
-    "practiceAreaLabel": "مجال الممارسة",
-    "practiceAreaPlaceholder": "اختر مجال الممارسة",
-    "messageLabel": "كيف يمكننا مساعدتك؟",
-    "submit": "طلب موعد",
-    "comingSoon": "قريباً"
+    "cta": "تواصل معنا"
   },
   "contact": {
     "addressLabel": "العنوان",

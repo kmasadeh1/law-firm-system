@@ -149,9 +149,6 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
             <a href="#lawyers" className="transition-colors hover:text-paper">
               {t('nav.lawyers')}
             </a>
-            <a href="#appointment" className="transition-colors hover:text-paper">
-              {t('nav.appointment')}
-            </a>
             <a href="#contact" className="transition-colors hover:text-paper">
               {t('nav.contact')}
             </a>
@@ -184,8 +181,10 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
           <p className="mt-6 max-w-xl text-base leading-relaxed text-paper-dim">
             {heroBody}
           </p>
+          {/* Points at the working contact form - an enquiry the firm
+              receives and can assign. There is no online booking yet. */}
           <a
-            href="#appointment"
+            href="#contact"
             className="mt-8 inline-block rounded-sm bg-brass px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-brass-hover"
           >
             {t('hero.cta')}
@@ -237,65 +236,11 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
           </div>
         </section>
 
-        {/* 2.4 Book an appointment + 2.5 Contact and location */}
-        <section
-          id="appointment"
-          className="border-t border-warm-grey/25 bg-ink-raised/40"
-        >
+        {/* 2.4 Contact and location - details, WhatsApp and map beside the
+            contact form, which creates an enquiry the firm can assign. */}
+        <section id="contact" className="border-t border-warm-grey/25 bg-ink-raised/40" data-testid="contact-section">
           <div className="grid w-full gap-12 px-6 py-20 sm:px-10 lg:grid-cols-2 lg:px-16">
             <div>
-              <h2 className="font-heading text-3xl text-paper">{t('appointment.title')}</h2>
-              <p className="mt-3 text-sm text-paper-dim">{t('appointment.intro')}</p>
-
-              <form className="mt-8 flex flex-col gap-4">
-                <Field label={t('appointment.nameLabel')} id="appt-name" />
-                <Field label={t('appointment.emailLabel')} id="appt-email" type="email" />
-                <Field label={t('appointment.phoneLabel')} id="appt-phone" type="tel" />
-
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="appt-area" className="text-sm text-paper-dim">
-                    {t('appointment.practiceAreaLabel')}
-                  </label>
-                  <select
-                    id="appt-area"
-                    className="rounded-sm border border-warm-grey/40 bg-ink px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      {t('appointment.practiceAreaPlaceholder')}
-                    </option>
-                    {practiceAreas.map((area) => (
-                      <option key={area.name} value={area.name}>
-                        {area.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="appt-message" className="text-sm text-paper-dim">
-                    {t('appointment.messageLabel')}
-                  </label>
-                  <textarea
-                    id="appt-message"
-                    rows={3}
-                    className="rounded-sm border border-warm-grey/40 bg-ink px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  disabled
-                  title={t('appointment.comingSoon')}
-                  className="mt-2 cursor-not-allowed rounded-sm border border-warm-grey/40 px-5 py-2.5 text-start text-sm font-medium text-warm-grey"
-                >
-                  {t('appointment.submit')} ({t('appointment.comingSoon')})
-                </button>
-              </form>
-            </div>
-
-            {/* 2.5 Contact and location */}
-            <div id="contact">
               <h2 className="font-heading text-3xl text-paper">
                 {contactSection && localizedField(contactSection, 'title', locale)}
               </h2>
@@ -342,7 +287,9 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
                   />
                 </div>
               )}
+            </div>
 
+            <div>
               <ContactForm />
             </div>
           </div>
@@ -356,29 +303,6 @@ export default async function PublicHomePage({ params }: PageProps<'/[locale]'>)
           </p>
         </div>
       </footer>
-    </div>
-  )
-}
-
-function Field({
-  label,
-  id,
-  type = 'text',
-}: {
-  label: string
-  id: string
-  type?: string
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm text-paper-dim">
-        {label}
-      </label>
-      <input
-        id={id}
-        type={type}
-        className="rounded-sm border border-warm-grey/40 bg-ink px-3 py-2 text-sm text-paper outline-none transition-colors focus:border-brass"
-      />
     </div>
   )
 }

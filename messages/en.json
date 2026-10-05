@@ -48,7 +48,6 @@
     "home": "Home",
     "practiceAreas": "Practice Areas",
     "lawyers": "Our Lawyers",
-    "appointment": "Book an Appointment",
     "contact": "Contact",
     "staffSignIn": "Staff sign in"
   },
@@ -57,19 +56,7 @@
     "ar": "العربية"
   },
   "hero": {
-    "cta": "Book a consultation"
-  },
-  "appointment": {
-    "title": "Book an Appointment",
-    "intro": "This form is a visual placeholder and does not submit yet - online booking is coming soon.",
-    "nameLabel": "Full name",
-    "emailLabel": "Email",
-    "phoneLabel": "Phone",
-    "practiceAreaLabel": "Practice area",
-    "practiceAreaPlaceholder": "Select a practice area",
-    "messageLabel": "How can we help?",
-    "submit": "Request appointment",
-    "comingSoon": "Coming soon"
+    "cta": "Contact us"
   },
   "contact": {
     "addressLabel": "Address",
