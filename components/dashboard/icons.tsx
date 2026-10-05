@@ -269,3 +269,12 @@ export function ChecklistsIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function RemindersIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4 4.5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Z" />
+      <path d="M7 8h6M7 10.5h4" />
+    </svg>
+  )
+}

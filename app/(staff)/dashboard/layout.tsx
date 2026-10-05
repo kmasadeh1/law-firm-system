@@ -89,6 +89,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   // the read policy (owner, assignee, or creator) has no single permission
   // to gate the nav entry on, and RLS scopes what the list actually shows.
   dailyWork.push({ href: '/dashboard/tasks', label: t('tasks'), icon: 'tasks' })
+  // Unconditional too: reminder_candidates is security_invoker and limits
+  // each kind to what the reader may see; an empty list is normal.
+  dailyWork.push({ href: '/dashboard/reminders', label: t('reminders'), icon: 'reminders' })
 
   const money: NavItem[] = []
   if (isOwner || feesView) {

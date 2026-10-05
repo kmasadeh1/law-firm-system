@@ -2850,6 +2850,79 @@ export type Database = {
         }
         Relationships: []
       }
+      reminders_sent: {
+        Row: {
+          client_id: string | null
+          id: string
+          kind: Database["public"]["Enums"]["reminder_kind"]
+          sent_at: string
+          sent_by: string
+          sent_to_phone: string | null
+          subject_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["reminder_kind"]
+          sent_at?: string
+          sent_by: string
+          sent_to_phone?: string | null
+          subject_id: string
+        }
+        Update: {
+          client_id?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["reminder_kind"]
+          sent_at?: string
+          sent_by?: string
+          sent_to_phone?: string | null
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_sent_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_fund_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           enabled: boolean
@@ -3642,6 +3715,23 @@ export type Database = {
         }
         Relationships: []
       }
+      reminder_candidates: {
+        Row: {
+          amount: number | null
+          case_id: string | null
+          case_number: string | null
+          client_id: string | null
+          client_name: string | null
+          client_phone: string | null
+          detail_ar: string | null
+          detail_en: string | null
+          due_on: string | null
+          kind: Database["public"]["Enums"]["reminder_kind"] | null
+          last_reminded_at: string | null
+          subject_id: string | null
+        }
+        Relationships: []
+      }
       staff_directory: {
         Row: {
           full_name: string | null
@@ -3813,6 +3903,7 @@ export type Database = {
         | "task_assigned"
         | "enquiry_assigned"
         | "payment_recorded"
+      reminder_kind: "hearing" | "appointment" | "payment_due"
       task_priority: "low" | "normal" | "high"
       task_status: "open" | "in_progress" | "done" | "cancelled"
       user_type: "owner" | "staff"
@@ -3996,6 +4087,7 @@ export const Constants = {
         "enquiry_assigned",
         "payment_recorded",
       ],
+      reminder_kind: ["hearing", "appointment", "payment_due"],
       task_priority: ["low", "normal", "high"],
       task_status: ["open", "in_progress", "done", "cancelled"],
       user_type: ["owner", "staff"],

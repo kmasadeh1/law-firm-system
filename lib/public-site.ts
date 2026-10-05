@@ -1,3 +1,5 @@
+import { whatsappLink } from './whatsapp'
+
 // Server-side helpers for the public site's contact link and search-engine
 // metadata. Display shaping only: nothing here decides anything the
 // database owns - it formats firm_settings values for wa.me, Open Graph and
@@ -23,16 +25,11 @@ function present(value: string | null | undefined): string | null {
   return trimmed ? trimmed : null
 }
 
-// wa.me takes the full international number as digits only - no plus, no
-// spaces, no punctuation: "+962 79 146 2040" -> "962791462040". A leading
-// "00" is the international dialling prefix written out, the same as "+",
-// so it is dropped too. firm_settings.whatsapp_phone NULL means "use the
-// main number". Both empty means no link at all.
+// The public contact button: firm_settings.whatsapp_phone, or the main
+// number when that is NULL. Both empty means no link at all. The number
+// itself is normalised by lib/whatsapp.ts - the only normaliser.
 export function whatsappHref(whatsappPhone: string | null, phone: string | null): string | null {
-  const source = present(whatsappPhone) ?? present(phone)
-  if (!source) return null
-  const digits = source.replace(/\D/g, '').replace(/^00/, '')
-  return digits ? `https://wa.me/${digits}` : null
+  return whatsappLink(present(whatsappPhone) ?? present(phone))
 }
 
 // Domains reserved for documentation (RFC 2606 / RFC 6761). An address at

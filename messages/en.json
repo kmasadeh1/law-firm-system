@@ -131,6 +131,41 @@
       "editDetailsInstead": "Edit details instead",
       "saving": "Saving…"
     },
+    "reminders": {
+      "title": "Reminders",
+      "description": "Prepared WhatsApp messages for upcoming hearings and appointments and overdue payments. Nothing is sent from here: open each one, read it, send it yourself, then mark it as sent.",
+      "emptyTitle": "No reminders due",
+      "emptyDescription": "Hearings and appointments in the next 7 days, and instalments past their due date, will appear here.",
+      "group": {
+        "hearing": "Hearings",
+        "appointment": "Appointments",
+        "payment_due": "Payments due"
+      },
+      "about": {
+        "hearing": "Hearing on case <bdi>{caseNumber}</bdi> at <bdi>{court}</bdi>",
+        "appointment": "Appointment",
+        "appointmentOnCase": "Appointment on case <bdi>{caseNumber}</bdi>",
+        "payment_due": "Instalment: <bdi>{description}</bdi>"
+      },
+      "lastReminded": "Last reminded <bdi>{date}</bdi>",
+      "neverReminded": "Not reminded yet",
+      "recentlyReminded": "Reminded in the last 24 hours",
+      "openWhatsApp": "Open in WhatsApp",
+      "markSent": "Mark as sent",
+      "recording": "Recording…",
+      "markSentHelp": "Only after you've actually sent it.",
+      "noPhone": "No phone number on file for this client - add one to their record to send a reminder.",
+      "errors": {
+        "noPermission": "You don't have permission to record a reminder for this client.",
+        "recordFailed": "Could not record the reminder. Please try again."
+      },
+      "message": {
+        "hearing": "Hello {client}, this is a reminder from {firm}: your case {caseNumber} has a hearing at {court} on {date}. Please contact us if you have any questions.",
+        "appointment": "Hello {client}, this is a reminder from {firm} of your appointment with us on {date} at {time}. Please let us know if you need to change it.",
+        "appointmentNoTime": "Hello {client}, this is a reminder from {firm} of your appointment with us on {date}. Please let us know if you need to change it.",
+        "payment_due": "Hello {client}, this is a reminder from {firm} that {amount} is outstanding for {description}, which was due on {date}. Please contact us to arrange payment."
+      }
+    },
     "notifications": {
       "open": "Notifications",
       "openWithCount": "{count, plural, one {Notifications, # new} other {Notifications, # new}}",
@@ -205,6 +240,7 @@
       "hearings": "Hearing calendar",
       "deadlines": "Deadlines",
       "tasks": "Tasks",
+      "reminders": "Reminders",
       "leaveRequests": "Leave requests",
       "feesAndPayments": "Fees & payments",
       "staffAccounts": "Staff accounts",

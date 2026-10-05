@@ -125,6 +125,41 @@
         "cancel": "إلغاء"
       }
     },
+    "reminders": {
+      "title": "التذكيرات",
+      "description": "رسائل واتساب جاهزة للجلسات والمواعيد القادمة وللدفعات المتأخرة. لا يُرسَل شيء من هنا: افتح كل رسالة واقرأها وأرسلها بنفسك، ثم علّمها كمُرسلة.",
+      "emptyTitle": "لا تذكيرات مستحقة",
+      "emptyDescription": "ستظهر هنا الجلسات والمواعيد خلال الأيام السبعة القادمة، والأقساط التي تجاوزت موعد استحقاقها.",
+      "group": {
+        "hearing": "الجلسات",
+        "appointment": "المواعيد",
+        "payment_due": "دفعات مستحقة"
+      },
+      "about": {
+        "hearing": "جلسة في القضية <bdi>{caseNumber}</bdi> في <bdi>{court}</bdi>",
+        "appointment": "موعد",
+        "appointmentOnCase": "موعد في القضية <bdi>{caseNumber}</bdi>",
+        "payment_due": "قسط: <bdi>{description}</bdi>"
+      },
+      "lastReminded": "آخر تذكير <bdi>{date}</bdi>",
+      "neverReminded": "لم يُذكَّر بعد",
+      "recentlyReminded": "ذُكِّر خلال آخر 24 ساعة",
+      "openWhatsApp": "فتح في واتساب",
+      "markSent": "تعليم كمُرسَل",
+      "recording": "جارٍ التسجيل…",
+      "markSentHelp": "فقط بعد أن ترسلها فعلاً.",
+      "noPhone": "لا يوجد رقم هاتف لهذا العميل - أضِف رقماً إلى سجله لإرسال تذكير.",
+      "errors": {
+        "noPermission": "ليس لديك صلاحية تسجيل تذكير لهذا العميل.",
+        "recordFailed": "تعذّر تسجيل التذكير. يرجى المحاولة مرة أخرى."
+      },
+      "message": {
+        "hearing": "مرحباً {client}، نذكّركم من {firm} بأن لقضيتكم رقم {caseNumber} جلسة في {court} بتاريخ {date}. يرجى التواصل معنا لأي استفسار.",
+        "appointment": "مرحباً {client}، نذكّركم من {firm} بموعدكم معنا بتاريخ {date} الساعة {time}. يرجى إعلامنا إن احتجتم إلى تغييره.",
+        "appointmentNoTime": "مرحباً {client}، نذكّركم من {firm} بموعدكم معنا بتاريخ {date}. يرجى إعلامنا إن احتجتم إلى تغييره.",
+        "payment_due": "مرحباً {client}، نذكّركم من {firm} بأن مبلغ {amount} مستحق عن {description}، وكان موعد استحقاقه {date}. يرجى التواصل معنا لترتيب الدفع."
+      }
+    },
     "notifications": {
       "open": "الإشعارات",
       "openWithCount": "{count, plural, zero {الإشعارات} one {الإشعارات، إشعار جديد واحد} two {الإشعارات، إشعاران جديدان} few {الإشعارات، # إشعارات جديدة} many {الإشعارات، # إشعارًا جديدًا} other {الإشعارات، # إشعار جديد}}",
@@ -199,6 +234,7 @@
       "hearings": "جدول الجلسات",
       "deadlines": "المهل",
       "tasks": "المهام",
+      "reminders": "التذكيرات",
       "leaveRequests": "طلبات الإجازة",
       "feesAndPayments": "الأتعاب والمدفوعات",
       "staffAccounts": "حسابات الموظفين",
