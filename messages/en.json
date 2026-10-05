@@ -744,7 +744,7 @@
         "referralSourceLabel": "Referral source",
         "referralSourceNone": "Not recorded",
         "referralSourceInactive": "{name} (deactivated)",
-        "referralSourcesEmpty": "No referral sources have been set up yet. The owner can add them under Administration → Referral sources.",
+        "referralSourcesEmpty": "No referral sources have been set up yet. They can be added under Administration → Referral sources.",
         "referralNotesLabel": "Referral notes",
         "referralNotesPlaceholder": "Who or what specifically, e.g. the person who referred them",
         "errors": {
@@ -1107,6 +1107,7 @@
       },
       "noAccess": {
         "title": "Owner access only",
+        "permissionTitle": "No access",
         "description": "You don't have permission to view this page."
       },
       "staff": {
@@ -1181,7 +1182,6 @@
           "deleting": "Deleting…",
           "deleteRole": "Delete role",
           "deleteNote": "A role held by any staff member can't be deleted until they're moved to another role first. Its permission settings will also be removed.",
-          "administrationHeading": "Administration",
           "ownerOnlyBadge": "(Owner only)",
           "ownerOnlyDescription": "Owner only — can't be granted to any role.",
           "ownerOnlySwitchLabel": "{label} (owner only, locked)",
@@ -1193,6 +1193,7 @@
           "billing": "Billing",
           "frontOffice": "Front Office",
           "reporting": "Reporting",
+          "administration": "Administration",
           "other": "Other"
         },
         "errors": {
@@ -1395,6 +1396,18 @@
         },
         "reports_view": {
           "label": "View reports"
+        },
+        "client_funds_access": {
+          "label": "Client funds",
+          "description": "View and record money the firm holds on behalf of a client."
+        },
+        "tasks_assign": {
+          "label": "Assign tasks",
+          "description": "Create tasks and assign them to other staff. Everyone can see and update tasks assigned to them without this."
+        },
+        "reference_data_manage": {
+          "label": "Manage reference lists",
+          "description": "Add and edit the firm's courts, case types and referral sources."
         },
         "roles_permissions_manage": {
           "label": "Create roles and set permissions"

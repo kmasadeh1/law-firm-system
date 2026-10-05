@@ -3,11 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 
-const PATH = '/dashboard/owner/case-types'
+const PATH = '/dashboard/reference/case-types'
 
 // Closed set the server can return - the render site validates against a
 // whitelist before calling t(), same convention as CourtErrorCode in
-// owner/courts/actions.ts. 'noName' maps the case_types_has_a_name CHECK
+// reference/courts/actions.ts. 'noName' maps the case_types_has_a_name CHECK
 // (23514) by constraint name, never by passing Postgres's own message text
 // through to the UI.
 export type CaseTypeErrorCode = 'noName' | 'noPermission' | 'createFailed' | 'saveFailed'
@@ -41,7 +41,7 @@ function readFields(formData: FormData): Fields {
 const ROW = 'id, name_en, name_ar, is_active'
 
 // Only the CHECK is mapped here. 42501 is handled at the insert call alone:
-// the owner-only INSERT policy refusing raises it, but an UPDATE refused by
+// the INSERT policy (can_manage_reference_data) refusing raises it, but an UPDATE refused by
 // RLS raises nothing (zero rows, checked at each update call), so a 42501
 // branch on the update paths could never run.
 function mapWriteError(code: string, message: string, fallback: CaseTypeErrorCode): CaseTypeErrorCode {

@@ -3195,6 +3195,7 @@ export type Database = {
         Args: { p_client_id: string }
         Returns: boolean
       }
+      can_manage_reference_data: { Args: never; Returns: boolean }
       can_view_client: { Args: { p_client_id: string }; Returns: boolean }
       can_withdraw: {
         Args: { lr: Database["public"]["Tables"]["leave_requests"]["Row"] }

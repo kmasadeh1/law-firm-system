@@ -27,6 +27,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     { data: enquiriesManage },
     { count: assignedEnquiryCount },
     { data: reportsView },
+    { data: manageReferenceData },
     initialTheme,
   ] = await Promise.all([
     supabase
@@ -41,6 +42,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     // enquiries layout guard will actually let them through to.
     supabase.from('enquiries').select('id', { count: 'exact', head: true }).eq('assigned_to', user.sub as string),
     supabase.rpc('has_permission', { p_key: 'reports_view' }),
+    supabase.rpc('can_manage_reference_data'),
     getThemeCookie(),
   ])
 
@@ -96,13 +98,19 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       label: t('deadlinePeriodTypes'),
       icon: 'period-types',
     })
-    administration.push({ href: '/dashboard/owner/courts', label: t('courts'), icon: 'courts' })
-    administration.push({ href: '/dashboard/owner/case-types', label: t('caseTypes'), icon: 'case-types' })
+  }
+  // The same function the reference lists' write policies and their route
+  // guard call - owner, or a role holding reference_data_manage.
+  if (manageReferenceData === true) {
+    administration.push({ href: '/dashboard/reference/courts', label: t('courts'), icon: 'courts' })
+    administration.push({ href: '/dashboard/reference/case-types', label: t('caseTypes'), icon: 'case-types' })
     administration.push({
-      href: '/dashboard/owner/referral-sources',
+      href: '/dashboard/reference/referral-sources',
       label: t('referralSources'),
       icon: 'referral-sources',
     })
+  }
+  if (isOwner) {
     administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
     administration.push({
       href: '/dashboard/owner/site-content',

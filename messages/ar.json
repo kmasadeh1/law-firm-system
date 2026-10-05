@@ -720,7 +720,7 @@
         "referralSourceLabel": "مصدر الإحالة",
         "referralSourceNone": "غير محدد",
         "referralSourceInactive": "{name} (معطّل)",
-        "referralSourcesEmpty": "لم تُضف أي مصادر إحالة بعد. يمكن للمالك إضافتها من الإدارة ← مصادر الإحالة.",
+        "referralSourcesEmpty": "لم تُضف أي مصادر إحالة بعد. يمكن إضافتها من الإدارة ← مصادر الإحالة.",
         "referralNotesLabel": "ملاحظات الإحالة",
         "referralNotesPlaceholder": "من أو ما تحديدًا، مثل الشخص الذي أحالهم",
         "errors": {
@@ -1057,6 +1057,7 @@
       },
       "noAccess": {
         "title": "للمالك فقط",
+        "permissionTitle": "لا صلاحية للوصول",
         "description": "ليس لديك صلاحية عرض هذه الصفحة."
       },
       "staff": {
@@ -1131,7 +1132,6 @@
           "deleting": "جارٍ الحذف…",
           "deleteRole": "حذف الدور",
           "deleteNote": "لا يمكن حذف دور يشغله أي موظف حتى يُنقل إلى دور آخر أولاً. ستُحذف أيضاً إعدادات صلاحياته.",
-          "administrationHeading": "الإدارة",
           "ownerOnlyBadge": "(للمالك فقط)",
           "ownerOnlyDescription": "للمالك فقط — لا يمكن منحها لأي دور.",
           "ownerOnlySwitchLabel": "{label} (للمالك فقط، مقفلة)",
@@ -1143,6 +1143,7 @@
           "billing": "الفوترة",
           "frontOffice": "الاستقبال",
           "reporting": "التقارير",
+          "administration": "الإدارة",
           "other": "أخرى"
         },
         "errors": {
@@ -1345,6 +1346,18 @@
         },
         "reports_view": {
           "label": "عرض التقارير"
+        },
+        "client_funds_access": {
+          "label": "أمانات العملاء",
+          "description": "عرض وتسجيل الأموال التي يحتفظ بها المكتب نيابةً عن العميل."
+        },
+        "tasks_assign": {
+          "label": "التكليف بالمهام",
+          "description": "إنشاء المهام وتكليف موظفين آخرين بها. يستطيع الجميع رؤية المهام المكلَّفين بها وتحديثها دون هذه الصلاحية."
+        },
+        "reference_data_manage": {
+          "label": "إدارة القوائم المرجعية",
+          "description": "إضافة وتعديل المحاكم وأنواع القضايا ومصادر الإحالة الخاصة بالمكتب."
         },
         "roles_permissions_manage": {
           "label": "إنشاء الأدوار وتحديد الصلاحيات"

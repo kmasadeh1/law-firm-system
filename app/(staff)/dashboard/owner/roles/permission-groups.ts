@@ -7,6 +7,10 @@
 // titleKey looks up dashboard.admin.roles.permissionGroups.<titleKey> -
 // group titles are UI chrome, not database content, so they're translated
 // like any other fixed set rather than read from a column.
+//
+// 'administration' is also where the roles screen lists the owner_only keys
+// (as locked rows), so grantable and owner-only administration sit under one
+// heading.
 export const PERMISSION_GROUPS: { titleKey: string; keys: string[] }[] = [
   {
     titleKey: 'clientsCases',
@@ -18,6 +22,9 @@ export const PERMISSION_GROUPS: { titleKey: string; keys: string[] }[] = [
       'case_notes_view_all',
       'documents_access',
       'documents_view_all',
+      // Next to cases_manage on purpose: can_assign_tasks() is also true
+      // for cases_manage, so a role with that already assigns tasks.
+      'tasks_assign',
     ],
   },
   {
@@ -26,7 +33,7 @@ export const PERMISSION_GROUPS: { titleKey: string; keys: string[] }[] = [
   },
   {
     titleKey: 'billing',
-    keys: ['fees_view', 'payments_record', 'expenses_manage'],
+    keys: ['fees_view', 'payments_record', 'expenses_manage', 'client_funds_access'],
   },
   {
     titleKey: 'frontOffice',
@@ -35,5 +42,9 @@ export const PERMISSION_GROUPS: { titleKey: string; keys: string[] }[] = [
   {
     titleKey: 'reporting',
     keys: ['reports_view'],
+  },
+  {
+    titleKey: 'administration',
+    keys: ['reference_data_manage'],
   },
 ]
