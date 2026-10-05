@@ -946,6 +946,9 @@ export async function addExpense(caseId: string, formData: FormData): Promise<Ac
     if (isAmountNotPositive(error)) {
       return { error: t('amountNotPositive') }
     }
+    if (error.code === '23514' && error.message.includes('expenses_description_not_blank')) {
+      return { error: t('descriptionRequired') }
+    }
     if (error.code === '42501') {
       return { error: t('noPermissionRecord') }
     }
@@ -986,6 +989,9 @@ export async function editExpense(
   if (error) {
     if (isAmountNotPositive(error)) {
       return { error: t('amountNotPositive') }
+    }
+    if (error.code === '23514' && error.message.includes('expenses_description_not_blank')) {
+      return { error: t('descriptionRequired') }
     }
     return { error: t('saveFailed') }
   }

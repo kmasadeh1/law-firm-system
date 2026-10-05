@@ -203,37 +203,17 @@ export async function unlinkCase(engagementId: string, caseId: string): Promise<
 // agreement was realistically uploaded to one. RLS on `documents`
 // (documents_access/documents_view_all plus case membership) already limits
 // what the caller sees, same as everywhere else documents are listed.
+//
+// Whether the document is on a linked case is the database's call (the
+// engagements_agreement_document_in_scope trigger, mapped below) - not
+// re-checked here. The page's picker only offers non-deleted documents on
+// linked cases, which is the fail-fast version.
 
 export async function setSignedAgreement(
   engagementId: string,
   documentId: string | null
 ): Promise<ActionResult> {
   const supabase = await createClient()
-
-  if (documentId) {
-    // Guard against attaching a document from outside the engagement's
-    // linked cases, the same way linkCase guards the client match - a
-    // client-side picker built from the right list is a UX nicety, not a
-    // security boundary, so this is re-checked server-side.
-    const { data: doc } = await supabase
-      .from('documents')
-      .select('case_id')
-      .eq('id', documentId)
-      .is('deleted_at', null)
-      .maybeSingle()
-    if (!doc || !doc.case_id) {
-      return { error: 'document_not_found' }
-    }
-    const { data: linkedCase } = await supabase
-      .from('engagement_cases')
-      .select('case_id')
-      .eq('engagement_id', engagementId)
-      .eq('case_id', doc.case_id)
-      .maybeSingle()
-    if (!linkedCase) {
-      return { error: 'document_not_linked' }
-    }
-  }
 
   const { data, error } = await supabase
     .from('engagements')
@@ -242,6 +222,9 @@ export async function setSignedAgreement(
     .select('id')
 
   if (error) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('engagement_agreement_document_in_scope')) {
+      return { error: 'document_not_linked' }
+    }
     return { error: 'save_failed' }
   }
   if (!data || data.length === 0) {
@@ -329,6 +312,9 @@ export async function createInstallment(
     if (error.code === CHECK_VIOLATION && error.message.includes('engagement_installments_amount_positive')) {
       return { error: 'installment_amount_not_positive' }
     }
+    if (error.code === CHECK_VIOLATION && error.message.includes('engagement_installments_description_not_blank')) {
+      return { error: 'description_required' }
+    }
     return { error: 'add_installment_failed' }
   }
 
@@ -353,6 +339,9 @@ export async function updateInstallment(
 
   if (error?.code === CHECK_VIOLATION && error.message.includes('engagement_installments_amount_positive')) {
     return { error: 'installment_amount_not_positive' }
+  }
+  if (error?.code === CHECK_VIOLATION && error.message.includes('engagement_installments_description_not_blank')) {
+    return { error: 'description_required' }
   }
   // Zero rows: refused by RLS or the instalment was deleted.
   if (error || !data || data.length === 0) {
