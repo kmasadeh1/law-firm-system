@@ -69,7 +69,7 @@ function ReminderItem({ row }: { row: ReminderRow }) {
   return (
     <li
       // Reminded in the last 24 hours: dampened and placed below the rest
-      // (by the page's queries), never hidden.
+      // (by the page's query), never hidden.
       className={`flex flex-col gap-2 px-3 py-3 text-sm ${row.recent ? 'bg-line/20 opacity-70' : ''}`}
       data-testid="reminder-row"
       data-recent={row.recent}

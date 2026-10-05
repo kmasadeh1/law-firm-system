@@ -2865,7 +2865,7 @@ export type Database = {
           id?: string
           kind: Database["public"]["Enums"]["reminder_kind"]
           sent_at?: string
-          sent_by: string
+          sent_by?: string
           sent_to_phone?: string | null
           subject_id: string
         }
@@ -3726,8 +3726,10 @@ export type Database = {
           detail_ar: string | null
           detail_en: string | null
           due_on: string | null
+          due_time: string | null
           kind: Database["public"]["Enums"]["reminder_kind"] | null
           last_reminded_at: string | null
+          reminded_recently: boolean | null
           subject_id: string | null
         }
         Relationships: []
@@ -3817,6 +3819,13 @@ export type Database = {
       is_active_staff: { Args: never; Returns: boolean }
       is_on_case: { Args: { p_case_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
+      last_reminded_at: {
+        Args: {
+          p_kind: Database["public"]["Enums"]["reminder_kind"]
+          p_subject_id: string
+        }
+        Returns: string
+      }
       mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       name_matches: {
         Args: { p_search: string; p_target: string }

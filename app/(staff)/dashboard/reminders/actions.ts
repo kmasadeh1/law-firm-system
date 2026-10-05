@@ -24,14 +24,9 @@ export async function markReminderSent(
   if (!(Constants.public.Enums.reminder_kind as readonly string[]).includes(kind)) return { error: 'recordFailed' }
 
   const supabase = await createClient()
-  // sent_by is NOT NULL with no column default, so the generated Insert type
-  // requires it - but the BEFORE INSERT trigger sets it from the signed-in
-  // user, overwriting anything sent. It is deliberately left out; the cast
-  // records that the trigger, not this code, supplies it.
-  const row = { kind, subject_id: subjectId, client_id: clientId, sent_to_phone: sentToPhone }
   const { error } = await supabase
     .from('reminders_sent')
-    .insert(row as Database['public']['Tables']['reminders_sent']['Insert'])
+    .insert({ kind, subject_id: subjectId, client_id: clientId, sent_to_phone: sentToPhone })
 
   if (error) {
     // The INSERT policy is can_view_client(client_id).
