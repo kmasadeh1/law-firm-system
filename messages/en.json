@@ -164,6 +164,7 @@
       "deadlinePeriodTypes": "Deadline period types",
       "courts": "Courts",
       "caseTypes": "Case types",
+      "referralSources": "Referral sources",
       "activityLog": "Activity log",
       "siteContent": "Site content",
       "settings": "Settings",
@@ -734,6 +735,12 @@
         "matchExistingClient": "<bdi>{name}</bdi> — existing client",
         "noAccess": "You don't have permission to create clients.",
         "noAccessConflictChecks": "You don't have permission to view conflict-check history.",
+        "referralSourceLabel": "Referral source",
+        "referralSourceNone": "Not recorded",
+        "referralSourceInactive": "{name} (deactivated)",
+        "referralSourcesEmpty": "No referral sources have been set up yet. The owner can add them under Administration → Referral sources.",
+        "referralNotesLabel": "Referral notes",
+        "referralNotesPlaceholder": "Who or what specifically, e.g. the person who referred them",
         "errors": {
           "fullNameRequired": "Full name is required.",
           "conflictCheckFailed": "Could not run the conflict check. Please try again.",
@@ -1240,6 +1247,38 @@
           "noName": "Enter a name in English or Arabic.",
           "noPermission": "You don't have permission to manage courts.",
           "createFailed": "Could not create the court. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
+        }
+      },
+      "referralSources": {
+        "title": "Referral sources",
+        "description": "Where clients come from. Each client can be tagged with one when they're created or edited.",
+        "noneYet": "No referral sources yet",
+        "noneYetDescription": "Add the ways clients reach the firm - for example a referral from an existing client, or from a professional. Staff pick from this list on the client form.",
+        "createForm": {
+          "heading": "New referral source",
+          "nameLabel": "Name",
+          "nameArLabel": "Name (Arabic)",
+          "creating": "Creating…",
+          "create": "Create referral source"
+        },
+        "card": {
+          "nameEnAriaLabel": "Name",
+          "nameArAriaLabel": "Name (Arabic)",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved",
+          "activeAriaLabel": "Active",
+          "inactiveAriaLabel": "Inactive",
+          "activeText": "Active",
+          "deactivatedText": "Deactivated",
+          "deactivate": "Deactivate",
+          "deactivateNote": "It will no longer be offered on the client form. Clients already tagged with it keep it."
+        },
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noPermission": "You don't have permission to manage referral sources.",
+          "createFailed": "Could not create the referral source. Please try again.",
           "saveFailed": "Could not save the changes. Please try again."
         }
       },

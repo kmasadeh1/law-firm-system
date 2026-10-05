@@ -158,6 +158,7 @@
       "deadlinePeriodTypes": "أنواع المهل",
       "courts": "المحاكم",
       "caseTypes": "أنواع القضايا",
+      "referralSources": "مصادر الإحالة",
       "activityLog": "سجل النشاط",
       "siteContent": "محتوى الموقع",
       "settings": "الإعدادات",
@@ -710,6 +711,12 @@
         "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
         "noAccess": "ليس لديك صلاحية إنشاء العملاء.",
         "noAccessConflictChecks": "ليس لديك صلاحية عرض سجلّ فحوصات التعارض.",
+        "referralSourceLabel": "مصدر الإحالة",
+        "referralSourceNone": "غير محدد",
+        "referralSourceInactive": "{name} (معطّل)",
+        "referralSourcesEmpty": "لم تُضف أي مصادر إحالة بعد. يمكن للمالك إضافتها من الإدارة ← مصادر الإحالة.",
+        "referralNotesLabel": "ملاحظات الإحالة",
+        "referralNotesPlaceholder": "من أو ما تحديدًا، مثل الشخص الذي أحالهم",
         "errors": {
           "fullNameRequired": "الاسم الكامل مطلوب.",
           "createFailed": "تعذّر إنشاء العميل. يرجى المحاولة مرة أخرى.",
@@ -1189,6 +1196,38 @@
           "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
           "noPermission": "ليس لديك صلاحية إدارة المحاكم.",
           "createFailed": "تعذّر إنشاء المحكمة. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
+        }
+      },
+      "referralSources": {
+        "title": "مصادر الإحالة",
+        "description": "من أين يأتي العملاء. يمكن ربط كل عميل بمصدر عند إنشائه أو تعديله.",
+        "noneYet": "لا توجد مصادر إحالة بعد",
+        "noneYetDescription": "أضف الطرق التي يصل بها العملاء إلى المكتب - مثل إحالة من عميل حالي أو من مهني. يختار الموظفون من هذه القائمة في نموذج العميل.",
+        "createForm": {
+          "heading": "مصدر إحالة جديد",
+          "nameLabel": "الاسم",
+          "nameArLabel": "الاسم (بالعربية)",
+          "creating": "جارٍ الإنشاء…",
+          "create": "إنشاء مصدر الإحالة"
+        },
+        "card": {
+          "nameEnAriaLabel": "الاسم",
+          "nameArAriaLabel": "الاسم (بالعربية)",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ",
+          "activeAriaLabel": "نشط",
+          "inactiveAriaLabel": "غير نشط",
+          "activeText": "نشط",
+          "deactivatedText": "معطّل",
+          "deactivate": "تعطيل",
+          "deactivateNote": "لن يظهر بعد الآن في نموذج العميل. يحتفظ به العملاء المرتبطون به مسبقًا."
+        },
+        "errors": {
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة مصادر الإحالة.",
+          "createFailed": "تعذّر إنشاء مصدر الإحالة. يرجى المحاولة مرة أخرى.",
           "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
         }
       },

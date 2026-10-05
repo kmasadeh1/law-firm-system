@@ -18,6 +18,8 @@ type ClientFields = {
   phone: string | null
   email: string | null
   notes: string | null
+  referral_source_id: string | null
+  referral_notes: string | null
 }
 
 async function readFields(formData: FormData): Promise<ClientFields | { error: string }> {
@@ -40,6 +42,10 @@ async function readFields(formData: FormData): Promise<ClientFields | { error: s
     phone: optional('phone'),
     email: optional('email'),
     notes: optional('notes'),
+    // Blank = "not recorded". Whether the id names a real source is the
+    // foreign key's call, not this function's.
+    referral_source_id: optional('referral_source_id'),
+    referral_notes: optional('referral_notes'),
   }
 }
 

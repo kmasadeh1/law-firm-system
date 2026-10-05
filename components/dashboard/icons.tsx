@@ -230,6 +230,17 @@ export function TasksIcon({ className }: IconProps) {
   )
 }
 
+export function ReferralSourcesIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <circle cx="5" cy="10" r="2" />
+      <circle cx="15" cy="5" r="2" />
+      <circle cx="15" cy="15" r="2" />
+      <path d="M6.8 9.1 13.2 5.9M6.8 10.9l6.4 3.2" />
+    </svg>
+  )
+}
+
 export function CaseTypesIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

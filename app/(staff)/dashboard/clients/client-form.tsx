@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClientRecord, updateClientRecord, type ConflictMatch } from './actions'
-import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
+import { Field, Label, FieldError, FieldSuccess, HelpText, controlClass } from '@/components/dashboard/form'
+import type { ReferralSourceOption } from './referral-source-options'
 import { Button } from '@/components/dashboard/button'
 import { ConflictWarning } from '@/components/dashboard/conflict-warning'
 
@@ -15,11 +16,16 @@ type ClientRow = {
   phone: string | null
   email: string | null
   notes: string | null
+  referral_source_id: string | null
+  referral_notes: string | null
 }
 
+// referralSources: active sources, plus (edit only) the client's current
+// one if it has since been deactivated - built server-side by
+// referralSourceOptions(). Labels are the database's names, localized.
 type Props =
-  | { mode: 'create' }
-  | { mode: 'edit'; client: ClientRow; canManage: boolean }
+  | { mode: 'create'; referralSources: ReferralSourceOption[] }
+  | { mode: 'edit'; client: ClientRow; canManage: boolean; referralSources: ReferralSourceOption[] }
 
 // Only two outcomes here (unlike the case-detail opposing-parties flow's
 // three) - this form has no "current case" to compare a matched opposing
@@ -51,7 +57,12 @@ export function ClientForm(props: Props) {
   const initial =
     props.mode === 'edit'
       ? props.client
-      : { full_name: '', national_id: '', phone: '', email: '', notes: '' }
+      : { full_name: '', national_id: '', phone: '', email: '', notes: '', referral_source_id: '', referral_notes: '' }
+
+  function sourceLabel(option: ReferralSourceOption) {
+    return option.inactive ? t('referralSourceInactive', { name: option.label }) : option.label
+  }
+  const currentSource = props.referralSources.find((o) => o.id === initial.referral_source_id) ?? null
 
   // Read is broader than write for a client - a Lawyer can reach this page
   // for a client on their own case without clients_manage. No control at
@@ -85,6 +96,16 @@ export function ClientForm(props: Props) {
         <div>
           <dt className="text-sm font-medium text-fg">{t('notesLabel')}</dt>
           <dd className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.notes || '—'}</dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('referralSourceLabel')}</dt>
+          <dd className="mt-1 text-sm text-fg" data-testid="client-referral-source">
+            {currentSource ? sourceLabel(currentSource) : '—'}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-fg">{t('referralNotesLabel')}</dt>
+          <dd className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.referral_notes || '—'}</dd>
         </div>
       </dl>
     )
@@ -165,6 +186,34 @@ export function ClientForm(props: Props) {
       <Field>
         <Label htmlFor="notes">{t('notesLabel')}</Label>
         <textarea id="notes" name="notes" rows={3} defaultValue={initial.notes ?? ''} className={controlClass} />
+      </Field>
+      <Field>
+        <Label htmlFor="referral_source_id">{t('referralSourceLabel')}</Label>
+        <select
+          id="referral_source_id"
+          name="referral_source_id"
+          defaultValue={initial.referral_source_id ?? ''}
+          className={controlClass}
+          data-testid="client-referral-source-picker"
+        >
+          <option value="">{t('referralSourceNone')}</option>
+          {props.referralSources.map((o) => (
+            <option key={o.id} value={o.id}>
+              {sourceLabel(o)}
+            </option>
+          ))}
+        </select>
+        {props.referralSources.length === 0 && <HelpText>{t('referralSourcesEmpty')}</HelpText>}
+      </Field>
+      <Field>
+        <Label htmlFor="referral_notes">{t('referralNotesLabel')}</Label>
+        <input
+          id="referral_notes"
+          name="referral_notes"
+          defaultValue={initial.referral_notes ?? ''}
+          placeholder={t('referralNotesPlaceholder')}
+          className={controlClass}
+        />
       </Field>
 
       {matches && matches.length > 0 && (

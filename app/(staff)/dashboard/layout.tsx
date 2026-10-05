@@ -98,6 +98,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     })
     administration.push({ href: '/dashboard/owner/courts', label: t('courts'), icon: 'courts' })
     administration.push({ href: '/dashboard/owner/case-types', label: t('caseTypes'), icon: 'case-types' })
+    administration.push({
+      href: '/dashboard/owner/referral-sources',
+      label: t('referralSources'),
+      icon: 'referral-sources',
+    })
     administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
     administration.push({
       href: '/dashboard/owner/site-content',

@@ -8,6 +8,7 @@ import { BalanceSection } from './balance-section'
 import { PowerOfAttorneySection, type Poa } from './power-of-attorney-section'
 import { ClientFundsSection, type FundBalance, type FundEntry } from './client-funds-section'
 import { ContactLogSection } from '../contact-log-section'
+import { ACTIVE_REFERRAL_SOURCES_SELECT, referralSourceOptions } from '../referral-source-options'
 import { CONTACT_LOG_SELECT, toContactRow, type ContactQueryRow } from '../contact-log-query'
 
 export default async function EditClientPage({ params }: PageProps<'/dashboard/clients/[id]'>) {
@@ -30,8 +31,17 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
     { data: canAccessFunds },
     { data: contactRows },
     { data: claimsData },
+    { data: activeSources },
   ] = await Promise.all([
-    supabase.from('clients').select('id, full_name, national_id, phone, email, notes').eq('id', id).maybeSingle(),
+    // The client's own source is embedded whatever its is_active, so a
+    // client pointing at a since-deactivated source still shows it.
+    supabase
+      .from('clients')
+      .select(
+        'id, full_name, national_id, phone, email, notes, referral_source_id, referral_notes, referral_sources(id, name_en, name_ar, is_active)'
+      )
+      .eq('id', id)
+      .maybeSingle(),
     supabase
       .from('client_balances')
       .select('agreed_fixed_fee_total, percentage_engagement_count, scheduled_total, paid_total, scheduled_outstanding')
@@ -73,6 +83,13 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
       .order('created_at', { ascending: false })
       .returns<ContactQueryRow[]>(),
     supabase.auth.getClaims(),
+    supabase
+      .from('referral_sources')
+      .select(ACTIVE_REFERRAL_SOURCES_SELECT)
+      .eq('is_active', true)
+      .order('sort_order', { nullsFirst: false })
+      .order('name_en', { nullsFirst: false })
+      .order('name_ar'),
   ])
 
   // Not fetched at all unless the gate passes - someone without access
@@ -164,7 +181,12 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
 
       {client ? (
         <>
-          <ClientForm mode="edit" client={client} canManage={canManage === true} />
+          <ClientForm
+            mode="edit"
+            client={client}
+            canManage={canManage === true}
+            referralSources={referralSourceOptions(activeSources ?? [], client.referral_sources, locale)}
+          />
           <BalanceSection balance={balance} />
           {canAccessFunds === true && (
             <ClientFundsSection clientId={client.id} balance={fundBalance} entries={fundEntries} cases={cases ?? []} />

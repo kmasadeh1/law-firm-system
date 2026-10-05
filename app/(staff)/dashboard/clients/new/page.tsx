@@ -5,6 +5,7 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { EmptyState } from '@/components/dashboard/empty-state'
+import { ACTIVE_REFERRAL_SOURCES_SELECT, referralSourceOptions } from '../referral-source-options'
 
 export default async function NewClientPage() {
   const supabase = await createClient()
@@ -14,7 +15,16 @@ export default async function NewClientPage() {
 
   // Asked here, not inferred from anything - has_permission already returns
   // true for the owner internally, so this is never OR'd with is_owner().
-  const { data: canCreate } = await supabase.rpc('has_permission', { p_key: 'clients_manage' })
+  const [{ data: canCreate }, { data: activeSources }] = await Promise.all([
+    supabase.rpc('has_permission', { p_key: 'clients_manage' }),
+    supabase
+      .from('referral_sources')
+      .select(ACTIVE_REFERRAL_SOURCES_SELECT)
+      .eq('is_active', true)
+      .order('sort_order', { nullsFirst: false })
+      .order('name_en', { nullsFirst: false })
+      .order('name_ar'),
+  ])
 
   return (
     <div className="flex max-w-lg flex-col gap-6">
@@ -23,7 +33,7 @@ export default async function NewClientPage() {
         <PageHeader title={t('title')} />
       </div>
 
-      {canCreate === true ? <ClientForm mode="create" /> : <EmptyState title={tForm('noAccess')} />}
+      {canCreate === true ? <ClientForm mode="create" referralSources={referralSourceOptions(activeSources ?? [], null, locale)} /> : <EmptyState title={tForm('noAccess')} />}
     </div>
   )
 }
