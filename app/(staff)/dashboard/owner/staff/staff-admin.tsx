@@ -183,13 +183,14 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
     setError(null)
     startTransition(async () => {
       const result = await regenerateTempPassword(staffId)
-      if (result.error) {
-        setError(resolveStaffError(result.error, result.userId, tErrors))
-        setConfirming(false)
-        return
-      }
+      // A password can come back WITH an error: the reset itself succeeded
+      // and only the must-change flag failed (passwordResetButRecordFailed).
+      // It's live, so it's shown either way, with the warning next to it.
       if (result.password) {
         onDone(result.password)
+      }
+      if (result.error) {
+        setError(resolveStaffError(result.error, result.userId, tErrors))
       }
       setConfirming(false)
     })

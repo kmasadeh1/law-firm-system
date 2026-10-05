@@ -1121,7 +1121,7 @@
           "couldNotCreateLogin": "Could not create the login. Please try again.",
           "staffRecordFailedWithCleanup": "Could not create the staff record, and cleanup of the orphaned login also failed. Auth user {userId} needs manual removal.",
           "staffRecordFailedRolledBack": "Could not create the staff record. The login was rolled back - please try again.",
-          "passwordResetButRecordFailed": "The password was reset, but updating the staff record failed. The account may not be flagged to require a change.",
+          "passwordResetButRecordFailed": "The new password is set and works - give it to the employee. But the account could not be flagged to require a password change, so they won't be asked to choose their own when they sign in. Issue a new password to retry the flag.",
           "updateAccountFailed": "Could not update that account. Please try again."
         }
       },

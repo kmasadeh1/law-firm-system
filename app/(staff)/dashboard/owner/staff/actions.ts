@@ -142,8 +142,9 @@ export async function regenerateTempPassword(
   // itself as the user's own change. So a failure here leaves a reset
   // password on an account that isn't flagged to change it; zero rows
   // (refused by RLS, which raises nothing) is that same failure and is
-  // reported the same way, never as success. What the owner should get
-  // back in that case is an open decision - see the commit message.
+  // reported the same way, never as success. The new password IS live in
+  // Auth at this point, so it's returned alongside the warning: the owner
+  // can still hand it over, and reissuing retries the flag.
   const { data, error } = await supabase
     .from('staff')
     .update({
@@ -155,7 +156,7 @@ export async function regenerateTempPassword(
     .select('id')
 
   if (error || !data || data.length === 0) {
-    return { error: 'passwordResetButRecordFailed' }
+    return { error: 'passwordResetButRecordFailed', password }
   }
 
   revalidatePath(STAFF_PATH)

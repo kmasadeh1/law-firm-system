@@ -81,7 +81,7 @@ export async function saveWorkingHours(
     return { error: 'saveFailed' }
   }
 
-  const { error } = await supabase.from('working_hours').upsert(
+  const { data: saved, error } = await supabase.from('working_hours').upsert(
     days.map((day) => ({
       staff_id: user.sub as string,
       day_of_week: day.day_of_week,
@@ -90,7 +90,7 @@ export async function saveWorkingHours(
       is_override: false,
     })),
     { onConflict: 'staff_id,day_of_week,is_override' }
-  )
+  ).select('id')
 
   if (error) {
     // working_hours_valid_times: rejects an end before/equal to the start,
@@ -107,6 +107,13 @@ export async function saveWorkingHours(
     if (error.code === NO_MATCHING_UNIQUE_CONSTRAINT) {
       return { error: 'saveFailed' }
     }
+    return { error: 'saveFailed' }
+  }
+
+  // A refused insert raises 42501, but a refused update - the day's row
+  // already exists - matches zero rows and raises nothing. Every day sent
+  // must come back, or the week wasn't saved.
+  if (!saved || saved.length !== days.length) {
     return { error: 'saveFailed' }
   }
 
