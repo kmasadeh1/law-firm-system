@@ -305,17 +305,13 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     creator_name: allNameById.get(row.created_by) ?? tCommon('unknownStaff'),
   }))
 
-  // Explicit application-layer filter, not just RLS: the "Deleted notes"
-  // section below this page's notes/documents lists is owner-only by
-  // design (restoring a deleted note or document is an owner capability),
-  // and its entire gate used to be "RLS never returns a deleted row to
-  // anyone but the owner in the first place" - a query-level assumption,
-  // not a check this code made itself. Keeping that gate here too means
-  // this page still hides deleted rows from a non-owner even if the RLS
-  // policy that used to do it changes for an unrelated reason (e.g. to
-  // stop blocking the delete action itself, per the deleted_at IS NULL OR
-  // is_owner() clause's dual role as both a read-visibility rule and an
-  // accidental write-blocker).
+  // This filter is the ONLY thing hiding deleted notes and documents from
+  // non-owners. The case_notes and documents SELECT policies return
+  // deleted rows to anyone who can read the case's notes/documents (there
+  // is no deleted_at clause in them), and their UPDATE policies would let
+  // any writer restore one. "Deleted rows are owner-only, restorable by the
+  // owner" is therefore a page-level rule, not a database one - a known,
+  // open decision, not an oversight.
   const visibleNoteRows = isOwner ? (noteRows ?? []) : (noteRows ?? []).filter((n) => !n.deleted_at)
   const visibleDocumentRows = isOwner ? (documentRows ?? []) : (documentRows ?? []).filter((d) => !d.deleted_at)
 

@@ -178,7 +178,6 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
 
       <CasesSection
         engagementId={engagement.id}
-        clientId={engagement.client_id}
         linkedCases={linkedCases}
         clientCases={clientCases ?? []}
       />

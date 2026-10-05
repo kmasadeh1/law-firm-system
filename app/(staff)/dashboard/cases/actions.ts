@@ -898,6 +898,13 @@ export async function restoreDocument(caseId: string, documentId: string): Promi
 
 // --- Expenses ------------------------------------------------------------
 
+// Parsing only - turning the field's text into a number. Whether the
+// amount is acceptable (> 0) is the expenses_amount_positive CHECK's call,
+// mapped by name where the insert/update fails.
+function isAmountNotPositive(error: { code: string; message: string }) {
+  return error.code === '23514' && error.message.includes('expenses_amount_positive')
+}
+
 async function parseAmount(
   formData: FormData,
   t: Awaited<ReturnType<typeof getTranslations>>
@@ -905,7 +912,7 @@ async function parseAmount(
   const raw = formData.get('amount')
   if (typeof raw !== 'string' || !raw.trim()) return { error: t('amountRequired') }
   const amount = Number(raw)
-  if (!Number.isFinite(amount) || amount <= 0) return { error: t('invalidAmount') }
+  if (!Number.isFinite(amount)) return { error: t('invalidAmount') }
   return amount
 }
 
@@ -936,6 +943,9 @@ export async function addExpense(caseId: string, formData: FormData): Promise<Ac
   })
 
   if (error) {
+    if (isAmountNotPositive(error)) {
+      return { error: t('amountNotPositive') }
+    }
     if (error.code === '42501') {
       return { error: t('noPermissionRecord') }
     }
@@ -974,6 +984,9 @@ export async function editExpense(
     .select('id')
 
   if (error) {
+    if (isAmountNotPositive(error)) {
+      return { error: t('amountNotPositive') }
+    }
     return { error: t('saveFailed') }
   }
   if (!data || data.length === 0) {
@@ -992,9 +1005,9 @@ export async function setExpenseReimbursed(
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.expenses.errors' })
   const supabase = await createClient()
-  // reimbursed and reimbursed_at are set together so they can never
-  // disagree - there's no database constraint enforcing that pairing, so
-  // this is the only place either field is ever written.
+  // reimbursed and reimbursed_at are written together; the
+  // expenses_reimbursed_matches_date CHECK guarantees they agree, so this
+  // can't leave them inconsistent even if it were wrong.
   const { data, error } = await supabase
     .from('expenses')
     .update({
@@ -1008,6 +1021,9 @@ export async function setExpenseReimbursed(
     .select('id')
 
   if (error) {
+    if (error.code === '23514' && error.message.includes('expenses_reimbursed_matches_date')) {
+      return { error: t('reimbursedDateMismatch') }
+    }
     return { error: t('reimbursedUpdateFailed') }
   }
   if (!data || data.length === 0) {

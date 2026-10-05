@@ -13,12 +13,10 @@ type CaseRow = { id: string; case_number: string; title: string }
 
 export function CasesSection({
   engagementId,
-  clientId,
   linkedCases,
   clientCases,
 }: {
   engagementId: string
-  clientId: string
   linkedCases: CaseRow[]
   clientCases: CaseRow[]
 }) {
@@ -97,7 +95,7 @@ export function CasesSection({
             disabled={isPending || !addCaseId}
             onClick={() =>
               runAction(async () => {
-                const result = await linkCase(engagementId, clientId, addCaseId)
+                const result = await linkCase(engagementId, addCaseId)
                 if (!result.error) setAddCaseId('')
                 return result
               })

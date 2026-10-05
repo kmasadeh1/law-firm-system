@@ -11,6 +11,22 @@ const FOREIGN_KEY_VIOLATION = '23503'
 const CHECK_VIOLATION = '23514'
 const INSUFFICIENT_PRIVILEGE = '42501'
 
+// Raised by the engagement_cases_client_match trigger (23514) when a linked
+// case belongs to a different client than the engagement. Matched by the
+// name it puts at the start of its message, like a CHECK's.
+function isWrongClientLink(error: { code: string; message: string }) {
+  return error.code === CHECK_VIOLATION && error.message.includes('engagement_case_matches_client')
+}
+
+// Amount parsing only - turning the form's text into a number. Whether the
+// amount is acceptable (> 0) is the database's call: the
+// *_amount_positive CHECKs reject it and are mapped by name below.
+function parseAmount(raw: FormDataEntryValue | null): number | null {
+  if (typeof raw !== 'string' || !raw.trim()) return null
+  const amount = Number(raw)
+  return Number.isNaN(amount) ? null : amount
+}
+
 const FEES_PATH = '/dashboard/fees'
 
 function engagementPath(engagementId: string) {
@@ -103,7 +119,7 @@ export async function createEngagement(
     .single()
 
   if (error) {
-    if (error.code === CHECK_VIOLATION) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('fee_amount_matches_type')) {
       return { error: 'invalid_fee_type_amount' }
     }
     return { error: 'create_failed' }
@@ -117,10 +133,13 @@ export async function createEngagement(
     if (linkError) {
       // The engagement itself was created successfully - don't fail the
       // whole flow over the linked-cases step, just surface it and let the
-      // user add the links from the detail page.
+      // user add the links from the detail page. The multi-row insert is
+      // one statement, so a case from another client (rejected by the
+      // engagement_cases_client_match trigger - this path used to link it
+      // without any check) means none of the selected cases were linked.
       return {
         engagementId: inserted.id,
-        error: 'cases_link_failed',
+        error: isWrongClientLink(linkError) ? 'cases_link_wrong_client' : 'cases_link_failed',
       }
     }
   }
@@ -131,21 +150,14 @@ export async function createEngagement(
 
 // --- Linked cases (engagement detail) ---------------------------------------
 
-export async function linkCase(engagementId: string, clientId: string, caseId: string): Promise<ActionResult> {
+// The case-belongs-to-the-engagement's-client rule is the database's
+// (engagement_cases_client_match trigger) - not re-checked here.
+export async function linkCase(engagementId: string, caseId: string): Promise<ActionResult> {
   if (!caseId) {
     return { error: 'select_case' }
   }
 
   const supabase = await createClient()
-
-  // engagement_cases has no constraint tying a linked case's client to the
-  // engagement's client - guard it here so a link can never point at a case
-  // that belongs to someone else.
-  const { data: caseRow } = await supabase.from('cases').select('client_id').eq('id', caseId).maybeSingle()
-  if (!caseRow || caseRow.client_id !== clientId) {
-    return { error: 'case_wrong_client' }
-  }
-
   const { error } = await supabase
     .from('engagement_cases')
     .insert({ engagement_id: engagementId, case_id: caseId })
@@ -153,6 +165,9 @@ export async function linkCase(engagementId: string, clientId: string, caseId: s
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
       return { error: 'case_already_linked' }
+    }
+    if (isWrongClientLink(error)) {
+      return { error: 'case_wrong_client' }
     }
     return { error: 'link_failed' }
   }
@@ -285,8 +300,8 @@ function readInstallmentFields(formData: FormData): InstallmentFields | { error:
   if (typeof description !== 'string' || !description.trim()) {
     return { error: 'description_required' }
   }
-  const amount = typeof amount_raw === 'string' ? Number(amount_raw) : NaN
-  if (Number.isNaN(amount) || amount <= 0) {
+  const amount = parseAmount(amount_raw)
+  if (amount === null) {
     return { error: 'invalid_amount' }
   }
 
@@ -311,6 +326,9 @@ export async function createInstallment(
     .insert({ engagement_id: engagementId, ...fields })
 
   if (error) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('engagement_installments_amount_positive')) {
+      return { error: 'installment_amount_not_positive' }
+    }
     return { error: 'add_installment_failed' }
   }
 
@@ -333,6 +351,9 @@ export async function updateInstallment(
     .eq('id', installmentId)
     .select('id')
 
+  if (error?.code === CHECK_VIOLATION && error.message.includes('engagement_installments_amount_positive')) {
+    return { error: 'installment_amount_not_positive' }
+  }
   // Zero rows: refused by RLS or the instalment was deleted.
   if (error || !data || data.length === 0) {
     return { error: 'save_installment_failed' }
@@ -375,8 +396,8 @@ export async function recordPayment(
   const paid_at = formData.get('paid_at')
   const method = formData.get('method')
 
-  const amount = typeof amount_raw === 'string' ? Number(amount_raw) : NaN
-  if (Number.isNaN(amount) || amount <= 0) {
+  const amount = parseAmount(amount_raw)
+  if (amount === null) {
     return { error: 'invalid_amount' }
   }
   if (typeof paid_at !== 'string' || !paid_at.trim()) {
@@ -395,6 +416,9 @@ export async function recordPayment(
   })
 
   if (error) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('payments_amount_positive')) {
+      return { error: 'payment_amount_not_positive' }
+    }
     if (error.code === INSUFFICIENT_PRIVILEGE) {
       return { error: 'no_permission_record_payment' }
     }
