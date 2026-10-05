@@ -143,7 +143,8 @@
       "lightMode": "Light mode",
       "darkMode": "Dark mode",
       "switchToArabic": "Switch to Arabic",
-      "switchToEnglish": "Switch to English"
+      "switchToEnglish": "Switch to English",
+      "localeSwitchFailed": "Couldn't switch language. Please try again."
     },
     "nav": {
       "groupDailyWork": "Daily work",
@@ -808,6 +809,7 @@
           "noPermissionCreate": "You don't have permission to create this appointment.",
           "createFailed": "Could not create the appointment. Please try again.",
           "noPermissionUpdate": "You don't have permission to change this appointment.",
+          "wouldLoseAccess": "You can't make that change: it would assign the appointment to someone else or change its type in a way you're not permitted to manage.",
           "updateFailed": "Could not update the appointment. Please try again."
         }
       },
@@ -885,7 +887,6 @@
           "extendedDateRequired": "Extended date is required.",
           "extensionReasonRequired": "A reason is required for an extension.",
           "bothExtensionFieldsRequired": "Both an extended date and a reason are required.",
-          "noPermissionExtend": "You don't have permission to extend this deadline.",
           "extendFailed": "Could not save the extension. Please try again."
         }
       },

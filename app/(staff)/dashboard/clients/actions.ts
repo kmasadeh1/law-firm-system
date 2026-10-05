@@ -100,9 +100,11 @@ export async function updateClientRecord(
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.clients.form.errors' })
   const supabase = await createClient()
-  const { error } = await supabase.from('clients').update(fields).eq('id', clientId)
+  const { data, error } = await supabase.from('clients').update(fields).eq('id', clientId).select('id')
 
-  if (error) {
+  // Zero rows: refused by RLS (raises nothing) or the client is gone -
+  // nothing was saved, so never report success.
+  if (error || !data || data.length === 0) {
     return { error: t('saveFailed') }
   }
 

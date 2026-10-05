@@ -137,7 +137,8 @@
       "lightMode": "الوضع الفاتح",
       "darkMode": "الوضع الداكن",
       "switchToArabic": "التبديل إلى العربية",
-      "switchToEnglish": "التبديل إلى الإنجليزية"
+      "switchToEnglish": "التبديل إلى الإنجليزية",
+      "localeSwitchFailed": "تعذّر تغيير اللغة. يرجى المحاولة مرة أخرى."
     },
     "nav": {
       "groupDailyWork": "العمل اليومي",
@@ -789,7 +790,6 @@
           "extendedDateRequired": "تاريخ التمديد مطلوب.",
           "extensionReasonRequired": "سبب التمديد مطلوب.",
           "bothExtensionFieldsRequired": "يجب إدخال تاريخ التمديد والسبب معاً.",
-          "noPermissionExtend": "ليس لديك صلاحية تمديد هذه المهلة.",
           "extendFailed": "تعذّر حفظ التمديد. يرجى المحاولة مرة أخرى."
         }
       },
@@ -873,6 +873,7 @@
           "noPermissionCreate": "ليس لديك صلاحية إنشاء هذا الموعد.",
           "createFailed": "تعذّر إنشاء الموعد. يرجى المحاولة مرة أخرى.",
           "noPermissionUpdate": "ليس لديك صلاحية تعديل هذا الموعد.",
+          "wouldLoseAccess": "لا يمكنك إجراء هذا التغيير: فهو يُسند الموعد إلى شخص آخر أو يغيّر نوعه بطريقة لا تملك صلاحية إدارتها.",
           "updateFailed": "تعذّر تحديث الموعد. يرجى المحاولة مرة أخرى."
         }
       },

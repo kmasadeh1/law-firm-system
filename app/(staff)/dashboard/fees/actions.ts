@@ -163,13 +163,15 @@ export async function linkCase(engagementId: string, clientId: string, caseId: s
 
 export async function unlinkCase(engagementId: string, caseId: string): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('engagement_cases')
     .delete()
     .eq('engagement_id', engagementId)
     .eq('case_id', caseId)
+    .select('case_id')
 
-  if (error) {
+  // Zero rows: refused by RLS (raises nothing) or already unlinked.
+  if (error || !data || data.length === 0) {
     return { error: 'unlink_failed' }
   }
 
@@ -325,12 +327,14 @@ export async function updateInstallment(
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('engagement_installments')
     .update(fields)
     .eq('id', installmentId)
+    .select('id')
 
-  if (error) {
+  // Zero rows: refused by RLS or the instalment was deleted.
+  if (error || !data || data.length === 0) {
     return { error: 'save_installment_failed' }
   }
 
@@ -343,12 +347,16 @@ export async function deleteInstallment(
   installmentId: string
 ): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase.from('engagement_installments').delete().eq('id', installmentId)
+  const { data, error } = await supabase.from('engagement_installments').delete().eq('id', installmentId).select('id')
 
   if (error) {
     if (error.code === FOREIGN_KEY_VIOLATION) {
       return { error: 'installment_has_payments' }
     }
+    return { error: 'delete_installment_failed' }
+  }
+  // Zero rows: refused by RLS or already deleted - not a success.
+  if (!data || data.length === 0) {
     return { error: 'delete_installment_failed' }
   }
 

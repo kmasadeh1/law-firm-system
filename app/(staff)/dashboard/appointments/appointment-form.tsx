@@ -36,6 +36,7 @@ const APPOINTMENT_ERROR_CODES: AppointmentErrorCode[] = [
   'noPermissionCreate',
   'createFailed',
   'noPermissionUpdate',
+  'wouldLoseAccess',
   'updateFailed',
 ]
 

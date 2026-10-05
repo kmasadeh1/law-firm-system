@@ -142,21 +142,27 @@ export async function extendDeadline(
 
   // extended_by/extended_at populate automatically from a trigger - never
   // send them.
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('deadlines')
     .update({
       extended_due_date: extended_due_date.trim(),
       extension_reason: extension_reason.trim(),
     })
     .eq('id', deadlineId)
+    .select('id')
 
+  // No 42501 branch: the update policy's USING and WITH CHECK are the same
+  // can_manage_case_details(case_id), and this never changes case_id, so a
+  // refusal can only show up as zero rows. Zero rows can also mean the
+  // deadline is gone, so it's reported as a failed save, not as a
+  // permissions problem.
   if (error) {
     if (error.code === CHECK_VIOLATION) {
       return { error: t('bothExtensionFieldsRequired') }
     }
-    if (error.code === INSUFFICIENT_PRIVILEGE) {
-      return { error: t('noPermissionExtend') }
-    }
+    return { error: t('extendFailed') }
+  }
+  if (!data || data.length === 0) {
     return { error: t('extendFailed') }
   }
 

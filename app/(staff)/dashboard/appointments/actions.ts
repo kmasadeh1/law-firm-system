@@ -21,6 +21,7 @@ export type AppointmentErrorCode =
   | 'noPermissionCreate'
   | 'createFailed'
   | 'noPermissionUpdate'
+  | 'wouldLoseAccess'
   | 'updateFailed'
 
 type ActionResult = { error?: AppointmentErrorCode }
@@ -202,10 +203,21 @@ export async function updateAppointment(
     if (error.code === '23514') {
       return { error: mapCheckViolation(error.message) ?? 'updateFailed' }
     }
+    // Unlike most updates, this one CAN raise 42501: it writes staff_id
+    // and type, which the policy's WITH CHECK depends on. Someone whose
+    // access is "it's my appointment" or "it's a court date and I manage
+    // court dates" is refused if the edit hands it to someone else or
+    // turns it into a consultation - the new row would be one they're no
+    // longer allowed to hold.
+    if (error.code === '42501') {
+      return { error: 'wouldLoseAccess' }
+    }
     return { error: 'updateFailed' }
   }
 
-  // UPDATE blocked by RLS matches zero rows rather than erroring.
+  // UPDATE blocked by RLS matches zero rows rather than erroring. There is
+  // no delete action for appointments, so this is a refusal rather than a
+  // vanished row.
   if (!data || data.length === 0) {
     return { error: 'noPermissionUpdate' }
   }

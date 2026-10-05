@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { setLocale } from '@/app/(staff)/dashboard/actions'
 import { LanguagePair, type LanguagePairOption } from '@/components/language-pair'
@@ -19,11 +19,14 @@ export function LocaleToggle() {
   const locale = useLocale()
   const t = useTranslations('dashboard.shell')
   const [isPending, startTransition] = useTransition()
+  const [failed, setFailed] = useState(false)
 
   function switchTo(code: LocaleCode) {
     if (code === locale || isPending) return
+    setFailed(false)
     startTransition(async () => {
-      await setLocale(code)
+      const result = await setLocale(code)
+      if (result.error) setFailed(true)
     })
   }
 
@@ -34,43 +37,50 @@ export function LocaleToggle() {
   }))
 
   return (
-    <LanguagePair
-      options={options}
-      // text-accent/text-fg-muted, not text-brass/text-paper-dim: these are
-      // the dashboard's own theme-toggle-aware tokens. Brass is only safe
-      // on the public site's fixed-dark identity - in the dashboard's light
-      // theme, accent resolves to ink, not brass (see globals.css).
-      activeClassName="text-accent"
-      inactiveClassName="text-fg-muted transition-colors hover:text-fg"
-      separatorClassName="text-fg-muted/60"
-      renderOption={(option, className) => {
-        // The active language is a no-op if clicked - it still costs a
-        // round trip for nothing - so it renders as plain text, not a
-        // button, unlike the public switcher's active Link (which still
-        // navigates, just to the same place).
-        if (option.active) {
+    <span className="flex items-center gap-2">
+      <LanguagePair
+        options={options}
+        // text-accent/text-fg-muted, not text-brass/text-paper-dim: these are
+        // the dashboard's own theme-toggle-aware tokens. Brass is only safe
+        // on the public site's fixed-dark identity - in the dashboard's light
+        // theme, accent resolves to ink, not brass (see globals.css).
+        activeClassName="text-accent"
+        inactiveClassName="text-fg-muted transition-colors hover:text-fg"
+        separatorClassName="text-fg-muted/60"
+        renderOption={(option, className) => {
+          // The active language is a no-op if clicked - it still costs a
+          // round trip for nothing - so it renders as plain text, not a
+          // button, unlike the public switcher's active Link (which still
+          // navigates, just to the same place).
+          if (option.active) {
+            return (
+              <span className={className} aria-current="true">
+                {option.label}
+              </span>
+            )
+          }
+          const code = option.code as LocaleCode
+          const switchLabel = code === 'ar' ? t('switchToArabic') : t('switchToEnglish')
           return (
-            <span className={className} aria-current="true">
+            <button
+              type="button"
+              onClick={() => switchTo(code)}
+              data-testid={`dashboard-locale-${code}`}
+              disabled={isPending}
+              aria-label={switchLabel}
+              title={switchLabel}
+              className={`${className} disabled:opacity-60`}
+            >
               {option.label}
-            </span>
+            </button>
           )
-        }
-        const code = option.code as LocaleCode
-        const switchLabel = code === 'ar' ? t('switchToArabic') : t('switchToEnglish')
-        return (
-          <button
-            type="button"
-            onClick={() => switchTo(code)}
-            data-testid={`dashboard-locale-${code}`}
-            disabled={isPending}
-            aria-label={switchLabel}
-            title={switchLabel}
-            className={`${className} disabled:opacity-60`}
-          >
-            {option.label}
-          </button>
-        )
-      }}
-    />
+        }}
+      />
+      {failed && (
+        <span role="alert" className="text-xs text-danger-text" data-testid="dashboard-locale-error">
+          {t('localeSwitchFailed')}
+        </span>
+      )}
+    </span>
   )
 }

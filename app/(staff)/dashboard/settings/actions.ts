@@ -29,15 +29,18 @@ export async function updateOwnProfile(formData: FormData): Promise<ActionResult
     return { error: t('updateFailed') }
   }
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('staff')
     .update({
       full_name: fullName.trim(),
       phone: typeof phone === 'string' && phone.trim() ? phone.trim() : null,
     })
     .eq('id', user.sub as string)
+    .select('id')
 
-  if (error) {
+  // Zero rows: the policy always allows your own row, so this would mean
+  // the row is gone or the policy changed - either way, not saved.
+  if (error || !updated || updated.length === 0) {
     return { error: t('updateFailed') }
   }
 
