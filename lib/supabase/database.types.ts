@@ -758,6 +758,163 @@ export type Database = {
           },
         ]
       }
+      client_contacts: {
+        Row: {
+          case_id: string | null
+          channel: Database["public"]["Enums"]["contact_channel"]
+          client_id: string
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          direction: Database["public"]["Enums"]["contact_direction"]
+          edited_at: string | null
+          follow_up_needed: boolean
+          handled_by: string | null
+          id: string
+          occurred_at: string
+          summary: string
+        }
+        Insert: {
+          case_id?: string | null
+          channel: Database["public"]["Enums"]["contact_channel"]
+          client_id: string
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          direction: Database["public"]["Enums"]["contact_direction"]
+          edited_at?: string | null
+          follow_up_needed?: boolean
+          handled_by?: string | null
+          id?: string
+          occurred_at?: string
+          summary: string
+        }
+        Update: {
+          case_id?: string | null
+          channel?: Database["public"]["Enums"]["contact_channel"]
+          client_id?: string
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          direction?: Database["public"]["Enums"]["contact_direction"]
+          edited_at?: string | null
+          follow_up_needed?: boolean
+          handled_by?: string | null
+          id?: string
+          occurred_at?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_fund_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_fund_entries: {
         Row: {
           amount: number
@@ -897,6 +1054,8 @@ export type Database = {
           national_id: string | null
           notes: string | null
           phone: string | null
+          referral_notes: string | null
+          referral_source_id: string | null
         }
         Insert: {
           created_at?: string
@@ -907,6 +1066,8 @@ export type Database = {
           national_id?: string | null
           notes?: string | null
           phone?: string | null
+          referral_notes?: string | null
+          referral_source_id?: string | null
         }
         Update: {
           created_at?: string
@@ -917,6 +1078,8 @@ export type Database = {
           national_id?: string | null
           notes?: string | null
           phone?: string | null
+          referral_notes?: string | null
+          referral_source_id?: string | null
         }
         Relationships: [
           {
@@ -938,6 +1101,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_referral_source_id_fkey"
+            columns: ["referral_source_id"]
+            isOneToOne: false
+            referencedRelation: "referral_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -2256,6 +2426,33 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_sources: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name_ar: string | null
+          name_en: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           enabled: boolean
@@ -2881,6 +3078,10 @@ export type Database = {
       can_access_client_funds: { Args: never; Returns: boolean }
       can_access_enquiry: { Args: { p_enquiry_id: string }; Returns: boolean }
       can_assign_tasks: { Args: never; Returns: boolean }
+      can_edit_client_contact: {
+        Args: { c: Database["public"]["Tables"]["client_contacts"]["Row"] }
+        Returns: boolean
+      }
       can_manage_case_details: { Args: { p_case_id: string }; Returns: boolean }
       can_manage_case_share_links: {
         Args: { p_case_id: string }
@@ -2953,6 +3154,8 @@ export type Database = {
           national_id: string | null
           notes: string | null
           phone: string | null
+          referral_notes: string | null
+          referral_source_id: string | null
         }[]
         SetofOptions: {
           from: "*"
@@ -2980,6 +3183,14 @@ export type Database = {
         | "fee_transfer"
         | "refund"
         | "reversal"
+      contact_channel:
+        | "phone"
+        | "whatsapp"
+        | "email"
+        | "in_person"
+        | "letter"
+        | "other"
+      contact_direction: "incoming" | "outgoing"
       court_type:
         | "conciliation"
         | "first_instance"
@@ -3143,6 +3354,15 @@ export const Constants = {
         "refund",
         "reversal",
       ],
+      contact_channel: [
+        "phone",
+        "whatsapp",
+        "email",
+        "in_person",
+        "letter",
+        "other",
+      ],
+      contact_direction: ["incoming", "outgoing"],
       court_type: [
         "conciliation",
         "first_instance",

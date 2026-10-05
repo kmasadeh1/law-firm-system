@@ -7,6 +7,8 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { BalanceSection } from './balance-section'
 import { PowerOfAttorneySection, type Poa } from './power-of-attorney-section'
 import { ClientFundsSection, type FundBalance, type FundEntry } from './client-funds-section'
+import { ContactLogSection } from '../contact-log-section'
+import { CONTACT_LOG_SELECT, toContactRow, type ContactQueryRow } from '../contact-log-query'
 
 export default async function EditClientPage({ params }: PageProps<'/dashboard/clients/[id]'>) {
   const { id } = await params
@@ -19,13 +21,15 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
     { data: client },
     { data: balance },
     { data: canManage },
-    { data: canViewPoa },
+    { data: canViewClient },
     { data: canManagePoa },
     { data: poaRows },
     { data: cases },
     { data: activeStaff },
     { data: allStaff },
     { data: canAccessFunds },
+    { data: contactRows },
+    { data: claimsData },
   ] = await Promise.all([
     supabase.from('clients').select('id, full_name, national_id, phone, email, notes').eq('id', id).maybeSingle(),
     supabase
@@ -58,6 +62,17 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
     // Owner, or a role holding client_funds_access - already covers the
     // owner internally, never OR'd with isOwner.
     supabase.rpc('can_access_client_funds'),
+    // Soft-deleted entries are still readable under RLS (deliberately, as
+    // with case_notes), so the deleted_at filter belongs here in the query.
+    supabase
+      .from('client_contacts')
+      .select(CONTACT_LOG_SELECT)
+      .eq('client_id', id)
+      .is('deleted_at', null)
+      .order('occurred_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .returns<ContactQueryRow[]>(),
+    supabase.auth.getClaims(),
   ])
 
   // Not fetched at all unless the gate passes - someone without access
@@ -138,6 +153,8 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
 
   const fundBalance: FundBalance | null = fundBalanceRow ?? null
 
+  const contacts = (contactRows ?? []).map((c) => toContactRow(c, allNameById, tCommon('unknownStaff')))
+
   return (
     <div className="flex max-w-lg flex-col gap-6">
       <div>
@@ -157,8 +174,21 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
             poas={poas}
             cases={cases ?? []}
             staffOptions={activeStaffOptions}
-            canView={canViewPoa === true}
+            canView={canViewClient === true}
             canManage={canManagePoa === true}
+          />
+          {/* canAdd is can_view_client() - the insert policy's own test.
+              Pre-fills "handled by" with whoever is logging the contact. */}
+          <ContactLogSection
+            clientId={client.id}
+            contacts={contacts}
+            cases={cases ?? []}
+            staffOptions={activeStaffOptions}
+            canAdd={canViewClient === true}
+            defaultCaseId={null}
+            defaultHandledBy={(claimsData?.claims?.sub as string | undefined) ?? null}
+            showCase
+            testId="client-contacts-section"
           />
         </>
       ) : (

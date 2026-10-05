@@ -18,6 +18,8 @@ import { DocumentsSection, type DocumentRow } from './documents-section'
 import { NotesSection, type CaseNote } from './notes-section'
 import { ExpensesSection, type Expense } from './expenses-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
+import { ContactLogSection } from '../../clients/contact-log-section'
+import { CONTACT_LOG_SELECT, toContactRow, type ContactQueryRow } from '../../clients/contact-log-query'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
   const { id } = await params
@@ -78,6 +80,9 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: poaRows },
     { data: canAssignTasks },
     { data: taskRows },
+    { data: contactRows },
+    { data: canViewClient },
+    { data: clientCases },
   ] = await Promise.all([
     supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order'),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
@@ -170,6 +175,26 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .select('id, title, details, case_id, assigned_to, due_date, status, priority, created_by')
       .eq('case_id', id)
       .order('due_date', { ascending: true, nullsFirst: false }),
+    // Contacts linked to this case only; deleted ones filtered in the
+    // query, not the component (RLS still returns them, deliberately).
+    supabase
+      .from('client_contacts')
+      .select(CONTACT_LOG_SELECT)
+      .eq('case_id', id)
+      .is('deleted_at', null)
+      .order('occurred_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .returns<ContactQueryRow[]>(),
+    // The contact log's add gate - the insert policy's own test. Asked
+    // about the case's client, since a contact belongs to the client.
+    caseRow.clients?.id
+      ? supabase.rpc('can_view_client', { p_client_id: caseRow.clients.id })
+      : Promise.resolve({ data: false, error: null }),
+    // The client's other cases, for the contact form's case picker - a
+    // contact logged here can still be re-pointed at a sibling case.
+    caseRow.clients?.id
+      ? supabase.from('cases').select('id, case_number, title').eq('client_id', caseRow.clients.id).order('case_number')
+      : Promise.resolve({ data: null, error: null }),
   ])
 
   // staff_directory is a view, so its columns come back nullable in the
@@ -309,6 +334,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     detail_redacted: row.detail_redacted,
   }))
 
+  const contacts = (contactRows ?? []).map((c) => toContactRow(c, allNameById, tCommon('unknownStaff')))
+
   const caseTypeName = caseRow.case_types
     ? localizedName({ name: caseRow.case_types.name_en ?? '', name_ar: caseRow.case_types.name_ar }, locale)
     : null
@@ -366,6 +393,20 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <DocumentsSection caseId={caseRow.id} documents={documents} canWrite={canWriteDocuments === true} />
 
       <NotesSection caseId={caseRow.id} notes={notes} canWrite={canWriteNotes === true} />
+
+      {caseRow.clients?.id && (
+        <ContactLogSection
+          clientId={caseRow.clients.id}
+          contacts={contacts}
+          cases={clientCases ?? []}
+          staffOptions={activeStaff}
+          canAdd={canViewClient === true}
+          defaultCaseId={caseRow.id}
+          defaultHandledBy={viewerId ?? null}
+          showCase={false}
+          testId="case-contacts-section"
+        />
+      )}
 
       {/* Not gated on "the query came back empty" - lawyers don't hold
           expenses_manage in the seeded roles, so this checks the permission

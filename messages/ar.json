@@ -597,6 +597,56 @@
             "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
           }
         },
+        "contacts": {
+          "heading": "سجل التواصل",
+          "noneYet": "لم يُسجَّل أي تواصل بعد.",
+          "logContact": "تسجيل تواصل",
+          "logging": "جارٍ التسجيل…",
+          "directionLabel": "الاتجاه",
+          "channelLabel": "الوسيلة",
+          "occurredAtLabel": "وقت التواصل",
+          "occurredAtHelp": "اتركه فارغًا لاستخدام الوقت الحالي.",
+          "handledByLabel": "تولّاه",
+          "handledByNone": "غير محدد",
+          "caseLabel": "القضية",
+          "generalOption": "عام — لا يتعلق بقضية محددة",
+          "summaryLabel": "الملخص",
+          "summaryPlaceholder": "عمّ سأل، وبماذا أُجيب.",
+          "followUpLabel": "تحتاج متابعة",
+          "followUpBadge": "تحتاج متابعة",
+          "handledByLine": "تولّاه <bdi>{name}</bdi>",
+          "editedLine": "عُدّل في <bdi>{date}</bdi>",
+          "edit": "تعديل",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "cancel": "إلغاء",
+          "delete": "حذف",
+          "deleting": "جارٍ الحذف…",
+          "deleteNote": "لن يظهر بعد الآن في سجل التواصل.",
+          "direction": {
+            "incoming": "وارد",
+            "outgoing": "صادر"
+          },
+          "channel": {
+            "phone": "هاتف",
+            "whatsapp": "واتساب",
+            "email": "بريد إلكتروني",
+            "in_person": "حضوريًا",
+            "letter": "كتاب خطي",
+            "other": "أخرى"
+          },
+          "errors": {
+            "summaryRequired": "اكتب ملخصًا للتواصل.",
+            "caseMismatch": "هذه القضية تخص عميلًا آخر.",
+            "invalidChoice": "اختر الاتجاه والوسيلة.",
+            "invalidOccurredAt": "أدخل تاريخًا ووقتًا صحيحين.",
+            "noPermission": "ليس لديك صلاحية للقيام بذلك.",
+            "addFailed": "تعذّر تسجيل التواصل. يرجى المحاولة مرة أخرى.",
+            "updateFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+            "deleteFailed": "تعذّر حذف السجل. يرجى المحاولة مرة أخرى.",
+            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+          }
+        },
         "funds": {
           "heading": "أمانات العميل",
           "notFeeMoneyNote": "أموال يحتفظ بها المكتب لحساب هذا العميل — عائدات تسوية، ودائع، تحصيلات. ليست إطلاقاً من دخل أتعاب المكتب.",

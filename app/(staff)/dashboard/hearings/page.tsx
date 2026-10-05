@@ -5,16 +5,13 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
-import { formatFullDate, formatTimeOfDay } from '@/lib/format-date-time'
+import { FIRM_TIME_ZONE, formatFullDate, formatTimeOfDay } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
 import { PrintButton } from './print-button'
 
 // The firm's own calendar day, not the server's - "today" on a UTC host
-// would still be yesterday in Amman until 03:00. Same zone the staff
-// layout hands next-intl.
-const FIRM_TIME_ZONE = 'Asia/Amman'
-
+// would still be yesterday in Amman until 03:00.
 function todayInFirmZone() {
   // en-CA formats as YYYY-MM-DD, the same shape as session_date and the
   // date input's value.

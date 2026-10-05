@@ -620,6 +620,56 @@
             "generic": "Something went wrong. Please try again."
           }
         },
+        "contacts": {
+          "heading": "Contact log",
+          "noneYet": "No contact logged yet.",
+          "logContact": "Log contact",
+          "logging": "Logging…",
+          "directionLabel": "Direction",
+          "channelLabel": "Channel",
+          "occurredAtLabel": "When it happened",
+          "occurredAtHelp": "Leave empty to use the current time.",
+          "handledByLabel": "Handled by",
+          "handledByNone": "Not recorded",
+          "caseLabel": "Case",
+          "generalOption": "General — not about a specific case",
+          "summaryLabel": "Summary",
+          "summaryPlaceholder": "What they asked about, and what they were told.",
+          "followUpLabel": "Follow-up needed",
+          "followUpBadge": "Follow-up needed",
+          "handledByLine": "Handled by <bdi>{name}</bdi>",
+          "editedLine": "Edited <bdi>{date}</bdi>",
+          "edit": "Edit",
+          "save": "Save",
+          "saving": "Saving…",
+          "cancel": "Cancel",
+          "delete": "Delete",
+          "deleting": "Deleting…",
+          "deleteNote": "It will no longer appear in the contact log.",
+          "direction": {
+            "incoming": "Incoming",
+            "outgoing": "Outgoing"
+          },
+          "channel": {
+            "phone": "Phone",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "in_person": "In person",
+            "letter": "Letter",
+            "other": "Other"
+          },
+          "errors": {
+            "summaryRequired": "Write a summary of the contact.",
+            "caseMismatch": "That case belongs to a different client.",
+            "invalidChoice": "Choose a direction and a channel.",
+            "invalidOccurredAt": "Enter a valid date and time.",
+            "noPermission": "You don't have permission to do that.",
+            "addFailed": "Couldn't log the contact. Please try again.",
+            "updateFailed": "Couldn't save the changes. Please try again.",
+            "deleteFailed": "Couldn't delete the entry. Please try again.",
+            "generic": "Something went wrong. Please try again."
+          }
+        },
         "funds": {
           "heading": "Client funds",
           "notFeeMoneyNote": "Money the firm holds on this client's behalf — settlement proceeds, deposits, collections. Never the firm's own fee income.",
