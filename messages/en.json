@@ -1407,7 +1407,7 @@
         },
         "reference_data_manage": {
           "label": "Manage reference lists",
-          "description": "Add and edit the firm's courts, case types and referral sources."
+          "description": "Add and edit the firm's courts, case types, referral sources and deadline period types."
         },
         "roles_permissions_manage": {
           "label": "Create roles and set permissions"

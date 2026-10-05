@@ -10,7 +10,7 @@ type ActionResult = { error?: string }
 const UNIQUE_VIOLATION = '23505'
 const FOREIGN_KEY_VIOLATION = '23503'
 
-const PATH = '/dashboard/owner/deadline-period-types'
+const PATH = '/dashboard/reference/deadline-period-types'
 
 type Fields = {
   name: string

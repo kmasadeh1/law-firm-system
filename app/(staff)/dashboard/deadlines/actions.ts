@@ -36,7 +36,7 @@ export async function searchCases(term: string): Promise<CaseOption[]> {
   return data ?? []
 }
 
-// --- Period types (read-only picker; the admin CRUD lives under owner/) ----
+// --- Period types (read-only picker; the admin CRUD lives under reference/)
 
 export type PeriodTypeOption = {
   id: string

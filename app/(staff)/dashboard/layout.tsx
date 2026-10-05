@@ -93,11 +93,6 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   if (isOwner) {
     administration.push({ href: '/dashboard/owner/staff', label: t('staffAccounts'), icon: 'staff' })
     administration.push({ href: '/dashboard/owner/roles', label: t('rolesAndPermissions'), icon: 'roles' })
-    administration.push({
-      href: '/dashboard/owner/deadline-period-types',
-      label: t('deadlinePeriodTypes'),
-      icon: 'period-types',
-    })
   }
   // The same function the reference lists' write policies and their route
   // guard call - owner, or a role holding reference_data_manage.
@@ -108,6 +103,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       href: '/dashboard/reference/referral-sources',
       label: t('referralSources'),
       icon: 'referral-sources',
+    })
+    administration.push({
+      href: '/dashboard/reference/deadline-period-types',
+      label: t('deadlinePeriodTypes'),
+      icon: 'period-types',
     })
   }
   if (isOwner) {
