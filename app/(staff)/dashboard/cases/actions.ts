@@ -240,7 +240,7 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
 
 // --- Opposing parties ------------------------------------------------------
 
-export type OpposingPartyErrorCode = 'name_required' | 'conflict_check_failed' | 'add_failed'
+export type OpposingPartyErrorCode = 'name_required' | 'conflict_check_failed' | 'add_failed' | 'primary_failed'
 
 type OpposingPartyActionResult = { error?: OpposingPartyErrorCode }
 
@@ -291,6 +291,43 @@ export async function addOpposingParty(
 
   if (error) {
     return { error: 'add_failed' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+// The primary opposing party is the one a document template's
+// {{opposing_party}} / {{opposing_counsel}} resolve to. A unique partial
+// index allows at most one per case, so changing it is: clear the current
+// primary, then mark the new one. Two statements, not atomic - if the second
+// fails the case is left with no primary (reported, never a wrong one).
+// partyId null just clears it.
+export async function setPrimaryOpposingParty(
+  caseId: string,
+  partyId: string | null
+): Promise<OpposingPartyActionResult> {
+  const supabase = await createClient()
+
+  let clear = supabase
+    .from('case_opposing_parties')
+    .update({ is_primary: false })
+    .eq('case_id', caseId)
+    .eq('is_primary', true)
+  if (partyId) clear = clear.neq('id', partyId)
+  const { error: clearError } = await clear
+  if (clearError) return { error: 'primary_failed' }
+
+  if (partyId) {
+    const { data, error } = await supabase
+      .from('case_opposing_parties')
+      .update({ is_primary: true })
+      .eq('id', partyId)
+      .eq('case_id', caseId)
+      .select('id')
+    // 23505: someone else made another party primary in between. Zero
+    // rows: refused by RLS or the party is gone. Either way, not saved.
+    if (error || !data || data.length === 0) return { error: 'primary_failed' }
   }
 
   revalidatePath(casePath(caseId))

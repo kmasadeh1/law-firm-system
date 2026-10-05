@@ -5,7 +5,7 @@ import { OwnerNoAccess } from '@/components/dashboard/owner-no-access'
 
 /**
  * Guards the firm's reference lists - courts, case types, referral sources,
- * deadline period types and document checklists.
+ * deadline period types, document checklists and document templates.
  * Their write policies are can_manage_reference_data() (owner, or a role
  * holding reference_data_manage), so they live outside /dashboard/owner,
  * whose layout refuses every non-owner. This asks the same function the

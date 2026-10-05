@@ -106,6 +106,22 @@
     "invalidMessage": "This link is no longer valid — please contact the office."
   },
   "dashboard": {
+    "documentPlaceholders": {
+      "case_number": "Case number",
+      "case_title": "Case title",
+      "client_name": "Client name",
+      "client_national_id": "Client national ID",
+      "lead_lawyer": "Lead lawyer",
+      "court_name": "Court",
+      "court_case_number": "Court case number",
+      "court_chamber": "Chamber",
+      "judge": "Judge",
+      "opposing_party": "Opposing party (primary)",
+      "opposing_counsel": "Opposing counsel (primary party's)",
+      "poa_number": "Power of attorney (وكالة) number",
+      "firm_name": "Firm name",
+      "today": "Today's date"
+    },
     "common": {
       "unknownStaff": "Unknown staff",
       "pagination": {
@@ -229,6 +245,7 @@
       "localeSwitchFailed": "Couldn't switch language. Please try again."
     },
     "nav": {
+      "documentTemplates": "Document templates",
       "groupDailyWork": "Daily work",
       "groupMoney": "Money",
       "groupAdministration": "Administration",
@@ -325,6 +342,44 @@
         }
       },
       "detail": {
+        "drafts": {
+          "heading": "Drafts",
+          "noneYet": "No drafts yet.",
+          "noTemplates": "No templates for this type of case yet.",
+          "templateLabel": "Template",
+          "chooseTemplate": "Choose a template…",
+          "languageLabel": "Language",
+          "language": {
+            "en": "English",
+            "ar": "Arabic"
+          },
+          "generate": "Generate draft",
+          "generating": "Generating…",
+          "delete": "Delete",
+          "backToCase": "Back to case",
+          "notFound": "This draft doesn't exist, has been deleted, or you don't have access to it.",
+          "titleLabel": "Title",
+          "bodyLabel": "Text",
+          "markerHelp": "Anything in [square brackets] is a detail the case doesn't have yet - fix it before printing.",
+          "save": "Save",
+          "saving": "Saving…",
+          "saved": "Saved",
+          "unsaved": "Unsaved changes",
+          "print": "Print",
+          "marker": {
+            "missing": "[{label}: not available]",
+            "unknown": "[unknown placeholder: {name}]"
+          },
+          "errors": {
+            "templateUnavailable": "That template is no longer available in this language.",
+            "titleRequired": "A title is required.",
+            "bodyRequired": "The text can't be empty.",
+            "noPermission": "You don't have permission to edit drafts on this case.",
+            "generateFailed": "Could not create the draft. Please try again.",
+            "saveFailed": "Could not save the draft. Please try again.",
+            "deleteFailed": "Could not delete the draft. Please try again."
+          }
+        },
         "checklist": {
           "heading": "Document checklist",
           "requiredCount": "{provided} of {total} required provided",
@@ -501,6 +556,9 @@
           }
         },
         "opposingParties": {
+          "primaryBadge": "Primary",
+          "setPrimary": "Make primary",
+          "unsetPrimary": "Unset primary",
           "heading": "Opposing parties",
           "noneAddedYet": "None added yet.",
           "nameLabel": "Name",
@@ -515,6 +573,7 @@
           "matchOtherCase": "<bdi>{name}</bdi> — already an opposing party on another case",
           "matchExistingClient": "<bdi>{name}</bdi> — existing client",
           "errors": {
+            "primary_failed": "Could not change the primary party. Please refresh and try again.",
             "name_required": "Name is required.",
             "conflict_check_failed": "Could not run the conflict check. Please try again.",
             "add_failed": "Could not add the opposing party. Please try again.",
@@ -1244,6 +1303,38 @@
       }
     },
     "admin": {
+      "templates": {
+        "title": "Document templates",
+        "description": "Standard documents with placeholders. Generating one from a case fills the placeholders and gives the lawyer an editable draft to print.",
+        "createHeading": "New template",
+        "noneYet": "No templates yet",
+        "noneYetDescription": "Templates you add here can be generated from any case of the matching type.",
+        "placeholdersHeading": "Placeholders",
+        "placeholdersHelp": "Write these exactly as shown. A value the case doesn't have shows in the draft as a marker to fix before printing.",
+        "nameEnLabel": "Name — English",
+        "nameArLabel": "Name — Arabic",
+        "caseTypeLabel": "Case type",
+        "anyCaseType": "Any case type",
+        "bodyEnLabel": "Text — English",
+        "bodyArLabel": "Text — Arabic",
+        "create": "Create template",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "activeLabel": "Active",
+        "inactiveLabel": "Deactivated",
+        "active": "Active",
+        "inactive": "Deactivated",
+        "deactivate": "Deactivate",
+        "deactivateNote": "It will no longer be offered on cases. Drafts already made from it are kept, and reactivating brings it back.",
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noBody": "Enter the text in English or Arabic.",
+          "noPermission": "You don't have permission to manage templates.",
+          "createFailed": "Could not create the template. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
+        }
+      },
       "userType": {
         "owner": "Owner",
         "staff": "Staff"

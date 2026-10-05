@@ -28,17 +28,3 @@ export const poaStatusClass: Record<PoaStatus, string> = {
   expired: 'border border-accent-border bg-accent text-accent-fg',
   revoked: 'border border-accent-border bg-accent text-accent-fg',
 }
-
-// Picks which of a client's powers of attorney is the one actually
-// covering something right now, for display only - prefers a row that
-// isn't revoked, then the most recently issued. Never used to decide what a
-// query returns; the case page still reads every row RLS allows and chooses
-// among what it already has.
-export function mostRelevantPoa<T extends { is_revoked: boolean; issued_at: string | null }>(rows: T[]): T | null {
-  if (rows.length === 0) return null
-  const sorted = [...rows].sort((a, b) => {
-    if (a.is_revoked !== b.is_revoked) return a.is_revoked ? 1 : -1
-    return (b.issued_at ?? '').localeCompare(a.issued_at ?? '')
-  })
-  return sorted[0]
-}

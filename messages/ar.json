@@ -106,6 +106,22 @@
     "invalidMessage": "هذا الرابط لم يعد صالحاً - يرجى التواصل مع المكتب."
   },
   "dashboard": {
+    "documentPlaceholders": {
+      "case_number": "رقم القضية",
+      "case_title": "عنوان القضية",
+      "client_name": "اسم العميل",
+      "client_national_id": "الرقم الوطني للعميل",
+      "lead_lawyer": "المحامي المسؤول",
+      "court_name": "المحكمة",
+      "court_case_number": "رقم الدعوى",
+      "court_chamber": "الدائرة",
+      "judge": "القاضي",
+      "opposing_party": "الخصم (الطرف الرئيسي)",
+      "opposing_counsel": "محامي الخصم (الطرف الرئيسي)",
+      "poa_number": "رقم الوكالة",
+      "firm_name": "اسم المكتب",
+      "today": "تاريخ اليوم"
+    },
     "common": {
       "unknownStaff": "موظف غير معروف",
       "pagination": {
@@ -223,6 +239,7 @@
       "localeSwitchFailed": "تعذّر تغيير اللغة. يرجى المحاولة مرة أخرى."
     },
     "nav": {
+      "documentTemplates": "قوالب المستندات",
       "groupDailyWork": "العمل اليومي",
       "groupMoney": "المالية",
       "groupAdministration": "الإدارة",
@@ -317,6 +334,44 @@
         }
       },
       "detail": {
+        "drafts": {
+          "heading": "المسودات",
+          "noneYet": "لا توجد مسودات بعد.",
+          "noTemplates": "لا توجد قوالب لهذا النوع من القضايا بعد.",
+          "templateLabel": "القالب",
+          "chooseTemplate": "اختر قالباً…",
+          "languageLabel": "اللغة",
+          "language": {
+            "en": "الإنجليزية",
+            "ar": "العربية"
+          },
+          "generate": "إنشاء مسودة",
+          "generating": "جارٍ الإنشاء…",
+          "delete": "حذف",
+          "backToCase": "العودة إلى القضية",
+          "notFound": "هذه المسودة غير موجودة، أو حُذفت، أو ليس لديك صلاحية الوصول إليها.",
+          "titleLabel": "العنوان",
+          "bodyLabel": "النص",
+          "markerHelp": "أي شيء بين [أقواس مربعة] هو معلومة غير متوفرة في القضية بعد - صحّحها قبل الطباعة.",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "saved": "تم الحفظ",
+          "unsaved": "تغييرات غير محفوظة",
+          "print": "طباعة",
+          "marker": {
+            "missing": "[{label}: غير متوفر]",
+            "unknown": "[حقل غير معروف: {name}]"
+          },
+          "errors": {
+            "templateUnavailable": "هذا القالب لم يعد متاحاً بهذه اللغة.",
+            "titleRequired": "العنوان مطلوب.",
+            "bodyRequired": "لا يمكن أن يكون النص فارغاً.",
+            "noPermission": "ليس لديك صلاحية تعديل المسودات في هذه القضية.",
+            "generateFailed": "تعذّر إنشاء المسودة. يرجى المحاولة مرة أخرى.",
+            "saveFailed": "تعذّر حفظ المسودة. يرجى المحاولة مرة أخرى.",
+            "deleteFailed": "تعذّر حذف المسودة. يرجى المحاولة مرة أخرى."
+          }
+        },
         "checklist": {
           "heading": "قائمة المستندات",
           "requiredCount": "قُدِّم {provided} من {total} من البنود المطلوبة",
@@ -487,6 +542,9 @@
           }
         },
         "opposingParties": {
+          "primaryBadge": "الطرف الرئيسي",
+          "setPrimary": "تعيين كطرف رئيسي",
+          "unsetPrimary": "إلغاء التعيين كطرف رئيسي",
           "noneAddedYet": "لم يُضف أحد بعد.",
           "nameLabel": "الاسم",
           "nationalIdLabel": "الرقم الوطني",
@@ -498,6 +556,7 @@
           "addAnyway": "إضافة على أي حال",
           "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
           "errors": {
+            "primary_failed": "تعذّر تغيير الطرف الرئيسي. يرجى تحديث الصفحة والمحاولة مرة أخرى.",
             "name_required": "الاسم مطلوب.",
             "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
           }
@@ -1194,6 +1253,38 @@
       }
     },
     "admin": {
+      "templates": {
+        "title": "قوالب المستندات",
+        "description": "مستندات نموذجية تحتوي حقولاً تُملأ تلقائياً. إنشاء مستند من قضية يملأ الحقول ويعطي المحامي مسودة قابلة للتعديل والطباعة.",
+        "createHeading": "قالب جديد",
+        "noneYet": "لا توجد قوالب بعد",
+        "noneYetDescription": "يمكن إنشاء القوالب التي تضيفها هنا من أي قضية من النوع المطابق.",
+        "placeholdersHeading": "الحقول",
+        "placeholdersHelp": "اكتبها كما هي تماماً. القيمة غير المتوفرة في القضية تظهر في المسودة كعلامة تُصحَّح قبل الطباعة.",
+        "nameEnLabel": "الاسم — بالإنجليزية",
+        "nameArLabel": "الاسم — بالعربية",
+        "caseTypeLabel": "نوع القضية",
+        "anyCaseType": "أي نوع قضية",
+        "bodyEnLabel": "النص — بالإنجليزية",
+        "bodyArLabel": "النص — بالعربية",
+        "create": "إنشاء القالب",
+        "save": "حفظ",
+        "saving": "جارٍ الحفظ…",
+        "saved": "تم الحفظ",
+        "activeLabel": "فعّال",
+        "inactiveLabel": "معطّل",
+        "active": "فعّال",
+        "inactive": "معطّل",
+        "deactivate": "تعطيل",
+        "deactivateNote": "لن يُعرض بعد الآن في القضايا. يُحتفظ بالمسودات التي أُنشئت منه، وإعادة تفعيله تعيده.",
+        "errors": {
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noBody": "أدخل النص بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة القوالب.",
+          "createFailed": "تعذّر إنشاء القالب. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
+        }
+      },
       "userType": {
         "owner": "المالك",
         "staff": "موظف"

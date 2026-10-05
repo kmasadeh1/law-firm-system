@@ -278,3 +278,13 @@ export function RemindersIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function TemplatesIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M5.5 2.5h6l3 3v12h-9a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1Z" />
+      <path d="M11.5 2.5v3h3" />
+      <path d="M7 9.5h6M7 12h6M7 14.5h3.5" />
+    </svg>
+  )
+}

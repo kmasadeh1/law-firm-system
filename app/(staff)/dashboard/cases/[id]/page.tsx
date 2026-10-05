@@ -10,12 +10,13 @@ import { OpposingPartiesSection } from './opposing-parties-section'
 import { CourtAndDeadlines } from './court-and-deadlines'
 import type { CourtFiling } from './court-section'
 import { PowerOfAttorneyLine } from './power-of-attorney-line'
-import { mostRelevantPoa } from '@/lib/poa-status'
 import { TasksSection } from './tasks-section'
 import type { Task } from '../../tasks/task-list'
 import { ShareLinksSection } from './share-links-section'
 import { DocumentsSection, type DocumentRow } from './documents-section'
 import { ChecklistSection, type ChecklistItem } from './checklist-section'
+import { DraftsSection, type TemplateOption } from './drafts-section'
+import type { DraftLanguage } from '@/lib/document-placeholders'
 import { NotesSection, type CaseNote } from './notes-section'
 import { ExpensesSection, type Expense } from './expenses-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
@@ -102,7 +103,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: canManageShareLinks },
     { data: canWriteDocuments },
     { data: canWriteNotes },
-    { data: poaRows },
+    { data: coveringPoaId },
     { data: canAssignTasks },
     { data: taskRows },
     { data: contactRows },
@@ -114,7 +115,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase.from('staff_directory').select('id, full_name').eq('is_active', true).order('full_name'),
     supabase
       .from('case_opposing_parties')
-      .select('id, name, national_id, counsel_name, counsel_phone')
+      .select('id, name, national_id, counsel_name, counsel_phone, is_primary')
       .eq('case_id', id),
     // Picker options for the add form - inactive courts are excluded here
     // but an existing filing's own court still comes through the join below
@@ -179,16 +180,9 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase.rpc('can_manage_case_share_links', { p_case_id: id }),
     supabase.rpc('can_write_case_documents', { p_case_id: id }),
     supabase.rpc('can_write_case_notes', { p_case_id: id }),
-    // Every PoA this case could be covered by: this case's own
-    // case-specific rows, plus the client's general ones (case_id IS NULL).
-    // RLS already scopes this to what the viewer may see; which one
-    // actually covers the case is picked below from what comes back.
-    caseRow.clients?.id
-      ? supabase
-          .from('powers_of_attorney')
-          .select('id, case_id, poa_number, issued_at, expires_at, is_revoked')
-          .or(`case_id.eq.${id},and(case_id.is.null,client_id.eq.${caseRow.clients.id})`)
-      : Promise.resolve({ data: null, error: null }),
+    // Which وكالة covers this case is the database's decision:
+    // case-specific before general, never revoked or expired (Amman date).
+    supabase.rpc('case_covering_poa', { p_case_id: id }),
     // STABLE, already true for the owner internally - resolved once here,
     // never OR'd with isOwner.
     supabase.rpc('can_assign_tasks'),
@@ -238,9 +232,15 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
   // Case-specific wins over the client's general وكالة, never the other way
   // - "otherwise" chain over rows already fetched, not a second query.
-  const caseSpecificPoa = mostRelevantPoa((poaRows ?? []).filter((p) => p.case_id === id))
-  const generalPoa = mostRelevantPoa((poaRows ?? []).filter((p) => p.case_id === null))
-  const coveringPoaRow = caseSpecificPoa ?? generalPoa
+  // RLS still applies to the row itself; a وكالة the reader can't see
+  // reads as none.
+  const { data: coveringPoaRow } = coveringPoaId
+    ? await supabase
+        .from('powers_of_attorney')
+        .select('case_id, poa_number, issued_at, expires_at, is_revoked')
+        .eq('id', coveringPoaId)
+        .maybeSingle()
+    : { data: null }
   const coveringPoa = coveringPoaRow
     ? {
         poa_number: coveringPoaRow.poa_number,
@@ -380,6 +380,37 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     noted_by_name: row.noted_by ? (allNameById.get(row.noted_by) ?? tCommon('unknownStaff')) : null,
   }))
 
+  // Pre-filled drafts. Read and write both require can_write_case_documents,
+  // so neither query runs without it. Templates offered: active ones for
+  // this case's type plus those for any type, filtered in the query.
+  const [{ data: templateRows }, { data: draftRows }] =
+    canWriteDocuments === true
+      ? await Promise.all([
+          supabase
+            .from('document_templates')
+            .select('id, name_en, name_ar, body_en, body_ar')
+            .eq('is_active', true)
+            .or(caseRow.case_type_id ? `case_type_id.is.null,case_type_id.eq.${caseRow.case_type_id}` : 'case_type_id.is.null')
+            .order('sort_order')
+            .order('created_at'),
+          supabase
+            .from('document_drafts')
+            .select('id, title, updated_at, created_at')
+            .eq('case_id', id)
+            .is('deleted_at', null)
+            .order('created_at', { ascending: false }),
+        ])
+      : [{ data: [] }, { data: [] }]
+
+  const templateOptions: TemplateOption[] = (templateRows ?? []).map((tpl) => ({
+    id: tpl.id,
+    name: localizedName({ name: tpl.name_en ?? tpl.name_ar ?? '', name_ar: tpl.name_ar }, locale),
+    // The languages this template can be generated in - those with a body.
+    languages: [tpl.body_en ? 'en' : null, tpl.body_ar ? 'ar' : null].filter(
+      (lang): lang is DraftLanguage => lang !== null
+    ),
+  }))
+
   const expenses: Expense[] = (expenseRows ?? []).map((e) => ({
     id: e.id,
     description: e.description,
@@ -478,6 +509,10 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       )}
 
       <DocumentsSection caseId={caseRow.id} documents={documents} canWrite={canWriteDocuments === true} />
+
+      {canWriteDocuments === true && (
+        <DraftsSection caseId={caseRow.id} templates={templateOptions} drafts={draftRows ?? []} />
+      )}
 
       <NotesSection caseId={caseRow.id} notes={notes} canWrite={canWriteNotes === true} />
 

@@ -123,6 +123,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       label: t('documentChecklists'),
       icon: 'checklists',
     })
+    administration.push({
+      href: '/dashboard/reference/templates',
+      label: t('documentTemplates'),
+      icon: 'templates',
+    })
   }
   if (isOwner) {
     administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
