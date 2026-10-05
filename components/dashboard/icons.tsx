@@ -259,3 +259,13 @@ export function BellIcon({ className }: IconProps) {
     </svg>
   )
 }
+
+export function ChecklistsIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="m4 5.5 1.5 1.5L8 4.5" />
+      <path d="m4 11 1.5 1.5L8 10" />
+      <path d="M10.5 6h5.5M10.5 11.5h5.5M4.5 16h11.5" />
+    </svg>
+  )
+}

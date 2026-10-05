@@ -213,6 +213,7 @@
       "courts": "Courts",
       "caseTypes": "Case types",
       "referralSources": "Referral sources",
+      "documentChecklists": "Document checklists",
       "activityLog": "Activity log",
       "siteContent": "Site content",
       "settings": "Settings",
@@ -288,6 +289,39 @@
         }
       },
       "detail": {
+        "checklist": {
+          "heading": "Document checklist",
+          "requiredCount": "{provided} of {total} required provided",
+          "requiredNotApplicable": "{count, plural, one {# required item not applicable} other {# required items not applicable}}",
+          "required": "Required",
+          "optional": "Optional",
+          "state": {
+            "outstanding": "Outstanding",
+            "provided": "Provided",
+            "not_applicable": "Not applicable"
+          },
+          "stateLabel": "Status",
+          "linkedDocument": "Document: <bdi>{name}</bdi>",
+          "linkedDocumentUnavailable": "The linked document is no longer available.",
+          "notedBy": "Recorded by <bdi>{name}</bdi> on <bdi>{date}</bdi>",
+          "notedOn": "Recorded on <bdi>{date}</bdi>",
+          "documentLabel": "Link a document from this case (optional)",
+          "noDocument": "No document",
+          "noteLabel": "Note (optional)",
+          "save": "Save",
+          "saving": "Saving…",
+          "cancel": "Cancel",
+          "record": "Record",
+          "edit": "Edit",
+          "clear": "Mark outstanding",
+          "errors": {
+            "invalidState": "Choose Provided or Not applicable.",
+            "documentNotOnCase": "That document isn't on this case, or has been deleted.",
+            "noPermission": "You don't have permission to update this checklist.",
+            "saveFailed": "Could not save. Please try again.",
+            "clearFailed": "Could not mark it outstanding. Please try again."
+          }
+        },
         "page": {
           "backToCases": "Cases",
           "caseNotFound": "This case doesn't exist, or you don't have access to it.",
@@ -1361,6 +1395,37 @@
           "noPermission": "You don't have permission to manage courts.",
           "createFailed": "Could not create the court. Please try again.",
           "saveFailed": "Could not save the changes. Please try again."
+        }
+      },
+      "checklists": {
+        "title": "Document checklists",
+        "description": "The documents each type of case needs. Items appear on every case of that type straight away; each case records only whether an item was provided.",
+        "noCaseTypes": "Add case types first - each checklist belongs to a case type.",
+        "caseTypeInactive": "Inactive case type",
+        "noItems": "No checklist items for this case type yet.",
+        "nameEnLabel": "Name — English",
+        "nameArLabel": "Name — Arabic",
+        "requiredLabel": "Required",
+        "required": "Required",
+        "optional": "Optional",
+        "activeLabel": "Active",
+        "active": "Active",
+        "inactive": "Deactivated",
+        "add": "Add item",
+        "adding": "Adding…",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "deactivate": "Deactivate",
+        "deactivateNote": "It disappears from the checklist on every case of this type. Anything already recorded against it is kept, and reactivating brings it back.",
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noPermission": "You don't have permission to manage checklists.",
+          "createFailed": "Could not add the item. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again.",
+          "reorderFailed": "Could not move the item. Please refresh and try again."
         }
       },
       "referralSources": {

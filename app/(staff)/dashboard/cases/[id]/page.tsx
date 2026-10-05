@@ -15,6 +15,7 @@ import { TasksSection } from './tasks-section'
 import type { Task } from '../../tasks/task-list'
 import { ShareLinksSection } from './share-links-section'
 import { DocumentsSection, type DocumentRow } from './documents-section'
+import { ChecklistSection, type ChecklistItem } from './checklist-section'
 import { NotesSection, type CaseNote } from './notes-section'
 import { ExpensesSection, type Expense } from './expenses-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
@@ -340,6 +341,45 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     deleted_by_name: d.deleted_by ? (allNameById.get(d.deleted_by) ?? tCommon('unknownStaff')) : null,
   }))
 
+  // Document checklist, derived from the case type's template by the
+  // case_document_checklist view (security_invoker). Ordered in the query:
+  // outstanding first, required before optional, then the template order.
+  // The three counts are head-count queries on the same view - required
+  // items only, never mixed with optional ones.
+  const checklistView = () => supabase.from('case_document_checklist').select('item_id', { count: 'exact', head: true }).eq('case_id', id).eq('is_required', true)
+  const [{ data: checklistRows }, { count: requiredTotal }, { count: requiredProvided }, { count: requiredNotApplicable }] =
+    await Promise.all([
+      supabase
+        .from('case_document_checklist')
+        .select('item_id, name_en, name_ar, is_required, state, document_id, note, noted_at, noted_by')
+        .eq('case_id', id)
+        .order('outstanding', { ascending: false })
+        .order('is_required', { ascending: false })
+        .order('sort_order', { ascending: true })
+        .order('name_en', { ascending: true, nullsFirst: false }),
+      checklistView(),
+      checklistView().eq('state', 'provided'),
+      checklistView().eq('state', 'not_applicable'),
+    ])
+
+  // Linkable documents are the ones the Documents section already lists,
+  // minus deleted ones - the checklist_document_on_case trigger refuses a
+  // deleted document, so it is never offered.
+  const linkableDocuments = documents.filter((d) => !d.deleted_at).map((d) => ({ id: d.id, filename: d.filename }))
+  const linkableFilenameById = new Map(linkableDocuments.map((d) => [d.id, d.filename]))
+
+  const checklistItems: ChecklistItem[] = (checklistRows ?? []).map((row) => ({
+    item_id: row.item_id ?? '',
+    name: localizedName({ name: row.name_en ?? row.name_ar ?? '', name_ar: row.name_ar }, locale),
+    is_required: row.is_required === true,
+    state: row.state,
+    note: row.note,
+    document_id: row.document_id,
+    document_filename: row.document_id ? (linkableFilenameById.get(row.document_id) ?? null) : null,
+    noted_at: row.noted_at,
+    noted_by_name: row.noted_by ? (allNameById.get(row.noted_by) ?? tCommon('unknownStaff')) : null,
+  }))
+
   const expenses: Expense[] = (expenseRows ?? []).map((e) => ({
     id: e.id,
     description: e.description,
@@ -420,6 +460,22 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       <TasksSection caseId={caseRow.id} tasks={tasks} staffOptions={activeStaff} canAssign={canAssignTasks === true} />
 
       <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} canManage={canManageShareLinks === true} />
+
+      {/* Nothing at all when the case type has no checklist items - most
+          types won't until the firm adds them. */}
+      {checklistItems.length > 0 && (
+        <ChecklistSection
+          caseId={caseRow.id}
+          items={checklistItems}
+          counts={{
+            requiredTotal: requiredTotal ?? 0,
+            requiredProvided: requiredProvided ?? 0,
+            requiredNotApplicable: requiredNotApplicable ?? 0,
+          }}
+          documents={linkableDocuments}
+          canWrite={canWriteDocuments === true}
+        />
+      )}
 
       <DocumentsSection caseId={caseRow.id} documents={documents} canWrite={canWriteDocuments === true} />
 

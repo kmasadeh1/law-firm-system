@@ -157,6 +157,13 @@ export type Database = {
             foreignKeyName: "appointments_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "appointments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -239,6 +246,110 @@ export type Database = {
           },
         ]
       }
+      case_checklist_status: {
+        Row: {
+          case_id: string
+          document_id: string | null
+          id: string
+          item_id: string
+          note: string | null
+          noted_at: string
+          noted_by: string | null
+          state: Database["public"]["Enums"]["checklist_state"]
+        }
+        Insert: {
+          case_id: string
+          document_id?: string | null
+          id?: string
+          item_id: string
+          note?: string | null
+          noted_at?: string
+          noted_by?: string | null
+          state: Database["public"]["Enums"]["checklist_state"]
+        }
+        Update: {
+          case_id?: string
+          document_id?: string | null
+          id?: string
+          item_id?: string
+          note?: string | null
+          noted_at?: string
+          noted_by?: string | null
+          state?: Database["public"]["Enums"]["checklist_state"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "document_checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_court_filings: {
         Row: {
           case_id: string
@@ -280,6 +391,13 @@ export type Database = {
           notes?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "case_court_filings_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "case_court_filings_case_id_fkey"
             columns: ["case_id"]
@@ -362,6 +480,13 @@ export type Database = {
             foreignKeyName: "case_lawyers_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_lawyers_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -434,6 +559,13 @@ export type Database = {
           staff_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "case_notes_case_id_fkey"
             columns: ["case_id"]
@@ -529,6 +661,13 @@ export type Database = {
             foreignKeyName: "case_opposing_parties_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_opposing_parties_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -586,6 +725,13 @@ export type Database = {
           token_hash?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "case_share_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "case_share_links_case_id_fkey"
             columns: ["case_id"]
@@ -855,6 +1001,13 @@ export type Database = {
             foreignKeyName: "client_contacts_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -1008,6 +1161,13 @@ export type Database = {
           reverses_entry_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "client_fund_entries_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "client_fund_entries_case_id_fkey"
             columns: ["case_id"]
@@ -1333,6 +1493,13 @@ export type Database = {
             foreignKeyName: "deadlines_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "deadlines_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -1436,6 +1603,47 @@ export type Database = {
           },
         ]
       }
+      document_checklist_items: {
+        Row: {
+          case_type_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_required: boolean
+          name_ar: string | null
+          name_en: string | null
+          sort_order: number
+        }
+        Insert: {
+          case_type_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Update: {
+          case_type_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_checklist_items_case_type_id_fkey"
+            columns: ["case_type_id"]
+            isOneToOne: false
+            referencedRelation: "case_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           case_id: string | null
@@ -1468,6 +1676,13 @@ export type Database = {
           uploaded_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "documents_case_id_fkey"
             columns: ["case_id"]
@@ -1547,6 +1762,13 @@ export type Database = {
           engagement_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "engagement_cases_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "engagement_cases_case_id_fkey"
             columns: ["case_id"]
@@ -1885,6 +2107,13 @@ export type Database = {
           reimbursed_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "expenses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "expenses_case_id_fkey"
             columns: ["case_id"]
@@ -2486,6 +2715,13 @@ export type Database = {
             foreignKeyName: "powers_of_attorney_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "powers_of_attorney_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -2829,6 +3065,13 @@ export type Database = {
             foreignKeyName: "tasks_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "tasks_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -3003,6 +3246,52 @@ export type Database = {
       }
     }
     Views: {
+      case_document_checklist: {
+        Row: {
+          case_id: string | null
+          document_id: string | null
+          is_required: boolean | null
+          item_id: string | null
+          name_ar: string | null
+          name_en: string | null
+          note: string | null
+          noted_at: string | null
+          noted_by: string | null
+          outstanding: boolean | null
+          sort_order: number | null
+          state: Database["public"]["Enums"]["checklist_state"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_checklist_status_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_type_profitability: {
         Row: {
           case_count: number | null
@@ -3480,6 +3769,7 @@ export type Database = {
       alert_kind: "deadline_approaching" | "hearing_tomorrow"
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
       appointment_type: "consultation" | "court_date"
+      checklist_state: "provided" | "not_applicable"
       client_fund_direction: "in" | "out"
       client_fund_entry_type:
         | "deposit"
@@ -3657,6 +3947,7 @@ export const Constants = {
       alert_kind: ["deadline_approaching", "hearing_tomorrow"],
       appointment_status: ["scheduled", "completed", "cancelled", "no_show"],
       appointment_type: ["consultation", "court_date"],
+      checklist_state: ["provided", "not_applicable"],
       client_fund_direction: ["in", "out"],
       client_fund_entry_type: [
         "deposit",
