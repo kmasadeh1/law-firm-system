@@ -8,7 +8,7 @@ import { controlClass } from '@/components/dashboard/form'
 import { addDaysToDate, formatFullDate, formatTimeOfDay, todayInFirmZone } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
-import { PrintButton } from './print-button'
+import { PrintButton } from '@/components/dashboard/print-button'
 
 // Parses ?date= defensively: anything that isn't a real YYYY-MM-DD calendar
 // date (typo'd URL, 2026-02-30) falls back to today rather than erroring.
@@ -92,7 +92,7 @@ export default async function HearingCalendarPage({ searchParams }: PageProps<'/
       </div>
 
       <div className="print:hidden">
-        <PageHeader title={t('title')} description={fullDate} action={<PrintButton label={t('print')} />} />
+        <PageHeader title={t('title')} description={fullDate} action={<PrintButton label={t('print')} testId="hearing-calendar-print" />} />
       </div>
 
       <div className="flex flex-col gap-3 print:hidden" data-testid="hearing-calendar-controls">

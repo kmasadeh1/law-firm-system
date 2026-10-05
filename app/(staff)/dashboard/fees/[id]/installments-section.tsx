@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRef, useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import {
@@ -507,13 +508,22 @@ function InstallmentRow({
           ) : (
             <ul className="flex flex-col divide-y divide-line">
               {installment.payments.map((p) => (
-                <li key={p.id} className="flex items-center justify-between py-1.5 text-sm">
+                <li key={p.id} className="flex items-center justify-between gap-3 py-1.5 text-sm" data-testid="payment-row">
                   <span className="text-fg">
                     <bdi>{formatAmount(p.amount, locale)}</bdi>
                   </span>
-                  <span className="text-fg-muted">
-                    <bdi>{formatDate(p.paid_at, locale)}</bdi>
-                    {p.method && t.rich('paymentMethodFragment', { method: p.method, bdi: (chunks) => <bdi>{chunks}</bdi> })}
+                  <span className="flex items-center gap-3 text-fg-muted">
+                    <span>
+                      <bdi>{formatDate(p.paid_at, locale)}</bdi>
+                      {p.method && t.rich('paymentMethodFragment', { method: p.method, bdi: (chunks) => <bdi>{chunks}</bdi> })}
+                    </span>
+                    <Link
+                      href={`/dashboard/fees/receipts/${p.id}`}
+                      className="font-medium text-fg underline underline-offset-2"
+                      data-testid="payment-receipt-link"
+                    >
+                      {t('receipt')}
+                    </Link>
                   </span>
                 </li>
               ))}

@@ -1041,6 +1041,7 @@
           "deleteNoteHasPayments": "Payments have already been recorded against this instalment - deleting it will fail until those payments are removed.",
           "deleteNoteNoPayments": "No payments have been recorded against this instalment yet. This can't be undone.",
           "noPaymentsYet": "No payments recorded yet.",
+          "receipt": "Receipt",
           "paymentMethodFragment": " · <bdi>{method}</bdi>",
           "paymentsImmutableBanner": "Payments can't be edited or removed once recorded. A mistake is corrected with an offsetting entry, not by changing history.",
           "amountLabel": "Amount",
@@ -1058,6 +1059,24 @@
           "adding": "Adding…",
           "addInstallment": "Add instalment"
         }
+      },
+      "receipt": {
+        "title": "Payment receipt",
+        "receiptNumber": "Receipt no.",
+        "date": "Date",
+        "receivedFrom": "Received from",
+        "clientHidden": "Client name not visible",
+        "for": "For",
+        "dueDate": "Instalment due <bdi>{date}</bdi>",
+        "method": "Method",
+        "amount": "Amount",
+        "amountInWords": "In words:",
+        "receivedBy": "Received by (signature)",
+        "stamp": "Firm stamp",
+        "print": "Print receipt",
+        "backToEngagement": "Back to engagement",
+        "backToFees": "Fees & payments",
+        "notFound": "This payment doesn't exist, or you don't have access to it."
       },
       "errors": {
         "select_client": "Select a client.",

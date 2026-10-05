@@ -1000,6 +1000,7 @@
           "deleteItemDue": "<bdi>{amount}</bdi> يستحق في <bdi>{date}</bdi>",
           "deleteItemNoDueDate": "<bdi>{amount}</bdi>، بلا تاريخ استحقاق",
           "noPaymentsYet": "لم تُسجَّل أي مدفوعات بعد.",
+          "receipt": "سند القبض",
           "paymentMethodFragment": " · <bdi>{method}</bdi>",
           "paymentsImmutableBanner": "لا يمكن تعديل المدفوعات أو حذفها بعد تسجيلها. يُصحَّح أي خطأ بقيد معاكس، لا بتغيير السجل.",
           "amountLabel": "المبلغ",
@@ -1016,6 +1017,24 @@
           "payerAddPlaceholder": "إن لم يكن العميل",
           "adding": "جارٍ الإضافة…"
         }
+      },
+      "receipt": {
+        "title": "سند قبض",
+        "receiptNumber": "رقم السند",
+        "date": "التاريخ",
+        "receivedFrom": "استلمنا من",
+        "clientHidden": "اسم العميل غير ظاهر",
+        "for": "وذلك عن",
+        "dueDate": "قسط مستحق في <bdi>{date}</bdi>",
+        "method": "طريقة الدفع",
+        "amount": "المبلغ",
+        "amountInWords": "كتابةً:",
+        "receivedBy": "المستلم (التوقيع)",
+        "stamp": "خاتم المكتب",
+        "print": "طباعة السند",
+        "backToEngagement": "العودة إلى اتفاق الأتعاب",
+        "backToFees": "الأتعاب والمدفوعات",
+        "notFound": "هذه الدفعة غير موجودة، أو ليس لديك صلاحية الوصول إليها."
       },
       "errors": {
         "select_client": "اختر عميلاً.",

@@ -2144,6 +2144,7 @@ export type Database = {
           installment_id: string
           method: string | null
           paid_at: string
+          receipt_number: number
           recorded_by: string | null
         }
         Insert: {
@@ -2153,6 +2154,7 @@ export type Database = {
           installment_id: string
           method?: string | null
           paid_at?: string
+          receipt_number?: number
           recorded_by?: string | null
         }
         Update: {
@@ -2162,6 +2164,7 @@ export type Database = {
           installment_id?: string
           method?: string | null
           paid_at?: string
+          receipt_number?: number
           recorded_by?: string | null
         }
         Relationships: [
