@@ -563,6 +563,7 @@
           "matchExistingClient": "<bdi>{name}</bdi> — existing client",
           "errors": {
             "primary_failed": "Could not change the primary party. Please refresh and try again.",
+            "conflict_check_not_allowed": "You don't have permission to run a conflict check, so an opposing party can't be added.",
             "name_required": "Name is required.",
             "conflict_check_failed": "Could not run the conflict check. Please try again.",
             "add_failed": "Could not add the opposing party. Please try again.",

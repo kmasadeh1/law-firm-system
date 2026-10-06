@@ -23,6 +23,7 @@ type OpposingParty = {
 const OPPOSING_PARTY_ERROR_CODES: OpposingPartyErrorCode[] = [
   'name_required',
   'conflict_check_failed',
+  'conflict_check_not_allowed',
   'phone_invalid',
   'add_failed',
   'primary_failed',

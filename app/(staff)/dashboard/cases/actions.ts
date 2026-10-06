@@ -244,6 +244,7 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
 export type OpposingPartyErrorCode =
   | 'name_required'
   | 'conflict_check_failed'
+  | 'conflict_check_not_allowed'
   | 'phone_invalid'
   | 'add_failed'
   | 'primary_failed'
@@ -280,6 +281,12 @@ export async function addOpposingParty(
     })
 
     if (conflictError) {
+      // check_conflict refuses a caller who is not the owner and holds
+      // neither clients_manage nor cases_manage - a permission answer, not
+      // a failure, so it is told apart by its constraint name.
+      if (conflictError.code === '42501' && conflictError.message.includes('check_conflict')) {
+        return { error: 'conflict_check_not_allowed' }
+      }
       return { error: 'conflict_check_failed' }
     }
     if (matches && matches.length > 0) {
