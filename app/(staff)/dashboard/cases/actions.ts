@@ -84,8 +84,6 @@ export async function createCase(formData: FormData): Promise<CreateCaseActionRe
     return { error: 'statusLookupFailed' }
   }
 
-  const { data: user } = await supabase.auth.getClaims()
-
   const { data: inserted, error } = await supabase
     .from('cases')
     .insert({
@@ -94,7 +92,7 @@ export async function createCase(formData: FormData): Promise<CreateCaseActionRe
       case_number: case_number.trim(),
       case_type_id: typeof case_type_id === 'string' && case_type_id ? case_type_id : null,
       status_id: firstStatus.id,
-      created_by: user?.claims?.sub,
+      // created_by is stamped by the cases_stamp_created_by trigger.
     })
     .select('id')
     .single()
@@ -561,10 +559,8 @@ export async function addHearing(
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { data: userData } = await supabase.auth.getClaims()
-  const { error } = await supabase
-    .from('hearings')
-    .insert({ filing_id: filingId, ...fields, created_by: userData?.claims?.sub })
+  // created_by is stamped by the hearings_stamp_created_by trigger.
+  const { error } = await supabase.from('hearings').insert({ filing_id: filingId, ...fields })
 
   if (error) {
     if (error.code === '23514') {
