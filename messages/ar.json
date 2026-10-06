@@ -929,6 +929,7 @@
       "new": {
         "backToDeadlines": "المهل",
         "title": "مهلة جديدة",
+      "noAccess": "ليس لديك صلاحية إضافة المهل.",
         "resultHeading": "تمت إضافة المهلة",
         "resultLine": "تاريخ البدء <bdi>{trigger}</bdi> <icon></icon> تستحق في <bdi><strong>{due}</strong></bdi>",
         "effectiveDueDateLine": "تاريخ الاستحقاق الفعلي (بعد أي تمديد): <bdi>{date}</bdi>",

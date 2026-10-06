@@ -19,21 +19,28 @@ export default async function DeadlinesListPage() {
   // RLS already scopes this to what the signed-in user can see (owner,
   // cases_manage, court_dates_manage, or is_on_case) - no extra gate here,
   // same as Cases and Appointments.
-  const { data: deadlines } = await supabase
-    .from('deadlines')
-    .select(
-      'id, case_id, trigger_date, effective_due_date, extended_due_date, completed_at, cases(case_number, title), deadline_period_types(name, name_ar)'
-    )
-    .order('effective_due_date', { ascending: true, nullsFirst: false })
+  const [{ data: deadlines }, { data: canAdd }] = await Promise.all([
+    supabase
+      .from('deadlines')
+      .select(
+        'id, case_id, trigger_date, effective_due_date, extended_due_date, completed_at, cases(case_number, title), deadline_period_types(name, name_ar)'
+      )
+      .order('effective_due_date', { ascending: true, nullsFirst: false }),
+    // "New deadline" is offered only to someone who could manage at least
+    // one case's details - the same question /deadlines/new asks.
+    supabase.rpc('can_manage_any_case_details'),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title={t('title')}
         action={
-          <LinkButton href="/dashboard/deadlines/new" variant="primary">
-            {t('newDeadline')}
-          </LinkButton>
+          canAdd === true ? (
+            <LinkButton href="/dashboard/deadlines/new" variant="primary" data-testid="deadlines-new">
+              {t('newDeadline')}
+            </LinkButton>
+          ) : undefined
         }
       />
 
@@ -42,9 +49,11 @@ export default async function DeadlinesListPage() {
           title={t('noneYet')}
           description={t('noneYetDescription')}
           action={
-            <LinkButton href="/dashboard/deadlines/new" variant="secondary">
-              {t('newDeadline')}
-            </LinkButton>
+            canAdd === true ? (
+              <LinkButton href="/dashboard/deadlines/new" variant="secondary">
+                {t('newDeadline')}
+              </LinkButton>
+            ) : undefined
           }
         />
       ) : (

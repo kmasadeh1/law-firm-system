@@ -1026,6 +1026,7 @@
       "new": {
         "backToDeadlines": "Deadlines",
         "title": "New deadline",
+      "noAccess": "You don't have permission to add deadlines.",
         "resultHeading": "Deadline added",
         "resultLine": "Trigger date <bdi>{trigger}</bdi> <icon></icon> due <bdi><strong>{due}</strong></bdi>",
         "effectiveDueDateLine": "Effective due date (after any extension): <bdi>{date}</bdi>",

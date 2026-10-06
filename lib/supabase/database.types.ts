@@ -3955,9 +3955,14 @@ export type Database = {
         Args: { n: Database["public"]["Tables"]["enquiry_notes"]["Row"] }
         Returns: boolean
       }
+      can_manage_any_case_details: { Args: never; Returns: boolean }
       can_manage_case_details: { Args: { p_case_id: string }; Returns: boolean }
       can_manage_case_share_links: {
         Args: { p_case_id: string }
+        Returns: boolean
+      }
+      can_manage_details: {
+        Args: { c: Database["public"]["Tables"]["cases"]["Row"] }
         Returns: boolean
       }
       can_manage_power_of_attorney: {

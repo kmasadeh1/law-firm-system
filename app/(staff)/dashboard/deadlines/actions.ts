@@ -20,6 +20,17 @@ function casePath(caseId: string) {
 
 export type CaseOption = { id: string; case_number: string; title: string }
 
+// Offers only cases whose details this person may manage - the deadline
+// insert policy is can_manage_case_details(case_id), so a case they can
+// merely see would be refused on save. can_manage_details is a computed
+// column on cases (a row-type function): named in the select because it is
+// not part of '*', and filtered in the query so a case outside it never
+// reaches the picker. The generated types don't add it to the cases Row,
+// so the row shape is stated.
+//
+// Deadlines only: the appointments and tasks pickers have their own search
+// actions and are not filtered this way - an appointment or task on a case
+// doesn't require managing its details.
 export async function searchCases(term: string): Promise<CaseOption[]> {
   const trimmed = term.trim()
   if (!trimmed) return []
@@ -28,12 +39,14 @@ export async function searchCases(term: string): Promise<CaseOption[]> {
   const safe = trimmed.replace(/[,()]/g, '')
   const { data } = await supabase
     .from('cases')
-    .select('id, case_number, title')
+    .select('id, case_number, title, can_manage_details')
+    .filter('can_manage_details', 'eq', true)
     .or(`case_number.ilike.%${safe}%,title.ilike.%${safe}%`)
     .order('case_number')
     .limit(10)
+    .overrideTypes<(CaseOption & { can_manage_details: boolean | null })[], { merge: false }>()
 
-  return data ?? []
+  return (data ?? []).map(({ id, case_number, title }) => ({ id, case_number, title }))
 }
 
 // --- Period types (read-only picker; the admin CRUD lives under reference/)
