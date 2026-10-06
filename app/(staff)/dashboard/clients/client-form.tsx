@@ -173,7 +173,7 @@ export function ClientForm(props: Props) {
       </Field>
       <Field>
         <Label htmlFor="national_id">{t('nationalIdLabel')}</Label>
-        <input id="national_id" name="national_id" defaultValue={initial.national_id ?? ''} className={controlClass} />
+        <input id="national_id" name="national_id" dir="ltr" defaultValue={initial.national_id ?? ''} className={controlClass} />
       </Field>
       <Field>
         <Label htmlFor="phone">{t('phoneLabel')}</Label>
@@ -181,7 +181,7 @@ export function ClientForm(props: Props) {
       </Field>
       <Field>
         <Label htmlFor="email">{t('emailLabel')}</Label>
-        <input id="email" name="email" type="email" defaultValue={initial.email ?? ''} className={controlClass} />
+        <input id="email" name="email" type="email" dir="ltr" defaultValue={initial.email ?? ''} className={controlClass} />
       </Field>
       <Field>
         <Label htmlFor="notes">{t('notesLabel')}</Label>
