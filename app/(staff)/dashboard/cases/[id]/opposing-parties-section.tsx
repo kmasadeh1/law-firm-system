@@ -23,6 +23,7 @@ type OpposingParty = {
 const OPPOSING_PARTY_ERROR_CODES: OpposingPartyErrorCode[] = [
   'name_required',
   'conflict_check_failed',
+  'phone_invalid',
   'add_failed',
   'primary_failed',
 ]
@@ -68,12 +69,15 @@ export function OpposingPartiesSection({
 }) {
   const t = useTranslations('dashboard.cases.detail.opposingParties')
   const tErrors = useTranslations('dashboard.cases.detail.opposingParties.errors')
+  const tCommon = useTranslations('dashboard.common')
   const formRef = useRef<HTMLFormElement>(null)
   const [matches, setMatches] = useState<ConflictMatch[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   function resolveError(code: OpposingPartyErrorCode) {
+    // The phone refusal reads the same on every form that takes a phone.
+    if (code === 'phone_invalid') return tCommon('phoneInvalid')
     return (OPPOSING_PARTY_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('generic')
   }
 
@@ -176,7 +180,7 @@ export function OpposingPartiesSection({
             <label htmlFor="op-national-id" className="text-sm text-fg-muted">
               {t('nationalIdLabel')}
             </label>
-            <input id="op-national-id" name="national_id" className={controlClass} />
+            <input id="op-national-id" name="national_id" dir="ltr" className={controlClass} />
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="op-counsel-name" className="text-sm text-fg-muted">

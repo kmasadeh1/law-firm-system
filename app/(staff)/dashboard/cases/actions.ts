@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { todayInFirmZone } from '@/lib/format-date-time'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 export type ConflictMatch = {
   source: string
@@ -240,7 +241,12 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
 
 // --- Opposing parties ------------------------------------------------------
 
-export type OpposingPartyErrorCode = 'name_required' | 'conflict_check_failed' | 'add_failed' | 'primary_failed'
+export type OpposingPartyErrorCode =
+  | 'name_required'
+  | 'conflict_check_failed'
+  | 'phone_invalid'
+  | 'add_failed'
+  | 'primary_failed'
 
 type OpposingPartyActionResult = { error?: OpposingPartyErrorCode }
 
@@ -290,6 +296,7 @@ export async function addOpposingParty(
   })
 
   if (error) {
+    if (isPhoneRefusal(error)) return { error: 'phone_invalid' }
     return { error: 'add_failed' }
   }
 

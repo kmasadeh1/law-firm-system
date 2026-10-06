@@ -77,6 +77,7 @@
     "errorNameRequired": "Please enter your name.",
     "errorMessageRequired": "Please enter a message.",
     "errorContactRequired": "Please provide a phone number or an email address.",
+    "errorPhoneInvalid": "Please enter a Jordanian phone number, or include the country code if your number is from abroad.",
     "errorGeneric": "Something went wrong sending your message. Please try again, or reach us by phone or email above."
   },
   "footer": {
@@ -111,6 +112,7 @@
     },
     "common": {
       "unknownStaff": "Unknown staff",
+      "phoneInvalid": "Enter a Jordanian phone number, or include the country code for a number from abroad.",
       "pagination": {
         "showing": "Showing {from}–{to} of {total}",
         "navLabel": "Pagination",

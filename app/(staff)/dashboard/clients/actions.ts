@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 export type ConflictMatch = {
   source: string
@@ -49,6 +50,11 @@ async function readFields(formData: FormData): Promise<ClientFields | { error: s
   }
 }
 
+async function phoneInvalidMessage(locale: string) {
+  const t = await getTranslations({ locale, namespace: 'dashboard.common' })
+  return t('phoneInvalid')
+}
+
 export async function createClientRecord(
   formData: FormData,
   confirmed: boolean
@@ -83,6 +89,7 @@ export async function createClientRecord(
     .single()
 
   if (error) {
+    if (isPhoneRefusal(error)) return { error: await phoneInvalidMessage(locale) }
     return { error: t('createFailed') }
   }
 
@@ -102,6 +109,7 @@ export async function updateClientRecord(
   const supabase = await createClient()
   const { data, error } = await supabase.from('clients').update(fields).eq('id', clientId).select('id')
 
+  if (isPhoneRefusal(error)) return { error: await phoneInvalidMessage(locale) }
   // Zero rows: refused by RLS (raises nothing) or the client is gone -
   // nothing was saved, so never report success.
   if (error || !data || data.length === 0) {

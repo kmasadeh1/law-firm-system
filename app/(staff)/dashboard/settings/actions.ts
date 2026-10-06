@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 type ActionResult = { error?: string }
 
@@ -38,6 +39,10 @@ export async function updateOwnProfile(formData: FormData): Promise<ActionResult
     .eq('id', user.sub as string)
     .select('id')
 
+  if (isPhoneRefusal(error)) {
+    const tCommon = await getTranslations({ locale, namespace: 'dashboard.common' })
+    return { error: tCommon('phoneInvalid') }
+  }
   // Zero rows: the policy always allows your own row, so this would mean
   // the row is gone or the policy changed - either way, not saved.
   if (error || !updated || updated.length === 0) {

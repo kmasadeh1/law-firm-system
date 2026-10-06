@@ -27,7 +27,7 @@ function present(value: string | null | undefined): string | null {
 
 // The public contact button: firm_settings.whatsapp_phone, or the main
 // number when that is NULL. Both empty means no link at all. The number
-// itself is normalised by lib/whatsapp.ts - the only normaliser.
+// itself is turned into a link by lib/whatsapp.ts.
 export function whatsappHref(whatsappPhone: string | null, phone: string | null): string | null {
   return whatsappLink(present(whatsappPhone) ?? present(phone))
 }

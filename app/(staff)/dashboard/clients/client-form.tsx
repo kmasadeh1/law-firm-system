@@ -177,7 +177,7 @@ export function ClientForm(props: Props) {
       </Field>
       <Field>
         <Label htmlFor="phone">{t('phoneLabel')}</Label>
-        <input id="phone" name="phone" type="tel" defaultValue={initial.phone ?? ''} className={controlClass} />
+        <input id="phone" name="phone" type="tel" dir="ltr" defaultValue={initial.phone ?? ''} className={controlClass} />
       </Field>
       <Field>
         <Label htmlFor="email">{t('emailLabel')}</Label>

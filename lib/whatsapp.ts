@@ -3,16 +3,17 @@
 // only: it decides nothing about who may be contacted.
 //
 // wa.me takes the full international number as digits only - no plus, no
-// spaces, no punctuation: "+962 79 146 2040" -> "962791462040". A leading
-// "00" is the international dialling prefix written out, the same as "+",
-// so it is dropped too. A number stored without its country code can't be
-// fixed here (guessing one would be wrong); it produces a link WhatsApp
-// itself will reject.
+// spaces, no punctuation: "+962791462040" -> "962791462040". Client, staff,
+// enquiry and counsel phones are stored that way already (normalise_phone,
+// in the database), so stripping the "+" is all they need. Stripping every
+// non-digit, not just the "+", keeps this tolerant of firm_settings.phone,
+// which is deliberately not normalised and is shown as the owner typed it
+// ("+962 79 146 2040").
 //
 // `text` pre-fills the message; WhatsApp opens it in the composer for a
 // person to read, edit and send - nothing is sent from here.
 export function whatsappLink(phone: string | null | undefined, text?: string): string | null {
-  const digits = (phone ?? '').replace(/\D/g, '').replace(/^00/, '')
+  const digits = (phone ?? '').replace(/\D/g, '')
   if (!digits) return null
   return text ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : `https://wa.me/${digits}`
 }
