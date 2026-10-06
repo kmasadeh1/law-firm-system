@@ -8,6 +8,12 @@ import { StatusSection } from './status-section'
 import { NotesSection, type EnquiryNote } from './notes-section'
 import { formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import type { Database } from '@/lib/supabase/database.types'
+
+type EnquiryNoteRow = Pick<
+  Database['public']['Tables']['enquiry_notes']['Row'],
+  'id' | 'note' | 'created_at' | 'staff_id' | 'edited_at' | 'deleted_at' | 'deleted_by'
+> & { can_edit_enquiry_note: boolean | null }
 
 export default async function EnquiryDetailPage({ params }: PageProps<'/dashboard/enquiries/[id]'>) {
   const { id } = await params
@@ -46,9 +52,15 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
     supabase.from('staff_directory').select('id, full_name'),
     supabase
       .from('enquiry_notes')
-      .select('id, note, created_at, staff_id, edited_at, deleted_at, deleted_by')
+      // can_edit_enquiry_note is a computed column (a row-type function):
+      // the database's per-note answer to who may edit or delete it. It is
+      // not part of '*', so it is named here. The generated types list it
+      // under Functions but not on the table's Row, so the row shape is
+      // stated rather than inferred.
+      .select('id, note, created_at, staff_id, edited_at, deleted_at, deleted_by, can_edit_enquiry_note')
       .eq('enquiry_id', id)
-      .order('created_at', { ascending: false }),
+      .order('created_at', { ascending: false })
+      .overrideTypes<EnquiryNoteRow[], { merge: false }>(),
   ])
 
   if (!enquiry) {
@@ -83,6 +95,7 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
     author_name: n.staff_id ? (nameById.get(n.staff_id) ?? tCommon('unknownStaff')) : tCommon('unknownStaff'),
     deleted_at: n.deleted_at,
     deleted_by_name: n.deleted_by ? (nameById.get(n.deleted_by) ?? tCommon('unknownStaff')) : null,
+    can_modify: n.can_edit_enquiry_note === true,
   }))
 
   return (

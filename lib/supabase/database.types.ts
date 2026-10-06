@@ -3951,6 +3951,10 @@ export type Database = {
         Args: { c: Database["public"]["Tables"]["client_contacts"]["Row"] }
         Returns: boolean
       }
+      can_edit_enquiry_note: {
+        Args: { n: Database["public"]["Tables"]["enquiry_notes"]["Row"] }
+        Returns: boolean
+      }
       can_manage_case_details: { Args: { p_case_id: string }; Returns: boolean }
       can_manage_case_share_links: {
         Args: { p_case_id: string }
@@ -4020,6 +4024,7 @@ export type Database = {
         Args: { p_search: string; p_target: string }
         Returns: boolean
       }
+      normalise_phone: { Args: { p_raw: string }; Returns: string }
       normalize_name: { Args: { p_input: string }; Returns: string }
       password_change_pending: { Args: never; Returns: boolean }
       safe_uuid: { Args: { p: string }; Returns: string }
