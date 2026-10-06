@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
-import { ENTITY_NAMES } from '@/lib/activity-labels'
+import { ENTITY_NAMES, activityEntityLabel } from '@/lib/activity-labels'
 import { firmDayBounds, formatFullDate } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
@@ -80,6 +80,12 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   const pageRows = (rows ?? []).slice(0, PAGE_SIZE) as ActivityLogRow[]
   const groups = groupByDay(pageRows, locale)
 
+  // Listed in the reader's language order. A table with no label shows its
+  // raw name (see activityEntityLabel) - an obvious gap, not a silent one.
+  const entityOptions = ENTITY_NAMES.map((e) => ({ value: e, label: activityEntityLabel(tActivity, e) })).sort((a, b) =>
+    a.label.localeCompare(b.label, locale)
+  )
+
   const filterParams = new URLSearchParams()
   if (entity) filterParams.set('entity', entity)
   if (actor) filterParams.set('actor', actor)
@@ -103,11 +109,17 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
           <label htmlFor="activity-entity" className="text-sm text-fg-muted">
             {t('entityLabel')}
           </label>
-          <select id="activity-entity" name="entity" defaultValue={entity ?? ''} className={controlClass}>
+          <select
+            id="activity-entity"
+            name="entity"
+            defaultValue={entity ?? ''}
+            className={controlClass}
+            data-testid="activity-entity-filter"
+          >
             <option value="">{t('allEntities')}</option>
-            {ENTITY_NAMES.map((e) => (
-              <option key={e} value={e}>
-                {tActivity(`entities.${e}.filterLabel`)}
+            {entityOptions.map((e) => (
+              <option key={e.value} value={e.value}>
+                {e.label}
               </option>
             ))}
           </select>

@@ -1829,7 +1829,6 @@
       }
     },
     "activity": {
-      "fallback": "Activity recorded",
       "entities": {
         "cases": {
           "filterLabel": "Cases",
@@ -1903,29 +1902,149 @@
           "update": "Client updated",
           "delete": "Client deleted"
         },
-        "roles": {
-          "filterLabel": "Roles",
-          "insert": "Role added",
-          "update": "Role updated",
-          "delete": "Role deleted"
-        },
-        "role_permissions": {
-          "filterLabel": "Role permissions",
-          "insert": "Permission granted",
-          "update": "Permission updated",
-          "delete": "Permission revoked"
-        },
-        "appointments": {
-          "filterLabel": "Appointments",
-          "insert": "Appointment booked",
-          "update": "Appointment updated",
-          "delete": "Appointment deleted"
-        },
         "staff": {
           "filterLabel": "Staff",
           "insert": "Staff member added",
           "update": "Staff account updated",
           "delete": "Staff account deleted"
+        },
+        "case_checklist_status": {
+          "filterLabel": "Case checklist status",
+          "insert": "Checklist item marked",
+          "update": "Checklist item status changed",
+          "delete": "Checklist item status cleared"
+        },
+        "case_court_filings": {
+          "filterLabel": "Court filings",
+          "insert": "Court filing added",
+          "update": "Court filing updated",
+          "delete": "Court filing removed"
+        },
+        "case_types": {
+          "filterLabel": "Case types",
+          "insert": "Case type added",
+          "update": "Case type updated",
+          "delete": "Case type deleted"
+        },
+        "client_contacts": {
+          "filterLabel": "Contact log",
+          "insert": "Contact logged",
+          "update": "Contact log entry updated",
+          "delete": "Contact log entry deleted"
+        },
+        "client_fund_entries": {
+          "filterLabel": "Client funds",
+          "insert": "Client funds entry recorded",
+          "update": "Client funds entry updated",
+          "delete": "Client funds entry removed"
+        },
+        "courts": {
+          "filterLabel": "Courts",
+          "insert": "Court added",
+          "update": "Court updated",
+          "delete": "Court deleted"
+        },
+        "document_checklist_items": {
+          "filterLabel": "Document checklist items",
+          "insert": "Checklist item added",
+          "update": "Checklist item updated",
+          "delete": "Checklist item removed"
+        },
+        "document_drafts": {
+          "filterLabel": "Document drafts",
+          "insert": "Draft generated",
+          "update": "Draft edited",
+          "delete": "Draft deleted"
+        },
+        "document_templates": {
+          "filterLabel": "Document templates",
+          "insert": "Template added",
+          "update": "Template updated",
+          "delete": "Template deleted"
+        },
+        "enquiries": {
+          "filterLabel": "Enquiries",
+          "insert": "Enquiry received",
+          "update": "Enquiry updated",
+          "delete": "Enquiry deleted"
+        },
+        "enquiry_notes": {
+          "filterLabel": "Enquiry notes",
+          "insert": "Enquiry note added",
+          "update": "Enquiry note edited",
+          "delete": "Enquiry note deleted"
+        },
+        "firm_settings": {
+          "filterLabel": "Firm details",
+          "insert": "Firm details set",
+          "update": "Firm details updated",
+          "delete": "Firm details removed"
+        },
+        "hearings": {
+          "filterLabel": "Hearings",
+          "insert": "Hearing added",
+          "update": "Hearing updated",
+          "delete": "Hearing removed"
+        },
+        "lawyer_profiles": {
+          "filterLabel": "Lawyer profiles",
+          "insert": "Lawyer profile added",
+          "update": "Lawyer profile updated",
+          "delete": "Lawyer profile removed"
+        },
+        "leave_requests": {
+          "filterLabel": "Leave requests",
+          "insert": "Leave requested",
+          "update": "Leave request updated",
+          "delete": "Leave request deleted"
+        },
+        "powers_of_attorney": {
+          "filterLabel": "Powers of attorney",
+          "insert": "Power of attorney added",
+          "update": "Power of attorney updated",
+          "delete": "Power of attorney removed"
+        },
+        "practice_areas": {
+          "filterLabel": "Practice areas",
+          "insert": "Practice area added",
+          "update": "Practice area updated",
+          "delete": "Practice area removed"
+        },
+        "referral_sources": {
+          "filterLabel": "Referral sources",
+          "insert": "Referral source added",
+          "update": "Referral source updated",
+          "delete": "Referral source deleted"
+        },
+        "reminders_sent": {
+          "filterLabel": "Reminders sent",
+          "insert": "Reminder marked as sent",
+          "update": "Reminder record updated",
+          "delete": "Reminder record removed"
+        },
+        "site_sections": {
+          "filterLabel": "Site content",
+          "insert": "Site section added",
+          "update": "Site section updated",
+          "delete": "Site section removed"
+        },
+        "tasks": {
+          "filterLabel": "Tasks",
+          "insert": "Task added",
+          "update": "Task updated",
+          "delete": "Task deleted"
+        },
+        "working_hours": {
+          "filterLabel": "Working hours",
+          "insert": "Working hours set",
+          "update": "Working hours updated",
+          "delete": "Working hours removed"
+        },
+        "write_offs": {
+          "filterLabel": "Write-offs",
+          "insert": "Write-off recorded",
+          "update": "Write-off updated",
+          "delete": "Write-off removed"
         }
       },
       "list": {

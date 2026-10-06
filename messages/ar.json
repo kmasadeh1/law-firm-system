@@ -1785,7 +1785,6 @@
       "saving": "جارٍ الحفظ…"
     },
     "activity": {
-      "fallback": "نشاط مُسجَّل",
       "entities": {
         "cases": {
           "filterLabel": "القضايا",
@@ -1818,16 +1817,19 @@
           "delete": "أُزيل المستند"
         },
         "engagements": {
+          "filterLabel": "اتفاقات الأتعاب",
           "insert": "أُنشئ اتفاق أتعاب",
           "update": "حُدّث اتفاق الأتعاب",
           "delete": "حُذف اتفاق الأتعاب"
         },
         "engagement_installments": {
+          "filterLabel": "أقساط الأتعاب",
           "insert": "تمت جدولة قسط",
           "update": "حُدّث القسط",
           "delete": "أُزيل القسط"
         },
         "engagement_cases": {
+          "filterLabel": "ربط القضايا باتفاقات الأتعاب",
           "insert": "رُبطت القضية باتفاق أتعاب",
           "update": "حُدّث ربط اتفاق الأتعاب",
           "delete": "أُلغي ربط القضية باتفاق الأتعاب"
@@ -1845,6 +1847,7 @@
           "delete": "أُزيل المصروف"
         },
         "case_opposing_parties": {
+          "filterLabel": "خصوم القضايا",
           "insert": "أُضيف خصم",
           "update": "حُدّثت بيانات الخصم",
           "delete": "أُزيل الخصم"
@@ -1855,29 +1858,149 @@
           "update": "حُدّثت بيانات العميل",
           "delete": "حُذف العميل"
         },
-        "roles": {
-          "filterLabel": "الأدوار",
-          "insert": "أُضيف دور",
-          "update": "حُدّث الدور",
-          "delete": "حُذف الدور"
-        },
-        "role_permissions": {
-          "filterLabel": "صلاحيات الأدوار",
-          "insert": "مُنحت صلاحية",
-          "update": "حُدّثت الصلاحية",
-          "delete": "سُحبت الصلاحية"
-        },
-        "appointments": {
-          "filterLabel": "المواعيد",
-          "insert": "حُجز موعد",
-          "update": "حُدّث الموعد",
-          "delete": "حُذف الموعد"
-        },
         "staff": {
           "filterLabel": "الموظفون",
           "insert": "أُضيف موظف",
           "update": "حُدّث حساب الموظف",
           "delete": "حُذف حساب الموظف"
+        },
+        "case_checklist_status": {
+          "filterLabel": "حالة قوائم المستندات",
+          "insert": "سُجّلت حالة بند في القائمة",
+          "update": "تغيّرت حالة بند في القائمة",
+          "delete": "مُسحت حالة بند في القائمة"
+        },
+        "case_court_filings": {
+          "filterLabel": "قيود المحاكم",
+          "insert": "أُضيف قيد في المحكمة",
+          "update": "حُدّث القيد",
+          "delete": "أُزيل القيد"
+        },
+        "case_types": {
+          "filterLabel": "أنواع القضايا",
+          "insert": "أُضيف نوع قضية",
+          "update": "حُدّث نوع القضية",
+          "delete": "حُذف نوع القضية"
+        },
+        "client_contacts": {
+          "filterLabel": "سجل التواصل",
+          "insert": "سُجّل تواصل",
+          "update": "حُدّث قيد التواصل",
+          "delete": "حُذف قيد التواصل"
+        },
+        "client_fund_entries": {
+          "filterLabel": "أمانات العملاء",
+          "insert": "سُجّل قيد أمانات",
+          "update": "حُدّث قيد الأمانات",
+          "delete": "أُزيل قيد الأمانات"
+        },
+        "courts": {
+          "filterLabel": "المحاكم",
+          "insert": "أُضيفت محكمة",
+          "update": "حُدّثت المحكمة",
+          "delete": "حُذفت المحكمة"
+        },
+        "document_checklist_items": {
+          "filterLabel": "بنود قوائم المستندات",
+          "insert": "أُضيف بند إلى القائمة",
+          "update": "حُدّث البند",
+          "delete": "أُزيل البند"
+        },
+        "document_drafts": {
+          "filterLabel": "مسودات المستندات",
+          "insert": "أُنشئت مسودة",
+          "update": "عُدّلت المسودة",
+          "delete": "حُذفت المسودة"
+        },
+        "document_templates": {
+          "filterLabel": "قوالب المستندات",
+          "insert": "أُضيف قالب",
+          "update": "حُدّث القالب",
+          "delete": "حُذف القالب"
+        },
+        "enquiries": {
+          "filterLabel": "الاستفسارات",
+          "insert": "ورد استفسار",
+          "update": "حُدّث الاستفسار",
+          "delete": "حُذف الاستفسار"
+        },
+        "enquiry_notes": {
+          "filterLabel": "ملاحظات الاستفسارات",
+          "insert": "أُضيفت ملاحظة على استفسار",
+          "update": "عُدّلت ملاحظة الاستفسار",
+          "delete": "حُذفت ملاحظة الاستفسار"
+        },
+        "firm_settings": {
+          "filterLabel": "بيانات المكتب",
+          "insert": "ضُبطت بيانات المكتب",
+          "update": "حُدّثت بيانات المكتب",
+          "delete": "أُزيلت بيانات المكتب"
+        },
+        "hearings": {
+          "filterLabel": "الجلسات",
+          "insert": "أُضيفت جلسة",
+          "update": "حُدّثت الجلسة",
+          "delete": "أُزيلت الجلسة"
+        },
+        "lawyer_profiles": {
+          "filterLabel": "نبذات المحامين",
+          "insert": "أُضيفت نبذة محامٍ",
+          "update": "حُدّثت نبذة المحامي",
+          "delete": "أُزيلت نبذة المحامي"
+        },
+        "leave_requests": {
+          "filterLabel": "طلبات الإجازة",
+          "insert": "قُدّم طلب إجازة",
+          "update": "حُدّث طلب الإجازة",
+          "delete": "حُذف طلب الإجازة"
+        },
+        "powers_of_attorney": {
+          "filterLabel": "الوكالات",
+          "insert": "أُضيفت وكالة",
+          "update": "حُدّثت الوكالة",
+          "delete": "أُزيلت الوكالة"
+        },
+        "practice_areas": {
+          "filterLabel": "مجالات الممارسة",
+          "insert": "أُضيف مجال ممارسة",
+          "update": "حُدّث مجال الممارسة",
+          "delete": "أُزيل مجال الممارسة"
+        },
+        "referral_sources": {
+          "filterLabel": "مصادر الإحالة",
+          "insert": "أُضيف مصدر إحالة",
+          "update": "حُدّث مصدر الإحالة",
+          "delete": "حُذف مصدر الإحالة"
+        },
+        "reminders_sent": {
+          "filterLabel": "التذكيرات المرسلة",
+          "insert": "سُجّل إرسال تذكير",
+          "update": "حُدّث سجل التذكير",
+          "delete": "أُزيل سجل التذكير"
+        },
+        "site_sections": {
+          "filterLabel": "محتوى الموقع",
+          "insert": "أُضيف قسم إلى الموقع",
+          "update": "حُدّث قسم الموقع",
+          "delete": "أُزيل قسم الموقع"
+        },
+        "tasks": {
+          "filterLabel": "المهام",
+          "insert": "أُضيفت مهمة",
+          "update": "حُدّثت المهمة",
+          "delete": "حُذفت المهمة"
+        },
+        "working_hours": {
+          "filterLabel": "ساعات العمل",
+          "insert": "ضُبطت ساعات العمل",
+          "update": "حُدّثت ساعات العمل",
+          "delete": "أُزيلت ساعات العمل"
+        },
+        "write_offs": {
+          "filterLabel": "الإعفاءات",
+          "insert": "سُجّل إعفاء",
+          "update": "حُدّث الإعفاء",
+          "delete": "أُزيل الإعفاء"
         }
       },
       "list": {
