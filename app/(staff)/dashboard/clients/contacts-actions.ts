@@ -147,17 +147,18 @@ export async function editClientContact(
 
 // Soft delete only - there is no DELETE grant on client_contacts. The row
 // stays readable under RLS; every list filters deleted_at in its query.
+// deleted_by is stamped by the client_contacts_stamp_delete trigger and is
+// never sent from here.
 export async function deleteClientContact(
   clientId: string,
   contactId: string,
   caseId: string | null
 ): Promise<ActionResult> {
   const supabase = await createClient()
-  const { data: claims } = await supabase.auth.getClaims()
 
   const { data, error } = await supabase
     .from('client_contacts')
-    .update({ deleted_at: new Date().toISOString(), deleted_by: claims?.claims?.sub as string })
+    .update({ deleted_at: new Date().toISOString() })
     .eq('id', contactId)
     .eq('client_id', clientId)
     .is('deleted_at', null)

@@ -95,15 +95,16 @@ export async function addEnquiryNote(enquiryId: string, formData: FormData): Pro
   return {}
 }
 
+// deleted_by is stamped (and cleared on restore) by the
+// enquiry_notes_stamp_delete trigger - never sent from here.
 export async function deleteEnquiryNote(enquiryId: string, noteId: string): Promise<ActionResult> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.enquiries.detail.notes.errors' })
   const supabase = await createClient()
-  const { data: userData } = await supabase.auth.getClaims()
 
   const { data, error } = await supabase
     .from('enquiry_notes')
-    .update({ deleted_at: new Date().toISOString(), deleted_by: userData?.claims?.sub })
+    .update({ deleted_at: new Date().toISOString() })
     .eq('id', noteId)
     .eq('enquiry_id', enquiryId)
     .select('id')
@@ -126,7 +127,7 @@ export async function restoreEnquiryNote(enquiryId: string, noteId: string): Pro
 
   const { data, error } = await supabase
     .from('enquiry_notes')
-    .update({ deleted_at: null, deleted_by: null })
+    .update({ deleted_at: null })
     .eq('id', noteId)
     .eq('enquiry_id', enquiryId)
     .select('id')
