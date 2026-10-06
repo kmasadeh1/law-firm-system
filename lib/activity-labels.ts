@@ -4,60 +4,17 @@
 // views can't drift into inconsistent wording for the same underlying
 // event. Labels themselves live in messages/{en,ar}.json under
 // dashboard.activity.entities.<entity>.{filterLabel,insert,update,delete} -
-// this only resolves which key to look up.
+// this only resolves which key to look up. Which tables are logged is not
+// listed here: the activity log asks the database (logged_tables()).
 
 export type ActivityAction = 'insert' | 'update' | 'delete'
 
-// Every table that has an activity-logging trigger in the database
-// (log_activity, plus case_lawyers' and engagement_cases' own triggers).
-// Builds the owner activity log's entity filter. A table listed here must
-// have a trigger - a filter that can never match anything is worse than no
-// filter - and a newly logged table must be added here and to both message
-// files. A logged table that is missing its labels does not fail quietly:
-// see activityEntityLabel/activityEventTitle.
-export const ENTITY_NAMES = [
-  'case_checklist_status',
-  'case_court_filings',
-  'case_lawyers',
-  'case_notes',
-  'case_opposing_parties',
-  'case_types',
-  'cases',
-  'client_contacts',
-  'client_fund_entries',
-  'clients',
-  'courts',
-  'deadlines',
-  'document_checklist_items',
-  'document_drafts',
-  'document_templates',
-  'documents',
-  'engagement_cases',
-  'engagement_installments',
-  'engagements',
-  'enquiries',
-  'enquiry_notes',
-  'expenses',
-  'firm_settings',
-  'hearings',
-  'lawyer_profiles',
-  'leave_requests',
-  'payments',
-  'powers_of_attorney',
-  'practice_areas',
-  'referral_sources',
-  'reminders_sent',
-  'site_sections',
-  'staff',
-  'tasks',
-  'working_hours',
-  'write_offs',
-]
-
-// These tables have no hard DELETE - "deleted" is a deleted_at flag set via
-// UPDATE, so it shows up in the log as action 'update' like any other edit.
-// Detect it from the row snapshot rather than mislabeling a removal as a
-// plain edit, which would hide it from the one place meant to surface it.
+// Hand-written, unlike the list of logged tables: a deleted_at column is a
+// convention, not something a trigger records. These tables have no hard
+// DELETE - "deleted" is a deleted_at flag set via UPDATE, so it shows up in
+// the log as action 'update' like any other edit. Detect it from the row
+// snapshot rather than mislabeling a removal as a plain edit, which would
+// hide it from the one place meant to surface it.
 const SOFT_DELETE_ENTITIES = new Set(['case_notes', 'client_contacts', 'document_drafts', 'documents', 'enquiry_notes'])
 
 type ActivityTranslator = {

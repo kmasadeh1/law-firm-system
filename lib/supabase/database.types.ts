@@ -4024,6 +4024,7 @@ export type Database = {
         }
         Returns: string
       }
+      logged_tables: { Args: never; Returns: string[] }
       mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       name_matches: {
         Args: { p_search: string; p_target: string }

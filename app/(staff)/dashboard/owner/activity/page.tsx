@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
-import { ENTITY_NAMES, activityEntityLabel } from '@/lib/activity-labels'
+import { activityEntityLabel } from '@/lib/activity-labels'
 import { firmDayBounds, formatFullDate } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
@@ -48,7 +48,16 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   // Unfiltered, unlike active-staff pickers elsewhere - someone who's left
   // the firm should still be filterable by name in a firm-wide audit log,
   // arguably more so than anywhere else this convention already applies.
-  const { data: staffDirectory } = await supabase.from('staff_directory').select('id, full_name')
+  //
+  // logged_tables() is the database's own list of every table with a
+  // trigger writing to activity_log, read from pg_trigger - so a newly
+  // logged table appears in the entity filter at once (under its raw name
+  // until it is labelled) and an unlogged one never does. Asked once per
+  // page load.
+  const [{ data: staffDirectory }, { data: loggedTables }] = await Promise.all([
+    supabase.from('staff_directory').select('id, full_name'),
+    supabase.rpc('logged_tables'),
+  ])
   const staffOptions = (staffDirectory ?? [])
     .filter((s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null)
     .sort((a, b) => a.full_name.localeCompare(b.full_name))
@@ -82,9 +91,9 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
 
   // Listed in the reader's language order. A table with no label shows its
   // raw name (see activityEntityLabel) - an obvious gap, not a silent one.
-  const entityOptions = ENTITY_NAMES.map((e) => ({ value: e, label: activityEntityLabel(tActivity, e) })).sort((a, b) =>
-    a.label.localeCompare(b.label, locale)
-  )
+  const entityOptions = (loggedTables ?? [])
+    .map((e) => ({ value: e, label: activityEntityLabel(tActivity, e) }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale))
 
   const filterParams = new URLSearchParams()
   if (entity) filterParams.set('entity', entity)
