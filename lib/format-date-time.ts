@@ -76,9 +76,12 @@ export function addDaysToDate(date: string, days: number) {
 // timestamptz column by "this day": start inclusive, end exclusive. Null
 // if the date isn't a real 'YYYY-MM-DD'.
 export function firmDayBounds(date: string): { start: string; end: string } | null {
+  // The start is validated first: addDaysToDate throws on a non-date, and
+  // this can be handed a raw URL parameter.
   const start = fromFirmDateTimeInput(`${date}T00:00`)
+  if (!start) return null
   const end = fromFirmDateTimeInput(`${addDaysToDate(date, 1)}T00:00`)
-  return start && end ? { start, end } : null
+  return end ? { start, end } : null
 }
 
 // Offset of FIRM_TIME_ZONE from UTC at a given instant, in ms.

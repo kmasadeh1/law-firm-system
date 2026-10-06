@@ -8,7 +8,7 @@ import { Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
 import { ENTITY_NAMES } from '@/lib/activity-labels'
-import { formatFullDate } from '@/lib/format-date-time'
+import { firmDayBounds, formatFullDate } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
 
@@ -62,8 +62,15 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   if (entity) query = query.eq('table_name', entity)
   if (actor === 'system') query = query.is('actor_id', null)
   else if (actor) query = query.eq('actor_id', actor)
-  if (from) query = query.gte('created_at', `${from}T00:00:00`)
-  if (to) query = query.lte('created_at', `${to}T23:59:59`)
+  // The filter's dates are Amman days. created_at is a timestamptz, so
+  // each day is turned into its exact Amman bounds: on or after the start
+  // of `from`, and strictly before the start of the day after `to` - lt,
+  // not lte 23:59:59, which would lose the final second. A date that isn't
+  // a valid YYYY-MM-DD gives no bounds and is ignored.
+  const fromBounds = from ? firmDayBounds(from) : null
+  const toBounds = to ? firmDayBounds(to) : null
+  if (fromBounds) query = query.gte('created_at', fromBounds.start)
+  if (toBounds) query = query.lt('created_at', toBounds.end)
 
   // One extra row tells us whether an Older page exists, without a separate
   // COUNT(*) over a table that only ever grows.
