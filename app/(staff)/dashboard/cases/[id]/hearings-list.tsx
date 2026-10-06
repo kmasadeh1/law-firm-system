@@ -183,7 +183,12 @@ function HearingRow({
           </p>
         )}
         {hearing.next_session_date && (
-          <p className="text-xs text-fg-muted">{t('nextSessionLine', { date: formatDate(hearing.next_session_date, locale) })}</p>
+          <p className="text-xs text-fg-muted" data-testid="hearing-next-session">
+            {t.rich('nextSessionLine', {
+              date: formatDate(hearing.next_session_date, locale),
+              bdi: (chunks) => <bdi>{chunks}</bdi>,
+            })}
+          </p>
         )}
         {isJudgment && !hearing.notified_at && (
           <p className="text-xs text-fg-muted">{t('notificationNeededPrompt')}</p>
