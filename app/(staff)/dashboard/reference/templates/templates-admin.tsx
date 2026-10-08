@@ -62,11 +62,17 @@ export function TemplatesAdmin({ templates, caseTypes }: { templates: TemplateRo
 function PlaceholderList() {
   const t = useTranslations('dashboard.admin.templates')
   const tLabels = useTranslations('dashboard.documentPlaceholders')
+  // The same sentence the draft editor shows - one wording for how --- lines
+  // lay out the printout, wherever the text is written.
+  const tDrafts = useTranslations('dashboard.cases.detail.drafts')
   return (
     <aside className="lg:sticky lg:top-20 lg:self-start" data-testid="template-placeholders">
       <Panel className="flex flex-col gap-2">
         <h2 className="text-sm font-semibold text-fg">{t('placeholdersHeading')}</h2>
         <p className="text-xs text-fg-muted">{t('placeholdersHelp')}</p>
+        <p className="text-xs text-fg-muted" data-testid="template-sections-help">
+          {tDrafts('sectionsHelp')}
+        </p>
         <ul className="flex flex-col gap-1.5 text-xs">
           {DOCUMENT_PLACEHOLDERS.map((key) => (
             <li key={key} className="flex flex-col">

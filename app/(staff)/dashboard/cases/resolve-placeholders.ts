@@ -7,6 +7,16 @@ import { DOCUMENT_PLACEHOLDERS, type DocumentPlaceholder, type DraftLanguage } f
 
 const TOKEN = /\{\{\s*([A-Za-z_]+)\s*\}\}/g
 
+// FIRST STRONG ISOLATE ... POP DIRECTIONAL ISOLATE. The body is plain text,
+// so <bdi> can't be used: every resolved value is isolated with these two
+// invisible characters instead, here, where it enters the text. An Arabic
+// name in an English sentence (or an English one in an Arabic sentence)
+// then takes its own direction without dragging the punctuation around it
+// - "we act for <name>," keeps its comma after the name. Stored in the
+// draft, so the editor and the printout both get it.
+const FSI = '\u2068'
+const PDI = '\u2069'
+
 function present(value: string | null | undefined): string | null {
   const trimmed = value?.trim()
   return trimmed ? trimmed : null
@@ -79,6 +89,8 @@ export async function resolvePlaceholders(caseId: string, body: string, language
       return tMarker('unknown', { name: rawKey })
     }
     const value = values[key as DocumentPlaceholder]
-    return value ?? tMarker('missing', { label: tLabels(key) })
+    // Markers are not isolated: they are written in the draft's own
+    // language, so they belong to the sentence around them.
+    return value !== null ? `${FSI}${value}${PDI}` : tMarker('missing', { label: tLabels(key) })
   })
 }

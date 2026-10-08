@@ -350,6 +350,7 @@
           "titleLabel": "Title",
           "bodyLabel": "Text",
           "markerHelp": "Anything in [square brackets] is a detail the case doesn't have yet - fix it before printing.",
+          "sectionsHelp": "On the printout, a line of --- after the court details sets them as an aligned reference block, and a second line of --- before the date and signature keeps that closing block at the foot of the last page.",
           "save": "Save",
           "saving": "Saving…",
           "saved": "Saved",

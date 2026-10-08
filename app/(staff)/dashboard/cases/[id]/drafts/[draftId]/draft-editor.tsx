@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { deleteDraft, saveDraft } from '../../../draft-actions'
@@ -10,29 +10,25 @@ import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { PrintButton } from '@/components/dashboard/print-button'
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
-
-type Letterhead = {
-  nameEn: string
-  nameAr: string
-  addressEn: string | null
-  addressAr: string | null
-  phone: string | null
-  email: string | null
-}
+import { draftDocumentTitle } from '@/lib/draft-sections'
+import { DraftDocument, type Letterhead } from './draft-document'
 
 // Plain text only - a textarea on screen, and on paper the same text with
 // its line breaks kept (whitespace-pre-wrap). dir="auto" lets each draft
 // take its direction from its own first words, so an Arabic draft is RTL
 // whatever the reader's interface language.
 //
-// The printout shows what is in the editor right now, saved or not; the
-// editor and its controls are print:hidden, as on the receipt.
+// The printout (draft-document.tsx) shows what is in the editor right now,
+// saved or not; the editor and its controls are print:hidden, as on the
+// receipt.
 export function DraftEditor({
   caseId,
+  caseNumber,
   draft,
   letterhead,
 }: {
   caseId: string
+  caseNumber: string | null
   draft: { id: string; title: string; body: string }
   letterhead: Letterhead
 }) {
@@ -50,6 +46,12 @@ export function DraftEditor({
   const [isPending, startTransition] = useTransition()
 
   const changed = title !== savedTitle || body !== savedBody
+
+  // The server set <title> from the saved draft; keep it on what is in the
+  // editor, so the PDF name and Chrome's print header match the printout.
+  useEffect(() => {
+    document.title = draftDocumentTitle(title, caseNumber)
+  }, [title, caseNumber])
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -113,6 +115,9 @@ export function DraftEditor({
           />
         </Field>
         <p className="text-xs text-fg-muted">{t('markerHelp')}</p>
+        <p className="text-xs text-fg-muted" data-testid="draft-sections-help">
+          {t('sectionsHelp')}
+        </p>
         {error && <FieldError>{error}</FieldError>}
         <div className="flex items-center gap-3">
           <Button type="submit" variant="primary" disabled={isPending || !changed} data-testid="draft-save">
@@ -123,25 +128,8 @@ export function DraftEditor({
         </div>
       </form>
 
-      {/* Print only: letterhead, title, body. */}
-      <article className="hidden text-black print:block" data-testid="draft-print-view">
-        <header className="flex flex-col gap-0.5 border-b-2 border-black pb-3 text-center">
-          <p className="font-heading text-xl">{letterhead.nameAr}</p>
-          <p className="font-heading text-lg">{letterhead.nameEn}</p>
-          <div className="mt-1 flex flex-wrap justify-center gap-x-4 text-xs">
-            {letterhead.addressAr && <span dir="rtl">{letterhead.addressAr}</span>}
-            {letterhead.addressEn && <span dir="ltr">{letterhead.addressEn}</span>}
-            {letterhead.phone && <span dir="ltr">{letterhead.phone}</span>}
-            {letterhead.email && <span dir="ltr">{letterhead.email}</span>}
-          </div>
-        </header>
-        <h1 dir="auto" className="mt-6 text-center font-heading text-lg">
-          {title}
-        </h1>
-        <div dir="auto" className="mt-4 whitespace-pre-wrap text-[11pt] leading-relaxed">
-          {body}
-        </div>
-      </article>
+      {/* Print only. Shows what is in the editor now, saved or not. */}
+      <DraftDocument letterhead={letterhead} title={title} body={body} />
 
       <DeleteConfirmDialog
         open={confirmingDelete}

@@ -1,7 +1,10 @@
+import { cache } from 'react'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { isPlaceholderEmail } from '@/lib/public-site'
+import { draftDocumentTitle } from '@/lib/draft-sections'
 import { BackLink } from '@/components/dashboard/back-link'
 import { DraftEditor } from './draft-editor'
 
@@ -13,6 +16,31 @@ import { DraftEditor } from './draft-editor'
 // can_write_case_documents(case_id), the same as its UPDATE policy, so a
 // draft this reader can see is one they may edit. Not visible and not
 // found read the same.
+// One read per request, shared by generateMetadata and the page.
+const loadDraft = cache(async (caseId: string, draftId: string) => {
+  const supabase = await createClient()
+  const [{ data: draft }, { data: caseRow }] = await Promise.all([
+    supabase
+      .from('document_drafts')
+      .select('id, title, body')
+      .eq('id', draftId)
+      .eq('case_id', caseId)
+      .is('deleted_at', null)
+      .maybeSingle(),
+    supabase.from('cases').select('case_number').eq('id', caseId).maybeSingle(),
+  ])
+  return { draft, caseNumber: caseRow?.case_number ?? null }
+})
+
+// The draft's own title, not the staff area's "<firm> - Staff sign in": it
+// is the tab name, the file name Chrome offers when saving as PDF, and what
+// Chrome prints in its page header.
+export async function generateMetadata({ params }: PageProps<'/dashboard/cases/[id]/drafts/[draftId]'>): Promise<Metadata> {
+  const { id, draftId } = await params
+  const { draft, caseNumber } = await loadDraft(id, draftId)
+  return draft ? { title: draftDocumentTitle(draft.title, caseNumber) } : {}
+}
+
 export default async function DraftPage({ params }: PageProps<'/dashboard/cases/[id]/drafts/[draftId]'>) {
   const { id, draftId } = await params
   const supabase = await createClient()
@@ -24,14 +52,8 @@ export default async function DraftPage({ params }: PageProps<'/dashboard/cases/
   const tShellEn = await getTranslations({ locale: 'en', namespace: 'dashboard.shell' })
   const tShellAr = await getTranslations({ locale: 'ar', namespace: 'dashboard.shell' })
 
-  const [{ data: draft }, { data: firm }] = await Promise.all([
-    supabase
-      .from('document_drafts')
-      .select('id, title, body')
-      .eq('id', draftId)
-      .eq('case_id', id)
-      .is('deleted_at', null)
-      .maybeSingle(),
+  const [{ draft, caseNumber }, { data: firm }] = await Promise.all([
+    loadDraft(id, draftId),
     supabase.from('firm_settings').select('address_en, address_ar, phone, email').maybeSingle(),
   ])
 
@@ -49,6 +71,7 @@ export default async function DraftPage({ params }: PageProps<'/dashboard/cases/
   return (
     <DraftEditor
       caseId={id}
+      caseNumber={caseNumber}
       draft={draft}
       letterhead={{
         nameEn: tShellEn('firmName'),
