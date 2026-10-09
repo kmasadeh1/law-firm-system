@@ -54,7 +54,6 @@
     "home": "الرئيسية",
     "practiceAreas": "مجالات الممارسة",
     "lawyers": "محامونا",
-    "appointment": "حجز موعد",
     "contact": "اتصل بنا",
     "staffSignIn": "دخول الموظفين"
   },
@@ -63,25 +62,14 @@
     "ar": "العربية"
   },
   "hero": {
-    "cta": "احجز استشارة"
-  },
-  "appointment": {
-    "title": "حجز موعد",
-    "intro": "هذا النموذج عرض مؤقت فقط ولا يقوم بإرسال البيانات بعد - الحجز الإلكتروني قريباً.",
-    "nameLabel": "الاسم الكامل",
-    "emailLabel": "البريد الإلكتروني",
-    "phoneLabel": "رقم الهاتف",
-    "practiceAreaLabel": "مجال الممارسة",
-    "practiceAreaPlaceholder": "اختر مجال الممارسة",
-    "messageLabel": "كيف يمكننا مساعدتك؟",
-    "submit": "طلب موعد",
-    "comingSoon": "قريباً"
+    "cta": "تواصل معنا"
   },
   "contact": {
     "addressLabel": "العنوان",
     "phoneLabel": "الهاتف",
     "emailLabel": "البريد الإلكتروني",
     "hoursLabel": "ساعات العمل",
+    "whatsapp": "راسلنا عبر واتساب",
     "mapTitle": "خريطة تُظهر موقع مكتب المحاماة",
     "formNameLabel": "الاسم الكامل",
     "formPhoneLabel": "الهاتف",
@@ -95,6 +83,7 @@
     "errorNameRequired": "يرجى إدخال اسمك.",
     "errorMessageRequired": "يرجى إدخال رسالة.",
     "errorContactRequired": "يرجى تزويدنا برقم هاتف أو بريد إلكتروني.",
+    "errorPhoneInvalid": "يرجى إدخال رقم هاتف أردني، أو إضافة رمز الدولة إذا كان رقمك من خارج الأردن.",
     "errorGeneric": "حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى، أو التواصل معنا عبر الهاتف أو البريد الإلكتروني أعلاه."
   },
   "footer": {
@@ -111,8 +100,25 @@
     "invalidMessage": "هذا الرابط لم يعد صالحاً - يرجى التواصل مع المكتب."
   },
   "dashboard": {
+    "documentPlaceholders": {
+      "case_number": "رقم القضية",
+      "case_title": "عنوان القضية",
+      "client_name": "اسم العميل",
+      "client_national_id": "الرقم الوطني للعميل",
+      "lead_lawyer": "المحامي المسؤول",
+      "court_name": "المحكمة",
+      "court_case_number": "رقم الدعوى",
+      "court_chamber": "الدائرة",
+      "judge": "القاضي",
+      "opposing_party": "الخصم (الطرف الرئيسي)",
+      "opposing_counsel": "محامي الخصم (الطرف الرئيسي)",
+      "poa_number": "رقم الوكالة",
+      "firm_name": "اسم المكتب",
+      "today": "تاريخ اليوم"
+    },
     "common": {
       "unknownStaff": "موظف غير معروف",
+      "phoneInvalid": "أدخل رقم هاتف أردنياً، أو أضف رمز الدولة إذا كان الرقم من خارج الأردن.",
       "pagination": {
         "showing": "عرض {from}–{to} من {total}",
         "navLabel": "ترقيم الصفحات",
@@ -130,6 +136,87 @@
         "cancel": "إلغاء"
       }
     },
+    "reminders": {
+      "title": "التذكيرات",
+      "description": "رسائل واتساب جاهزة للجلسات والمواعيد القادمة وللدفعات المتأخرة. لا يُرسَل شيء من هنا: افتح كل رسالة واقرأها وأرسلها بنفسك، ثم علّمها كمُرسلة.",
+      "emptyTitle": "لا تذكيرات مستحقة",
+      "emptyDescription": "ستظهر هنا الجلسات والمواعيد خلال الأيام السبعة القادمة، والأقساط التي تجاوزت موعد استحقاقها.",
+      "group": {
+        "hearing": "الجلسات",
+        "appointment": "المواعيد",
+        "payment_due": "دفعات مستحقة"
+      },
+      "about": {
+        "hearing": "جلسة في القضية <bdi>{caseNumber}</bdi> في <bdi>{court}</bdi>",
+        "appointment": "موعد",
+        "appointmentOnCase": "موعد في القضية <bdi>{caseNumber}</bdi>",
+        "payment_due": "قسط: <bdi>{description}</bdi>"
+      },
+      "lastReminded": "آخر تذكير <bdi>{date}</bdi>",
+      "neverReminded": "لم يُذكَّر بعد",
+      "recentlyReminded": "ذُكِّر خلال آخر 24 ساعة",
+      "openWhatsApp": "فتح في واتساب",
+      "markSent": "تعليم كمُرسَل",
+      "recording": "جارٍ التسجيل…",
+      "markSentHelp": "فقط بعد أن ترسلها فعلاً.",
+      "noPhone": "لا يوجد رقم هاتف لهذا العميل - أضِف رقماً إلى سجله لإرسال تذكير.",
+      "errors": {
+        "noPermission": "ليس لديك صلاحية تسجيل تذكير لهذا العميل.",
+        "recordFailed": "تعذّر تسجيل التذكير. يرجى المحاولة مرة أخرى."
+      },
+      "message": {
+        "hearing": "مرحباً {client}، نذكّركم من {firm} بأن لقضيتكم رقم {caseNumber} جلسة في {court} بتاريخ {date}. يرجى التواصل معنا لأي استفسار.",
+        "appointment": "مرحباً {client}، نذكّركم من {firm} بموعدكم معنا بتاريخ {date} الساعة {time}. يرجى إعلامنا إن احتجتم إلى تغييره.",
+        "appointmentNoTime": "مرحباً {client}، نذكّركم من {firm} بموعدكم معنا بتاريخ {date}. يرجى إعلامنا إن احتجتم إلى تغييره.",
+        "payment_due": "مرحباً {client}، نذكّركم من {firm} بأن مبلغ {amount} مستحق عن {description}، وكان موعد استحقاقه {date}. يرجى التواصل معنا لترتيب الدفع."
+      }
+    },
+    "notifications": {
+      "open": "الإشعارات",
+      "openWithCount": "{count, plural, zero {الإشعارات} one {الإشعارات، إشعار جديد واحد} two {الإشعارات، إشعاران جديدان} few {الإشعارات، # إشعارات جديدة} many {الإشعارات، # إشعارًا جديدًا} other {الإشعارات، # إشعار جديد}}",
+      "countOverflow": "99+",
+      "emptyTitle": "لا جديد لديك",
+      "emptyDescription": "ستظهر هنا التكليفات والدفعات والمهل والجلسات القريبة.",
+      "alertsHeading": "تحتاج إلى متابعة",
+      "notificationsHeading": "الإشعارات",
+      "markAllRead": "تعليم الكل كمقروء",
+      "dismiss": "إخفاء",
+      "unread": "غير مقروء",
+      "someone": "أحد الزملاء",
+      "unknownCase": "قضية",
+      "updateFailed": "لم يُحفظ ذلك. يرجى المحاولة مرة أخرى.",
+      "alert": {
+        "deadline": "مهلة في القضية <bdi>{caseNumber}</bdi>",
+        "deadlineWithType": "مهلة <bdi>{type}</bdi> في القضية <bdi>{caseNumber}</bdi>",
+        "hearing": "جلسة في القضية <bdi>{caseNumber}</bdi>",
+        "hearingWithCourt": "جلسة في <bdi>{court}</bdi> للقضية <bdi>{caseNumber}</bdi>"
+      },
+      "when": {
+        "overdue": "{days, plural, one {متأخرة يومًا واحدًا} two {متأخرة يومين} few {متأخرة # أيام} many {متأخرة # يومًا} other {متأخرة # يوم}}",
+        "today": "اليوم",
+        "tomorrow": "غدًا",
+        "inDays": "{days, plural, one {خلال يوم واحد} two {خلال يومين} few {خلال # أيام} many {خلال # يومًا} other {خلال # يوم}}"
+      },
+      "type": {
+        "case_assigned": {
+          "default": "تم تكليفك بالقضية <bdi>{subject}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "تم تكليفك بقضية لم تعد متاحة لك بواسطة <bdi>{actor}</bdi>"
+        },
+        "task_assigned": {
+          "default": "تم تكليفك بمهمة: <bdi>{subject}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "تم تكليفك بمهمة لم تعد متاحة بواسطة <bdi>{actor}</bdi>"
+        },
+        "enquiry_assigned": {
+          "default": "تم تكليفك باستفسار من <bdi>{subject}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "تم تكليفك باستفسار لم يعد متاحًا لك بواسطة <bdi>{actor}</bdi>"
+        },
+        "payment_recorded": {
+          "default": "سُجّلت دفعة بقيمة <bdi>{amount}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "withClient": "سُجّلت دفعة بقيمة <bdi>{amount}</bdi> من <bdi>{client}</bdi> بواسطة <bdi>{actor}</bdi>",
+          "unavailable": "سُجّلت دفعة لم تعد متاحة لك بواسطة <bdi>{actor}</bdi>"
+        }
+      }
+    },
     "shell": {
       "firmName": "أحمد المساعده ومشاركوه",
       "logOut": "تسجيل الخروج",
@@ -143,9 +230,11 @@
       "lightMode": "الوضع الفاتح",
       "darkMode": "الوضع الداكن",
       "switchToArabic": "التبديل إلى العربية",
-      "switchToEnglish": "التبديل إلى الإنجليزية"
+      "switchToEnglish": "التبديل إلى الإنجليزية",
+      "localeSwitchFailed": "تعذّر تغيير اللغة. يرجى المحاولة مرة أخرى."
     },
     "nav": {
+      "documentTemplates": "قوالب المستندات",
       "groupDailyWork": "العمل اليومي",
       "groupMoney": "المالية",
       "groupAdministration": "الإدارة",
@@ -154,8 +243,10 @@
       "enquiries": "الاستفسارات",
       "cases": "القضايا",
       "appointments": "المواعيد",
+      "hearings": "جدول الجلسات",
       "deadlines": "المهل",
       "tasks": "المهام",
+      "reminders": "التذكيرات",
       "leaveRequests": "طلبات الإجازة",
       "feesAndPayments": "الأتعاب والمدفوعات",
       "staffAccounts": "حسابات الموظفين",
@@ -163,6 +254,8 @@
       "deadlinePeriodTypes": "أنواع المهل",
       "courts": "المحاكم",
       "caseTypes": "أنواع القضايا",
+      "referralSources": "مصادر الإحالة",
+      "documentChecklists": "قوائم المستندات",
       "activityLog": "سجل النشاط",
       "siteContent": "محتوى الموقع",
       "settings": "الإعدادات",
@@ -236,6 +329,78 @@
         }
       },
       "detail": {
+        "drafts": {
+          "heading": "المسودات",
+          "noneYet": "لا توجد مسودات بعد.",
+          "noTemplates": "لا توجد قوالب لهذا النوع من القضايا بعد.",
+          "templateLabel": "القالب",
+          "chooseTemplate": "اختر قالباً…",
+          "languageLabel": "اللغة",
+          "language": {
+            "en": "الإنجليزية",
+            "ar": "العربية"
+          },
+          "generate": "إنشاء مسودة",
+          "generating": "جارٍ الإنشاء…",
+          "delete": "حذف",
+          "backToCase": "العودة إلى القضية",
+          "notFound": "هذه المسودة غير موجودة، أو حُذفت، أو ليس لديك صلاحية الوصول إليها.",
+          "titleLabel": "العنوان",
+          "bodyLabel": "النص",
+          "markerHelp": "أي شيء بين [أقواس مربعة] هو معلومة غير متوفرة في القضية بعد - صحّحها قبل الطباعة.",
+          "sectionsHelp": "في النسخة المطبوعة، يجعل سطرٌ من --- بعد بيانات المحكمة منها كتلةً مرجعية مصفوفة، ويُبقي سطرٌ ثانٍ من --- قبل التاريخ والتوقيع هذه الخاتمةَ أسفل الصفحة الأخيرة.",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "saved": "تم الحفظ",
+          "unsaved": "تغييرات غير محفوظة",
+          "print": "طباعة",
+          "marker": {
+            "missing": "[{label}: غير متوفر]",
+            "unknown": "[حقل غير معروف: {name}]"
+          },
+          "errors": {
+            "templateUnavailable": "هذا القالب لم يعد متاحاً بهذه اللغة.",
+            "titleRequired": "العنوان مطلوب.",
+            "bodyRequired": "لا يمكن أن يكون النص فارغاً.",
+            "noPermission": "ليس لديك صلاحية تعديل المسودات في هذه القضية.",
+            "generateFailed": "تعذّر إنشاء المسودة. يرجى المحاولة مرة أخرى.",
+            "saveFailed": "تعذّر حفظ المسودة. يرجى المحاولة مرة أخرى.",
+            "deleteFailed": "تعذّر حذف المسودة. يرجى المحاولة مرة أخرى."
+          }
+        },
+        "checklist": {
+          "heading": "قائمة المستندات",
+          "requiredCount": "قُدِّم {provided} من {total} من البنود المطلوبة",
+          "requiredNotApplicable": "{count, plural, zero {لا بنود مطلوبة غير منطبقة} one {بند مطلوب واحد غير منطبق} two {بندان مطلوبان غير منطبقين} few {# بنود مطلوبة غير منطبقة} many {# بندًا مطلوبًا غير منطبق} other {# بند مطلوب غير منطبق}}",
+          "required": "مطلوب",
+          "optional": "اختياري",
+          "state": {
+            "outstanding": "لم يُقدَّم",
+            "provided": "قُدِّم",
+            "not_applicable": "غير منطبق"
+          },
+          "stateLabel": "الحالة",
+          "linkedDocument": "المستند: <bdi>{name}</bdi>",
+          "linkedDocumentUnavailable": "المستند المرتبط لم يعد متاحاً.",
+          "notedBy": "سجّله <bdi>{name}</bdi> في <bdi>{date}</bdi>",
+          "notedOn": "سُجّل في <bdi>{date}</bdi>",
+          "documentLabel": "ربط مستند من هذه القضية (اختياري)",
+          "noDocument": "بلا مستند",
+          "noteLabel": "ملاحظة (اختيارية)",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "cancel": "إلغاء",
+          "record": "تسجيل",
+          "edit": "تعديل",
+          "clear": "إعادة إلى لم يُقدَّم",
+          "errors": {
+            "invalidState": "اختر «قُدِّم» أو «غير منطبق».",
+            "documentNotOnCase": "هذا المستند ليس في هذه القضية، أو تم حذفه.",
+            "noPermission": "ليس لديك صلاحية تحديث هذه القائمة.",
+            "saveFailed": "تعذّر الحفظ. يرجى المحاولة مرة أخرى.",
+            "clearFailed": "تعذّرت الإعادة إلى «لم يُقدَّم». يرجى المحاولة مرة أخرى."
+          }
+        },
         "page": {
           "backToCases": "القضايا",
           "caseNotFound": "هذه القضية غير موجودة، أو ليس لديك صلاحية الوصول إليها.",
@@ -249,7 +414,9 @@
           "saveStatus": "حفظ الحالة",
           "saved": "تم الحفظ",
           "errors": {
-            "updateFailed": "تعذّر تحديث الحالة. يرجى المحاولة مرة أخرى."
+            "updateFailed": "تعذّر تحديث الحالة. يرجى المحاولة مرة أخرى.",
+            "noPermissionClose": "لا يمكن إغلاق القضية إلا للمحامي الرئيسي فيها أو للمالك.",
+            "noPermissionChange": "ليس لديك صلاحية تغيير حالة هذه القضية."
           }
         },
         "team": {
@@ -298,6 +465,8 @@
             "incurredRequired": "تاريخ الصرف مطلوب.",
             "amountRequired": "المبلغ مطلوب.",
             "invalidAmount": "أدخل مبلغاً صحيحاً أكبر من صفر.",
+            "amountNotPositive": "يجب أن يكون المبلغ أكبر من صفر.",
+            "reimbursedDateMismatch": "لم تتطابق حالة الاسترداد مع تاريخه، لذلك لم يُحفظ التغيير. يرجى المحاولة مرة أخرى.",
             "noPermissionRecord": "ليس لديك صلاحية تسجيل مصاريف على هذه القضية.",
             "recordFailed": "تعذّر تسجيل المصروف. يرجى المحاولة مرة أخرى.",
             "saveFailed": "تعذّر حفظ المصروف. يرجى المحاولة مرة أخرى.",
@@ -369,6 +538,9 @@
           }
         },
         "opposingParties": {
+          "primaryBadge": "الطرف الرئيسي",
+          "setPrimary": "تعيين كطرف رئيسي",
+          "unsetPrimary": "إلغاء التعيين كطرف رئيسي",
           "noneAddedYet": "لم يُضف أحد بعد.",
           "nameLabel": "الاسم",
           "nationalIdLabel": "الرقم الوطني",
@@ -380,6 +552,8 @@
           "addAnyway": "إضافة على أي حال",
           "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
           "errors": {
+            "primary_failed": "تعذّر تغيير الطرف الرئيسي. يرجى تحديث الصفحة والمحاولة مرة أخرى.",
+            "conflict_check_not_allowed": "ليس لديك صلاحية إجراء فحص التعارض، لذا لا يمكن إضافة طرف مقابل.",
             "name_required": "الاسم مطلوب.",
             "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
           }
@@ -538,6 +712,7 @@
         "balance": {
           "heading": "موقف الأتعاب",
           "agreedFixedFees": "المتفق عليه (أتعاب مقطوعة): <bdi>{amount}</bdi>",
+          "writtenOff": "المُعفى منه: <bdi>{amount}</bdi>",
           "scheduled": "المجدول: <bdi>{amount}</bdi>",
           "paid": "المدفوع: <bdi>{amount}</bdi>",
           "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>"
@@ -599,6 +774,56 @@
             "alreadyAssigned": "هذا المحامي معيَّن بالفعل على هذه الوكالة.",
             "assignFailed": "تعذّر تعيين هذا المحامي. يرجى المحاولة مرة أخرى.",
             "unassignFailed": "تعذّرت إزالة هذا المحامي. يرجى المحاولة مرة أخرى.",
+            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+          }
+        },
+        "contacts": {
+          "heading": "سجل التواصل",
+          "noneYet": "لم يُسجَّل أي تواصل بعد.",
+          "logContact": "تسجيل تواصل",
+          "logging": "جارٍ التسجيل…",
+          "directionLabel": "الاتجاه",
+          "channelLabel": "الوسيلة",
+          "occurredAtLabel": "وقت التواصل",
+          "occurredAtHelp": "اتركه فارغًا لاستخدام الوقت الحالي.",
+          "handledByLabel": "تولّاه",
+          "handledByNone": "غير محدد",
+          "caseLabel": "القضية",
+          "generalOption": "عام — لا يتعلق بقضية محددة",
+          "summaryLabel": "الملخص",
+          "summaryPlaceholder": "عمّ سأل، وبماذا أُجيب.",
+          "followUpLabel": "تحتاج متابعة",
+          "followUpBadge": "تحتاج متابعة",
+          "handledByLine": "تولّاه <bdi>{name}</bdi>",
+          "editedLine": "عُدّل في <bdi>{date}</bdi>",
+          "edit": "تعديل",
+          "save": "حفظ",
+          "saving": "جارٍ الحفظ…",
+          "cancel": "إلغاء",
+          "delete": "حذف",
+          "deleting": "جارٍ الحذف…",
+          "deleteNote": "لن يظهر بعد الآن في سجل التواصل.",
+          "direction": {
+            "incoming": "وارد",
+            "outgoing": "صادر"
+          },
+          "channel": {
+            "phone": "هاتف",
+            "whatsapp": "واتساب",
+            "email": "بريد إلكتروني",
+            "in_person": "حضوريًا",
+            "letter": "كتاب خطي",
+            "other": "أخرى"
+          },
+          "errors": {
+            "summaryRequired": "اكتب ملخصًا للتواصل.",
+            "caseMismatch": "هذه القضية تخص عميلًا آخر.",
+            "invalidChoice": "اختر الاتجاه والوسيلة.",
+            "invalidOccurredAt": "أدخل تاريخًا ووقتًا صحيحين.",
+            "noPermission": "ليس لديك صلاحية للقيام بذلك.",
+            "addFailed": "تعذّر تسجيل التواصل. يرجى المحاولة مرة أخرى.",
+            "updateFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+            "deleteFailed": "تعذّر حذف السجل. يرجى المحاولة مرة أخرى.",
             "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
           }
         },
@@ -665,11 +890,39 @@
         "matchExistingClient": "<bdi>{name}</bdi> — عميل حالي",
         "noAccess": "ليس لديك صلاحية إنشاء العملاء.",
         "noAccessConflictChecks": "ليس لديك صلاحية عرض سجلّ فحوصات التعارض.",
+        "referralSourceLabel": "مصدر الإحالة",
+        "referralSourceNone": "غير محدد",
+        "referralSourceInactive": "{name} (معطّل)",
+        "referralSourcesEmpty": "لم تُضف أي مصادر إحالة بعد. يمكن إضافتها من الإدارة ← مصادر الإحالة.",
+        "referralNotesLabel": "ملاحظات الإحالة",
+        "referralNotesPlaceholder": "من أو ما تحديدًا، مثل الشخص الذي أحالهم",
         "errors": {
           "fullNameRequired": "الاسم الكامل مطلوب.",
           "createFailed": "تعذّر إنشاء العميل. يرجى المحاولة مرة أخرى.",
           "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
         }
+      }
+    },
+    "hearings": {
+      "title": "جدول الجلسات",
+      "printTitle": "جلسات المحاكم",
+      "previousDay": "اليوم السابق",
+      "nextDay": "اليوم التالي",
+      "today": "اليوم",
+      "dateLabel": "التاريخ",
+      "show": "عرض",
+      "print": "طباعة",
+      "count": "{count, plural, zero {لا جلسات} one {جلسة واحدة} two {جلستان} few {# جلسات} many {# جلسة} other {# جلسة}}",
+      "emptyTitle": "لا توجد جلسات في هذا اليوم.",
+      "emptyDescription": "يعرض هذا الجدول الجلسات المسجّلة على القضايا التي يمكنك الاطلاع عليها.",
+      "columns": {
+        "time": "الوقت",
+        "courtCaseNumber": "رقم الدعوى",
+        "chamber": "الدائرة",
+        "judge": "القاضي",
+        "firmCase": "قضية المكتب",
+        "client": "العميل",
+        "leadLawyer": "المحامي المسؤول"
       }
     },
     "deadlines": {
@@ -683,6 +936,7 @@
       "new": {
         "backToDeadlines": "المهل",
         "title": "مهلة جديدة",
+      "noAccess": "ليس لديك صلاحية إضافة المهل.",
         "resultHeading": "تمت إضافة المهلة",
         "resultLine": "تاريخ البدء <bdi>{trigger}</bdi> <icon></icon> تستحق في <bdi><strong>{due}</strong></bdi>",
         "effectiveDueDateLine": "تاريخ الاستحقاق الفعلي (بعد أي تمديد): <bdi>{date}</bdi>",
@@ -713,8 +967,9 @@
           "extendedDateRequired": "تاريخ التمديد مطلوب.",
           "extensionReasonRequired": "سبب التمديد مطلوب.",
           "bothExtensionFieldsRequired": "يجب إدخال تاريخ التمديد والسبب معاً.",
-          "noPermissionExtend": "ليس لديك صلاحية تمديد هذه المهلة.",
-          "extendFailed": "تعذّر حفظ التمديد. يرجى المحاولة مرة أخرى."
+          "extendFailed": "تعذّر حفظ التمديد. يرجى المحاولة مرة أخرى.",
+          "markMetFailed": "تعذّر تعليم المهلة كمُستوفاة. يرجى المحاولة مرة أخرى.",
+          "unmarkMetFailed": "تعذّر إلغاء استيفاء المهلة. يرجى المحاولة مرة أخرى."
         }
       },
       "section": {
@@ -732,12 +987,17 @@
         "cancel": "إلغاء",
         "changeExtension": "تغيير التمديد",
         "extend": "تمديد",
+        "markMet": "تعليم كمُستوفاة",
+        "unmarkMet": "إلغاء الاستيفاء",
+        "metLine": "مُستوفاة — عُلِّمت في <bdi>{date}</bdi> بواسطة <bdi>{name}</bdi>.",
+        "metLineNoName": "مُستوفاة — عُلِّمت في <bdi>{date}</bdi>.",
         "viewAllDeadlines": "عرض جميع المهل"
       },
       "urgency": {
         "overdue": "متأخرة",
         "soon": "تستحق قريباً",
-        "later": "قادمة"
+        "later": "قادمة",
+        "met": "مُستوفاة"
       }
     },
     "appointments": {
@@ -797,6 +1057,7 @@
           "noPermissionCreate": "ليس لديك صلاحية إنشاء هذا الموعد.",
           "createFailed": "تعذّر إنشاء الموعد. يرجى المحاولة مرة أخرى.",
           "noPermissionUpdate": "ليس لديك صلاحية تعديل هذا الموعد.",
+          "wouldLoseAccess": "لا يمكنك إجراء هذا التغيير: فهو يُسند الموعد إلى شخص آخر أو يغيّر نوعه بطريقة لا تملك صلاحية إدارتها.",
           "updateFailed": "تعذّر تحديث الموعد. يرجى المحاولة مرة أخرى."
         }
       },
@@ -847,6 +1108,7 @@
         "outstandingScheduled": "المتبقي (من المجدول): <bdi>{amount}</bdi>",
         "unscheduledPositive": "<bdi>{amount}</bdi> من الأتعاب المتفق عليها لم تُجدوَل بعد.",
         "unscheduledNegative": "يتجاوز الجدول الأتعاب المتفق عليها بمقدار <bdi>{amount}</bdi>.",
+        "writtenOff": "المُعفى منه: <bdi>{amount}</bdi>",
         "cases": {
           "heading": "القضايا المرتبطة",
           "noneYet": "لا توجد قضايا مرتبطة بعد.",
@@ -885,6 +1147,26 @@
           "payerFragment": " · الدافع: <bdi>{name}</bdi>",
           "paidBadge": "المدفوع: <bdi>{amount}</bdi>",
           "balanceBadge": "الرصيد: <bdi>{amount}</bdi>",
+          "writtenOffBadge": "المُعفى منه: <bdi>{amount}</bdi>",
+          "writeOffs": {
+            "heading": "الإعفاءات",
+            "open": "إعفاء",
+            "immutableBanner": "الإعفاء دائم. لا يمكن تعديله أو حذفه - يُصحَّح الخطأ بعكسه، ويبقى العكس مسجّلاً إلى جانبه.",
+            "amountLabel": "المبلغ المُعفى منه",
+            "dateLabel": "التاريخ",
+            "reasonLabel": "السبب",
+            "reasonPlaceholder": "سبب الإعفاء من هذا المبلغ",
+            "submit": "تسجيل الإعفاء",
+            "recording": "جارٍ التسجيل…",
+            "cancel": "إلغاء",
+            "recordedLine": "<bdi>{date}</bdi> · سجّله <bdi>{name}</bdi>",
+            "recordedLineNoName": "<bdi>{date}</bdi>",
+            "reversedBadge": "معكوس",
+            "reverse": "عكس",
+            "reverseReasonLabel": "سبب العكس",
+            "confirmReverse": "تسجيل العكس",
+            "reversing": "جارٍ العكس…"
+          },
           "hidePayments": "إخفاء المدفوعات",
           "showPayments": "المدفوعات",
           "edit": "تعديل",
@@ -898,6 +1180,7 @@
           "deleteItemDue": "<bdi>{amount}</bdi> يستحق في <bdi>{date}</bdi>",
           "deleteItemNoDueDate": "<bdi>{amount}</bdi>، بلا تاريخ استحقاق",
           "noPaymentsYet": "لم تُسجَّل أي مدفوعات بعد.",
+          "receipt": "سند القبض",
           "paymentMethodFragment": " · <bdi>{method}</bdi>",
           "paymentsImmutableBanner": "لا يمكن تعديل المدفوعات أو حذفها بعد تسجيلها. يُصحَّح أي خطأ بقيد معاكس، لا بتغيير السجل.",
           "amountLabel": "المبلغ",
@@ -915,6 +1198,24 @@
           "adding": "جارٍ الإضافة…"
         }
       },
+      "receipt": {
+        "title": "سند قبض",
+        "receiptNumber": "رقم السند",
+        "date": "التاريخ",
+        "receivedFrom": "استلمنا من",
+        "clientHidden": "اسم العميل غير ظاهر",
+        "for": "وذلك عن",
+        "dueDate": "قسط مستحق في <bdi>{date}</bdi>",
+        "method": "طريقة الدفع",
+        "amount": "المبلغ",
+        "amountInWords": "كتابةً:",
+        "receivedBy": "المستلم (التوقيع)",
+        "stamp": "خاتم المكتب",
+        "print": "طباعة السند",
+        "backToEngagement": "العودة إلى اتفاق الأتعاب",
+        "backToFees": "الأتعاب والمدفوعات",
+        "notFound": "هذه الدفعة غير موجودة، أو ليس لديك صلاحية الوصول إليها."
+      },
       "errors": {
         "select_client": "اختر عميلاً.",
         "select_fee_type": "اختر نوع الأتعاب.",
@@ -922,6 +1223,7 @@
         "enter_percentage": "أدخل النسبة المتفق عليها.",
         "invalid_fee_type_amount": "هذا التوافق بين نوع الأتعاب والمبلغ/النسبة غير صالح.",
         "select_case": "اختر قضية.",
+        "cases_link_wrong_client": "أُنشئ الاتفاق، لكن إحدى القضايا المختارة تخص عميلاً آخر، لذلك لم تُربط أيٌّ منها. أضف القضايا الصحيحة من صفحة الاتفاق.",
         "link_failed": "تعذّر ربط القضية. يرجى المحاولة مرة أخرى.",
         "unlink_failed": "تعذّر إلغاء ربط القضية. يرجى المحاولة مرة أخرى.",
         "document_not_found": "تعذّر العثور على هذا المستند، أو ليس لديك صلاحية عرضه.",
@@ -929,20 +1231,65 @@
         "link_generation_failed": "تعذّر إنشاء رابط لهذا الملف. يرجى المحاولة مرة أخرى.",
         "description_required": "الوصف مطلوب.",
         "invalid_amount": "أدخل مبلغاً صحيحاً.",
+        "installment_amount_not_positive": "يجب أن يكون مبلغ القسط أكبر من صفر.",
+        "payment_amount_not_positive": "يجب أن يكون مبلغ الدفعة أكبر من صفر.",
         "save_installment_failed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+        "installment_has_records": "سُجّلت على هذا القسط دفعات أو إعفاءات، ولا يمكن حذفه.",
+        "installment_below_commitments": "لا يمكن أن يقلّ المبلغ عمّا دُفع وأُعفي منه على هذا القسط.",
         "date_required": "التاريخ مطلوب.",
         "no_permission_record_payment": "ليس لديك صلاحية تسجيل المدفوعات.",
         "record_payment_failed": "تعذّر تسجيل الدفعة. يرجى المحاولة مرة أخرى.",
+        "write_off_amount_not_positive": "يجب أن يكون المبلغ المُعفى منه أكبر من صفر.",
+        "write_off_reason_required": "سبب الإعفاء مطلوب.",
+        "write_off_exceeds_balance": "هذا المبلغ أكبر مما تبقّى مستحقاً على هذا القسط.",
+        "write_off_already_reversed": "سبق عكس هذا الإعفاء.",
+        "write_off_reversal_mismatch": "هذا العكس لا يطابق الإعفاء الذي يعكسه. حدّث الصفحة وحاول مرة أخرى.",
+        "no_permission_write_off": "لا يمكن تسجيل الإعفاءات إلا للمالك.",
+        "write_off_failed": "تعذّر تسجيل الإعفاء. يرجى المحاولة مرة أخرى.",
+        "write_off_reverse_failed": "تعذّر عكس الإعفاء. يرجى المحاولة مرة أخرى.",
         "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
       }
     },
     "admin": {
+      "templates": {
+        "title": "قوالب المستندات",
+        "description": "مستندات نموذجية تحتوي حقولاً تُملأ تلقائياً. إنشاء مستند من قضية يملأ الحقول ويعطي المحامي مسودة قابلة للتعديل والطباعة.",
+        "createHeading": "قالب جديد",
+        "noneYet": "لا توجد قوالب بعد",
+        "noneYetDescription": "يمكن إنشاء القوالب التي تضيفها هنا من أي قضية من النوع المطابق.",
+        "placeholdersHeading": "الحقول",
+        "placeholdersHelp": "اكتبها كما هي تماماً. القيمة غير المتوفرة في القضية تظهر في المسودة كعلامة تُصحَّح قبل الطباعة.",
+        "nameEnLabel": "الاسم — بالإنجليزية",
+        "nameArLabel": "الاسم — بالعربية",
+        "caseTypeLabel": "نوع القضية",
+        "anyCaseType": "أي نوع قضية",
+        "bodyEnLabel": "النص — بالإنجليزية",
+        "bodyArLabel": "النص — بالعربية",
+        "create": "إنشاء القالب",
+        "save": "حفظ",
+        "saving": "جارٍ الحفظ…",
+        "saved": "تم الحفظ",
+        "activeLabel": "فعّال",
+        "inactiveLabel": "معطّل",
+        "active": "فعّال",
+        "inactive": "معطّل",
+        "deactivate": "تعطيل",
+        "deactivateNote": "لن يُعرض بعد الآن في القضايا. يُحتفظ بالمسودات التي أُنشئت منه، وإعادة تفعيله تعيده.",
+        "errors": {
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noBody": "أدخل النص بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة القوالب.",
+          "createFailed": "تعذّر إنشاء القالب. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
+        }
+      },
       "userType": {
         "owner": "المالك",
         "staff": "موظف"
       },
       "noAccess": {
         "title": "للمالك فقط",
+        "permissionTitle": "لا صلاحية للوصول",
         "description": "ليس لديك صلاحية عرض هذه الصفحة."
       },
       "staff": {
@@ -994,7 +1341,7 @@
           "couldNotCreateLogin": "تعذّر إنشاء بيانات الدخول. يرجى المحاولة مرة أخرى.",
           "staffRecordFailedWithCleanup": "تعذّر إنشاء سجل الموظف، كما تعذّر تنظيف بيانات الدخول اليتيمة. يحتاج المستخدم {userId} إلى إزالة يدوية.",
           "staffRecordFailedRolledBack": "تعذّر إنشاء سجل الموظف. تم التراجع عن بيانات الدخول - يرجى المحاولة مرة أخرى.",
-          "passwordResetButRecordFailed": "أُعيد تعيين كلمة المرور، لكن تحديث سجل الموظف فشل. قد لا يكون الحساب مُعلَّماً باشتراط تغيير كلمة المرور.",
+          "passwordResetButRecordFailed": "تم تعيين كلمة المرور الجديدة وهي تعمل - سلّمها للموظف. لكن تعذّر تعليم الحساب باشتراط تغيير كلمة المرور، لذلك لن يُطلب منه اختيار كلمة مرور خاصة به عند تسجيل الدخول. أصدر كلمة مرور جديدة لإعادة محاولة التعليم.",
           "updateAccountFailed": "تعذّر تحديث هذا الحساب. يرجى المحاولة مرة أخرى."
         }
       },
@@ -1018,7 +1365,6 @@
           "deleting": "جارٍ الحذف…",
           "deleteRole": "حذف الدور",
           "deleteNote": "لا يمكن حذف دور يشغله أي موظف حتى يُنقل إلى دور آخر أولاً. ستُحذف أيضاً إعدادات صلاحياته.",
-          "administrationHeading": "الإدارة",
           "ownerOnlyBadge": "(للمالك فقط)",
           "ownerOnlyDescription": "للمالك فقط — لا يمكن منحها لأي دور.",
           "ownerOnlySwitchLabel": "{label} (للمالك فقط، مقفلة)",
@@ -1030,6 +1376,7 @@
           "billing": "الفوترة",
           "frontOffice": "الاستقبال",
           "reporting": "التقارير",
+          "administration": "الإدارة",
           "other": "أخرى"
         },
         "errors": {
@@ -1126,6 +1473,69 @@
           "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
         }
       },
+      "checklists": {
+        "title": "قوائم المستندات",
+        "description": "المستندات التي يحتاجها كل نوع من القضايا. تظهر البنود فوراً في كل قضية من ذلك النوع، ولا تسجّل كل قضية إلا ما إذا قُدِّم البند.",
+        "noCaseTypes": "أضف أنواع القضايا أولاً - فكل قائمة تتبع نوع قضية.",
+        "caseTypeInactive": "نوع قضية معطّل",
+        "noItems": "لا توجد بنود لهذا النوع من القضايا بعد.",
+        "nameEnLabel": "الاسم — بالإنجليزية",
+        "nameArLabel": "الاسم — بالعربية",
+        "requiredLabel": "مطلوب",
+        "required": "مطلوب",
+        "optional": "اختياري",
+        "activeLabel": "فعّال",
+        "active": "فعّال",
+        "inactive": "معطّل",
+        "add": "إضافة بند",
+        "adding": "جارٍ الإضافة…",
+        "save": "حفظ",
+        "saving": "جارٍ الحفظ…",
+        "saved": "تم الحفظ",
+        "moveUp": "نقل للأعلى",
+        "moveDown": "نقل للأسفل",
+        "deactivate": "تعطيل",
+        "deactivateNote": "سيختفي من قائمة كل قضية من هذا النوع. يُحتفظ بما سُجّل عليه، وإعادة تفعيله تعيده.",
+        "errors": {
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة قوائم المستندات.",
+          "createFailed": "تعذّرت إضافة البند. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى.",
+          "reorderFailed": "تعذّر نقل البند. يرجى تحديث الصفحة والمحاولة مرة أخرى."
+        }
+      },
+      "referralSources": {
+        "title": "مصادر الإحالة",
+        "description": "من أين يأتي العملاء. يمكن ربط كل عميل بمصدر عند إنشائه أو تعديله.",
+        "noneYet": "لا توجد مصادر إحالة بعد",
+        "noneYetDescription": "أضف الطرق التي يصل بها العملاء إلى المكتب - مثل إحالة من عميل حالي أو من مهني. يختار الموظفون من هذه القائمة في نموذج العميل.",
+        "createForm": {
+          "heading": "مصدر إحالة جديد",
+          "nameLabel": "الاسم",
+          "nameArLabel": "الاسم (بالعربية)",
+          "creating": "جارٍ الإنشاء…",
+          "create": "إنشاء مصدر الإحالة"
+        },
+        "card": {
+          "nameEnAriaLabel": "الاسم",
+          "nameArAriaLabel": "الاسم (بالعربية)",
+          "saving": "جارٍ الحفظ…",
+          "save": "حفظ",
+          "saved": "تم الحفظ",
+          "activeAriaLabel": "نشط",
+          "inactiveAriaLabel": "غير نشط",
+          "activeText": "نشط",
+          "deactivatedText": "معطّل",
+          "deactivate": "تعطيل",
+          "deactivateNote": "لن يظهر بعد الآن في نموذج العميل. يحتفظ به العملاء المرتبطون به مسبقًا."
+        },
+        "errors": {
+          "noName": "أدخل اسماً بالإنجليزية أو بالعربية.",
+          "noPermission": "ليس لديك صلاحية إدارة مصادر الإحالة.",
+          "createFailed": "تعذّر إنشاء مصدر الإحالة. يرجى المحاولة مرة أخرى.",
+          "saveFailed": "تعذّر حفظ التغييرات. يرجى المحاولة مرة أخرى."
+        }
+      },
       "caseTypes": {
         "title": "أنواع القضايا",
         "noneYet": "لا توجد أنواع قضايا بعد",
@@ -1201,6 +1611,18 @@
         "reports_view": {
           "label": "عرض التقارير"
         },
+        "client_funds_access": {
+          "label": "أمانات العملاء",
+          "description": "عرض وتسجيل الأموال التي يحتفظ بها المكتب نيابةً عن العميل."
+        },
+        "tasks_assign": {
+          "label": "التكليف بالمهام",
+          "description": "إنشاء المهام وتكليف موظفين آخرين بها. يستطيع الجميع رؤية المهام المكلَّفين بها وتحديثها دون هذه الصلاحية."
+        },
+        "reference_data_manage": {
+          "label": "إدارة القوائم المرجعية",
+          "description": "إضافة وتعديل المحاكم وأنواع القضايا ومصادر الإحالة وأنواع المهل الخاصة بالمكتب."
+        },
         "roles_permissions_manage": {
           "label": "إنشاء الأدوار وتحديد الصلاحيات"
         },
@@ -1258,6 +1680,8 @@
         "addressEnLabel": "العنوان — بالإنجليزية",
         "addressArLabel": "العنوان — بالعربية",
         "phoneLabel": "الهاتف",
+        "whatsappPhoneLabel": "رقم واتساب",
+        "whatsappPhoneHelp": "الرقم الذي يفتحه زر واتساب في الموقع العام، مع رمز الدولة (مثلاً <ltr>+962 79 123 4567</ltr>). اتركه فارغاً لاستخدام رقم الهاتف الرئيسي.",
         "emailLabel": "البريد الإلكتروني",
         "hoursEnLabel": "ساعات العمل — بالإنجليزية",
         "hoursArLabel": "ساعات العمل — بالعربية",
@@ -1369,7 +1793,6 @@
       "saving": "جارٍ الحفظ…"
     },
     "activity": {
-      "fallback": "نشاط مُسجَّل",
       "entities": {
         "cases": {
           "filterLabel": "القضايا",
@@ -1402,16 +1825,19 @@
           "delete": "أُزيل المستند"
         },
         "engagements": {
+          "filterLabel": "اتفاقات الأتعاب",
           "insert": "أُنشئ اتفاق أتعاب",
           "update": "حُدّث اتفاق الأتعاب",
           "delete": "حُذف اتفاق الأتعاب"
         },
         "engagement_installments": {
+          "filterLabel": "أقساط الأتعاب",
           "insert": "تمت جدولة قسط",
           "update": "حُدّث القسط",
           "delete": "أُزيل القسط"
         },
         "engagement_cases": {
+          "filterLabel": "ربط القضايا باتفاقات الأتعاب",
           "insert": "رُبطت القضية باتفاق أتعاب",
           "update": "حُدّث ربط اتفاق الأتعاب",
           "delete": "أُلغي ربط القضية باتفاق الأتعاب"
@@ -1429,6 +1855,7 @@
           "delete": "أُزيل المصروف"
         },
         "case_opposing_parties": {
+          "filterLabel": "خصوم القضايا",
           "insert": "أُضيف خصم",
           "update": "حُدّثت بيانات الخصم",
           "delete": "أُزيل الخصم"
@@ -1439,29 +1866,149 @@
           "update": "حُدّثت بيانات العميل",
           "delete": "حُذف العميل"
         },
-        "roles": {
-          "filterLabel": "الأدوار",
-          "insert": "أُضيف دور",
-          "update": "حُدّث الدور",
-          "delete": "حُذف الدور"
-        },
-        "role_permissions": {
-          "filterLabel": "صلاحيات الأدوار",
-          "insert": "مُنحت صلاحية",
-          "update": "حُدّثت الصلاحية",
-          "delete": "سُحبت الصلاحية"
-        },
-        "appointments": {
-          "filterLabel": "المواعيد",
-          "insert": "حُجز موعد",
-          "update": "حُدّث الموعد",
-          "delete": "حُذف الموعد"
-        },
         "staff": {
           "filterLabel": "الموظفون",
           "insert": "أُضيف موظف",
           "update": "حُدّث حساب الموظف",
           "delete": "حُذف حساب الموظف"
+        },
+        "case_checklist_status": {
+          "filterLabel": "حالة قوائم المستندات",
+          "insert": "سُجّلت حالة بند في القائمة",
+          "update": "تغيّرت حالة بند في القائمة",
+          "delete": "مُسحت حالة بند في القائمة"
+        },
+        "case_court_filings": {
+          "filterLabel": "قيود المحاكم",
+          "insert": "أُضيف قيد في المحكمة",
+          "update": "حُدّث القيد",
+          "delete": "أُزيل القيد"
+        },
+        "case_types": {
+          "filterLabel": "أنواع القضايا",
+          "insert": "أُضيف نوع قضية",
+          "update": "حُدّث نوع القضية",
+          "delete": "حُذف نوع القضية"
+        },
+        "client_contacts": {
+          "filterLabel": "سجل التواصل",
+          "insert": "سُجّل تواصل",
+          "update": "حُدّث قيد التواصل",
+          "delete": "حُذف قيد التواصل"
+        },
+        "client_fund_entries": {
+          "filterLabel": "أمانات العملاء",
+          "insert": "سُجّل قيد أمانات",
+          "update": "حُدّث قيد الأمانات",
+          "delete": "أُزيل قيد الأمانات"
+        },
+        "courts": {
+          "filterLabel": "المحاكم",
+          "insert": "أُضيفت محكمة",
+          "update": "حُدّثت المحكمة",
+          "delete": "حُذفت المحكمة"
+        },
+        "document_checklist_items": {
+          "filterLabel": "بنود قوائم المستندات",
+          "insert": "أُضيف بند إلى القائمة",
+          "update": "حُدّث البند",
+          "delete": "أُزيل البند"
+        },
+        "document_drafts": {
+          "filterLabel": "مسودات المستندات",
+          "insert": "أُنشئت مسودة",
+          "update": "عُدّلت المسودة",
+          "delete": "حُذفت المسودة"
+        },
+        "document_templates": {
+          "filterLabel": "قوالب المستندات",
+          "insert": "أُضيف قالب",
+          "update": "حُدّث القالب",
+          "delete": "حُذف القالب"
+        },
+        "enquiries": {
+          "filterLabel": "الاستفسارات",
+          "insert": "ورد استفسار",
+          "update": "حُدّث الاستفسار",
+          "delete": "حُذف الاستفسار"
+        },
+        "enquiry_notes": {
+          "filterLabel": "ملاحظات الاستفسارات",
+          "insert": "أُضيفت ملاحظة على استفسار",
+          "update": "عُدّلت ملاحظة الاستفسار",
+          "delete": "حُذفت ملاحظة الاستفسار"
+        },
+        "firm_settings": {
+          "filterLabel": "بيانات المكتب",
+          "insert": "ضُبطت بيانات المكتب",
+          "update": "حُدّثت بيانات المكتب",
+          "delete": "أُزيلت بيانات المكتب"
+        },
+        "hearings": {
+          "filterLabel": "الجلسات",
+          "insert": "أُضيفت جلسة",
+          "update": "حُدّثت الجلسة",
+          "delete": "أُزيلت الجلسة"
+        },
+        "lawyer_profiles": {
+          "filterLabel": "نبذات المحامين",
+          "insert": "أُضيفت نبذة محامٍ",
+          "update": "حُدّثت نبذة المحامي",
+          "delete": "أُزيلت نبذة المحامي"
+        },
+        "leave_requests": {
+          "filterLabel": "طلبات الإجازة",
+          "insert": "قُدّم طلب إجازة",
+          "update": "حُدّث طلب الإجازة",
+          "delete": "حُذف طلب الإجازة"
+        },
+        "powers_of_attorney": {
+          "filterLabel": "الوكالات",
+          "insert": "أُضيفت وكالة",
+          "update": "حُدّثت الوكالة",
+          "delete": "أُزيلت الوكالة"
+        },
+        "practice_areas": {
+          "filterLabel": "مجالات الممارسة",
+          "insert": "أُضيف مجال ممارسة",
+          "update": "حُدّث مجال الممارسة",
+          "delete": "أُزيل مجال الممارسة"
+        },
+        "referral_sources": {
+          "filterLabel": "مصادر الإحالة",
+          "insert": "أُضيف مصدر إحالة",
+          "update": "حُدّث مصدر الإحالة",
+          "delete": "حُذف مصدر الإحالة"
+        },
+        "reminders_sent": {
+          "filterLabel": "التذكيرات المرسلة",
+          "insert": "سُجّل إرسال تذكير",
+          "update": "حُدّث سجل التذكير",
+          "delete": "أُزيل سجل التذكير"
+        },
+        "site_sections": {
+          "filterLabel": "محتوى الموقع",
+          "insert": "أُضيف قسم إلى الموقع",
+          "update": "حُدّث قسم الموقع",
+          "delete": "أُزيل قسم الموقع"
+        },
+        "tasks": {
+          "filterLabel": "المهام",
+          "insert": "أُضيفت مهمة",
+          "update": "حُدّثت المهمة",
+          "delete": "حُذفت المهمة"
+        },
+        "working_hours": {
+          "filterLabel": "ساعات العمل",
+          "insert": "ضُبطت ساعات العمل",
+          "update": "حُدّثت ساعات العمل",
+          "delete": "أُزيلت ساعات العمل"
+        },
+        "write_offs": {
+          "filterLabel": "الإعفاءات",
+          "insert": "سُجّل إعفاء",
+          "update": "حُدّث الإعفاء",
+          "delete": "أُزيل الإعفاء"
         }
       },
       "list": {
@@ -1528,6 +2075,27 @@
         "upcomingDeadlinesHeader": "المهل القادمة",
         "overdueDeadlinesHeader": "المهل المتأخرة",
         "nextDeadlineHeader": "المهلة التالية"
+      },
+      "profitability": {
+        "heading": "الربحية حسب نوع القضية",
+        "description": "الأتعاب والدفعات والمصاريف مجمّعة حسب نوع القضية. لا تُحتسب أموال اتفاقية أتعاب ضمن نوع قضية إلا إذا كانت تشمل قضية واحدة على الأقل وكانت جميع القضايا التي تشملها من ذلك النوع.",
+        "noneTitle": "لا توجد أنواع قضايا بعد",
+        "noneDescription": "أضف أنواع القضايا من الإدارة ← أنواع القضايا لعرض هذا التقرير.",
+        "caseTypeHeader": "نوع القضية",
+        "casesHeader": "القضايا",
+        "openClosed": "{open} مفتوحة · {closed} مغلقة",
+        "scheduledHeader": "المجدول",
+        "paidHeader": "المسدد",
+        "writtenOffHeader": "المُعفى منه",
+        "outstandingHeader": "المتبقي",
+        "expensesHeader": "المصاريف",
+        "unreimbursed": "<bdi>{amount}</bdi> غير مستردّة",
+        "netReceivedHeader": "صافي المقبوض",
+        "netReceivedNote": "صافي المقبوض هو المبلغ المسدد مطروحاً منه المصاريف التي لم تُسترد بعد.",
+        "mixedLabel": "اتفاقيات أتعاب تشمل أكثر من نوع قضية",
+        "mixedExplanation": "اتفاقيات لا يمكن نسبة أموالها بأمانة إلى نوع قضية واحد: التي تشمل قضايا من أكثر من نوع، والتي لم يُحدَّد نوع بعض قضاياها، والتي لا ترتبط بأي قضية. تظهر أموالها هنا بدلاً من ذلك دون عدد قضايا أو مصاريف — فهذه محتسبة في الأعلى ضمن نوع كل قضية، أو ضمن القضايا غير محددة النوع.",
+        "untypedLabel": "قضايا لم يُحدَّد نوعها",
+        "untypedExplanation": "عدد القضايا والمصاريف أرقام فعلية. أعمدة الأتعاب فارغة لأن اتفاقيات الأتعاب تُنسب حسب نوع القضية؛ والاتفاقيات التي تشمل هذه القضايا تظهر في الصف الأخير بدلاً من ذلك."
       }
     },
     "enquiries": {

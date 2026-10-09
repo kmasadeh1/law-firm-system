@@ -5,6 +5,8 @@ import { DashboardShell, type NavGroup, type NavItem } from '@/components/dashbo
 import { getThemeCookie } from '@/components/dashboard/get-theme-cookie'
 import { localizedName } from '@/lib/localized-name'
 import { logout } from './actions'
+import { loadBellData } from './notifications/data'
+import { NotificationBell } from './notifications/notification-bell'
 
 /**
  * Persistent shell for every /dashboard/* page. Nav visibility is computed
@@ -27,7 +29,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     { data: enquiriesManage },
     { count: assignedEnquiryCount },
     { data: reportsView },
+    { data: manageReferenceData },
     initialTheme,
+    bellData,
   ] = await Promise.all([
     supabase
       .from('staff')
@@ -41,7 +45,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
     // enquiries layout guard will actually let them through to.
     supabase.from('enquiries').select('id', { count: 'exact', head: true }).eq('assigned_to', user.sub as string),
     supabase.rpc('has_permission', { p_key: 'reports_view' }),
+    supabase.rpc('can_manage_reference_data'),
     getThemeCookie(),
+    // The bell is for everyone - no permission gates it. What each person
+    // sees is already limited by RLS and the pending_alerts view.
+    loadBellData(),
   ])
 
   const isOwner = staffRow?.user_type === 'owner'
@@ -67,6 +75,11 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   // you're the owner.
   dailyWork.push({ href: '/dashboard/leave-requests', label: t('leaveRequests'), icon: 'leave-requests' })
   dailyWork.push({ href: '/dashboard/appointments', label: t('appointments'), icon: 'appointments' })
+  // Unconditional, same reasoning as Cases/Appointments/Deadlines - the
+  // firm_hearing_schedule view is security_invoker, so it already returns
+  // only the hearings on cases this user can see. An empty day for a role
+  // with no visible cases is a normal state, not an access failure.
+  dailyWork.push({ href: '/dashboard/hearings', label: t('hearings'), icon: 'hearings' })
   // Deadlines has no single gating permission (owner, cases_manage,
   // court_dates_manage, or just being on the case's team all qualify), so
   // - like Cases and Appointments - it's always shown and RLS scopes what's
@@ -76,6 +89,9 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   // the read policy (owner, assignee, or creator) has no single permission
   // to gate the nav entry on, and RLS scopes what the list actually shows.
   dailyWork.push({ href: '/dashboard/tasks', label: t('tasks'), icon: 'tasks' })
+  // Unconditional too: reminder_candidates is security_invoker and limits
+  // each kind to what the reader may see; an empty list is normal.
+  dailyWork.push({ href: '/dashboard/reminders', label: t('reminders'), icon: 'reminders' })
 
   const money: NavItem[] = []
   if (isOwner || feesView) {
@@ -86,13 +102,34 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
   if (isOwner) {
     administration.push({ href: '/dashboard/owner/staff', label: t('staffAccounts'), icon: 'staff' })
     administration.push({ href: '/dashboard/owner/roles', label: t('rolesAndPermissions'), icon: 'roles' })
+  }
+  // The same function the reference lists' write policies and their route
+  // guard call - owner, or a role holding reference_data_manage.
+  if (manageReferenceData === true) {
+    administration.push({ href: '/dashboard/reference/courts', label: t('courts'), icon: 'courts' })
+    administration.push({ href: '/dashboard/reference/case-types', label: t('caseTypes'), icon: 'case-types' })
     administration.push({
-      href: '/dashboard/owner/deadline-period-types',
+      href: '/dashboard/reference/referral-sources',
+      label: t('referralSources'),
+      icon: 'referral-sources',
+    })
+    administration.push({
+      href: '/dashboard/reference/deadline-period-types',
       label: t('deadlinePeriodTypes'),
       icon: 'period-types',
     })
-    administration.push({ href: '/dashboard/owner/courts', label: t('courts'), icon: 'courts' })
-    administration.push({ href: '/dashboard/owner/case-types', label: t('caseTypes'), icon: 'case-types' })
+    administration.push({
+      href: '/dashboard/reference/checklists',
+      label: t('documentChecklists'),
+      icon: 'checklists',
+    })
+    administration.push({
+      href: '/dashboard/reference/templates',
+      label: t('documentTemplates'),
+      icon: 'templates',
+    })
+  }
+  if (isOwner) {
     administration.push({ href: '/dashboard/owner/activity', label: t('activityLog'), icon: 'activity' })
     administration.push({
       href: '/dashboard/owner/site-content',
@@ -133,6 +170,7 @@ export default async function DashboardLayout({ children }: LayoutProps<'/dashbo
       roleLabel={roleLabel}
       logoutAction={logout}
       initialTheme={initialTheme ?? 'light'}
+      notificationBell={<NotificationBell initial={bellData} />}
     >
       {children}
     </DashboardShell>

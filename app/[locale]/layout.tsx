@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 import { Amiri, IBM_Plex_Sans_Arabic, Source_Serif_4 } from 'next/font/google'
 import { routing } from '@/i18n/routing'
+import { getSiteOrigin, openGraphLocale } from '@/lib/public-site'
 import '../globals.css'
 
 const amiri = Amiri({
@@ -26,9 +27,23 @@ const plexArabic = IBM_Plex_Sans_Arabic({
 export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'layout' })
+  const origin = getSiteOrigin()
+  // The firm's name in the reader's language everywhere a search engine or
+  // a link preview reads it. No og:url or canonical here - this layout also
+  // wraps /[locale]/track/[token], which must not claim the homepage's URL;
+  // the homepage adds those itself.
   return {
+    ...(origin ? { metadataBase: new URL(origin) } : {}),
     title: t('firmName'),
     description: t('metaDescription'),
+    openGraph: {
+      type: 'website',
+      siteName: t('firmName'),
+      title: t('firmName'),
+      description: t('metaDescription'),
+      locale: openGraphLocale(locale),
+      alternateLocale: routing.locales.filter((l) => l !== locale).map(openGraphLocale),
+    },
   }
 }
 

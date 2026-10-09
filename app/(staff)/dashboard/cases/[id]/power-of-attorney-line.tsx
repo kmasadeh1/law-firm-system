@@ -11,11 +11,10 @@ export type CoveringPoa = {
   is_general: boolean
 }
 
-// Read-only - editing a وكالة lives entirely on the client page. The choice
-// of which row to show (case-specific over the client's general one, over
-// nothing) is made once in page.tsx via lib/poa-status.ts's
-// mostRelevantPoa, over rows RLS already scoped; this component only
-// renders whatever it's handed.
+// Read-only - editing a وكالة lives entirely on the client page. Which row
+// covers the case (case-specific over the client's general one, never
+// revoked or expired) is decided by case_covering_poa() in the database,
+// called once in page.tsx; this component only renders what it's handed.
 export async function PowerOfAttorneyLine({ poa }: { poa: CoveringPoa | null }) {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.clients.detail.powerOfAttorney' })

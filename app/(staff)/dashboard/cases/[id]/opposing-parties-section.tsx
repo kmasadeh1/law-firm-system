@@ -2,9 +2,10 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
-import { addOpposingParty, type ConflictMatch, type OpposingPartyErrorCode } from '../actions'
+import { addOpposingParty, setPrimaryOpposingParty, type ConflictMatch, type OpposingPartyErrorCode } from '../actions'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
+import { Badge } from '@/components/dashboard/badge'
 import { FieldError, controlClass } from '@/components/dashboard/form'
 import { ConflictWarning } from '@/components/dashboard/conflict-warning'
 
@@ -14,6 +15,7 @@ type OpposingParty = {
   national_id: string | null
   counsel_name: string | null
   counsel_phone: string | null
+  is_primary: boolean
 }
 
 // Closed set the server can return - anything else falls back to a generic
@@ -21,7 +23,10 @@ type OpposingParty = {
 const OPPOSING_PARTY_ERROR_CODES: OpposingPartyErrorCode[] = [
   'name_required',
   'conflict_check_failed',
+  'conflict_check_not_allowed',
+  'phone_invalid',
   'add_failed',
+  'primary_failed',
 ]
 
 // Each distinct conflict-check outcome is its own complete message, not a
@@ -65,12 +70,15 @@ export function OpposingPartiesSection({
 }) {
   const t = useTranslations('dashboard.cases.detail.opposingParties')
   const tErrors = useTranslations('dashboard.cases.detail.opposingParties.errors')
+  const tCommon = useTranslations('dashboard.common')
   const formRef = useRef<HTMLFormElement>(null)
   const [matches, setMatches] = useState<ConflictMatch[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   function resolveError(code: OpposingPartyErrorCode) {
+    // The phone refusal reads the same on every form that takes a phone.
+    if (code === 'phone_invalid') return tCommon('phoneInvalid')
     return (OPPOSING_PARTY_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('generic')
   }
 
@@ -91,6 +99,14 @@ export function OpposingPartiesSection({
       }
       formRef.current?.reset()
       setMatches(null)
+    })
+  }
+
+  function handlePrimary(partyId: string | null) {
+    setError(null)
+    startTransition(async () => {
+      const result = await setPrimaryOpposingParty(caseId, partyId)
+      if (result.error) setError(resolveError(result.error))
     })
   }
 
@@ -119,8 +135,9 @@ export function OpposingPartiesSection({
       ) : (
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {parties.map((p) => (
-            <li key={p.id} className="px-3 py-2 text-sm text-fg">
+            <li key={p.id} className="flex flex-wrap items-center gap-x-1 px-3 py-2 text-sm text-fg" data-testid="opposing-party-row" data-primary={p.is_primary}>
               <bdi>{p.name}</bdi>
+              {p.is_primary && <Badge variant="accent">{t('primaryBadge')}</Badge>}
               {p.national_id && <span className="text-fg-muted"> · <bdi>{p.national_id}</bdi></span>}
               {p.counsel_name && (
                 <span className="text-fg-muted">
@@ -133,6 +150,19 @@ export function OpposingPartiesSection({
                   {' · '}
                   <span dir="ltr">{p.counsel_phone}</span>
                 </span>
+              )}
+              {/* Which party document templates name - same gate as the
+                  rest of this section (can_manage_case_details). */}
+              {canManage && (
+                <button
+                  type="button"
+                  onClick={() => handlePrimary(p.is_primary ? null : p.id)}
+                  disabled={isPending}
+                  className="ms-auto text-xs text-fg-muted underline-offset-2 hover:text-fg hover:underline disabled:opacity-50"
+                  data-testid={p.is_primary ? 'opposing-party-unset-primary' : 'opposing-party-set-primary'}
+                >
+                  {p.is_primary ? t('unsetPrimary') : t('setPrimary')}
+                </button>
               )}
             </li>
           ))}
@@ -151,7 +181,7 @@ export function OpposingPartiesSection({
             <label htmlFor="op-national-id" className="text-sm text-fg-muted">
               {t('nationalIdLabel')}
             </label>
-            <input id="op-national-id" name="national_id" className={controlClass} />
+            <input id="op-national-id" name="national_id" dir="ltr" className={controlClass} />
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="op-counsel-name" className="text-sm text-fg-muted">

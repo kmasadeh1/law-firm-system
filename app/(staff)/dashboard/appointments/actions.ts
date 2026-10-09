@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { fromFirmDateTimeInput } from '@/lib/format-date-time'
 
 // A caller-controlled value never reaches next-intl's t() directly - the
 // render site validates against a whitelist, same as TeamErrorCode in
@@ -20,6 +21,7 @@ export type AppointmentErrorCode =
   | 'noPermissionCreate'
   | 'createFailed'
   | 'noPermissionUpdate'
+  | 'wouldLoseAccess'
   | 'updateFailed'
 
 type ActionResult = { error?: AppointmentErrorCode }
@@ -59,6 +61,20 @@ export async function searchCases(term: string): Promise<CaseOption[]> {
   return data ?? []
 }
 
+// starts_at/ends_at arrive as datetime-local values ("2026-10-05T14:30"),
+// which carry no zone. They are Amman wall-clock times, so they're converted
+// explicitly through the firm zone - never `new Date(value)`, which would
+// read them in whatever zone the server runs in (UTC on Vercel, three hours
+// off). A value that isn't a well-formed datetime-local is treated as
+// missing; the form never sends one.
+function readTimes(startsAt: string, endsAt: string): { starts: string; ends: string } | { error: AppointmentErrorCode } {
+  const starts = fromFirmDateTimeInput(startsAt)
+  if (!starts) return { error: 'startRequired' }
+  const ends = fromFirmDateTimeInput(endsAt)
+  if (!ends) return { error: 'endRequired' }
+  return { starts, ends }
+}
+
 // --- Create --------------------------------------------------------------
 
 export async function createAppointment(
@@ -89,6 +105,9 @@ export async function createAppointment(
   // cover the normal UX, and the insert below maps the DB's rejection by
   // constraint name if either gets bypassed.
 
+  const times = readTimes(starts_at, ends_at)
+  if ('error' in times) return times
+
   const supabase = await createClient()
   const { data: user } = await supabase.auth.getClaims()
   const resolvedStaffId =
@@ -101,8 +120,8 @@ export async function createAppointment(
       client_id,
       case_id: typeof case_id === 'string' && case_id ? case_id : null,
       staff_id: resolvedStaffId,
-      starts_at: new Date(starts_at).toISOString(),
-      ends_at: new Date(ends_at).toISOString(),
+      starts_at: times.starts,
+      ends_at: times.ends,
       notes: typeof notes === 'string' && notes.trim() ? notes.trim() : null,
       created_by: user?.claims?.sub,
     })
@@ -161,6 +180,9 @@ export async function updateAppointment(
     return { error: 'selectStatus' }
   }
 
+  const times = readTimes(starts_at, ends_at)
+  if ('error' in times) return times
+
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('appointments')
@@ -169,8 +191,8 @@ export async function updateAppointment(
       client_id,
       case_id: typeof case_id === 'string' && case_id ? case_id : null,
       staff_id: typeof staff_id === 'string' && staff_id ? staff_id : null,
-      starts_at: new Date(starts_at).toISOString(),
-      ends_at: new Date(ends_at).toISOString(),
+      starts_at: times.starts,
+      ends_at: times.ends,
       notes: typeof notes === 'string' && notes.trim() ? notes.trim() : null,
       status,
     })
@@ -181,10 +203,21 @@ export async function updateAppointment(
     if (error.code === '23514') {
       return { error: mapCheckViolation(error.message) ?? 'updateFailed' }
     }
+    // Unlike most updates, this one CAN raise 42501: it writes staff_id
+    // and type, which the policy's WITH CHECK depends on. Someone whose
+    // access is "it's my appointment" or "it's a court date and I manage
+    // court dates" is refused if the edit hands it to someone else or
+    // turns it into a consultation - the new row would be one they're no
+    // longer allowed to hold.
+    if (error.code === '42501') {
+      return { error: 'wouldLoseAccess' }
+    }
     return { error: 'updateFailed' }
   }
 
-  // UPDATE blocked by RLS matches zero rows rather than erroring.
+  // UPDATE blocked by RLS matches zero rows rather than erroring. There is
+  // no delete action for appointments, so this is a refusal rather than a
+  // vanished row.
   if (!data || data.length === 0) {
     return { error: 'noPermissionUpdate' }
   }

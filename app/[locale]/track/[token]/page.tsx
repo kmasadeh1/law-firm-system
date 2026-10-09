@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Crest } from '@/components/crest'
 import { LanguageSwitcher } from '../../components/language-switcher'
 import { localizedName } from '@/lib/localized-name'
+import { FIRM_TIME_ZONE } from '@/lib/format-date-time'
 
 type SharedCase = {
   case_number: string
@@ -56,7 +57,7 @@ export default async function TrackCasePage({ params }: PageProps<'/[locale]/tra
               <div>
                 <dt className="text-paper-dim">{t('track.openedLabel')}</dt>
                 <dd className="mt-0.5 text-paper">
-                  {new Date(sharedCase.opened_at).toLocaleDateString(locale, { dateStyle: 'long' })}
+                  {new Date(sharedCase.opened_at).toLocaleDateString(locale, { dateStyle: 'long', timeZone: FIRM_TIME_ZONE })}
                 </dd>
               </div>
               <div>
@@ -66,6 +67,7 @@ export default async function TrackCasePage({ params }: PageProps<'/[locale]/tra
                     ? new Date(sharedCase.next_hearing).toLocaleString(locale, {
                         dateStyle: 'long',
                         timeStyle: 'short',
+                        timeZone: FIRM_TIME_ZONE,
                       })
                     : t('track.noNextHearing')}
                 </dd>

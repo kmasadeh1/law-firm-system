@@ -94,7 +94,7 @@ export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermission
           return true
         })
       return { titleKey: group.titleKey, items }
-    }).filter((group) => group.items.length > 0)
+    }).filter((group) => group.items.length > 0 || (group.titleKey === 'administration' && ownerOnlyKeys.length > 0))
 
     const leftover = grantableKeys.filter((pk) => !used.has(pk.key))
     if (leftover.length > 0) {
@@ -102,7 +102,7 @@ export function RolesAdmin({ roles: initialRoles, permissionKeys, rolePermission
     }
 
     return named
-  }, [grantableKeys])
+  }, [grantableKeys, ownerOnlyKeys])
 
   return (
     <div className="flex flex-col gap-10">
@@ -354,18 +354,11 @@ function RoleCard({
                   onSaved={onPermissionSaved}
                 />
               ))}
+              {group.titleKey === 'administration' &&
+                ownerOnlyKeys.map((pk) => <OwnerOnlyPermissionRow key={pk.key} permissionKey={pk} />)}
             </div>
           </div>
         ))}
-
-        <div>
-          <h3 className="text-sm font-semibold text-fg-muted">{t('administrationHeading')}</h3>
-          <div className="mt-2 flex flex-col gap-2">
-            {ownerOnlyKeys.map((pk) => (
-              <OwnerOnlyPermissionRow key={pk.key} permissionKey={pk} />
-            ))}
-          </div>
-        </div>
       </div>
     </Panel>
   )

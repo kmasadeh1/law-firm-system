@@ -3,49 +3,37 @@
 // owner-wide activity log). Keep this the single source so the different
 // views can't drift into inconsistent wording for the same underlying
 // event. Labels themselves live in messages/{en,ar}.json under
-// dashboard.activity.entities.<entity>.<action> - this only resolves which
-// key to look up.
+// dashboard.activity.entities.<entity>.{filterLabel,insert,update,delete} -
+// this only resolves which key to look up. Which tables are logged is not
+// listed here: the activity log asks the database (logged_tables()).
 
 export type ActivityAction = 'insert' | 'update' | 'delete'
 
-// Single source for both "which entities have a logging trigger" (used to
-// build the owner activity log's filter) and "how do we label an event for
-// one" (activityEventTitle below, via the message keys named after these).
-export const ENTITY_NAMES = [
-  'cases',
-  'case_lawyers',
-  'deadlines',
-  'case_notes',
-  'documents',
-  'engagements',
-  'engagement_installments',
-  'engagement_cases',
-  'payments',
-  'expenses',
-  'case_opposing_parties',
-  'clients',
-  'roles',
-  'role_permissions',
-  'appointments',
-  'staff',
-].sort()
-
-// case_notes and documents have no hard DELETE - "deleted" is a soft flag
-// set via UPDATE, so it shows up in the log as action 'update' like any
-// other edit. Detect it from the row snapshot rather than mislabeling a
-// removal as a plain edit, which would hide it from the one place meant to
-// surface it.
-const SOFT_DELETE_ENTITIES = new Set(['case_notes', 'documents'])
+// Hand-written, unlike the list of logged tables: a deleted_at column is a
+// convention, not something a trigger records. These tables have no hard
+// DELETE - "deleted" is a deleted_at flag set via UPDATE, so it shows up in
+// the log as action 'update' like any other edit. Detect it from the row
+// snapshot rather than mislabeling a removal as a plain edit, which would
+// hide it from the one place meant to surface it.
+const SOFT_DELETE_ENTITIES = new Set(['case_notes', 'client_contacts', 'document_drafts', 'documents', 'enquiry_notes'])
 
 type ActivityTranslator = {
   (key: string): string
   has(key: string): boolean
 }
 
-// t is scoped to the 'dashboard.activity' namespace: entities.<entity>.<action>
-// for each label, with 'fallback' for a table that gets a logging trigger
-// later and hasn't had its label added here yet - that should read as an
-// obvious gap to fill in, not as broken grammar mistaken for the real label.
+// t is scoped to the 'dashboard.activity' namespace.
+//
+// A missing label falls back to the raw key ("write_offs", or
+// "write_offs.insert" for an event) - deliberately, so a table that gained
+// a logging trigger without labels reads as unfinished, and names exactly
+// which message key to add, instead of a generic phrase that looks
+// intentional.
+export function activityEntityLabel(t: ActivityTranslator, entity: string): string {
+  const key = `entities.${entity}.filterLabel`
+  return t.has(key) ? t(key) : entity
+}
+
 export function activityEventTitle(
   t: ActivityTranslator,
   entity: string,
@@ -62,5 +50,5 @@ export function activityEventTitle(
       : action
 
   const key = `entities.${entity}.${effectiveAction}`
-  return t.has(key) ? t(key) : t('fallback')
+  return t.has(key) ? t(key) : `${entity}.${effectiveAction}`
 }

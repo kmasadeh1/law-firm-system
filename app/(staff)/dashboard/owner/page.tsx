@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { formatRelativeTime } from '@/lib/format-relative-time'
-import { formatTime, formatDateTime } from '@/lib/format-date-time'
+import { firmDayBounds, formatTime, formatDateTime, todayInFirmZone } from '@/lib/format-date-time'
 import { formatNumber } from '@/lib/format-number'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
@@ -21,10 +21,9 @@ export default async function OwnerDashboardPage() {
   const tType = await getTranslations({ locale, namespace: 'dashboard.appointments.type' })
   const tActivity = await getTranslations({ locale, namespace: 'dashboard.activity' })
 
-  const startOfDay = new Date()
-  startOfDay.setHours(0, 0, 0, 0)
-  const startOfTomorrow = new Date(startOfDay)
-  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1)
+  // Today in Amman, as UTC instants - setHours(0) on the server would be
+  // the server's midnight (03:00 in Amman on a UTC host).
+  const today = firmDayBounds(todayInFirmZone())!
   const nowIso = new Date().toISOString()
 
   const [
@@ -38,8 +37,8 @@ export default async function OwnerDashboardPage() {
     supabase
       .from('appointments')
       .select('id, type, starts_at, status, clients(full_name), staff_id')
-      .gte('starts_at', startOfDay.toISOString())
-      .lt('starts_at', startOfTomorrow.toISOString())
+      .gte('starts_at', today.start)
+      .lt('starts_at', today.end)
       .order('starts_at', { ascending: true }),
     // count: 'exact' alongside the same unfiltered order/limit - the
     // RLS-scoped total, not a client-side count, so "+N more" always

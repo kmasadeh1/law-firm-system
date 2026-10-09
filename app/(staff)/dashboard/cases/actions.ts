@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { todayInFirmZone } from '@/lib/format-date-time'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 export type ConflictMatch = {
   source: string
@@ -82,8 +84,6 @@ export async function createCase(formData: FormData): Promise<CreateCaseActionRe
     return { error: 'statusLookupFailed' }
   }
 
-  const { data: user } = await supabase.auth.getClaims()
-
   const { data: inserted, error } = await supabase
     .from('cases')
     .insert({
@@ -92,7 +92,7 @@ export async function createCase(formData: FormData): Promise<CreateCaseActionRe
       case_number: case_number.trim(),
       case_type_id: typeof case_type_id === 'string' && case_type_id ? case_type_id : null,
       status_id: firstStatus.id,
-      created_by: user?.claims?.sub,
+      // created_by is stamped by the cases_stamp_created_by trigger.
     })
     .select('id')
     .single()
@@ -117,18 +117,25 @@ export async function setCaseStatus(caseId: string, statusId: string): Promise<A
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.status.errors' })
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('cases')
     .update({ status_id: statusId })
     .eq('id', caseId)
+    .select('id')
 
+  // Never error.message - it's English Postgres text. Two refusals, two
+  // messages: the close-permission trigger (moving an open case INTO a
+  // terminal status as anyone but the lead lawyer or the owner) raises
+  // 42501 naming itself; the update policy refusing the change altogether
+  // raises nothing and matches zero rows.
   if (error) {
-    // The close-permission trigger raises a plain exception whose message
-    // is already the friendly text we want - just surface it.
-    if (error.code === 'P0001') {
-      return { error: error.message }
+    if (error.code === '42501' && error.message.includes('enforce_case_close_permission')) {
+      return { error: t('noPermissionClose') }
     }
     return { error: t('updateFailed') }
+  }
+  if (!data || data.length === 0) {
+    return { error: t('noPermissionChange') }
   }
 
   revalidatePath(casePath(caseId))
@@ -232,7 +239,13 @@ export async function removeTeamMember(caseId: string, staffId: string): Promise
 
 // --- Opposing parties ------------------------------------------------------
 
-export type OpposingPartyErrorCode = 'name_required' | 'conflict_check_failed' | 'add_failed'
+export type OpposingPartyErrorCode =
+  | 'name_required'
+  | 'conflict_check_failed'
+  | 'conflict_check_not_allowed'
+  | 'phone_invalid'
+  | 'add_failed'
+  | 'primary_failed'
 
 type OpposingPartyActionResult = { error?: OpposingPartyErrorCode }
 
@@ -266,6 +279,12 @@ export async function addOpposingParty(
     })
 
     if (conflictError) {
+      // check_conflict refuses a caller who is not the owner and holds
+      // neither clients_manage nor cases_manage - a permission answer, not
+      // a failure, so it is told apart by its constraint name.
+      if (conflictError.code === '42501' && conflictError.message.includes('check_conflict')) {
+        return { error: 'conflict_check_not_allowed' }
+      }
       return { error: 'conflict_check_failed' }
     }
     if (matches && matches.length > 0) {
@@ -282,7 +301,45 @@ export async function addOpposingParty(
   })
 
   if (error) {
+    if (isPhoneRefusal(error)) return { error: 'phone_invalid' }
     return { error: 'add_failed' }
+  }
+
+  revalidatePath(casePath(caseId))
+  return {}
+}
+
+// The primary opposing party is the one a document template's
+// {{opposing_party}} / {{opposing_counsel}} resolve to. A unique partial
+// index allows at most one per case, so changing it is: clear the current
+// primary, then mark the new one. Two statements, not atomic - if the second
+// fails the case is left with no primary (reported, never a wrong one).
+// partyId null just clears it.
+export async function setPrimaryOpposingParty(
+  caseId: string,
+  partyId: string | null
+): Promise<OpposingPartyActionResult> {
+  const supabase = await createClient()
+
+  let clear = supabase
+    .from('case_opposing_parties')
+    .update({ is_primary: false })
+    .eq('case_id', caseId)
+    .eq('is_primary', true)
+  if (partyId) clear = clear.neq('id', partyId)
+  const { error: clearError } = await clear
+  if (clearError) return { error: 'primary_failed' }
+
+  if (partyId) {
+    const { data, error } = await supabase
+      .from('case_opposing_parties')
+      .update({ is_primary: true })
+      .eq('id', partyId)
+      .eq('case_id', caseId)
+      .select('id')
+    // 23505: someone else made another party primary in between. Zero
+    // rows: refused by RLS or the party is gone. Either way, not saved.
+    if (error || !data || data.length === 0) return { error: 'primary_failed' }
   }
 
   revalidatePath(casePath(caseId))
@@ -502,10 +559,8 @@ export async function addHearing(
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { data: userData } = await supabase.auth.getClaims()
-  const { error } = await supabase
-    .from('hearings')
-    .insert({ filing_id: filingId, ...fields, created_by: userData?.claims?.sub })
+  // created_by is stamped by the hearings_stamp_created_by trigger.
+  const { error } = await supabase.from('hearings').insert({ filing_id: filingId, ...fields })
 
   if (error) {
     if (error.code === '23514') {
@@ -890,6 +945,13 @@ export async function restoreDocument(caseId: string, documentId: string): Promi
 
 // --- Expenses ------------------------------------------------------------
 
+// Parsing only - turning the field's text into a number. Whether the
+// amount is acceptable (> 0) is the expenses_amount_positive CHECK's call,
+// mapped by name where the insert/update fails.
+function isAmountNotPositive(error: { code: string; message: string }) {
+  return error.code === '23514' && error.message.includes('expenses_amount_positive')
+}
+
 async function parseAmount(
   formData: FormData,
   t: Awaited<ReturnType<typeof getTranslations>>
@@ -897,7 +959,7 @@ async function parseAmount(
   const raw = formData.get('amount')
   if (typeof raw !== 'string' || !raw.trim()) return { error: t('amountRequired') }
   const amount = Number(raw)
-  if (!Number.isFinite(amount) || amount <= 0) return { error: t('invalidAmount') }
+  if (!Number.isFinite(amount)) return { error: t('invalidAmount') }
   return amount
 }
 
@@ -928,6 +990,12 @@ export async function addExpense(caseId: string, formData: FormData): Promise<Ac
   })
 
   if (error) {
+    if (isAmountNotPositive(error)) {
+      return { error: t('amountNotPositive') }
+    }
+    if (error.code === '23514' && error.message.includes('expenses_description_not_blank')) {
+      return { error: t('descriptionRequired') }
+    }
     if (error.code === '42501') {
       return { error: t('noPermissionRecord') }
     }
@@ -966,6 +1034,12 @@ export async function editExpense(
     .select('id')
 
   if (error) {
+    if (isAmountNotPositive(error)) {
+      return { error: t('amountNotPositive') }
+    }
+    if (error.code === '23514' && error.message.includes('expenses_description_not_blank')) {
+      return { error: t('descriptionRequired') }
+    }
     return { error: t('saveFailed') }
   }
   if (!data || data.length === 0) {
@@ -984,20 +1058,25 @@ export async function setExpenseReimbursed(
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.cases.detail.expenses.errors' })
   const supabase = await createClient()
-  // reimbursed and reimbursed_at are set together so they can never
-  // disagree - there's no database constraint enforcing that pairing, so
-  // this is the only place either field is ever written.
+  // reimbursed and reimbursed_at are written together; the
+  // expenses_reimbursed_matches_date CHECK guarantees they agree, so this
+  // can't leave them inconsistent even if it were wrong.
   const { data, error } = await supabase
     .from('expenses')
     .update({
       reimbursed,
-      reimbursed_at: reimbursed ? new Date().toISOString().slice(0, 10) : null,
+      // Today in Amman - toISOString() would give the UTC date, which is
+      // still yesterday until 03:00.
+      reimbursed_at: reimbursed ? todayInFirmZone() : null,
     })
     .eq('id', expenseId)
     .eq('case_id', caseId)
     .select('id')
 
   if (error) {
+    if (error.code === '23514' && error.message.includes('expenses_reimbursed_matches_date')) {
+      return { error: t('reimbursedDateMismatch') }
+    }
     return { error: t('reimbursedUpdateFailed') }
   }
   if (!data || data.length === 0) {

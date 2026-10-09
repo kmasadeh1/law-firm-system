@@ -54,7 +54,6 @@
     "home": "Home",
     "practiceAreas": "Practice Areas",
     "lawyers": "Our Lawyers",
-    "appointment": "Book an Appointment",
     "contact": "Contact",
     "staffSignIn": "Staff sign in"
   },
@@ -63,25 +62,14 @@
     "ar": "العربية"
   },
   "hero": {
-    "cta": "Book a consultation"
-  },
-  "appointment": {
-    "title": "Book an Appointment",
-    "intro": "This form is a visual placeholder and does not submit yet - online booking is coming soon.",
-    "nameLabel": "Full name",
-    "emailLabel": "Email",
-    "phoneLabel": "Phone",
-    "practiceAreaLabel": "Practice area",
-    "practiceAreaPlaceholder": "Select a practice area",
-    "messageLabel": "How can we help?",
-    "submit": "Request appointment",
-    "comingSoon": "Coming soon"
+    "cta": "Contact us"
   },
   "contact": {
     "addressLabel": "Address",
     "phoneLabel": "Phone",
     "emailLabel": "Email",
     "hoursLabel": "Office hours",
+    "whatsapp": "Message us on WhatsApp",
     "mapTitle": "Map showing the firm's office location",
     "formNameLabel": "Full name",
     "formPhoneLabel": "Phone",
@@ -95,6 +83,7 @@
     "errorNameRequired": "Please enter your name.",
     "errorMessageRequired": "Please enter a message.",
     "errorContactRequired": "Please provide a phone number or an email address.",
+    "errorPhoneInvalid": "Please enter a Jordanian phone number, or include the country code if your number is from abroad.",
     "errorGeneric": "Something went wrong sending your message. Please try again, or reach us by phone or email above."
   },
   "footer": {
@@ -111,8 +100,25 @@
     "invalidMessage": "This link is no longer valid — please contact the office."
   },
   "dashboard": {
+    "documentPlaceholders": {
+      "case_number": "Case number",
+      "case_title": "Case title",
+      "client_name": "Client name",
+      "client_national_id": "Client national ID",
+      "lead_lawyer": "Lead lawyer",
+      "court_name": "Court",
+      "court_case_number": "Court case number",
+      "court_chamber": "Chamber",
+      "judge": "Judge",
+      "opposing_party": "Opposing party (primary)",
+      "opposing_counsel": "Opposing counsel (primary party's)",
+      "poa_number": "Power of attorney (وكالة) number",
+      "firm_name": "Firm name",
+      "today": "Today's date"
+    },
     "common": {
       "unknownStaff": "Unknown staff",
+      "phoneInvalid": "Enter a Jordanian phone number, or include the country code for a number from abroad.",
       "pagination": {
         "showing": "Showing {from}–{to} of {total}",
         "navLabel": "Pagination",
@@ -136,6 +142,87 @@
       "editDetailsInstead": "Edit details instead",
       "saving": "Saving…"
     },
+    "reminders": {
+      "title": "Reminders",
+      "description": "Prepared WhatsApp messages for upcoming hearings and appointments and overdue payments. Nothing is sent from here: open each one, read it, send it yourself, then mark it as sent.",
+      "emptyTitle": "No reminders due",
+      "emptyDescription": "Hearings and appointments in the next 7 days, and instalments past their due date, will appear here.",
+      "group": {
+        "hearing": "Hearings",
+        "appointment": "Appointments",
+        "payment_due": "Payments due"
+      },
+      "about": {
+        "hearing": "Hearing on case <bdi>{caseNumber}</bdi> at <bdi>{court}</bdi>",
+        "appointment": "Appointment",
+        "appointmentOnCase": "Appointment on case <bdi>{caseNumber}</bdi>",
+        "payment_due": "Instalment: <bdi>{description}</bdi>"
+      },
+      "lastReminded": "Last reminded <bdi>{date}</bdi>",
+      "neverReminded": "Not reminded yet",
+      "recentlyReminded": "Reminded in the last 24 hours",
+      "openWhatsApp": "Open in WhatsApp",
+      "markSent": "Mark as sent",
+      "recording": "Recording…",
+      "markSentHelp": "Only after you've actually sent it.",
+      "noPhone": "No phone number on file for this client - add one to their record to send a reminder.",
+      "errors": {
+        "noPermission": "You don't have permission to record a reminder for this client.",
+        "recordFailed": "Could not record the reminder. Please try again."
+      },
+      "message": {
+        "hearing": "Hello {client}, this is a reminder from {firm}: your case {caseNumber} has a hearing at {court} on {date}. Please contact us if you have any questions.",
+        "appointment": "Hello {client}, this is a reminder from {firm} of your appointment with us on {date} at {time}. Please let us know if you need to change it.",
+        "appointmentNoTime": "Hello {client}, this is a reminder from {firm} of your appointment with us on {date}. Please let us know if you need to change it.",
+        "payment_due": "Hello {client}, this is a reminder from {firm} that {amount} is outstanding for {description}, which was due on {date}. Please contact us to arrange payment."
+      }
+    },
+    "notifications": {
+      "open": "Notifications",
+      "openWithCount": "{count, plural, one {Notifications, # new} other {Notifications, # new}}",
+      "countOverflow": "99+",
+      "emptyTitle": "You're all caught up",
+      "emptyDescription": "Assignments, payments, approaching deadlines and hearings will appear here.",
+      "alertsHeading": "Needs attention",
+      "notificationsHeading": "Notifications",
+      "markAllRead": "Mark all read",
+      "dismiss": "Dismiss",
+      "unread": "Unread",
+      "someone": "Someone",
+      "unknownCase": "a case",
+      "updateFailed": "That didn't save. Please try again.",
+      "alert": {
+        "deadline": "Deadline on case <bdi>{caseNumber}</bdi>",
+        "deadlineWithType": "<bdi>{type}</bdi> deadline on case <bdi>{caseNumber}</bdi>",
+        "hearing": "Hearing on case <bdi>{caseNumber}</bdi>",
+        "hearingWithCourt": "Hearing at <bdi>{court}</bdi> on case <bdi>{caseNumber}</bdi>"
+      },
+      "when": {
+        "overdue": "{days, plural, one {Overdue by # day} other {Overdue by # days}}",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "inDays": "{days, plural, one {In # day} other {In # days}}"
+      },
+      "type": {
+        "case_assigned": {
+          "default": "<bdi>{actor}</bdi> assigned you to case <bdi>{subject}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> assigned you to a case you can no longer see"
+        },
+        "task_assigned": {
+          "default": "<bdi>{actor}</bdi> assigned you a task: <bdi>{subject}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> assigned you a task that is no longer available"
+        },
+        "enquiry_assigned": {
+          "default": "<bdi>{actor}</bdi> assigned you an enquiry from <bdi>{subject}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> assigned you an enquiry you can no longer see"
+        },
+        "payment_recorded": {
+          "default": "<bdi>{actor}</bdi> recorded a payment of <bdi>{amount}</bdi>",
+          "withClient": "<bdi>{actor}</bdi> recorded a payment of <bdi>{amount}</bdi> from <bdi>{client}</bdi>",
+          "unavailable": "<bdi>{actor}</bdi> recorded a payment you can no longer see"
+        }
+      }
+    },
     "shell": {
       "firmName": "Ahmad Al-Masadeh & Associates",
       "logOut": "Log out",
@@ -149,9 +236,11 @@
       "lightMode": "Light mode",
       "darkMode": "Dark mode",
       "switchToArabic": "Switch to Arabic",
-      "switchToEnglish": "Switch to English"
+      "switchToEnglish": "Switch to English",
+      "localeSwitchFailed": "Couldn't switch language. Please try again."
     },
     "nav": {
+      "documentTemplates": "Document templates",
       "groupDailyWork": "Daily work",
       "groupMoney": "Money",
       "groupAdministration": "Administration",
@@ -160,8 +249,10 @@
       "enquiries": "Enquiries",
       "cases": "Cases",
       "appointments": "Appointments",
+      "hearings": "Hearing calendar",
       "deadlines": "Deadlines",
       "tasks": "Tasks",
+      "reminders": "Reminders",
       "leaveRequests": "Leave requests",
       "feesAndPayments": "Fees & payments",
       "staffAccounts": "Staff accounts",
@@ -169,6 +260,8 @@
       "deadlinePeriodTypes": "Deadline period types",
       "courts": "Courts",
       "caseTypes": "Case types",
+      "referralSources": "Referral sources",
+      "documentChecklists": "Document checklists",
       "activityLog": "Activity log",
       "siteContent": "Site content",
       "settings": "Settings",
@@ -244,6 +337,78 @@
         }
       },
       "detail": {
+        "drafts": {
+          "heading": "Drafts",
+          "noneYet": "No drafts yet.",
+          "noTemplates": "No templates for this type of case yet.",
+          "templateLabel": "Template",
+          "chooseTemplate": "Choose a template…",
+          "languageLabel": "Language",
+          "language": {
+            "en": "English",
+            "ar": "Arabic"
+          },
+          "generate": "Generate draft",
+          "generating": "Generating…",
+          "delete": "Delete",
+          "backToCase": "Back to case",
+          "notFound": "This draft doesn't exist, has been deleted, or you don't have access to it.",
+          "titleLabel": "Title",
+          "bodyLabel": "Text",
+          "markerHelp": "Anything in [square brackets] is a detail the case doesn't have yet - fix it before printing.",
+          "sectionsHelp": "On the printout, a line of --- after the court details sets them as an aligned reference block, and a second line of --- before the date and signature keeps that closing block at the foot of the last page.",
+          "save": "Save",
+          "saving": "Saving…",
+          "saved": "Saved",
+          "unsaved": "Unsaved changes",
+          "print": "Print",
+          "marker": {
+            "missing": "[{label}: not available]",
+            "unknown": "[unknown placeholder: {name}]"
+          },
+          "errors": {
+            "templateUnavailable": "That template is no longer available in this language.",
+            "titleRequired": "A title is required.",
+            "bodyRequired": "The text can't be empty.",
+            "noPermission": "You don't have permission to edit drafts on this case.",
+            "generateFailed": "Could not create the draft. Please try again.",
+            "saveFailed": "Could not save the draft. Please try again.",
+            "deleteFailed": "Could not delete the draft. Please try again."
+          }
+        },
+        "checklist": {
+          "heading": "Document checklist",
+          "requiredCount": "{provided} of {total} required provided",
+          "requiredNotApplicable": "{count, plural, one {# required item not applicable} other {# required items not applicable}}",
+          "required": "Required",
+          "optional": "Optional",
+          "state": {
+            "outstanding": "Outstanding",
+            "provided": "Provided",
+            "not_applicable": "Not applicable"
+          },
+          "stateLabel": "Status",
+          "linkedDocument": "Document: <bdi>{name}</bdi>",
+          "linkedDocumentUnavailable": "The linked document is no longer available.",
+          "notedBy": "Recorded by <bdi>{name}</bdi> on <bdi>{date}</bdi>",
+          "notedOn": "Recorded on <bdi>{date}</bdi>",
+          "documentLabel": "Link a document from this case (optional)",
+          "noDocument": "No document",
+          "noteLabel": "Note (optional)",
+          "save": "Save",
+          "saving": "Saving…",
+          "cancel": "Cancel",
+          "record": "Record",
+          "edit": "Edit",
+          "clear": "Mark outstanding",
+          "errors": {
+            "invalidState": "Choose Provided or Not applicable.",
+            "documentNotOnCase": "That document isn't on this case, or has been deleted.",
+            "noPermission": "You don't have permission to update this checklist.",
+            "saveFailed": "Could not save. Please try again.",
+            "clearFailed": "Could not mark it outstanding. Please try again."
+          }
+        },
         "page": {
           "backToCases": "Cases",
           "caseNotFound": "This case doesn't exist, or you don't have access to it.",
@@ -257,7 +422,9 @@
           "saveStatus": "Save status",
           "saved": "Saved",
           "errors": {
-            "updateFailed": "Could not update the status. Please try again."
+            "updateFailed": "Could not update the status. Please try again.",
+            "noPermissionClose": "Only the case's lead lawyer or the owner can close a case.",
+            "noPermissionChange": "You don't have permission to change this case's status."
           }
         },
         "team": {
@@ -312,6 +479,8 @@
             "incurredRequired": "Date incurred is required.",
             "amountRequired": "Amount is required.",
             "invalidAmount": "Enter a valid amount greater than zero.",
+            "amountNotPositive": "The amount must be greater than zero.",
+            "reimbursedDateMismatch": "The reimbursement status and its date didn't match, so the change wasn't saved. Please try again.",
             "noPermissionRecord": "You don't have permission to record expenses on this case.",
             "recordFailed": "Could not record the expense. Please try again.",
             "saveFailed": "Could not save the expense. Please try again.",
@@ -383,6 +552,9 @@
           }
         },
         "opposingParties": {
+          "primaryBadge": "Primary",
+          "setPrimary": "Make primary",
+          "unsetPrimary": "Unset primary",
           "heading": "Opposing parties",
           "noneAddedYet": "None added yet.",
           "nameLabel": "Name",
@@ -397,6 +569,8 @@
           "matchOtherCase": "<bdi>{name}</bdi> — already an opposing party on another case",
           "matchExistingClient": "<bdi>{name}</bdi> — existing client",
           "errors": {
+            "primary_failed": "Could not change the primary party. Please refresh and try again.",
+            "conflict_check_not_allowed": "You don't have permission to run a conflict check, so an opposing party can't be added.",
             "name_required": "Name is required.",
             "conflict_check_failed": "Could not run the conflict check. Please try again.",
             "add_failed": "Could not add the opposing party. Please try again.",
@@ -559,6 +733,7 @@
         "balance": {
           "heading": "Fees position",
           "noEngagementsYet": "No fee engagements for this client yet.",
+          "writtenOff": "Written off: <bdi>{amount}</bdi>",
           "agreedFixedFees": "Agreed (fixed fees): <bdi>{amount}</bdi>",
           "scheduled": "Scheduled: <bdi>{amount}</bdi>",
           "paid": "Paid: <bdi>{amount}</bdi>",
@@ -622,6 +797,56 @@
             "alreadyAssigned": "That lawyer is already assigned to this power of attorney.",
             "assignFailed": "Could not assign that lawyer. Please try again.",
             "unassignFailed": "Could not remove that lawyer. Please try again.",
+            "generic": "Something went wrong. Please try again."
+          }
+        },
+        "contacts": {
+          "heading": "Contact log",
+          "noneYet": "No contact logged yet.",
+          "logContact": "Log contact",
+          "logging": "Logging…",
+          "directionLabel": "Direction",
+          "channelLabel": "Channel",
+          "occurredAtLabel": "When it happened",
+          "occurredAtHelp": "Leave empty to use the current time.",
+          "handledByLabel": "Handled by",
+          "handledByNone": "Not recorded",
+          "caseLabel": "Case",
+          "generalOption": "General — not about a specific case",
+          "summaryLabel": "Summary",
+          "summaryPlaceholder": "What they asked about, and what they were told.",
+          "followUpLabel": "Follow-up needed",
+          "followUpBadge": "Follow-up needed",
+          "handledByLine": "Handled by <bdi>{name}</bdi>",
+          "editedLine": "Edited <bdi>{date}</bdi>",
+          "edit": "Edit",
+          "save": "Save",
+          "saving": "Saving…",
+          "cancel": "Cancel",
+          "delete": "Delete",
+          "deleting": "Deleting…",
+          "deleteNote": "It will no longer appear in the contact log.",
+          "direction": {
+            "incoming": "Incoming",
+            "outgoing": "Outgoing"
+          },
+          "channel": {
+            "phone": "Phone",
+            "whatsapp": "WhatsApp",
+            "email": "Email",
+            "in_person": "In person",
+            "letter": "Letter",
+            "other": "Other"
+          },
+          "errors": {
+            "summaryRequired": "Write a summary of the contact.",
+            "caseMismatch": "That case belongs to a different client.",
+            "invalidChoice": "Choose a direction and a channel.",
+            "invalidOccurredAt": "Enter a valid date and time.",
+            "noPermission": "You don't have permission to do that.",
+            "addFailed": "Couldn't log the contact. Please try again.",
+            "updateFailed": "Couldn't save the changes. Please try again.",
+            "deleteFailed": "Couldn't delete the entry. Please try again.",
             "generic": "Something went wrong. Please try again."
           }
         },
@@ -689,6 +914,12 @@
         "matchExistingClient": "<bdi>{name}</bdi> — existing client",
         "noAccess": "You don't have permission to create clients.",
         "noAccessConflictChecks": "You don't have permission to view conflict-check history.",
+        "referralSourceLabel": "Referral source",
+        "referralSourceNone": "Not recorded",
+        "referralSourceInactive": "{name} (deactivated)",
+        "referralSourcesEmpty": "No referral sources have been set up yet. They can be added under Administration → Referral sources.",
+        "referralNotesLabel": "Referral notes",
+        "referralNotesPlaceholder": "Who or what specifically, e.g. the person who referred them",
         "errors": {
           "fullNameRequired": "Full name is required.",
           "conflictCheckFailed": "Could not run the conflict check. Please try again.",
@@ -754,6 +985,7 @@
           "noPermissionCreate": "You don't have permission to create this appointment.",
           "createFailed": "Could not create the appointment. Please try again.",
           "noPermissionUpdate": "You don't have permission to change this appointment.",
+          "wouldLoseAccess": "You can't make that change: it would assign the appointment to someone else or change its type in a way you're not permitted to manage.",
           "updateFailed": "Could not update the appointment. Please try again."
         }
       },
@@ -768,6 +1000,28 @@
         "no_show": "No-show"
       }
     },
+    "hearings": {
+      "title": "Hearing calendar",
+      "printTitle": "Court sessions",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "today": "Today",
+      "dateLabel": "Date",
+      "show": "Show",
+      "print": "Print",
+      "count": "{count, plural, one {# hearing} other {# hearings}}",
+      "emptyTitle": "No hearings on this day.",
+      "emptyDescription": "This calendar lists the hearings recorded on the cases you can see.",
+      "columns": {
+        "time": "Time",
+        "courtCaseNumber": "Court case no.",
+        "chamber": "Chamber",
+        "judge": "Judge",
+        "firmCase": "Firm case",
+        "client": "Client",
+        "leadLawyer": "Lead lawyer"
+      }
+    },
     "deadlines": {
       "list": {
         "title": "Deadlines",
@@ -779,6 +1033,7 @@
       "new": {
         "backToDeadlines": "Deadlines",
         "title": "New deadline",
+      "noAccess": "You don't have permission to add deadlines.",
         "resultHeading": "Deadline added",
         "resultLine": "Trigger date <bdi>{trigger}</bdi> <icon></icon> due <bdi><strong>{due}</strong></bdi>",
         "effectiveDueDateLine": "Effective due date (after any extension): <bdi>{date}</bdi>",
@@ -809,8 +1064,9 @@
           "extendedDateRequired": "Extended date is required.",
           "extensionReasonRequired": "A reason is required for an extension.",
           "bothExtensionFieldsRequired": "Both an extended date and a reason are required.",
-          "noPermissionExtend": "You don't have permission to extend this deadline.",
-          "extendFailed": "Could not save the extension. Please try again."
+          "extendFailed": "Could not save the extension. Please try again.",
+          "markMetFailed": "Could not mark the deadline as met. Please try again.",
+          "unmarkMetFailed": "Could not mark the deadline as not met. Please try again."
         }
       },
       "section": {
@@ -828,12 +1084,17 @@
         "cancel": "Cancel",
         "changeExtension": "Change extension",
         "extend": "Extend",
+        "markMet": "Mark as met",
+        "unmarkMet": "Mark as not met",
+        "metLine": "Met — marked on <bdi>{date}</bdi> by <bdi>{name}</bdi>.",
+        "metLineNoName": "Met — marked on <bdi>{date}</bdi>.",
         "viewAllDeadlines": "View all deadlines"
       },
       "urgency": {
         "overdue": "Overdue",
         "soon": "Due soon",
-        "later": "Upcoming"
+        "later": "Upcoming",
+        "met": "Met"
       }
     },
     "fees": {
@@ -881,6 +1142,7 @@
         "outstandingScheduled": "Outstanding (scheduled): <bdi>{amount}</bdi>",
         "unscheduledPositive": "<bdi>{amount}</bdi> of the agreed fee is not scheduled yet.",
         "unscheduledNegative": "The schedule exceeds the agreed fee by <bdi>{amount}</bdi>.",
+        "writtenOff": "Written off: <bdi>{amount}</bdi>",
         "cases": {
           "heading": "Linked cases",
           "noneYet": "No cases linked yet.",
@@ -924,6 +1186,26 @@
           "payerFragment": " · payer: <bdi>{name}</bdi>",
           "paidBadge": "Paid: <bdi>{amount}</bdi>",
           "balanceBadge": "Balance: <bdi>{amount}</bdi>",
+          "writtenOffBadge": "Written off: <bdi>{amount}</bdi>",
+          "writeOffs": {
+            "heading": "Write-offs",
+            "open": "Write off",
+            "immutableBanner": "A write-off is permanent. It can't be edited or deleted - a mistake is corrected by reversing it, which stays on record alongside it.",
+            "amountLabel": "Amount to write off",
+            "dateLabel": "Date",
+            "reasonLabel": "Reason",
+            "reasonPlaceholder": "Why this amount is being forgiven",
+            "submit": "Record write-off",
+            "recording": "Recording…",
+            "cancel": "Cancel",
+            "recordedLine": "<bdi>{date}</bdi> · recorded by <bdi>{name}</bdi>",
+            "recordedLineNoName": "<bdi>{date}</bdi>",
+            "reversedBadge": "Reversed",
+            "reverse": "Reverse",
+            "reverseReasonLabel": "Reason for reversing",
+            "confirmReverse": "Record reversal",
+            "reversing": "Reversing…"
+          },
           "hidePayments": "Hide payments",
           "showPayments": "Payments",
           "edit": "Edit",
@@ -939,6 +1221,7 @@
           "deleteNoteHasPayments": "Payments have already been recorded against this instalment - deleting it will fail until those payments are removed.",
           "deleteNoteNoPayments": "No payments have been recorded against this instalment yet. This can't be undone.",
           "noPaymentsYet": "No payments recorded yet.",
+          "receipt": "Receipt",
           "paymentMethodFragment": " · <bdi>{method}</bdi>",
           "paymentsImmutableBanner": "Payments can't be edited or removed once recorded. A mistake is corrected with an offsetting entry, not by changing history.",
           "amountLabel": "Amount",
@@ -957,6 +1240,24 @@
           "addInstallment": "Add instalment"
         }
       },
+      "receipt": {
+        "title": "Payment receipt",
+        "receiptNumber": "Receipt no.",
+        "date": "Date",
+        "receivedFrom": "Received from",
+        "clientHidden": "Client name not visible",
+        "for": "For",
+        "dueDate": "Instalment due <bdi>{date}</bdi>",
+        "method": "Method",
+        "amount": "Amount",
+        "amountInWords": "In words:",
+        "receivedBy": "Received by (signature)",
+        "stamp": "Firm stamp",
+        "print": "Print receipt",
+        "backToEngagement": "Back to engagement",
+        "backToFees": "Fees & payments",
+        "notFound": "This payment doesn't exist, or you don't have access to it."
+      },
       "errors": {
         "select_client": "Select a client.",
         "select_fee_type": "Select a fee type.",
@@ -967,6 +1268,7 @@
         "cases_link_failed": "Engagement created, but the selected cases could not be linked. Add them from the engagement page.",
         "select_case": "Select a case.",
         "case_wrong_client": "That case doesn't belong to this engagement's client.",
+        "cases_link_wrong_client": "Engagement created, but one of the selected cases belongs to a different client, so none of them were linked. Add the right cases from the engagement page.",
         "case_already_linked": "That case is already linked to this engagement.",
         "link_failed": "Could not link the case. Please try again.",
         "unlink_failed": "Could not unlink the case. Please try again.",
@@ -977,23 +1279,67 @@
         "link_generation_failed": "Could not generate a link to that file. Please try again.",
         "description_required": "Description is required.",
         "invalid_amount": "Enter a valid amount.",
+        "installment_amount_not_positive": "The instalment amount must be greater than zero.",
+        "payment_amount_not_positive": "The payment amount must be greater than zero.",
         "add_installment_failed": "Could not add the instalment. Please try again.",
         "save_installment_failed": "Could not save the changes. Please try again.",
-        "installment_has_payments": "Can't delete an instalment that has payments recorded against it.",
+        "installment_has_records": "This instalment has payments or write-offs recorded against it and cannot be deleted.",
+        "installment_below_commitments": "The amount can't be lower than what has already been paid and written off on this instalment.",
         "delete_installment_failed": "Could not delete the instalment. Please try again.",
         "date_required": "Date is required.",
         "no_permission_record_payment": "You don't have permission to record payments.",
         "record_payment_failed": "Could not record the payment. Please try again.",
+        "write_off_amount_not_positive": "The amount to write off must be greater than zero.",
+        "write_off_reason_required": "A reason is required for a write-off.",
+        "write_off_exceeds_balance": "That's more than is still outstanding on this instalment.",
+        "write_off_already_reversed": "This write-off has already been reversed.",
+        "write_off_reversal_mismatch": "This reversal doesn't match the write-off it reverses. Refresh the page and try again.",
+        "no_permission_write_off": "Only the owner can record write-offs.",
+        "write_off_failed": "Could not record the write-off. Please try again.",
+        "write_off_reverse_failed": "Could not reverse the write-off. Please try again.",
         "generic": "Something went wrong. Please try again."
       }
     },
     "admin": {
+      "templates": {
+        "title": "Document templates",
+        "description": "Standard documents with placeholders. Generating one from a case fills the placeholders and gives the lawyer an editable draft to print.",
+        "createHeading": "New template",
+        "noneYet": "No templates yet",
+        "noneYetDescription": "Templates you add here can be generated from any case of the matching type.",
+        "placeholdersHeading": "Placeholders",
+        "placeholdersHelp": "Write these exactly as shown. A value the case doesn't have shows in the draft as a marker to fix before printing.",
+        "nameEnLabel": "Name — English",
+        "nameArLabel": "Name — Arabic",
+        "caseTypeLabel": "Case type",
+        "anyCaseType": "Any case type",
+        "bodyEnLabel": "Text — English",
+        "bodyArLabel": "Text — Arabic",
+        "create": "Create template",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "activeLabel": "Active",
+        "inactiveLabel": "Deactivated",
+        "active": "Active",
+        "inactive": "Deactivated",
+        "deactivate": "Deactivate",
+        "deactivateNote": "It will no longer be offered on cases. Drafts already made from it are kept, and reactivating brings it back.",
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noBody": "Enter the text in English or Arabic.",
+          "noPermission": "You don't have permission to manage templates.",
+          "createFailed": "Could not create the template. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
+        }
+      },
       "userType": {
         "owner": "Owner",
         "staff": "Staff"
       },
       "noAccess": {
         "title": "Owner access only",
+        "permissionTitle": "No access",
         "description": "You don't have permission to view this page."
       },
       "staff": {
@@ -1045,7 +1391,7 @@
           "couldNotCreateLogin": "Could not create the login. Please try again.",
           "staffRecordFailedWithCleanup": "Could not create the staff record, and cleanup of the orphaned login also failed. Auth user {userId} needs manual removal.",
           "staffRecordFailedRolledBack": "Could not create the staff record. The login was rolled back - please try again.",
-          "passwordResetButRecordFailed": "The password was reset, but updating the staff record failed. The account may not be flagged to require a change.",
+          "passwordResetButRecordFailed": "The new password is set and works - give it to the employee. But the account could not be flagged to require a password change, so they won't be asked to choose their own when they sign in. Issue a new password to retry the flag.",
           "updateAccountFailed": "Could not update that account. Please try again."
         }
       },
@@ -1069,7 +1415,6 @@
           "deleting": "Deleting…",
           "deleteRole": "Delete role",
           "deleteNote": "A role held by any staff member can't be deleted until they're moved to another role first. Its permission settings will also be removed.",
-          "administrationHeading": "Administration",
           "ownerOnlyBadge": "(Owner only)",
           "ownerOnlyDescription": "Owner only — can't be granted to any role.",
           "ownerOnlySwitchLabel": "{label} (owner only, locked)",
@@ -1081,6 +1426,7 @@
           "billing": "Billing",
           "frontOffice": "Front Office",
           "reporting": "Reporting",
+          "administration": "Administration",
           "other": "Other"
         },
         "errors": {
@@ -1177,6 +1523,69 @@
           "saveFailed": "Could not save the changes. Please try again."
         }
       },
+      "checklists": {
+        "title": "Document checklists",
+        "description": "The documents each type of case needs. Items appear on every case of that type straight away; each case records only whether an item was provided.",
+        "noCaseTypes": "Add case types first - each checklist belongs to a case type.",
+        "caseTypeInactive": "Inactive case type",
+        "noItems": "No checklist items for this case type yet.",
+        "nameEnLabel": "Name — English",
+        "nameArLabel": "Name — Arabic",
+        "requiredLabel": "Required",
+        "required": "Required",
+        "optional": "Optional",
+        "activeLabel": "Active",
+        "active": "Active",
+        "inactive": "Deactivated",
+        "add": "Add item",
+        "adding": "Adding…",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "deactivate": "Deactivate",
+        "deactivateNote": "It disappears from the checklist on every case of this type. Anything already recorded against it is kept, and reactivating brings it back.",
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noPermission": "You don't have permission to manage checklists.",
+          "createFailed": "Could not add the item. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again.",
+          "reorderFailed": "Could not move the item. Please refresh and try again."
+        }
+      },
+      "referralSources": {
+        "title": "Referral sources",
+        "description": "Where clients come from. Each client can be tagged with one when they're created or edited.",
+        "noneYet": "No referral sources yet",
+        "noneYetDescription": "Add the ways clients reach the firm - for example a referral from an existing client, or from a professional. Staff pick from this list on the client form.",
+        "createForm": {
+          "heading": "New referral source",
+          "nameLabel": "Name",
+          "nameArLabel": "Name (Arabic)",
+          "creating": "Creating…",
+          "create": "Create referral source"
+        },
+        "card": {
+          "nameEnAriaLabel": "Name",
+          "nameArAriaLabel": "Name (Arabic)",
+          "saving": "Saving…",
+          "save": "Save",
+          "saved": "Saved",
+          "activeAriaLabel": "Active",
+          "inactiveAriaLabel": "Inactive",
+          "activeText": "Active",
+          "deactivatedText": "Deactivated",
+          "deactivate": "Deactivate",
+          "deactivateNote": "It will no longer be offered on the client form. Clients already tagged with it keep it."
+        },
+        "errors": {
+          "noName": "Enter a name in English or Arabic.",
+          "noPermission": "You don't have permission to manage referral sources.",
+          "createFailed": "Could not create the referral source. Please try again.",
+          "saveFailed": "Could not save the changes. Please try again."
+        }
+      },
       "caseTypes": {
         "title": "Case types",
         "noneYet": "No case types yet",
@@ -1252,6 +1661,18 @@
         "reports_view": {
           "label": "View reports"
         },
+        "client_funds_access": {
+          "label": "Client funds",
+          "description": "View and record money the firm holds on behalf of a client."
+        },
+        "tasks_assign": {
+          "label": "Assign tasks",
+          "description": "Create tasks and assign them to other staff. Everyone can see and update tasks assigned to them without this."
+        },
+        "reference_data_manage": {
+          "label": "Manage reference lists",
+          "description": "Add and edit the firm's courts, case types, referral sources and deadline period types."
+        },
         "roles_permissions_manage": {
           "label": "Create roles and set permissions"
         },
@@ -1309,6 +1730,8 @@
         "addressEnLabel": "Address — English",
         "addressArLabel": "Address — Arabic",
         "phoneLabel": "Phone",
+        "whatsappPhoneLabel": "WhatsApp number",
+        "whatsappPhoneHelp": "The number the public site's WhatsApp button opens, with the country code (e.g. <ltr>+962 79 123 4567</ltr>). Leave blank to use the main phone number.",
         "emailLabel": "Email",
         "hoursEnLabel": "Business hours — English",
         "hoursArLabel": "Business hours — Arabic",
@@ -1414,7 +1837,6 @@
       }
     },
     "activity": {
-      "fallback": "Activity recorded",
       "entities": {
         "cases": {
           "filterLabel": "Cases",
@@ -1488,29 +1910,149 @@
           "update": "Client updated",
           "delete": "Client deleted"
         },
-        "roles": {
-          "filterLabel": "Roles",
-          "insert": "Role added",
-          "update": "Role updated",
-          "delete": "Role deleted"
-        },
-        "role_permissions": {
-          "filterLabel": "Role permissions",
-          "insert": "Permission granted",
-          "update": "Permission updated",
-          "delete": "Permission revoked"
-        },
-        "appointments": {
-          "filterLabel": "Appointments",
-          "insert": "Appointment booked",
-          "update": "Appointment updated",
-          "delete": "Appointment deleted"
-        },
         "staff": {
           "filterLabel": "Staff",
           "insert": "Staff member added",
           "update": "Staff account updated",
           "delete": "Staff account deleted"
+        },
+        "case_checklist_status": {
+          "filterLabel": "Case checklist status",
+          "insert": "Checklist item marked",
+          "update": "Checklist item status changed",
+          "delete": "Checklist item status cleared"
+        },
+        "case_court_filings": {
+          "filterLabel": "Court filings",
+          "insert": "Court filing added",
+          "update": "Court filing updated",
+          "delete": "Court filing removed"
+        },
+        "case_types": {
+          "filterLabel": "Case types",
+          "insert": "Case type added",
+          "update": "Case type updated",
+          "delete": "Case type deleted"
+        },
+        "client_contacts": {
+          "filterLabel": "Contact log",
+          "insert": "Contact logged",
+          "update": "Contact log entry updated",
+          "delete": "Contact log entry deleted"
+        },
+        "client_fund_entries": {
+          "filterLabel": "Client funds",
+          "insert": "Client funds entry recorded",
+          "update": "Client funds entry updated",
+          "delete": "Client funds entry removed"
+        },
+        "courts": {
+          "filterLabel": "Courts",
+          "insert": "Court added",
+          "update": "Court updated",
+          "delete": "Court deleted"
+        },
+        "document_checklist_items": {
+          "filterLabel": "Document checklist items",
+          "insert": "Checklist item added",
+          "update": "Checklist item updated",
+          "delete": "Checklist item removed"
+        },
+        "document_drafts": {
+          "filterLabel": "Document drafts",
+          "insert": "Draft generated",
+          "update": "Draft edited",
+          "delete": "Draft deleted"
+        },
+        "document_templates": {
+          "filterLabel": "Document templates",
+          "insert": "Template added",
+          "update": "Template updated",
+          "delete": "Template deleted"
+        },
+        "enquiries": {
+          "filterLabel": "Enquiries",
+          "insert": "Enquiry received",
+          "update": "Enquiry updated",
+          "delete": "Enquiry deleted"
+        },
+        "enquiry_notes": {
+          "filterLabel": "Enquiry notes",
+          "insert": "Enquiry note added",
+          "update": "Enquiry note edited",
+          "delete": "Enquiry note deleted"
+        },
+        "firm_settings": {
+          "filterLabel": "Firm details",
+          "insert": "Firm details set",
+          "update": "Firm details updated",
+          "delete": "Firm details removed"
+        },
+        "hearings": {
+          "filterLabel": "Hearings",
+          "insert": "Hearing added",
+          "update": "Hearing updated",
+          "delete": "Hearing removed"
+        },
+        "lawyer_profiles": {
+          "filterLabel": "Lawyer profiles",
+          "insert": "Lawyer profile added",
+          "update": "Lawyer profile updated",
+          "delete": "Lawyer profile removed"
+        },
+        "leave_requests": {
+          "filterLabel": "Leave requests",
+          "insert": "Leave requested",
+          "update": "Leave request updated",
+          "delete": "Leave request deleted"
+        },
+        "powers_of_attorney": {
+          "filterLabel": "Powers of attorney",
+          "insert": "Power of attorney added",
+          "update": "Power of attorney updated",
+          "delete": "Power of attorney removed"
+        },
+        "practice_areas": {
+          "filterLabel": "Practice areas",
+          "insert": "Practice area added",
+          "update": "Practice area updated",
+          "delete": "Practice area removed"
+        },
+        "referral_sources": {
+          "filterLabel": "Referral sources",
+          "insert": "Referral source added",
+          "update": "Referral source updated",
+          "delete": "Referral source deleted"
+        },
+        "reminders_sent": {
+          "filterLabel": "Reminders sent",
+          "insert": "Reminder marked as sent",
+          "update": "Reminder record updated",
+          "delete": "Reminder record removed"
+        },
+        "site_sections": {
+          "filterLabel": "Site content",
+          "insert": "Site section added",
+          "update": "Site section updated",
+          "delete": "Site section removed"
+        },
+        "tasks": {
+          "filterLabel": "Tasks",
+          "insert": "Task added",
+          "update": "Task updated",
+          "delete": "Task deleted"
+        },
+        "working_hours": {
+          "filterLabel": "Working hours",
+          "insert": "Working hours set",
+          "update": "Working hours updated",
+          "delete": "Working hours removed"
+        },
+        "write_offs": {
+          "filterLabel": "Write-offs",
+          "insert": "Write-off recorded",
+          "update": "Write-off updated",
+          "delete": "Write-off removed"
         }
       },
       "list": {
@@ -1577,6 +2119,27 @@
         "upcomingDeadlinesHeader": "Upcoming deadlines",
         "overdueDeadlinesHeader": "Overdue deadlines",
         "nextDeadlineHeader": "Next deadline"
+      },
+      "profitability": {
+        "heading": "Profitability by case type",
+        "description": "Fees, payments and expenses grouped by case type. A fee agreement's money is counted under a case type only when it covers at least one case and every case it covers is that type.",
+        "noneTitle": "No case types yet",
+        "noneDescription": "Add case types under Administration → Case types to see this report.",
+        "caseTypeHeader": "Case type",
+        "casesHeader": "Cases",
+        "openClosed": "{open} open · {closed} closed",
+        "scheduledHeader": "Scheduled",
+        "paidHeader": "Paid",
+        "writtenOffHeader": "Written off",
+        "outstandingHeader": "Outstanding",
+        "expensesHeader": "Expenses",
+        "unreimbursed": "<bdi>{amount}</bdi> not reimbursed",
+        "netReceivedHeader": "Net received",
+        "netReceivedNote": "Net received is the amount paid minus expenses not yet reimbursed.",
+        "mixedLabel": "Fee agreements covering more than one case type",
+        "mixedExplanation": "Agreements whose money can't honestly be given to a single case type: those covering cases of more than one type, those where some cases have no type set, and those with no linked case at all. Their money is shown here instead, with no case count or expenses — those are counted under each case's own type, or as cases with no type, above.",
+        "untypedLabel": "Cases with no type set",
+        "untypedExplanation": "Their case count and expenses are real figures. The fee columns are empty because fee agreements are attributed by case type; agreements covering these cases appear in the last row instead."
       }
     },
     "enquiries": {

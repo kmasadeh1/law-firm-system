@@ -9,7 +9,7 @@ import { formatAmount, formatPercentage } from '@/lib/format-money'
 import { formatFeeType } from '../format'
 import { CasesSection } from './cases-section'
 import { AgreementSection } from './agreement-section'
-import { InstallmentsSection } from './installments-section'
+import { InstallmentsSection, type WriteOff } from './installments-section'
 
 export default async function EngagementDetailPage({ params }: PageProps<'/dashboard/fees/[id]'>) {
   const { id } = await params
@@ -44,10 +44,14 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
     { data: installments },
     { data: installmentBalances },
     { data: canRecordPayments },
+    { data: isOwner },
+    { data: staffDirectory },
   ] = await Promise.all([
     supabase
       .from('engagement_balances')
-      .select('agreed_fixed_fee, agreed_percentage, scheduled_total, paid_total, scheduled_outstanding, unscheduled_amount')
+      .select(
+        'agreed_fixed_fee, agreed_percentage, scheduled_total, paid_total, scheduled_outstanding, unscheduled_amount, written_off_total'
+      )
       .eq('engagement_id', id)
       .maybeSingle(),
     supabase.from('engagement_cases').select('cases(id, case_number, title)').eq('engagement_id', id),
@@ -61,19 +65,38 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
       .select('id, description, due_date, amount, payer_name')
       .eq('engagement_id', id)
       .order('due_date', { ascending: true, nullsFirst: false }),
-    supabase.from('installment_balances').select('installment_id, paid_amount, balance_due').eq('engagement_id', id),
+    // Every per-instalment figure comes from this view - amount, paid,
+    // written off and balance due. Nothing is added or subtracted here.
+    supabase
+      .from('installment_balances')
+      .select('installment_id, installment_amount, paid_amount, written_off_amount, balance_due')
+      .eq('engagement_id', id),
     supabase.rpc('has_permission', { p_key: 'payments_record' }),
+    // Write-offs (and their reversals) are owner-only to record - the
+    // INSERT policy is is_owner() - so the controls are gated on the same
+    // question, asked once here.
+    supabase.rpc('is_owner'),
+    // Unfiltered - who recorded a write-off should still show after they
+    // leave the firm.
+    supabase.from('staff_directory').select('id, full_name'),
   ])
 
   const installmentIds = (installments ?? []).map((i) => i.id)
-  const { data: payments } =
+  const [{ data: payments }, { data: writeOffRows }] =
     installmentIds.length > 0
-      ? await supabase
-          .from('payments')
-          .select('id, installment_id, amount, paid_at, method')
-          .in('installment_id', installmentIds)
-          .order('paid_at', { ascending: false })
-      : { data: [] }
+      ? await Promise.all([
+          supabase
+            .from('payments')
+            .select('id, installment_id, amount, paid_at, method')
+            .in('installment_id', installmentIds)
+            .order('paid_at', { ascending: false }),
+          supabase
+            .from('write_offs')
+            .select('id, installment_id, amount, reason, written_off_on, reverses_write_off_id, created_by, created_at')
+            .in('installment_id', installmentIds)
+            .order('created_at', { ascending: true }),
+        ])
+      : [{ data: [] }, { data: [] }]
 
   const linkedCases = (linkedCaseRows ?? [])
     .map((r) => r.cases)
@@ -105,6 +128,41 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
   const balanceByInstallment = new Map(
     (installmentBalances ?? []).map((b) => [b.installment_id, b])
   )
+  const nameById = new Map(
+    (staffDirectory ?? [])
+      .filter((s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null)
+      .map((s) => [s.id, s.full_name])
+  )
+
+  // Display pairing only: each original write-off is shown with the row
+  // that reverses it (if any) directly beneath it. Whether a write-off
+  // counts is already decided by installment_balances.
+  const reversalByOriginal = new Map(
+    (writeOffRows ?? []).filter((w) => w.reverses_write_off_id).map((w) => [w.reverses_write_off_id as string, w])
+  )
+  const writeOffsByInstallment = new Map<string, WriteOff[]>()
+  for (const w of writeOffRows ?? []) {
+    if (w.reverses_write_off_id) continue
+    const reversal = reversalByOriginal.get(w.id) ?? null
+    const list = writeOffsByInstallment.get(w.installment_id) ?? []
+    list.push({
+      id: w.id,
+      amount: w.amount,
+      reason: w.reason,
+      written_off_on: w.written_off_on,
+      recorded_by_name: nameById.get(w.created_by) ?? null,
+      reversal: reversal
+        ? {
+            id: reversal.id,
+            reason: reversal.reason,
+            written_off_on: reversal.written_off_on,
+            recorded_by_name: nameById.get(reversal.created_by) ?? null,
+          }
+        : null,
+    })
+    writeOffsByInstallment.set(w.installment_id, list)
+  }
+
   const paymentsByInstallment = new Map<string, typeof payments>()
   for (const p of payments ?? []) {
     const list = paymentsByInstallment.get(p.installment_id) ?? []
@@ -151,6 +209,10 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
           <Badge variant="neutral">
             {t.rich('paid', { amount: formatAmount(balance?.paid_total ?? 0, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
           </Badge>
+          {/* Its own figure - money forgiven is never added to money paid. */}
+          <Badge variant="neutral" data-testid="engagement-written-off-total">
+            {t.rich('writtenOff', { amount: formatAmount(balance?.written_off_total ?? 0, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+          </Badge>
           <Badge variant={(balance?.scheduled_outstanding ?? 0) > 0 ? 'accent' : 'muted'}>
             {t.rich('outstandingScheduled', {
               amount: formatAmount(balance?.scheduled_outstanding ?? 0, locale),
@@ -178,7 +240,6 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
 
       <CasesSection
         engagementId={engagement.id}
-        clientId={engagement.client_id}
         linkedCases={linkedCases}
         clientCases={clientCases ?? []}
       />
@@ -195,11 +256,14 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
         engagementId={engagement.id}
         installments={(installments ?? []).map((i) => ({
           ...i,
-          paid_amount: balanceByInstallment.get(i.id)?.paid_amount ?? 0,
-          balance_due: balanceByInstallment.get(i.id)?.balance_due ?? i.amount,
+          // Straight from installment_balances; null (rendered as a dash) if
+          // the view returned no row, never a figure derived here.
+          balance: balanceByInstallment.get(i.id) ?? null,
           payments: paymentsByInstallment.get(i.id) ?? [],
+          writeOffs: writeOffsByInstallment.get(i.id) ?? [],
         }))}
         canRecordPayments={Boolean(canRecordPayments)}
+        canWriteOff={isOwner === true}
       />
     </div>
   )

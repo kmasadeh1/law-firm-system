@@ -7,8 +7,8 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { ChevronLeftIcon } from '@/components/dashboard/icons'
-import { ENTITY_NAMES } from '@/lib/activity-labels'
-import { formatFullDate } from '@/lib/format-date-time'
+import { activityEntityLabel } from '@/lib/activity-labels'
+import { firmDayBounds, formatFullDate } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
 
@@ -48,7 +48,16 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   // Unfiltered, unlike active-staff pickers elsewhere - someone who's left
   // the firm should still be filterable by name in a firm-wide audit log,
   // arguably more so than anywhere else this convention already applies.
-  const { data: staffDirectory } = await supabase.from('staff_directory').select('id, full_name')
+  //
+  // logged_tables() is the database's own list of every table with a
+  // trigger writing to activity_log, read from pg_trigger - so a newly
+  // logged table appears in the entity filter at once (under its raw name
+  // until it is labelled) and an unlogged one never does. Asked once per
+  // page load.
+  const [{ data: staffDirectory }, { data: loggedTables }] = await Promise.all([
+    supabase.from('staff_directory').select('id, full_name'),
+    supabase.rpc('logged_tables'),
+  ])
   const staffOptions = (staffDirectory ?? [])
     .filter((s): s is { id: string; full_name: string } => s.id !== null && s.full_name !== null)
     .sort((a, b) => a.full_name.localeCompare(b.full_name))
@@ -62,8 +71,15 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   if (entity) query = query.eq('table_name', entity)
   if (actor === 'system') query = query.is('actor_id', null)
   else if (actor) query = query.eq('actor_id', actor)
-  if (from) query = query.gte('created_at', `${from}T00:00:00`)
-  if (to) query = query.lte('created_at', `${to}T23:59:59`)
+  // The filter's dates are Amman days. created_at is a timestamptz, so
+  // each day is turned into its exact Amman bounds: on or after the start
+  // of `from`, and strictly before the start of the day after `to` - lt,
+  // not lte 23:59:59, which would lose the final second. A date that isn't
+  // a valid YYYY-MM-DD gives no bounds and is ignored.
+  const fromBounds = from ? firmDayBounds(from) : null
+  const toBounds = to ? firmDayBounds(to) : null
+  if (fromBounds) query = query.gte('created_at', fromBounds.start)
+  if (toBounds) query = query.lt('created_at', toBounds.end)
 
   // One extra row tells us whether an Older page exists, without a separate
   // COUNT(*) over a table that only ever grows.
@@ -72,6 +88,12 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
   const hasNext = (rows ?? []).length > PAGE_SIZE
   const pageRows = (rows ?? []).slice(0, PAGE_SIZE) as ActivityLogRow[]
   const groups = groupByDay(pageRows, locale)
+
+  // Listed in the reader's language order. A table with no label shows its
+  // raw name (see activityEntityLabel) - an obvious gap, not a silent one.
+  const entityOptions = (loggedTables ?? [])
+    .map((e) => ({ value: e, label: activityEntityLabel(tActivity, e) }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale))
 
   const filterParams = new URLSearchParams()
   if (entity) filterParams.set('entity', entity)
@@ -96,11 +118,17 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
           <label htmlFor="activity-entity" className="text-sm text-fg-muted">
             {t('entityLabel')}
           </label>
-          <select id="activity-entity" name="entity" defaultValue={entity ?? ''} className={controlClass}>
+          <select
+            id="activity-entity"
+            name="entity"
+            defaultValue={entity ?? ''}
+            className={controlClass}
+            data-testid="activity-entity-filter"
+          >
             <option value="">{t('allEntities')}</option>
-            {ENTITY_NAMES.map((e) => (
-              <option key={e} value={e}>
-                {tActivity(`entities.${e}.filterLabel`)}
+            {entityOptions.map((e) => (
+              <option key={e.value} value={e.value}>
+                {e.label}
               </option>
             ))}
           </select>

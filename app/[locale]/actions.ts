@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 type SubmitEnquiryResult = { error?: string }
 
@@ -58,6 +59,9 @@ export async function submitEnquiry(formData: FormData): Promise<SubmitEnquiryRe
   })
 
   if (error) {
+    // A mistyped phone number is the one database refusal a visitor can
+    // fix themselves, so it gets its own message rather than 'generic'.
+    if (isPhoneRefusal(error)) return { error: 'phone_invalid' }
     return { error: 'generic' }
   }
 

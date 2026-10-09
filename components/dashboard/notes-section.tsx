@@ -24,6 +24,10 @@ export type NoteRow = {
   author_name: string
   deleted_at: string | null
   deleted_by_name: string | null
+  // The database's answer to "may this viewer edit or delete this note?",
+  // where it differs per note (enquiry notes: can_edit_enquiry_note). false
+  // hides Edit and Delete on this note; omitted leaves it to `actions`.
+  can_modify?: boolean
 }
 
 type ActionResult = { error?: string }
@@ -104,6 +108,7 @@ function NoteItem({
   editNote?: (noteId: string, formData: FormData) => Promise<ActionResult>
   deleteNote?: (noteId: string) => Promise<ActionResult>
 }) {
+  const canModify = note.can_modify !== false
   const [isEditing, setIsEditing] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -163,7 +168,7 @@ function NoteItem({
   }
 
   return (
-    <li className="flex flex-col gap-1 px-3 py-3 text-sm">
+    <li className="flex flex-col gap-1 px-3 py-3 text-sm" data-testid="note-item">
       <p className="text-xs text-fg-muted">
         {t.rich('authorLine', {
           author: note.author_name,
@@ -181,15 +186,21 @@ function NoteItem({
         )}
       </p>
       <p className="whitespace-pre-wrap text-fg">{note.note}</p>
-      {(editNote || deleteNote) && (
+      {canModify && (editNote || deleteNote) && (
         <div className="flex items-center gap-2">
           {editNote && (
-            <Button type="button" variant="ghost" onClick={() => setIsEditing(true)}>
+            <Button type="button" variant="ghost" onClick={() => setIsEditing(true)} data-testid="note-edit">
               {t('edit')}
             </Button>
           )}
           {deleteNote && (
-            <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isPending}>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={() => setConfirmingDelete(true)}
+              disabled={isPending}
+              data-testid="note-delete"
+            >
               {isPending ? t('deleting') : t('delete')}
             </Button>
           )}
@@ -197,7 +208,7 @@ function NoteItem({
       )}
       {error && <FieldError>{error}</FieldError>}
 
-      {deleteNote && (
+      {canModify && deleteNote && (
         <DeleteConfirmDialog
           open={confirmingDelete}
           onCancel={() => setConfirmingDelete(false)}

@@ -3,13 +3,13 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 
-const PATH = '/dashboard/owner/courts'
+const PATH = '/dashboard/reference/courts'
 
 // Closed set the server can return - the render site validates against a
 // whitelist before calling t(), same convention as TeamErrorCode /
 // OpposingPartyErrorCode in cases/actions.ts. 'noName' maps the
-// courts_has_a_name CHECK (23514) by code, never by passing Postgres's own
-// message text through to the UI.
+// courts_has_a_name CHECK (23514) by constraint name, never by passing
+// Postgres's own message text through to the UI.
 export type CourtErrorCode = 'selectType' | 'noName' | 'noPermission' | 'createFailed' | 'saveFailed'
 
 type ActionResult = { error?: CourtErrorCode }
@@ -75,63 +75,58 @@ function readFields(formData: FormData): Fields | { error: CourtErrorCode } {
   }
 }
 
+const ROW = 'id, name_en, name_ar, city_en, city_ar, court_type, is_active'
+
+// Only the CHECK is mapped here. 42501 is handled at the insert call alone:
+// the INSERT policy (can_manage_reference_data) refusing raises it, but an UPDATE refused by
+// RLS raises nothing (zero rows, checked at each update call), so a 42501
+// branch on the update paths could never run.
+function mapWriteError(code: string, message: string, fallback: CourtErrorCode): CourtErrorCode {
+  if (code === '23514' && message.includes('courts_has_a_name')) return 'noName'
+  return fallback
+}
+
 export async function createCourt(formData: FormData): Promise<ActionResult & { court?: CourtRow }> {
   const fields = readFields(formData)
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('courts')
-    .insert(fields)
-    .select('id, name_en, name_ar, city_en, city_ar, court_type, is_active')
-    .single()
+  const { data, error } = await supabase.from('courts').insert(fields).select(ROW).single()
 
   if (error) {
-    if (error.code === '23514') {
-      return { error: 'noName' }
-    }
-    if (error.code === '42501') {
-      return { error: 'noPermission' }
-    }
-    return { error: 'createFailed' }
+    if (error.code === '42501') return { error: 'noPermission' }
+    return { error: mapWriteError(error.code, error.message, 'createFailed') }
   }
 
   revalidatePath(PATH)
   return { court: data }
 }
 
-export async function updateCourt(id: string, formData: FormData): Promise<ActionResult> {
+// An UPDATE that RLS refuses is not an error - it matches zero rows and
+// PostgREST returns an empty result. So the row is selected back and an
+// empty result is reported as noPermission, never as "Saved". The returned
+// row is what the database kept (blank Arabic stored as NULL by trigger).
+export async function updateCourt(id: string, formData: FormData): Promise<ActionResult & { court?: CourtRow }> {
   const fields = readFields(formData)
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { error } = await supabase.from('courts').update(fields).eq('id', id)
+  const { data, error } = await supabase.from('courts').update(fields).eq('id', id).select(ROW)
 
-  if (error) {
-    if (error.code === '23514') {
-      return { error: 'noName' }
-    }
-    if (error.code === '42501') {
-      return { error: 'noPermission' }
-    }
-    return { error: 'saveFailed' }
-  }
+  if (error) return { error: mapWriteError(error.code, error.message, 'saveFailed') }
+  if (!data || data.length === 0) return { error: 'noPermission' }
 
   revalidatePath(PATH)
-  return {}
+  return { court: data[0] }
 }
 
-export async function setCourtActive(id: string, isActive: boolean): Promise<ActionResult> {
+export async function setCourtActive(id: string, isActive: boolean): Promise<ActionResult & { court?: CourtRow }> {
   const supabase = await createClient()
-  const { error } = await supabase.from('courts').update({ is_active: isActive }).eq('id', id)
+  const { data, error } = await supabase.from('courts').update({ is_active: isActive }).eq('id', id).select(ROW)
 
-  if (error) {
-    if (error.code === '42501') {
-      return { error: 'noPermission' }
-    }
-    return { error: 'saveFailed' }
-  }
+  if (error) return { error: mapWriteError(error.code, error.message, 'saveFailed') }
+  if (!data || data.length === 0) return { error: 'noPermission' }
 
   revalidatePath(PATH)
-  return {}
+  return { court: data[0] }
 }

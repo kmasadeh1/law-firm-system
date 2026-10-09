@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { Badge } from '@/components/dashboard/badge'
-import { formatDateTime } from '@/lib/format-date-time'
+import { firmDayBounds, formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 
 export default async function AppointmentsListPage({
@@ -29,11 +29,18 @@ export default async function AppointmentsListPage({
     .select('id, type, status, starts_at, ends_at, clients(full_name), cases(case_number)')
     .order('starts_at', { ascending: true })
 
-  if (from) {
-    query = query.gte('starts_at', new Date(from).toISOString())
+  // from/to are calendar days in Amman, inclusive at both ends: from the
+  // start of the `from` day up to (not including) the start of the day
+  // after `to`. firmDayBounds converts through the firm zone explicitly -
+  // `new Date('2026-10-05')` is UTC midnight, i.e. 03:00 in Amman, and as
+  // an upper bound it used to drop almost all of the `to` day.
+  const fromBounds = from ? firmDayBounds(from) : null
+  const toBounds = to ? firmDayBounds(to) : null
+  if (fromBounds) {
+    query = query.gte('starts_at', fromBounds.start)
   }
-  if (to) {
-    query = query.lte('starts_at', new Date(to).toISOString())
+  if (toBounds) {
+    query = query.lt('starts_at', toBounds.end)
   }
   if (type === 'consultation' || type === 'court_date') {
     query = query.eq('type', type)

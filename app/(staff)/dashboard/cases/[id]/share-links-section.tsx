@@ -9,6 +9,8 @@ import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatDateTime, formatDate } from '@/lib/format-date-time'
+import { whatsappShareLink } from '@/lib/whatsapp'
+import { routing } from '@/i18n/routing'
 
 type ShareLink = {
   id: string
@@ -40,9 +42,11 @@ const statusBadgeVariant: Record<LinkStatus, 'accent' | 'muted'> = {
 
 // The full URL is built client-side purely for display/sharing - the token
 // itself, and everything about its validity, comes from the server action.
-// Client-facing tracking links default to Arabic, the site's default locale.
-function buildTrackingUrl(token: string) {
-  return `${window.location.origin}/ar/track/${token}`
+// The link opens the public tracking page in the language the staff member
+// is working in - the public site's own switcher is there for the client.
+function buildTrackingUrl(token: string, locale: string) {
+  const prefix = (routing.locales as readonly string[]).includes(locale) ? locale : routing.defaultLocale
+  return `${window.location.origin}/${prefix}/track/${token}`
 }
 
 function GeneratedLinkPanel({ url }: { url: string }) {
@@ -60,7 +64,7 @@ function GeneratedLinkPanel({ url }: { url: string }) {
     }
   }
 
-  const whatsappHref = `https://wa.me/?text=${encodeURIComponent(url)}`
+  const whatsappHref = whatsappShareLink(url)
 
   return (
     <div
@@ -184,6 +188,7 @@ export function ShareLinksSection({
   canManage: boolean
 }) {
   const t = useTranslations('dashboard.cases.detail.shareLinks')
+  const locale = useLocale()
   const [expiresDays, setExpiresDays] = useState('90')
   const [label, setLabel] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -200,7 +205,7 @@ export function ShareLinksSection({
         return
       }
       if (result.token) {
-        setGeneratedUrl(buildTrackingUrl(result.token))
+        setGeneratedUrl(buildTrackingUrl(result.token, locale))
         setLabel('')
       }
     })

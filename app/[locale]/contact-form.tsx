@@ -11,6 +11,7 @@ const ERROR_KEY_BY_CODE: Record<string, string> = {
   name_required: 'errorNameRequired',
   message_required: 'errorMessageRequired',
   contact_required: 'errorContactRequired',
+  phone_invalid: 'errorPhoneInvalid',
   generic: 'errorGeneric',
 }
 
@@ -109,7 +110,11 @@ export function ContactForm() {
         <input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
-      {error && <p className="text-sm text-danger">{t(ERROR_KEY_BY_CODE[error] ?? 'errorGeneric')}</p>}
+      {error && (
+        <p className="text-sm text-danger" role="alert" data-testid="contact-form-error" data-error={error}>
+          {t(ERROR_KEY_BY_CODE[error] ?? 'errorGeneric')}
+        </p>
+      )}
 
       <button
         type="submit"

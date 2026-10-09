@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 type ActionResult = { error?: string }
 
@@ -29,15 +30,22 @@ export async function updateOwnProfile(formData: FormData): Promise<ActionResult
     return { error: t('updateFailed') }
   }
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('staff')
     .update({
       full_name: fullName.trim(),
       phone: typeof phone === 'string' && phone.trim() ? phone.trim() : null,
     })
     .eq('id', user.sub as string)
+    .select('id')
 
-  if (error) {
+  if (isPhoneRefusal(error)) {
+    const tCommon = await getTranslations({ locale, namespace: 'dashboard.common' })
+    return { error: tCommon('phoneInvalid') }
+  }
+  // Zero rows: the policy always allows your own row, so this would mean
+  // the row is gone or the policy changed - either way, not saved.
+  if (error || !updated || updated.length === 0) {
     return { error: t('updateFailed') }
   }
 
@@ -78,7 +86,7 @@ export async function saveWorkingHours(
     return { error: 'saveFailed' }
   }
 
-  const { error } = await supabase.from('working_hours').upsert(
+  const { data: saved, error } = await supabase.from('working_hours').upsert(
     days.map((day) => ({
       staff_id: user.sub as string,
       day_of_week: day.day_of_week,
@@ -87,7 +95,7 @@ export async function saveWorkingHours(
       is_override: false,
     })),
     { onConflict: 'staff_id,day_of_week,is_override' }
-  )
+  ).select('id')
 
   if (error) {
     // working_hours_valid_times: rejects an end before/equal to the start,
@@ -104,6 +112,13 @@ export async function saveWorkingHours(
     if (error.code === NO_MATCHING_UNIQUE_CONSTRAINT) {
       return { error: 'saveFailed' }
     }
+    return { error: 'saveFailed' }
+  }
+
+  // A refused insert raises 42501, but a refused update - the day's row
+  // already exists - matches zero rows and raises nothing. Every day sent
+  // must come back, or the week wasn't saved.
+  if (!saved || saved.length !== days.length) {
     return { error: 'saveFailed' }
   }
 

@@ -13,7 +13,7 @@ import {
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
-import { formatDate } from '@/lib/format-date-time'
+import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
 import { poaStatusOf, poaStatusClass } from '@/lib/poa-status'
 
 export type CaseOption = { id: string; case_number: string; title: string }
@@ -51,11 +51,6 @@ const POA_ERROR_CODES: PoaErrorCode[] = [
   'assignFailed',
   'unassignFailed',
 ]
-
-function todayIsoDate() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 
 function LawyersBlock({
   clientId,
@@ -170,7 +165,7 @@ function PoaRow({
   const [error, setError] = useState<string | null>(null)
   const [isSaving, startSave] = useTransition()
   const [revoking, setRevoking] = useState(false)
-  const [revokedAt, setRevokedAt] = useState(todayIsoDate())
+  const [revokedAt, setRevokedAt] = useState(todayInFirmZone())
   const [revokeError, setRevokeError] = useState<string | null>(null)
   const [isRevoking, startRevoke] = useTransition()
 

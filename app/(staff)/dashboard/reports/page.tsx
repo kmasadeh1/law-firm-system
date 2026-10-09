@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { formatAmount } from '@/lib/format-money'
 import { formatDate as formatDateWithLocale } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { ProfitabilityPanel } from './profitability-panel'
 
 function formatPercent(value: number | null, notYetAvailable: string) {
   if (value === null) return notYetAvailable
@@ -28,8 +29,30 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
     workloadQuery = workloadQuery.eq('is_active', true)
   }
 
-  const [{ data: summary }, { data: overdue }, { data: workload }] = await Promise.all([
+  // Profitability is two queries so neither order depends on how row_kind
+  // happens to sort as text: the 'type' rows ranked by net received (the
+  // figure this report exists to compare), name for ties; and the view's
+  // non-type rows ('untyped_cases', 'unattributable_fees'), each at most
+  // one, which the panel places after the types in a fixed order.
+  const profitabilityColumns =
+    'case_type_id, name_en, name_ar, row_kind, case_count, open_cases, closed_cases, scheduled_total, paid_total, written_off_total, outstanding_total, expenses_total, expenses_unreimbursed, net_received'
+
+  const [
+    { data: summary },
+    { data: profitabilityTypes },
+    { data: profitabilityOther },
+    { data: overdue },
+    { data: workload },
+  ] = await Promise.all([
     supabase.from('collection_summary').select('*').maybeSingle(),
+    supabase
+      .from('case_type_profitability')
+      .select(profitabilityColumns)
+      .eq('row_kind', 'type')
+      .order('net_received', { ascending: false })
+      .order(locale === 'ar' ? 'name_ar' : 'name_en', { ascending: true, nullsFirst: false })
+      .order('name_en', { ascending: true, nullsFirst: false }),
+    supabase.from('case_type_profitability').select(profitabilityColumns).neq('row_kind', 'type'),
     supabase.from('overdue_installments').select('*').order('days_overdue', { ascending: false }),
     workloadQuery,
   ])
@@ -67,6 +90,8 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
           </div>
         </dl>
       </Panel>
+
+      <ProfitabilityPanel typeRows={profitabilityTypes ?? []} otherRows={profitabilityOther ?? []} locale={locale} />
 
       <Panel className="flex flex-col gap-4">
         <h2 className="font-heading text-lg text-fg">{t('overdue.heading')}</h2>

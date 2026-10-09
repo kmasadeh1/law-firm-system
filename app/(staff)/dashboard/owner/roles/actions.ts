@@ -57,12 +57,20 @@ export async function renameRole(roleId: string, name: string, nameAr: string): 
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.from('roles').update({ name: trimmed, name_ar: nameAr }).eq('id', roleId)
+  const { data, error } = await supabase
+    .from('roles')
+    .update({ name: trimmed, name_ar: nameAr })
+    .eq('id', roleId)
+    .select('id')
 
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
       return { error: t('roleNameExists') }
     }
+    return { error: t('renameFailed') }
+  }
+  // Zero rows: refused by RLS (raises nothing) or the role is gone.
+  if (!data || data.length === 0) {
     return { error: t('renameFailed') }
   }
 
@@ -74,12 +82,16 @@ export async function deleteRole(roleId: string): Promise<ActionResult> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.admin.roles.errors' })
   const supabase = await createClient()
-  const { error } = await supabase.from('roles').delete().eq('id', roleId)
+  const { data, error } = await supabase.from('roles').delete().eq('id', roleId).select('id')
 
   if (error) {
     if (error.code === FOREIGN_KEY_VIOLATION) {
       return { error: t('roleInUse') }
     }
+    return { error: t('deleteFailed') }
+  }
+  // Zero rows: refused by RLS or already deleted - not a success.
+  if (!data || data.length === 0) {
     return { error: t('deleteFailed') }
   }
 
@@ -95,14 +107,20 @@ export async function setRolePermission(
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.admin.roles.errors' })
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('role_permissions')
     .upsert(
       { role_id: roleId, permission_key: permissionKey, enabled },
       { onConflict: 'role_id,permission_key' }
     )
+    .select('role_id')
 
   if (error) {
+    return { error: t('permissionSaveFailed') }
+  }
+  // A refused insert raises 42501 (caught above); a refused update - the
+  // row already exists - matches zero rows and raises nothing.
+  if (!data || data.length === 0) {
     return { error: t('permissionSaveFailed') }
   }
 

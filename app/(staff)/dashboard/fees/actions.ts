@@ -11,6 +11,22 @@ const FOREIGN_KEY_VIOLATION = '23503'
 const CHECK_VIOLATION = '23514'
 const INSUFFICIENT_PRIVILEGE = '42501'
 
+// Raised by the engagement_cases_client_match trigger (23514) when a linked
+// case belongs to a different client than the engagement. Matched by the
+// name it puts at the start of its message, like a CHECK's.
+function isWrongClientLink(error: { code: string; message: string }) {
+  return error.code === CHECK_VIOLATION && error.message.includes('engagement_case_matches_client')
+}
+
+// Amount parsing only - turning the form's text into a number. Whether the
+// amount is acceptable (> 0) is the database's call: the
+// *_amount_positive CHECKs reject it and are mapped by name below.
+function parseAmount(raw: FormDataEntryValue | null): number | null {
+  if (typeof raw !== 'string' || !raw.trim()) return null
+  const amount = Number(raw)
+  return Number.isNaN(amount) ? null : amount
+}
+
 const FEES_PATH = '/dashboard/fees'
 
 function engagementPath(engagementId: string) {
@@ -103,7 +119,7 @@ export async function createEngagement(
     .single()
 
   if (error) {
-    if (error.code === CHECK_VIOLATION) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('fee_amount_matches_type')) {
       return { error: 'invalid_fee_type_amount' }
     }
     return { error: 'create_failed' }
@@ -117,10 +133,13 @@ export async function createEngagement(
     if (linkError) {
       // The engagement itself was created successfully - don't fail the
       // whole flow over the linked-cases step, just surface it and let the
-      // user add the links from the detail page.
+      // user add the links from the detail page. The multi-row insert is
+      // one statement, so a case from another client (rejected by the
+      // engagement_cases_client_match trigger - this path used to link it
+      // without any check) means none of the selected cases were linked.
       return {
         engagementId: inserted.id,
-        error: 'cases_link_failed',
+        error: isWrongClientLink(linkError) ? 'cases_link_wrong_client' : 'cases_link_failed',
       }
     }
   }
@@ -131,21 +150,14 @@ export async function createEngagement(
 
 // --- Linked cases (engagement detail) ---------------------------------------
 
-export async function linkCase(engagementId: string, clientId: string, caseId: string): Promise<ActionResult> {
+// The case-belongs-to-the-engagement's-client rule is the database's
+// (engagement_cases_client_match trigger) - not re-checked here.
+export async function linkCase(engagementId: string, caseId: string): Promise<ActionResult> {
   if (!caseId) {
     return { error: 'select_case' }
   }
 
   const supabase = await createClient()
-
-  // engagement_cases has no constraint tying a linked case's client to the
-  // engagement's client - guard it here so a link can never point at a case
-  // that belongs to someone else.
-  const { data: caseRow } = await supabase.from('cases').select('client_id').eq('id', caseId).maybeSingle()
-  if (!caseRow || caseRow.client_id !== clientId) {
-    return { error: 'case_wrong_client' }
-  }
-
   const { error } = await supabase
     .from('engagement_cases')
     .insert({ engagement_id: engagementId, case_id: caseId })
@@ -153,6 +165,9 @@ export async function linkCase(engagementId: string, clientId: string, caseId: s
   if (error) {
     if (error.code === UNIQUE_VIOLATION) {
       return { error: 'case_already_linked' }
+    }
+    if (isWrongClientLink(error)) {
+      return { error: 'case_wrong_client' }
     }
     return { error: 'link_failed' }
   }
@@ -163,13 +178,15 @@ export async function linkCase(engagementId: string, clientId: string, caseId: s
 
 export async function unlinkCase(engagementId: string, caseId: string): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('engagement_cases')
     .delete()
     .eq('engagement_id', engagementId)
     .eq('case_id', caseId)
+    .select('case_id')
 
-  if (error) {
+  // Zero rows: refused by RLS (raises nothing) or already unlinked.
+  if (error || !data || data.length === 0) {
     return { error: 'unlink_failed' }
   }
 
@@ -186,37 +203,17 @@ export async function unlinkCase(engagementId: string, caseId: string): Promise<
 // agreement was realistically uploaded to one. RLS on `documents`
 // (documents_access/documents_view_all plus case membership) already limits
 // what the caller sees, same as everywhere else documents are listed.
+//
+// Whether the document is on a linked case is the database's call (the
+// engagements_agreement_document_in_scope trigger, mapped below) - not
+// re-checked here. The page's picker only offers non-deleted documents on
+// linked cases, which is the fail-fast version.
 
 export async function setSignedAgreement(
   engagementId: string,
   documentId: string | null
 ): Promise<ActionResult> {
   const supabase = await createClient()
-
-  if (documentId) {
-    // Guard against attaching a document from outside the engagement's
-    // linked cases, the same way linkCase guards the client match - a
-    // client-side picker built from the right list is a UX nicety, not a
-    // security boundary, so this is re-checked server-side.
-    const { data: doc } = await supabase
-      .from('documents')
-      .select('case_id')
-      .eq('id', documentId)
-      .is('deleted_at', null)
-      .maybeSingle()
-    if (!doc || !doc.case_id) {
-      return { error: 'document_not_found' }
-    }
-    const { data: linkedCase } = await supabase
-      .from('engagement_cases')
-      .select('case_id')
-      .eq('engagement_id', engagementId)
-      .eq('case_id', doc.case_id)
-      .maybeSingle()
-    if (!linkedCase) {
-      return { error: 'document_not_linked' }
-    }
-  }
 
   const { data, error } = await supabase
     .from('engagements')
@@ -225,6 +222,9 @@ export async function setSignedAgreement(
     .select('id')
 
   if (error) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('engagement_agreement_document_in_scope')) {
+      return { error: 'document_not_linked' }
+    }
     return { error: 'save_failed' }
   }
   if (!data || data.length === 0) {
@@ -283,8 +283,8 @@ function readInstallmentFields(formData: FormData): InstallmentFields | { error:
   if (typeof description !== 'string' || !description.trim()) {
     return { error: 'description_required' }
   }
-  const amount = typeof amount_raw === 'string' ? Number(amount_raw) : NaN
-  if (Number.isNaN(amount) || amount <= 0) {
+  const amount = parseAmount(amount_raw)
+  if (amount === null) {
     return { error: 'invalid_amount' }
   }
 
@@ -309,6 +309,12 @@ export async function createInstallment(
     .insert({ engagement_id: engagementId, ...fields })
 
   if (error) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('engagement_installments_amount_positive')) {
+      return { error: 'installment_amount_not_positive' }
+    }
+    if (error.code === CHECK_VIOLATION && error.message.includes('engagement_installments_description_not_blank')) {
+      return { error: 'description_required' }
+    }
     return { error: 'add_installment_failed' }
   }
 
@@ -325,12 +331,23 @@ export async function updateInstallment(
   if ('error' in fields) return fields
 
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('engagement_installments')
     .update(fields)
     .eq('id', installmentId)
+    .select('id')
 
-  if (error) {
+  if (error?.code === CHECK_VIOLATION && error.message.includes('engagement_installments_amount_positive')) {
+    return { error: 'installment_amount_not_positive' }
+  }
+  if (error?.code === CHECK_VIOLATION && error.message.includes('engagement_installments_description_not_blank')) {
+    return { error: 'description_required' }
+  }
+  if (error?.code === CHECK_VIOLATION && error.message.includes('installment_amount_covers_commitments')) {
+    return { error: 'installment_below_commitments' }
+  }
+  // Zero rows: refused by RLS or the instalment was deleted.
+  if (error || !data || data.length === 0) {
     return { error: 'save_installment_failed' }
   }
 
@@ -343,12 +360,18 @@ export async function deleteInstallment(
   installmentId: string
 ): Promise<ActionResult> {
   const supabase = await createClient()
-  const { error } = await supabase.from('engagement_installments').delete().eq('id', installmentId)
+  const { data, error } = await supabase.from('engagement_installments').delete().eq('id', installmentId).select('id')
 
   if (error) {
+    // Payments and write-offs both reference the instalment with RESTRICT;
+    // either one blocks the delete, and the message covers both.
     if (error.code === FOREIGN_KEY_VIOLATION) {
-      return { error: 'installment_has_payments' }
+      return { error: 'installment_has_records' }
     }
+    return { error: 'delete_installment_failed' }
+  }
+  // Zero rows: refused by RLS or already deleted - not a success.
+  if (!data || data.length === 0) {
     return { error: 'delete_installment_failed' }
   }
 
@@ -367,8 +390,8 @@ export async function recordPayment(
   const paid_at = formData.get('paid_at')
   const method = formData.get('method')
 
-  const amount = typeof amount_raw === 'string' ? Number(amount_raw) : NaN
-  if (Number.isNaN(amount) || amount <= 0) {
+  const amount = parseAmount(amount_raw)
+  if (amount === null) {
     return { error: 'invalid_amount' }
   }
   if (typeof paid_at !== 'string' || !paid_at.trim()) {
@@ -387,10 +410,116 @@ export async function recordPayment(
   })
 
   if (error) {
+    if (error.code === CHECK_VIOLATION && error.message.includes('payments_amount_positive')) {
+      return { error: 'payment_amount_not_positive' }
+    }
     if (error.code === INSUFFICIENT_PRIVILEGE) {
       return { error: 'no_permission_record_payment' }
     }
     return { error: 'record_payment_failed' }
+  }
+
+  revalidatePath(engagementPath(engagementId))
+  return {}
+}
+
+// --- Write-offs (append-only) -------------------------------------------
+//
+// A write-off forgives part of an instalment's outstanding balance with a
+// recorded reason. write_offs has no UPDATE or DELETE grant: a mistake is
+// corrected by a reversing row (reverses_write_off_id), never an edit. The
+// INSERT policy is owner-only with created_by = the signed-in user. Every
+// rule - amount > 0, a non-blank reason, not more than is outstanding, one
+// reversal per write-off - is the database's; this only maps its refusals.
+
+function mapWriteOffError(error: { code: string; message: string }, fallback: FeesErrorCode): FeesErrorCode {
+  if (error.code === CHECK_VIOLATION) {
+    if (error.message.includes('write_offs_amount_positive')) return 'write_off_amount_not_positive'
+    if (error.message.includes('write_offs_reason_not_blank')) return 'write_off_reason_required'
+    if (error.message.includes('write_off_within_balance')) return 'write_off_exceeds_balance'
+    if (error.message.includes('write_off_reversal_matches_original')) return 'write_off_reversal_mismatch'
+  }
+  if (error.code === UNIQUE_VIOLATION) return 'write_off_already_reversed'
+  if (error.code === INSUFFICIENT_PRIVILEGE) return 'no_permission_write_off'
+  return fallback
+}
+
+function readWriteOffDate(formData: FormData) {
+  const value = formData.get('written_off_on')
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+export async function writeOffInstallment(
+  engagementId: string,
+  installmentId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const amount = parseAmount(formData.get('amount'))
+  if (amount === null) {
+    return { error: 'invalid_amount' }
+  }
+  const reason = formData.get('reason')
+  const writtenOffOn = readWriteOffDate(formData)
+  if (!writtenOffOn) {
+    return { error: 'date_required' }
+  }
+
+  const supabase = await createClient()
+  const { data: user } = await supabase.auth.getClaims()
+
+  const { error } = await supabase.from('write_offs').insert({
+    installment_id: installmentId,
+    amount,
+    // Sent as typed - write_offs_reason_not_blank decides what's blank.
+    reason: typeof reason === 'string' ? reason : '',
+    written_off_on: writtenOffOn,
+    created_by: user?.claims?.sub as string,
+  })
+
+  if (error) {
+    return { error: mapWriteOffError(error, 'write_off_failed') }
+  }
+
+  revalidatePath(engagementPath(engagementId))
+  return {}
+}
+
+// The reversing row carries the original's instalment and amount (read
+// back here, never sent by the browser) and its own reason and date.
+export async function reverseWriteOff(
+  engagementId: string,
+  writeOffId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  const reason = formData.get('reason')
+  const writtenOffOn = readWriteOffDate(formData)
+  if (!writtenOffOn) {
+    return { error: 'date_required' }
+  }
+
+  const supabase = await createClient()
+  const { data: original } = await supabase
+    .from('write_offs')
+    .select('installment_id, amount')
+    .eq('id', writeOffId)
+    .is('reverses_write_off_id', null)
+    .maybeSingle()
+  if (!original) {
+    return { error: 'write_off_reverse_failed' }
+  }
+
+  const { data: user } = await supabase.auth.getClaims()
+  const { error } = await supabase.from('write_offs').insert({
+    installment_id: original.installment_id,
+    amount: original.amount,
+    reason: typeof reason === 'string' ? reason : '',
+    written_off_on: writtenOffOn,
+    reverses_write_off_id: writeOffId,
+    created_by: user?.claims?.sub as string,
+  })
+
+  if (error) {
+    return { error: mapWriteOffError(error, 'write_off_reverse_failed') }
   }
 
   revalidatePath(engagementPath(engagementId))

@@ -30,6 +30,11 @@ import {
   CourtsIcon,
   TasksIcon,
   CaseTypesIcon,
+  HearingsIcon,
+  ReferralSourcesIcon,
+  ChecklistsIcon,
+  RemindersIcon,
+  TemplatesIcon,
 } from './icons'
 
 // A component reference can't cross the server->client prop boundary (the
@@ -40,6 +45,7 @@ const iconByKey = {
   clients: ClientsIcon,
   cases: CasesIcon,
   appointments: AppointmentsIcon,
+  hearings: HearingsIcon,
   roles: RolesIcon,
   fees: FeesIcon,
   deadlines: DeadlinesIcon,
@@ -54,6 +60,10 @@ const iconByKey = {
   courts: CourtsIcon,
   tasks: TasksIcon,
   'case-types': CaseTypesIcon,
+  'referral-sources': ReferralSourcesIcon,
+  checklists: ChecklistsIcon,
+  reminders: RemindersIcon,
+  templates: TemplatesIcon,
 } as const
 
 export type IconKey = keyof typeof iconByKey
@@ -120,6 +130,7 @@ export function DashboardShell({
   roleLabel,
   logoutAction,
   initialTheme,
+  notificationBell,
   children,
 }: {
   firmName: string
@@ -130,6 +141,9 @@ export function DashboardShell({
   roleLabel: string
   logoutAction: () => Promise<void>
   initialTheme: Theme
+  // Rendered by the dashboard layout (it loads its own data server-side),
+  // passed in as a slot so this shell stays free of data fetching.
+  notificationBell: React.ReactNode
   children: React.ReactNode
 }) {
   const t = useTranslations('dashboard.shell')
@@ -173,16 +187,20 @@ export function DashboardShell({
     </>
   )
 
+  // print:* classes below: every dashboard page prints as just its own
+  // content - no sidebar, drawer, or header bar, and no sidebar offset or
+  // max-width on the content column. Paper colours and page size live in
+  // the @media print block in app/globals.css.
   return (
     <div className="dashboard min-h-screen">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 start-0 hidden w-64 flex-col border-e border-line bg-surface p-4 md:flex">
+      <aside className="fixed inset-y-0 start-0 hidden w-64 flex-col border-e border-line bg-surface p-4 md:flex print:hidden">
         {sidebarContent}
       </aside>
 
       {/* Mobile drawer */}
       {drawerOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 md:hidden print:hidden">
           <button
             type="button"
             aria-label={t('closeMenu')}
@@ -205,7 +223,7 @@ export function DashboardShell({
         </div>
       )}
 
-      <div className="min-h-screen md:ms-64">
+      <div className="min-h-screen md:ms-64 print:ms-0 print:min-h-0">
         {/* Content header: spans the main content area, above the page's own
             title (PageHeader, rendered by each page inside children - this
             bar is shell-level chrome, the two are deliberately not merged).
@@ -232,7 +250,7 @@ export function DashboardShell({
             under dir="rtl" the same way the rest of the app relies on for
             start/end layout; the language pair's own internal order mirrors
             the same way, for the same reason. */}
-        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-2 sm:px-6 md:px-8">
+        <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-surface px-4 py-2 sm:px-6 md:px-8 print:hidden">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -247,13 +265,17 @@ export function DashboardShell({
             <LocaleToggle />
           </div>
 
+          {/* Its own slot, after the preferences and before the account:
+              it's about your work, not a setting. */}
+          <div className="ms-1 sm:ms-2">{notificationBell}</div>
+
           <div className="ms-2 border-s border-line ps-3 sm:ms-3">
             <AccountDrawer userName={userName} roleLabel={roleLabel} logoutAction={logoutAction} />
           </div>
         </header>
 
-        <main className="px-4 py-8 sm:px-6 md:px-8 md:py-10">
-          <div className="mx-auto max-w-4xl">{children}</div>
+        <main className="px-4 py-8 sm:px-6 md:px-8 md:py-10 print:p-0">
+          <div className="mx-auto max-w-4xl print:max-w-none">{children}</div>
         </main>
       </div>
     </div>

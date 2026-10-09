@@ -21,8 +21,12 @@ Law firm management system. Phase 1 and beyond are built and styled:
 - Appointments and court dates.
 - Fees and payments — engagements, instalments, payments
   (`dashboard/fees`).
-- Deadlines, with an owner-only period-types admin screen
-  (`dashboard/owner/deadline-period-types`).
+- Deadlines, with a period-types admin screen
+  (`dashboard/reference/deadline-period-types`).
+- Reference lists — courts, case types, referral sources and deadline
+  period types — under `dashboard/reference/`, guarded by
+  `can_manage_reference_data()` (owner, or a role holding
+  `reference_data_manage`), the same function their write policies use.
 - Dashboard shell with the visual identity pass and light/dark theming
   (`components/dashboard/`).
 - A Supabase schema of 23 tables with RLS enabled on all of them, plus 4

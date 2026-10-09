@@ -15,7 +15,7 @@ import { Badge } from '@/components/dashboard/badge'
 import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { formatAmount } from '@/lib/format-money'
-import { formatDate } from '@/lib/format-date-time'
+import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
 
 export type CaseOption = { id: string; case_number: string; title: string }
 
@@ -61,11 +61,6 @@ const FUND_ERROR_CODES: ClientFundErrorCode[] = [
   'noPermission',
   'addFailed',
 ]
-
-function todayIsoDate() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 
 function resolveError(code: ClientFundErrorCode, tErrors: ReturnType<typeof useTranslations>) {
   return (FUND_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('generic')
@@ -179,7 +174,7 @@ function EntryRow({ clientId, entry, cases }: { clientId: string; entry: FundEnt
             </Field>
             <Field>
               <Label htmlFor={`rev-date-${entry.id}`}>{t('occurredOnLabel')}</Label>
-              <input id={`rev-date-${entry.id}`} name="occurred_on" type="date" defaultValue={todayIsoDate()} className={controlClass} />
+              <input id={`rev-date-${entry.id}`} name="occurred_on" type="date" defaultValue={todayInFirmZone()} className={controlClass} />
             </Field>
             <Field>
               <Label htmlFor={`rev-case-${entry.id}`}>{t('caseLabel')}</Label>
@@ -317,7 +312,7 @@ export function ClientFundsSection({
           </Field>
           <Field>
             <Label htmlFor="new-fund-date">{t('occurredOnLabel')}</Label>
-            <input id="new-fund-date" name="occurred_on" type="date" defaultValue={todayIsoDate()} className={controlClass} />
+            <input id="new-fund-date" name="occurred_on" type="date" defaultValue={todayInFirmZone()} className={controlClass} />
           </Field>
         </div>
         <div className="flex flex-wrap gap-3">

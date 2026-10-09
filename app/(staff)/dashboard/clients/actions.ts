@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { isPhoneRefusal } from '@/lib/phone-error'
 
 export type ConflictMatch = {
   source: string
@@ -18,6 +19,8 @@ type ClientFields = {
   phone: string | null
   email: string | null
   notes: string | null
+  referral_source_id: string | null
+  referral_notes: string | null
 }
 
 async function readFields(formData: FormData): Promise<ClientFields | { error: string }> {
@@ -40,7 +43,16 @@ async function readFields(formData: FormData): Promise<ClientFields | { error: s
     phone: optional('phone'),
     email: optional('email'),
     notes: optional('notes'),
+    // Blank = "not recorded". Whether the id names a real source is the
+    // foreign key's call, not this function's.
+    referral_source_id: optional('referral_source_id'),
+    referral_notes: optional('referral_notes'),
   }
+}
+
+async function phoneInvalidMessage(locale: string) {
+  const t = await getTranslations({ locale, namespace: 'dashboard.common' })
+  return t('phoneInvalid')
 }
 
 export async function createClientRecord(
@@ -77,6 +89,7 @@ export async function createClientRecord(
     .single()
 
   if (error) {
+    if (isPhoneRefusal(error)) return { error: await phoneInvalidMessage(locale) }
     return { error: t('createFailed') }
   }
 
@@ -94,9 +107,12 @@ export async function updateClientRecord(
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.clients.form.errors' })
   const supabase = await createClient()
-  const { error } = await supabase.from('clients').update(fields).eq('id', clientId)
+  const { data, error } = await supabase.from('clients').update(fields).eq('id', clientId).select('id')
 
-  if (error) {
+  if (isPhoneRefusal(error)) return { error: await phoneInvalidMessage(locale) }
+  // Zero rows: refused by RLS (raises nothing) or the client is gone -
+  // nothing was saved, so never report success.
+  if (error || !data || data.length === 0) {
     return { error: t('saveFailed') }
   }
 

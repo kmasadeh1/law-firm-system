@@ -2,7 +2,13 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { createCaseType, setCaseTypeActive, updateCaseType, type CaseTypeErrorCode, type CaseTypeRow } from './actions'
+import {
+  createReferralSource,
+  setReferralSourceActive,
+  updateReferralSource,
+  type ReferralSourceErrorCode,
+  type ReferralSourceRow,
+} from './actions'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
@@ -13,46 +19,41 @@ import { localizedName } from '@/lib/localized-name'
 
 // Closed set the server can return - anything else falls back to a generic
 // translated message rather than passing an arbitrary value to t() as a key.
-const CASE_TYPE_ERROR_CODES: CaseTypeErrorCode[] = ['noName', 'noPermission', 'createFailed', 'saveFailed']
+const ERROR_CODES: ReferralSourceErrorCode[] = ['noName', 'noPermission', 'createFailed', 'saveFailed']
 
-export function CaseTypesAdmin({ caseTypes: initial }: { caseTypes: CaseTypeRow[] }) {
-  const t = useTranslations('dashboard.admin.caseTypes')
-  const [caseTypes, setCaseTypes] = useState(initial)
+function resolveError(
+  code: ReferralSourceErrorCode,
+  fallback: ReferralSourceErrorCode,
+  tErrors: ReturnType<typeof useTranslations>
+) {
+  return tErrors((ERROR_CODES as string[]).includes(code) ? code : fallback)
+}
 
-  function sorted(list: CaseTypeRow[]) {
-    return [...list].sort((a, b) =>
-      localizedName({ name: a.name_en ?? '', name_ar: a.name_ar }, 'en').localeCompare(
-        localizedName({ name: b.name_en ?? '', name_ar: b.name_ar }, 'en')
-      )
-    )
-  }
+// The list is rendered straight from the server's rows, in the query's
+// order. Every action revalidates this page, so a created, renamed or
+// (de)activated source arrives as fresh props - no client-side copy of the
+// list, and no client-side re-sort.
+export function ReferralSourcesAdmin({ sources }: { sources: ReferralSourceRow[] }) {
+  const t = useTranslations('dashboard.admin.referralSources')
 
   return (
-    <div className="flex flex-col gap-8">
-      <CreateForm onCreated={(c) => setCaseTypes((prev) => sorted([...prev, c]))} />
+    <div className="flex flex-col gap-8" data-testid="referral-sources-admin">
+      <CreateForm />
 
-      {caseTypes.length === 0 && <EmptyState title={t('noneYet')} />}
+      {sources.length === 0 && <EmptyState title={t('noneYet')} description={t('noneYetDescription')} />}
 
       <div className="flex flex-col gap-4">
-        {caseTypes.map((c) => (
-          <CaseTypeCard
-            key={c.id}
-            caseType={c}
-            onUpdated={(updated) => setCaseTypes((prev) => sorted(prev.map((p) => (p.id === updated.id ? updated : p))))}
-          />
+        {sources.map((s) => (
+          <SourceCard key={s.id} source={s} />
         ))}
       </div>
     </div>
   )
 }
 
-function resolveError(code: CaseTypeErrorCode, tErrors: ReturnType<typeof useTranslations>) {
-  return (CASE_TYPE_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('createFailed')
-}
-
-function CreateForm({ onCreated }: { onCreated: (c: CaseTypeRow) => void }) {
-  const t = useTranslations('dashboard.admin.caseTypes.createForm')
-  const tErrors = useTranslations('dashboard.admin.caseTypes.errors')
+function CreateForm() {
+  const t = useTranslations('dashboard.admin.referralSources.createForm')
+  const tErrors = useTranslations('dashboard.admin.referralSources.errors')
   const formRef = useRef<HTMLFormElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -62,58 +63,55 @@ function CreateForm({ onCreated }: { onCreated: (c: CaseTypeRow) => void }) {
     setError(null)
     const formData = new FormData(formRef.current!)
     startTransition(async () => {
-      const result = await createCaseType(formData)
+      const result = await createReferralSource(formData)
       if (result.error) {
-        setError(resolveError(result.error, tErrors))
+        setError(resolveError(result.error, 'createFailed', tErrors))
         return
       }
-      if (result.caseType) {
-        onCreated(result.caseType)
-        formRef.current?.reset()
-      }
+      formRef.current?.reset()
     })
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="referral-source-create">
       <h2 className="font-heading text-lg text-fg">{t('heading')}</h2>
       <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-3">
           <Field>
-            <Label htmlFor="new-case-type-name-en">{t('nameLabel')}</Label>
-            <input id="new-case-type-name-en" name="name_en" className={controlClass} />
+            <Label htmlFor="new-referral-source-name-en">{t('nameLabel')}</Label>
+            <input id="new-referral-source-name-en" name="name_en" className={controlClass} />
           </Field>
           <Field>
-            <Label htmlFor="new-case-type-name-ar">{t('nameArLabel')}</Label>
-            <input id="new-case-type-name-ar" name="name_ar" dir="rtl" lang="ar" className={controlClass} />
+            <Label htmlFor="new-referral-source-name-ar">{t('nameArLabel')}</Label>
+            <input id="new-referral-source-name-ar" name="name_ar" dir="rtl" lang="ar" className={controlClass} />
           </Field>
         </div>
         {error && <FieldError>{error}</FieldError>}
         <Button type="submit" variant="primary" disabled={isPending} className="self-start">
-          {isPending ? t('creating') : t('createCaseType')}
+          {isPending ? t('creating') : t('create')}
         </Button>
       </form>
     </Panel>
   )
 }
 
-function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdated: (c: CaseTypeRow) => void }) {
+function SourceCard({ source }: { source: ReferralSourceRow }) {
   const locale = useLocale()
-  const t = useTranslations('dashboard.admin.caseTypes.card')
-  const tErrors = useTranslations('dashboard.admin.caseTypes.errors')
+  const t = useTranslations('dashboard.admin.referralSources.card')
+  const tErrors = useTranslations('dashboard.admin.referralSources.errors')
   const formRef = useRef<HTMLFormElement>(null)
-  const [nameEn, setNameEn] = useState(caseType.name_en ?? '')
-  const [nameAr, setNameAr] = useState(caseType.name_ar ?? '')
+  const [nameEn, setNameEn] = useState(source.name_en ?? '')
+  const [nameAr, setNameAr] = useState(source.name_ar ?? '')
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, startSave] = useTransition()
 
-  const [checked, setChecked] = useState(caseType.is_active)
+  const [checked, setChecked] = useState(source.is_active)
   const [confirmingDeactivate, setConfirmingDeactivate] = useState(false)
   const [activeError, setActiveError] = useState<string | null>(null)
   const [isTogglingActive, startToggleActive] = useTransition()
 
-  const changed = nameEn.trim() !== (caseType.name_en ?? '') || nameAr !== (caseType.name_ar ?? '')
+  const changed = nameEn !== (source.name_en ?? '') || nameAr !== (source.name_ar ?? '')
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -121,16 +119,15 @@ function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdate
     setSaved(false)
     const formData = new FormData(formRef.current!)
     startSave(async () => {
-      const result = await updateCaseType(caseType.id, formData)
-      if (result.error) {
-        setError(resolveError(result.error, tErrors))
+      const result = await updateReferralSource(source.id, formData)
+      if (result.error || !result.source) {
+        setError(resolveError(result.error ?? 'saveFailed', 'saveFailed', tErrors))
         return
       }
-      onUpdated({
-        ...caseType,
-        name_en: nameEn.trim() || null,
-        name_ar: nameAr.trim() ? nameAr : null,
-      })
+      // Show what the database kept (trimmed English, blank Arabic stored
+      // as NULL), not what was typed.
+      setNameEn(result.source.name_en ?? '')
+      setNameAr(result.source.name_ar ?? '')
       setSaved(true)
     })
   }
@@ -140,18 +137,18 @@ function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdate
     setActiveError(null)
     setChecked(next)
     startToggleActive(async () => {
-      const result = await setCaseTypeActive(caseType.id, next)
-      if (result.error) {
+      const result = await setReferralSourceActive(source.id, next)
+      if (result.error || !result.source) {
         setChecked(previous)
-        setActiveError(resolveError(result.error, tErrors))
+        setActiveError(resolveError(result.error ?? 'saveFailed', 'saveFailed', tErrors))
         return
       }
-      onUpdated({ ...caseType, is_active: next })
+      setChecked(result.source.is_active)
     })
   }
 
-  // Reactivating isn't destructive - only turning a case type off needs the
-  // extra step, same reasoning as staff ActiveToggle / courts' CourtCard.
+  // Reactivating isn't destructive - only turning a source off needs the
+  // extra step, same as case types and courts.
   function handleActiveChange(next: boolean) {
     if (next) {
       applyActive(next)
@@ -161,7 +158,7 @@ function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdate
   }
 
   return (
-    <Panel className="flex flex-col gap-3">
+    <Panel className="flex flex-col gap-3" data-testid="referral-source-card">
       <form ref={formRef} onSubmit={handleSave} className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <input
@@ -213,8 +210,9 @@ function CaseTypeCard({ caseType, onUpdated }: { caseType: CaseTypeRow; onUpdate
           applyActive(false)
         }}
         kind="deactivate"
-        itemLabel={localizedName({ name: caseType.name_en ?? '', name_ar: caseType.name_ar }, locale)}
+        itemLabel={localizedName({ name: source.name_en ?? source.name_ar ?? '', name_ar: source.name_ar }, locale)}
         confirmLabel={t('deactivate')}
+        note={t('deactivateNote')}
       />
     </Panel>
   )

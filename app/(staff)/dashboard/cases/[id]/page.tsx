@@ -10,14 +10,18 @@ import { OpposingPartiesSection } from './opposing-parties-section'
 import { CourtAndDeadlines } from './court-and-deadlines'
 import type { CourtFiling } from './court-section'
 import { PowerOfAttorneyLine } from './power-of-attorney-line'
-import { mostRelevantPoa } from '@/lib/poa-status'
 import { TasksSection } from './tasks-section'
 import type { Task } from '../../tasks/task-list'
 import { ShareLinksSection } from './share-links-section'
 import { DocumentsSection, type DocumentRow } from './documents-section'
+import { ChecklistSection, type ChecklistItem } from './checklist-section'
+import { DraftsSection, type TemplateOption } from './drafts-section'
+import type { DraftLanguage } from '@/lib/document-placeholders'
 import { NotesSection, type CaseNote } from './notes-section'
 import { ExpensesSection, type Expense } from './expenses-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
+import { ContactLogSection } from '../../clients/contact-log-section'
+import { CONTACT_LOG_SELECT, toContactRow, type ContactQueryRow } from '../../clients/contact-log-query'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
   const { id } = await params
@@ -28,7 +32,14 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
   // No access gate here either - a row RLS hides looks identical to one
   // that doesn't exist, same as the Clients edit page.
-  const [{ data: caseRow }, { data: claimsData }] = await Promise.all([
+  // can_change_case_status / can_close_case only need the route's id, so
+  // they ride in this first wave rather than the permission wave below:
+  // the status options query in that wave is filtered by their answers,
+  // which would otherwise cost a second sequential round trip. Both are
+  // the database's own rules (the cases UPDATE policy, and what
+  // enforce_case_close_permission enforces) and already include the owner -
+  // never OR'd with isOwner.
+  const [{ data: caseRow }, { data: claimsData }, { data: canChangeStatus }, { data: canCloseCase }] = await Promise.all([
     supabase
       .from('cases')
       .select(
@@ -37,6 +48,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .eq('id', id)
       .maybeSingle(),
     supabase.auth.getClaims(),
+    supabase.rpc('can_change_case_status', { p_case_id: id }),
+    supabase.rpc('can_close_case', { p_case_id: id }),
   ])
 
   const viewerId = claimsData?.claims?.sub as string | undefined
@@ -52,6 +65,21 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         <p className="text-sm text-fg-muted">{t('caseNotFound')}</p>
       </div>
     )
+  }
+
+  // The status options are filtered in the query by what the database will
+  // accept, never in the component:
+  // - can't change the status at all: only the current status, for display
+  //   as plain text;
+  // - can change but not close: non-terminal statuses only, plus the
+  //   current one so the picker shows the case's real status (re-saving an
+  //   already-closed case never fires the close check);
+  // - can close: every status.
+  function statusOptionsQuery() {
+    const query = supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order')
+    if (canChangeStatus !== true) return query.eq('id', caseRow!.status_id)
+    if (canCloseCase !== true) return query.or(`is_terminal.eq.false,id.eq.${caseRow!.status_id}`)
+    return query
   }
 
   const [
@@ -75,16 +103,19 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     { data: canManageShareLinks },
     { data: canWriteDocuments },
     { data: canWriteNotes },
-    { data: poaRows },
+    { data: coveringPoaId },
     { data: canAssignTasks },
     { data: taskRows },
+    { data: contactRows },
+    { data: canViewClient },
+    { data: clientCases },
   ] = await Promise.all([
-    supabase.from('case_statuses').select('id, name, name_ar, is_terminal').order('sort_order'),
+    statusOptionsQuery(),
     supabase.from('case_lawyers').select('staff_id, is_lead').eq('case_id', id),
     supabase.from('staff_directory').select('id, full_name').eq('is_active', true).order('full_name'),
     supabase
       .from('case_opposing_parties')
-      .select('id, name, national_id, counsel_name, counsel_phone')
+      .select('id, name, national_id, counsel_name, counsel_phone, is_primary')
       .eq('case_id', id),
     // Picker options for the add form - inactive courts are excluded here
     // but an existing filing's own court still comes through the join below
@@ -106,7 +137,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase
       .from('deadlines')
       .select(
-        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, description, deadline_period_types(name, name_ar, period_days)'
+        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, completed_at, completed_by, description, deadline_period_types(name, name_ar, period_days)'
       )
       .eq('case_id', id)
       .order('effective_due_date', { ascending: true, nullsFirst: false }),
@@ -149,16 +180,9 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase.rpc('can_manage_case_share_links', { p_case_id: id }),
     supabase.rpc('can_write_case_documents', { p_case_id: id }),
     supabase.rpc('can_write_case_notes', { p_case_id: id }),
-    // Every PoA this case could be covered by: this case's own
-    // case-specific rows, plus the client's general ones (case_id IS NULL).
-    // RLS already scopes this to what the viewer may see; which one
-    // actually covers the case is picked below from what comes back.
-    caseRow.clients?.id
-      ? supabase
-          .from('powers_of_attorney')
-          .select('id, case_id, poa_number, issued_at, expires_at, is_revoked')
-          .or(`case_id.eq.${id},and(case_id.is.null,client_id.eq.${caseRow.clients.id})`)
-      : Promise.resolve({ data: null, error: null }),
+    // Which وكالة covers this case is the database's decision:
+    // case-specific before general, never revoked or expired (Amman date).
+    supabase.rpc('case_covering_poa', { p_case_id: id }),
     // STABLE, already true for the owner internally - resolved once here,
     // never OR'd with isOwner.
     supabase.rpc('can_assign_tasks'),
@@ -170,6 +194,26 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
       .select('id, title, details, case_id, assigned_to, due_date, status, priority, created_by')
       .eq('case_id', id)
       .order('due_date', { ascending: true, nullsFirst: false }),
+    // Contacts linked to this case only; deleted ones filtered in the
+    // query, not the component (RLS still returns them, deliberately).
+    supabase
+      .from('client_contacts')
+      .select(CONTACT_LOG_SELECT)
+      .eq('case_id', id)
+      .is('deleted_at', null)
+      .order('occurred_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .returns<ContactQueryRow[]>(),
+    // The contact log's add gate - the insert policy's own test. Asked
+    // about the case's client, since a contact belongs to the client.
+    caseRow.clients?.id
+      ? supabase.rpc('can_view_client', { p_client_id: caseRow.clients.id })
+      : Promise.resolve({ data: false, error: null }),
+    // The client's other cases, for the contact form's case picker - a
+    // contact logged here can still be re-pointed at a sibling case.
+    caseRow.clients?.id
+      ? supabase.from('cases').select('id, case_number, title').eq('client_id', caseRow.clients.id).order('case_number')
+      : Promise.resolve({ data: null, error: null }),
   ])
 
   // staff_directory is a view, so its columns come back nullable in the
@@ -188,9 +232,15 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
   // Case-specific wins over the client's general وكالة, never the other way
   // - "otherwise" chain over rows already fetched, not a second query.
-  const caseSpecificPoa = mostRelevantPoa((poaRows ?? []).filter((p) => p.case_id === id))
-  const generalPoa = mostRelevantPoa((poaRows ?? []).filter((p) => p.case_id === null))
-  const coveringPoaRow = caseSpecificPoa ?? generalPoa
+  // RLS still applies to the row itself; a وكالة the reader can't see
+  // reads as none.
+  const { data: coveringPoaRow } = coveringPoaId
+    ? await supabase
+        .from('powers_of_attorney')
+        .select('case_id, poa_number, issued_at, expires_at, is_revoked')
+        .eq('id', coveringPoaId)
+        .maybeSingle()
+    : { data: null }
   const coveringPoa = coveringPoaRow
     ? {
         poa_number: coveringPoaRow.poa_number,
@@ -229,6 +279,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     extension_reason: d.extension_reason,
     extended_by_name: d.extended_by ? (nameById.get(d.extended_by) ?? tCommon('unknownStaff')) : null,
     extended_at: d.extended_at,
+    completed_at: d.completed_at,
+    // Any staff member, active or not - who marked it met must still show
+    // after they leave the firm.
+    completed_by_name: d.completed_by
+      ? (allStaffDirectory?.find((s) => s.id === d.completed_by)?.full_name ?? tCommon('unknownStaff'))
+      : null,
     description: d.description,
     period_type_name: d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : t('unknownPeriod'),
     period_days: d.deadline_period_types?.period_days ?? 0,
@@ -256,17 +312,13 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     creator_name: allNameById.get(row.created_by) ?? tCommon('unknownStaff'),
   }))
 
-  // Explicit application-layer filter, not just RLS: the "Deleted notes"
-  // section below this page's notes/documents lists is owner-only by
-  // design (restoring a deleted note or document is an owner capability),
-  // and its entire gate used to be "RLS never returns a deleted row to
-  // anyone but the owner in the first place" - a query-level assumption,
-  // not a check this code made itself. Keeping that gate here too means
-  // this page still hides deleted rows from a non-owner even if the RLS
-  // policy that used to do it changes for an unrelated reason (e.g. to
-  // stop blocking the delete action itself, per the deleted_at IS NULL OR
-  // is_owner() clause's dual role as both a read-visibility rule and an
-  // accidental write-blocker).
+  // This filter is the ONLY thing hiding deleted notes and documents from
+  // non-owners. The case_notes and documents SELECT policies return
+  // deleted rows to anyone who can read the case's notes/documents (there
+  // is no deleted_at clause in them), and their UPDATE policies would let
+  // any writer restore one. "Deleted rows are owner-only, restorable by the
+  // owner" is therefore a page-level rule, not a database one - a known,
+  // open decision, not an oversight.
   const visibleNoteRows = isOwner ? (noteRows ?? []) : (noteRows ?? []).filter((n) => !n.deleted_at)
   const visibleDocumentRows = isOwner ? (documentRows ?? []) : (documentRows ?? []).filter((d) => !d.deleted_at)
 
@@ -289,6 +341,76 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     deleted_by_name: d.deleted_by ? (allNameById.get(d.deleted_by) ?? tCommon('unknownStaff')) : null,
   }))
 
+  // Document checklist, derived from the case type's template by the
+  // case_document_checklist view (security_invoker). Ordered in the query:
+  // outstanding first, required before optional, then the template order.
+  // The three counts are head-count queries on the same view - required
+  // items only, never mixed with optional ones.
+  const checklistView = () => supabase.from('case_document_checklist').select('item_id', { count: 'exact', head: true }).eq('case_id', id).eq('is_required', true)
+  const [{ data: checklistRows }, { count: requiredTotal }, { count: requiredProvided }, { count: requiredNotApplicable }] =
+    await Promise.all([
+      supabase
+        .from('case_document_checklist')
+        .select('item_id, name_en, name_ar, is_required, state, document_id, note, noted_at, noted_by')
+        .eq('case_id', id)
+        .order('outstanding', { ascending: false })
+        .order('is_required', { ascending: false })
+        .order('sort_order', { ascending: true })
+        .order('name_en', { ascending: true, nullsFirst: false }),
+      checklistView(),
+      checklistView().eq('state', 'provided'),
+      checklistView().eq('state', 'not_applicable'),
+    ])
+
+  // Linkable documents are the ones the Documents section already lists,
+  // minus deleted ones - the checklist_document_on_case trigger refuses a
+  // deleted document, so it is never offered.
+  const linkableDocuments = documents.filter((d) => !d.deleted_at).map((d) => ({ id: d.id, filename: d.filename }))
+  const linkableFilenameById = new Map(linkableDocuments.map((d) => [d.id, d.filename]))
+
+  const checklistItems: ChecklistItem[] = (checklistRows ?? []).map((row) => ({
+    item_id: row.item_id ?? '',
+    name: localizedName({ name: row.name_en ?? row.name_ar ?? '', name_ar: row.name_ar }, locale),
+    is_required: row.is_required === true,
+    state: row.state,
+    note: row.note,
+    document_id: row.document_id,
+    document_filename: row.document_id ? (linkableFilenameById.get(row.document_id) ?? null) : null,
+    noted_at: row.noted_at,
+    noted_by_name: row.noted_by ? (allNameById.get(row.noted_by) ?? tCommon('unknownStaff')) : null,
+  }))
+
+  // Pre-filled drafts. Read and write both require can_write_case_documents,
+  // so neither query runs without it. Templates offered: active ones for
+  // this case's type plus those for any type, filtered in the query.
+  const [{ data: templateRows }, { data: draftRows }] =
+    canWriteDocuments === true
+      ? await Promise.all([
+          supabase
+            .from('document_templates')
+            .select('id, name_en, name_ar, body_en, body_ar')
+            .eq('is_active', true)
+            .or(caseRow.case_type_id ? `case_type_id.is.null,case_type_id.eq.${caseRow.case_type_id}` : 'case_type_id.is.null')
+            .order('sort_order')
+            .order('created_at'),
+          supabase
+            .from('document_drafts')
+            .select('id, title, updated_at, created_at')
+            .eq('case_id', id)
+            .is('deleted_at', null)
+            .order('created_at', { ascending: false }),
+        ])
+      : [{ data: [] }, { data: [] }]
+
+  const templateOptions: TemplateOption[] = (templateRows ?? []).map((tpl) => ({
+    id: tpl.id,
+    name: localizedName({ name: tpl.name_en ?? tpl.name_ar ?? '', name_ar: tpl.name_ar }, locale),
+    // The languages this template can be generated in - those with a body.
+    languages: [tpl.body_en ? 'en' : null, tpl.body_ar ? 'ar' : null].filter(
+      (lang): lang is DraftLanguage => lang !== null
+    ),
+  }))
+
   const expenses: Expense[] = (expenseRows ?? []).map((e) => ({
     id: e.id,
     description: e.description,
@@ -308,6 +430,8 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     detail: (row.detail as Record<string, unknown> | null) ?? null,
     detail_redacted: row.detail_redacted,
   }))
+
+  const contacts = (contactRows ?? []).map((c) => toContactRow(c, allNameById, tCommon('unknownStaff')))
 
   const caseTypeName = caseRow.case_types
     ? localizedName({ name: caseRow.case_types.name_en ?? '', name_ar: caseRow.case_types.name_ar }, locale)
@@ -332,7 +456,12 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
         />
       </div>
 
-      <StatusSection caseId={caseRow.id} currentStatusId={caseRow.status_id} statuses={statuses ?? []} />
+      <StatusSection
+        caseId={caseRow.id}
+        currentStatusId={caseRow.status_id}
+        statuses={statuses ?? []}
+        canChange={canChangeStatus === true}
+      />
 
       <TeamSection
         caseId={caseRow.id}
@@ -363,9 +492,43 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
 
       <ShareLinksSection caseId={caseRow.id} links={shareLinks ?? []} canManage={canManageShareLinks === true} />
 
+      {/* Nothing at all when the case type has no checklist items - most
+          types won't until the firm adds them. */}
+      {checklistItems.length > 0 && (
+        <ChecklistSection
+          caseId={caseRow.id}
+          items={checklistItems}
+          counts={{
+            requiredTotal: requiredTotal ?? 0,
+            requiredProvided: requiredProvided ?? 0,
+            requiredNotApplicable: requiredNotApplicable ?? 0,
+          }}
+          documents={linkableDocuments}
+          canWrite={canWriteDocuments === true}
+        />
+      )}
+
       <DocumentsSection caseId={caseRow.id} documents={documents} canWrite={canWriteDocuments === true} />
 
+      {canWriteDocuments === true && (
+        <DraftsSection caseId={caseRow.id} templates={templateOptions} drafts={draftRows ?? []} />
+      )}
+
       <NotesSection caseId={caseRow.id} notes={notes} canWrite={canWriteNotes === true} />
+
+      {caseRow.clients?.id && (
+        <ContactLogSection
+          clientId={caseRow.clients.id}
+          contacts={contacts}
+          cases={clientCases ?? []}
+          staffOptions={activeStaff}
+          canAdd={canViewClient === true}
+          defaultCaseId={caseRow.id}
+          defaultHandledBy={viewerId ?? null}
+          showCase={false}
+          testId="case-contacts-section"
+        />
+      )}
 
       {/* Not gated on "the query came back empty" - lawyers don't hold
           expenses_manage in the seeded roles, so this checks the permission

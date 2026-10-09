@@ -12,6 +12,7 @@ export type FeesErrorCode =
   | 'invalid_fee_type_amount'
   | 'create_failed'
   | 'cases_link_failed'
+  | 'cases_link_wrong_client'
   | 'select_case'
   | 'case_wrong_client'
   | 'case_already_linked'
@@ -24,13 +25,24 @@ export type FeesErrorCode =
   | 'link_generation_failed'
   | 'description_required'
   | 'invalid_amount'
+  | 'installment_amount_not_positive'
+  | 'payment_amount_not_positive'
   | 'add_installment_failed'
   | 'save_installment_failed'
-  | 'installment_has_payments'
+  | 'installment_has_records'
+  | 'installment_below_commitments'
   | 'delete_installment_failed'
   | 'date_required'
   | 'no_permission_record_payment'
   | 'record_payment_failed'
+  | 'write_off_amount_not_positive'
+  | 'write_off_reason_required'
+  | 'write_off_exceeds_balance'
+  | 'write_off_already_reversed'
+  | 'write_off_reversal_mismatch'
+  | 'no_permission_write_off'
+  | 'write_off_failed'
+  | 'write_off_reverse_failed'
 
 export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'select_client',
@@ -40,6 +52,7 @@ export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'invalid_fee_type_amount',
   'create_failed',
   'cases_link_failed',
+  'cases_link_wrong_client',
   'select_case',
   'case_wrong_client',
   'case_already_linked',
@@ -52,13 +65,24 @@ export const FEES_ERROR_CODES: FeesErrorCode[] = [
   'link_generation_failed',
   'description_required',
   'invalid_amount',
+  'installment_amount_not_positive',
+  'payment_amount_not_positive',
   'add_installment_failed',
   'save_installment_failed',
-  'installment_has_payments',
+  'installment_has_records',
+  'installment_below_commitments',
   'delete_installment_failed',
   'date_required',
   'no_permission_record_payment',
   'record_payment_failed',
+  'write_off_amount_not_positive',
+  'write_off_reason_required',
+  'write_off_exceeds_balance',
+  'write_off_already_reversed',
+  'write_off_reversal_mismatch',
+  'no_permission_write_off',
+  'write_off_failed',
+  'write_off_reverse_failed',
 ]
 
 // A caller-controlled value never reaches t() as a message key - validate

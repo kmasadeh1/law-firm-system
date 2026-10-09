@@ -157,7 +157,9 @@ function FilingRow({
           {filing.judge_name && <bdi>{filing.judge_name}</bdi>}
         </span>
         {filing.filed_at && (
-          <span className="text-xs text-fg-muted">{t('filedOn', { date: formatDate(filing.filed_at, locale) })}</span>
+          <span className="text-xs text-fg-muted" data-testid="court-filing-filed-on">
+            {t.rich('filedOn', { date: formatDate(filing.filed_at, locale), bdi: (chunks) => <bdi>{chunks}</bdi> })}
+          </span>
         )}
         {filing.notes && <p className="text-fg-muted">{filing.notes}</p>}
 

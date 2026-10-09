@@ -18,6 +18,16 @@ const sourceSerif = Source_Serif_4({
   subsets: ['latin'],
 })
 
+// The first family name alone - "'Source Serif 4'" out of "'Source Serif
+// 4', 'Source Serif 4 Fallback'". next/font's metric fallback for these is
+// local Times New Roman with no unicode-range, so in a stack like
+// var(--font-source-serif), var(--font-amiri) Arabic text would be caught
+// by Times New Roman (size-adjusted for Latin) before it ever reached Amiri.
+// The printed document draft names the faces directly instead.
+function primaryFamily(fontFamily: string) {
+  return fontFamily.split(',')[0]!.trim()
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth' })
@@ -64,6 +74,12 @@ export default async function StaffRootLayout({ children }: { children: React.Re
       dir={dir}
       data-theme={theme}
       className={`${amiri.variable} ${sourceSerif.variable} h-full`}
+      style={
+        {
+          '--font-amiri-face': primaryFamily(amiri.style.fontFamily),
+          '--font-source-serif-face': primaryFamily(sourceSerif.style.fontFamily),
+        } as React.CSSProperties
+      }
     >
       <body className="min-h-full flex flex-col font-body-en antialiased">
         {/* locale/messages aren't enough on their own: NextIntlClientProvider's
