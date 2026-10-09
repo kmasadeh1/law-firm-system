@@ -220,6 +220,10 @@
           "default": "<bdi>{actor}</bdi> recorded a payment of <bdi>{amount}</bdi>",
           "withClient": "<bdi>{actor}</bdi> recorded a payment of <bdi>{amount}</bdi> from <bdi>{client}</bdi>",
           "unavailable": "<bdi>{actor}</bdi> recorded a payment you can no longer see"
+        },
+        "password_reset_requested": {
+          "default": "<bdi>{subject}</bdi> asked for a password reset",
+          "unavailable": "Someone asked for a password reset"
         }
       }
     },

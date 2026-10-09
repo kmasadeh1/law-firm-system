@@ -214,6 +214,10 @@
           "default": "سُجّلت دفعة بقيمة <bdi>{amount}</bdi> بواسطة <bdi>{actor}</bdi>",
           "withClient": "سُجّلت دفعة بقيمة <bdi>{amount}</bdi> من <bdi>{client}</bdi> بواسطة <bdi>{actor}</bdi>",
           "unavailable": "سُجّلت دفعة لم تعد متاحة لك بواسطة <bdi>{actor}</bdi>"
+        },
+        "password_reset_requested": {
+          "default": "طلب <bdi>{subject}</bdi> إعادة تعيين كلمة المرور",
+          "unavailable": "طُلبت إعادة تعيين كلمة المرور"
         }
       }
     },

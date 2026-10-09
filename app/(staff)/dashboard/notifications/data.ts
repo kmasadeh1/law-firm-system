@@ -93,9 +93,10 @@ export async function loadBellData(): Promise<BellData> {
   const taskIds = idsFor('tasks')
   const enquiryIds = idsFor('enquiries')
   const paymentIds = idsFor('payments')
+  const staffIds = idsFor('staff')
   const none = Promise.resolve({ data: [] as never[] })
 
-  const [cases, tasks, enquiries, payments, actors] = await Promise.all([
+  const [cases, tasks, enquiries, payments, staffSubjects, actors] = await Promise.all([
     caseIds.length ? supabase.from('cases').select('id, case_number').in('id', caseIds) : none,
     taskIds.length ? supabase.from('tasks').select('id, title').in('id', taskIds) : none,
     enquiryIds.length ? supabase.from('enquiries').select('id, name').in('id', enquiryIds) : none,
@@ -105,6 +106,8 @@ export async function loadBellData(): Promise<BellData> {
           .select('id, amount, engagement_installments(engagement_id, engagements(clients(full_name)))')
           .in('id', paymentIds)
       : none,
+    // Password-reset requests point at the person who asked.
+    staffIds.length ? supabase.from('staff_directory').select('id, full_name').in('id', staffIds) : none,
     // Unfiltered by is_active - who assigned something should still show
     // after they leave the firm.
     actorIds.length ? supabase.from('staff_directory').select('id, full_name').in('id', actorIds) : none,
@@ -114,6 +117,7 @@ export async function loadBellData(): Promise<BellData> {
   const taskById = new Map((tasks.data ?? []).map((t) => [t.id, t]))
   const enquiryById = new Map((enquiries.data ?? []).map((e) => [e.id, e]))
   const paymentById = new Map((payments.data ?? []).map((p) => [p.id, p]))
+  const staffById = new Map((staffSubjects.data ?? []).map((m) => [m.id, m]))
   const actorById = new Map((actors.data ?? []).map((a) => [a.id, a.full_name]))
 
   function subjectFor(n: (typeof notifications)[number]): BellNotification['subject'] {
@@ -140,6 +144,12 @@ export async function loadBellData(): Promise<BellData> {
           label: installment?.engagements?.clients?.full_name ?? null,
           amount: p.amount,
         }
+      }
+      case 'staff': {
+        // The Staff screen row carries id="staff-<id>", so the owner lands
+        // on the person and can issue the password from there.
+        const m = staffById.get(n.subject_id)
+        return m ? { href: `/dashboard/owner/staff#staff-${m.id}`, label: m.full_name } : null
       }
       default:
         return null
