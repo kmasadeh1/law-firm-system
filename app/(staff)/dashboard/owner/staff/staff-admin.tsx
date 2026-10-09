@@ -267,20 +267,33 @@ function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullNa
   )
 }
 
-function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (password: string) => void }) {
+function StaffRowItem({
+  row,
+  resetRequestedAt,
+  onPassword,
+}: {
+  row: StaffRow
+  resetRequestedAt: string | undefined
+  onPassword: (password: string) => void
+}) {
   const locale = useLocale()
   const t = useTranslations('dashboard.admin.staff.row')
   const tUserType = useTranslations('dashboard.admin.userType')
   const expired = isExpired(row.temp_password_expires_at)
 
   return (
-    <li className="flex flex-col gap-2 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+    <li id={`staff-${row.id}`} className="flex flex-col gap-2 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-medium text-fg">{row.full_name}</span>
           <Badge variant={row.user_type === 'owner' ? 'accent' : 'neutral'}>
             {row.user_type === 'owner' ? tUserType('owner') : row.roles ? localizedName(row.roles, locale) : t('noRole')}
           </Badge>
+          {resetRequestedAt && (
+            <Badge variant="accent" data-testid={`staff-reset-requested-${row.id}`}>
+              {t('passwordResetRequestedBadge')}
+            </Badge>
+          )}
           {row.must_change_password && (
             <Badge variant={expired ? 'muted' : 'accent'}>
               {expired ? t('tempPasswordExpiredBadge') : t('awaitingPasswordChangeBadge')}
@@ -307,7 +320,15 @@ function StaffRowItem({ row, onPassword }: { row: StaffRow; onPassword: (passwor
   )
 }
 
-export function StaffAdmin({ staff, roles }: { staff: StaffRow[]; roles: RoleOption[] }) {
+export function StaffAdmin({
+  staff,
+  roles,
+  resetRequests,
+}: {
+  staff: StaffRow[]
+  roles: RoleOption[]
+  resetRequests: Record<string, string>
+}) {
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null)
 
   return (
@@ -319,7 +340,7 @@ export function StaffAdmin({ staff, roles }: { staff: StaffRow[]; roles: RoleOpt
       <Panel className="p-0">
         <ul className="flex flex-col divide-y divide-line">
           {staff.map((row) => (
-            <StaffRowItem key={row.id} row={row} onPassword={setGeneratedPassword} />
+            <StaffRowItem key={row.id} row={row} resetRequestedAt={resetRequests[row.id]} onPassword={setGeneratedPassword} />
           ))}
         </ul>
       </Panel>

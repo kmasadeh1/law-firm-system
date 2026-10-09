@@ -23,6 +23,22 @@ export async function setLoginLocale(locale: 'en' | 'ar') {
   revalidatePath('/login')
 }
 
+// Asks the owner for a new temporary password. The database function
+// request_password_reset behaves identically for a real, unknown or
+// repeated address and returns nothing, so this action does too: whatever
+// happens (including an RPC error) it lands on the same confirmation URL.
+// Never branch on the outcome - that would reveal which addresses are real.
+export async function requestPasswordReset(formData: FormData) {
+  const email = formData.get('email')
+
+  if (typeof email === 'string' && email.trim()) {
+    const supabase = await createClient()
+    await supabase.rpc('request_password_reset', { p_email: email.trim() })
+  }
+
+  redirect('/login?forgot=sent')
+}
+
 export async function login(formData: FormData) {
   const email = formData.get('email')
   const password = formData.get('password')

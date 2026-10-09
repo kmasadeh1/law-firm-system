@@ -27,6 +27,13 @@
         "completeFailed": "The password was set, but finishing the change failed. Please try again."
       }
     },
+    "forgotPassword": {
+      "heading": "Forgot your password?",
+      "intro": "Enter the email address of your account. The firm owner will be notified and can issue you a new temporary password.",
+      "submit": "Request a new password",
+      "confirmation": "If that address belongs to an account, the firm owner has been notified and will issue you a new password.",
+      "backToSignIn": "Back to sign in"
+    },
     "login": {
       "brandingHeading": "Staff sign in",
       "brandingBody": "This area is for firm staff only. Clients and visitors looking for the firm's public site should head back to the homepage.",
@@ -34,8 +41,7 @@
       "emailLabel": "Email",
       "passwordLabel": "Password",
       "submit": "Log in",
-      "forgotPassword": "Forgot password? (coming soon)",
-      "forgotPasswordTitle": "Not implemented yet",
+      "forgotPassword": "Forgot password?",
       "errors": {
         "missingFields": "Email and password are required.",
         "invalidCredentials": "Invalid email or password.",
@@ -1021,6 +1027,7 @@
           "noRole": "No role",
           "tempPasswordExpiredBadge": "Temporary password expired",
           "awaitingPasswordChangeBadge": "Awaiting password change",
+          "passwordResetRequestedBadge": "Password reset requested",
           "tempPasswordExpiresLine": "Temporary password expires <bdi>{date}</bdi>",
           "tempPasswordExpiredLine": "Temporary password expired <bdi>{date}</bdi>",
           "activeAriaLabel": "Active",

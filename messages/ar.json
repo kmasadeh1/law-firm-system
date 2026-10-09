@@ -8,6 +8,13 @@
     "firmName": "أحمد المساعده ومشاركوه",
     "firmTagline": "مكتب محاماة | محامون ومستشارون قانونيون",
     "pageTitleSuffix": "دخول الموظفين",
+    "forgotPassword": {
+      "heading": "نسيت كلمة المرور؟",
+      "intro": "أدخل البريد الإلكتروني الخاص بحسابك. سيتم إشعار مالك المكتب وسيمنحك كلمة مرور مؤقتة جديدة.",
+      "submit": "طلب كلمة مرور جديدة",
+      "confirmation": "إذا كان هذا العنوان يخص حسابًا، فقد تم إشعار مالك المكتب وسيمنحك كلمة مرور جديدة.",
+      "backToSignIn": "العودة إلى تسجيل الدخول"
+    },
     "login": {
       "brandingHeading": "دخول الموظفين",
       "brandingBody": "هذا القسم مخصص لموظفي المكتب فقط. العملاء والزوار الباحثون عن الموقع العام للمكتب يمكنهم العودة إلى الصفحة الرئيسية.",
@@ -15,8 +22,7 @@
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة المرور",
       "submit": "تسجيل الدخول",
-      "forgotPassword": "نسيت كلمة المرور؟ (قريباً)",
-      "forgotPasswordTitle": "غير متاح بعد",
+      "forgotPassword": "نسيت كلمة المرور؟",
       "errors": {
         "missingFields": "البريد الإلكتروني وكلمة المرور مطلوبان.",
         "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
@@ -970,6 +976,7 @@
           "noRole": "بلا دور",
           "tempPasswordExpiredBadge": "انتهت صلاحية كلمة المرور المؤقتة",
           "awaitingPasswordChangeBadge": "بانتظار تغيير كلمة المرور",
+          "passwordResetRequestedBadge": "طلب إعادة تعيين كلمة المرور",
           "tempPasswordExpiresLine": "تنتهي صلاحية كلمة المرور المؤقتة في <bdi>{date}</bdi>",
           "tempPasswordExpiredLine": "انتهت صلاحية كلمة المرور المؤقتة في <bdi>{date}</bdi>",
           "activeAriaLabel": "نشط",

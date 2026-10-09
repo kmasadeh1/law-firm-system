@@ -23,10 +23,15 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
     staffQuery = staffQuery.eq('is_active', true)
   }
 
-  const [{ data: staffRows }, { data: roles }] = await Promise.all([
+  const [{ data: staffRows }, { data: roles }, { data: openRequests }] = await Promise.all([
     staffQuery,
     supabase.from('roles').select('id, name, name_ar').order('name'),
+    supabase.from('password_reset_requests').select('staff_id, requested_at').is('resolved_at', null),
   ])
+
+  const resetRequests: Record<string, string> = Object.fromEntries(
+    (openRequests ?? []).map((r) => [r.staff_id, r.requested_at])
+  )
 
   return (
     <div className="flex flex-col gap-6">
@@ -45,7 +50,7 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
         />
       </div>
 
-      <StaffAdmin staff={staffRows ?? []} roles={roles ?? []} />
+      <StaffAdmin staff={staffRows ?? []} roles={roles ?? []} resetRequests={resetRequests} />
     </div>
   )
 }

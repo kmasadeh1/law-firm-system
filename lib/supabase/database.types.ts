@@ -69,6 +69,49 @@ export type Database = {
           },
         ]
       }
+      alert_dismissals: {
+        Row: {
+          dismissed_at: string
+          kind: Database["public"]["Enums"]["alert_kind"]
+          staff_id: string
+          subject_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          kind: Database["public"]["Enums"]["alert_kind"]
+          staff_id: string
+          subject_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          kind?: Database["public"]["Enums"]["alert_kind"]
+          staff_id?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_dismissals_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "alert_dismissals_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_dismissals_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           case_id: string | null
@@ -114,6 +157,13 @@ export type Database = {
             foreignKeyName: "appointments_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "appointments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -122,6 +172,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "appointments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -137,6 +194,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
           },
           {
             foreignKeyName: "appointments_created_by_fkey"
@@ -176,6 +240,110 @@ export type Database = {
           {
             foreignKeyName: "appointments_staff_id_fkey"
             columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_checklist_status: {
+        Row: {
+          case_id: string
+          document_id: string | null
+          id: string
+          item_id: string
+          note: string | null
+          noted_at: string
+          noted_by: string | null
+          state: Database["public"]["Enums"]["checklist_state"]
+        }
+        Insert: {
+          case_id: string
+          document_id?: string | null
+          id?: string
+          item_id: string
+          note?: string | null
+          noted_at?: string
+          noted_by?: string | null
+          state: Database["public"]["Enums"]["checklist_state"]
+        }
+        Update: {
+          case_id?: string
+          document_id?: string | null
+          id?: string
+          item_id?: string
+          note?: string | null
+          noted_at?: string
+          noted_by?: string | null
+          state?: Database["public"]["Enums"]["checklist_state"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "document_checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
             isOneToOne: false
             referencedRelation: "staff_directory"
             referencedColumns: ["id"]
@@ -227,6 +395,13 @@ export type Database = {
             foreignKeyName: "case_court_filings_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_court_filings_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -238,11 +413,25 @@ export type Database = {
             referencedColumns: ["case_id"]
           },
           {
+            foreignKeyName: "case_court_filings_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
             foreignKeyName: "case_court_filings_court_id_fkey"
             columns: ["court_id"]
             isOneToOne: false
             referencedRelation: "courts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_court_filings_court_id_fkey"
+            columns: ["court_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["court_id"]
           },
           {
             foreignKeyName: "case_court_filings_created_by_fkey"
@@ -291,6 +480,13 @@ export type Database = {
             foreignKeyName: "case_lawyers_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_lawyers_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -299,6 +495,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_lawyers_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -360,6 +563,13 @@ export type Database = {
             foreignKeyName: "case_notes_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -368,6 +578,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -420,6 +637,7 @@ export type Database = {
           counsel_name: string | null
           counsel_phone: string | null
           id: string
+          is_primary: boolean
           name: string
           national_id: string | null
         }
@@ -428,6 +646,7 @@ export type Database = {
           counsel_name?: string | null
           counsel_phone?: string | null
           id?: string
+          is_primary?: boolean
           name: string
           national_id?: string | null
         }
@@ -436,10 +655,18 @@ export type Database = {
           counsel_name?: string | null
           counsel_phone?: string | null
           id?: string
+          is_primary?: boolean
           name?: string
           national_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "case_opposing_parties_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
           {
             foreignKeyName: "case_opposing_parties_case_id_fkey"
             columns: ["case_id"]
@@ -452,6 +679,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_opposing_parties_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
         ]
@@ -498,6 +732,13 @@ export type Database = {
             foreignKeyName: "case_share_links_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_share_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -506,6 +747,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "case_share_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -645,6 +893,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "cases_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
+          {
             foreignKeyName: "cases_closed_by_fkey"
             columns: ["closed_by"]
             isOneToOne: false
@@ -691,6 +946,170 @@ export type Database = {
             columns: ["status_id"]
             isOneToOne: false
             referencedRelation: "case_statuses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_contacts: {
+        Row: {
+          case_id: string | null
+          channel: Database["public"]["Enums"]["contact_channel"]
+          client_id: string
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          direction: Database["public"]["Enums"]["contact_direction"]
+          edited_at: string | null
+          follow_up_needed: boolean
+          handled_by: string | null
+          id: string
+          occurred_at: string
+          summary: string
+        }
+        Insert: {
+          case_id?: string | null
+          channel: Database["public"]["Enums"]["contact_channel"]
+          client_id: string
+          created_at?: string
+          created_by: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          direction: Database["public"]["Enums"]["contact_direction"]
+          edited_at?: string | null
+          follow_up_needed?: boolean
+          handled_by?: string | null
+          id?: string
+          occurred_at?: string
+          summary: string
+        }
+        Update: {
+          case_id?: string | null
+          channel?: Database["public"]["Enums"]["contact_channel"]
+          client_id?: string
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          direction?: Database["public"]["Enums"]["contact_direction"]
+          edited_at?: string | null
+          follow_up_needed?: boolean
+          handled_by?: string | null
+          id?: string
+          occurred_at?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_fund_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "client_contacts_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_contacts_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
             referencedColumns: ["id"]
           },
         ]
@@ -749,6 +1168,13 @@ export type Database = {
             foreignKeyName: "client_fund_entries_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_fund_entries_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -757,6 +1183,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "client_fund_entries_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -772,6 +1205,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_fund_entries_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
           },
           {
             foreignKeyName: "client_fund_entries_payment_id_fkey"
@@ -820,6 +1260,8 @@ export type Database = {
           national_id: string | null
           notes: string | null
           phone: string | null
+          referral_notes: string | null
+          referral_source_id: string | null
         }
         Insert: {
           created_at?: string
@@ -830,6 +1272,8 @@ export type Database = {
           national_id?: string | null
           notes?: string | null
           phone?: string | null
+          referral_notes?: string | null
+          referral_source_id?: string | null
         }
         Update: {
           created_at?: string
@@ -840,6 +1284,8 @@ export type Database = {
           national_id?: string | null
           notes?: string | null
           phone?: string | null
+          referral_notes?: string | null
+          referral_source_id?: string | null
         }
         Relationships: [
           {
@@ -861,6 +1307,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_referral_source_id_fkey"
+            columns: ["referral_source_id"]
+            isOneToOne: false
+            referencedRelation: "referral_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -983,6 +1436,8 @@ export type Database = {
       deadlines: {
         Row: {
           case_id: string
+          completed_at: string | null
+          completed_by: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -1000,6 +1455,8 @@ export type Database = {
         }
         Insert: {
           case_id: string
+          completed_at?: string | null
+          completed_by?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1017,6 +1474,8 @@ export type Database = {
         }
         Update: {
           case_id?: string
+          completed_at?: string | null
+          completed_by?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1037,6 +1496,13 @@ export type Database = {
             foreignKeyName: "deadlines_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "deadlines_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -1046,6 +1512,34 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "expense_totals"
             referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "deadlines_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "deadlines_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "deadlines_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deadlines_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "deadlines_created_by_fkey"
@@ -1100,7 +1594,240 @@ export type Database = {
             foreignKeyName: "deadlines_source_hearing_id_fkey"
             columns: ["source_hearing_id"]
             isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["hearing_id"]
+          },
+          {
+            foreignKeyName: "deadlines_source_hearing_id_fkey"
+            columns: ["source_hearing_id"]
+            isOneToOne: false
             referencedRelation: "hearings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_checklist_items: {
+        Row: {
+          case_type_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_required: boolean
+          name_ar: string | null
+          name_en: string | null
+          sort_order: number
+        }
+        Insert: {
+          case_type_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Update: {
+          case_type_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_checklist_items_case_type_id_fkey"
+            columns: ["case_type_id"]
+            isOneToOne: false
+            referencedRelation: "case_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_drafts: {
+        Row: {
+          body: string
+          case_id: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          template_id: string | null
+          title: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          body: string
+          case_id: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          template_id?: string | null
+          title: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          body?: string
+          case_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_drafts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "document_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_templates: {
+        Row: {
+          body_ar: string | null
+          body_en: string | null
+          case_type_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name_ar: string | null
+          name_en: string | null
+          sort_order: number
+        }
+        Insert: {
+          body_ar?: string | null
+          body_en?: string | null
+          case_type_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Update: {
+          body_ar?: string | null
+          body_en?: string | null
+          case_type_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_templates_case_type_id_fkey"
+            columns: ["case_type_id"]
+            isOneToOne: false
+            referencedRelation: "case_types"
             referencedColumns: ["id"]
           },
         ]
@@ -1141,6 +1868,13 @@ export type Database = {
             foreignKeyName: "documents_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -1149,6 +1883,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -1213,6 +1954,13 @@ export type Database = {
             foreignKeyName: "engagement_cases_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "engagement_cases_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -1221,6 +1969,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "engagement_cases_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -1329,6 +2084,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
           },
           {
             foreignKeyName: "engagements_created_by_fkey"
@@ -1537,6 +2299,13 @@ export type Database = {
             foreignKeyName: "expenses_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "expenses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -1545,6 +2314,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "expenses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -1600,6 +2376,7 @@ export type Database = {
           phone: string | null
           singleton: boolean
           updated_at: string
+          whatsapp_phone: string | null
         }
         Insert: {
           address_ar?: string | null
@@ -1612,6 +2389,7 @@ export type Database = {
           phone?: string | null
           singleton?: boolean
           updated_at?: string
+          whatsapp_phone?: string | null
         }
         Update: {
           address_ar?: string | null
@@ -1624,6 +2402,7 @@ export type Database = {
           phone?: string | null
           singleton?: boolean
           updated_at?: string
+          whatsapp_phone?: string | null
         }
         Relationships: []
       }
@@ -1720,6 +2499,13 @@ export type Database = {
             referencedRelation: "case_court_filings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "hearings_filing_id_fkey"
+            columns: ["filing_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["filing_id"]
+          },
         ]
       }
       lawyer_profiles: {
@@ -1769,27 +2555,36 @@ export type Database = {
           approved_by: string | null
           created_at: string
           end_date: string
+          end_time: string | null
           id: string
+          kind: Database["public"]["Enums"]["leave_kind"]
           staff_id: string
           start_date: string
+          start_time: string | null
           status: Database["public"]["Enums"]["leave_status"]
         }
         Insert: {
           approved_by?: string | null
           created_at?: string
           end_date: string
+          end_time?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["leave_kind"]
           staff_id: string
           start_date: string
+          start_time?: string | null
           status?: Database["public"]["Enums"]["leave_status"]
         }
         Update: {
           approved_by?: string | null
           created_at?: string
           end_date?: string
+          end_time?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["leave_kind"]
           staff_id?: string
           start_date?: string
+          start_time?: string | null
           status?: Database["public"]["Enums"]["leave_status"]
         }
         Relationships: [
@@ -1837,6 +2632,149 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          subject_id: string
+          subject_table: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          subject_id: string
+          subject_table: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          subject_id?: string
+          subject_table?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      password_reset_requests: {
+        Row: {
+          id: string
+          requested_at: string
+          resolved_at: string | null
+          resolved_by: string | null
+          staff_id: string
+        }
+        Insert: {
+          id?: string
+          requested_at?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          staff_id: string
+        }
+        Update: {
+          id?: string
+          requested_at?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          staff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_reset_requests_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "password_reset_requests_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -1845,6 +2783,7 @@ export type Database = {
           installment_id: string
           method: string | null
           paid_at: string
+          receipt_number: number
           recorded_by: string | null
         }
         Insert: {
@@ -1854,6 +2793,7 @@ export type Database = {
           installment_id: string
           method?: string | null
           paid_at?: string
+          receipt_number?: number
           recorded_by?: string | null
         }
         Update: {
@@ -1863,6 +2803,7 @@ export type Database = {
           installment_id?: string
           method?: string | null
           paid_at?: string
+          receipt_number?: number
           recorded_by?: string | null
         }
         Relationships: [
@@ -2029,6 +2970,13 @@ export type Database = {
             foreignKeyName: "powers_of_attorney_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "powers_of_attorney_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -2037,6 +2985,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "powers_of_attorney_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -2052,6 +3007,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "powers_of_attorney_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
           },
           {
             foreignKeyName: "powers_of_attorney_created_by_fkey"
@@ -2115,6 +3077,106 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      referral_sources: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name_ar: string | null
+          name_en: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_ar?: string | null
+          name_en?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      reminders_sent: {
+        Row: {
+          client_id: string | null
+          id: string
+          kind: Database["public"]["Enums"]["reminder_kind"]
+          sent_at: string
+          sent_by: string
+          sent_to_phone: string | null
+          subject_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["reminder_kind"]
+          sent_at?: string
+          sent_by?: string
+          sent_to_phone?: string | null
+          subject_id: string
+        }
+        Update: {
+          client_id?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["reminder_kind"]
+          sent_at?: string
+          sent_by?: string
+          sent_to_phone?: string | null
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_sent_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "client_fund_balances"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reminders_sent_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_permissions: {
         Row: {
@@ -2331,6 +3393,13 @@ export type Database = {
             foreignKeyName: "tasks_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
+            referencedRelation: "case_document_checklist"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "tasks_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
           },
@@ -2339,6 +3408,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "expense_totals"
+            referencedColumns: ["case_id"]
+          },
+          {
+            foreignKeyName: "tasks_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
             referencedColumns: ["case_id"]
           },
           {
@@ -2413,8 +3489,158 @@ export type Database = {
           },
         ]
       }
+      write_offs: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          id: string
+          installment_id: string
+          reason: string
+          reverses_write_off_id: string | null
+          written_off_on: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          id?: string
+          installment_id: string
+          reason: string
+          reverses_write_off_id?: string | null
+          written_off_on?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          installment_id?: string
+          reason?: string
+          reverses_write_off_id?: string | null
+          written_off_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "write_offs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "write_offs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "write_offs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "write_offs_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "engagement_installments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "write_offs_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "installment_balances"
+            referencedColumns: ["installment_id"]
+          },
+          {
+            foreignKeyName: "write_offs_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "overdue_installments"
+            referencedColumns: ["installment_id"]
+          },
+          {
+            foreignKeyName: "write_offs_reverses_write_off_id_fkey"
+            columns: ["reverses_write_off_id"]
+            isOneToOne: false
+            referencedRelation: "write_offs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
+      case_document_checklist: {
+        Row: {
+          case_id: string | null
+          document_id: string | null
+          is_required: boolean | null
+          item_id: string | null
+          name_ar: string | null
+          name_en: string | null
+          note: string | null
+          noted_at: string | null
+          noted_by: string | null
+          outstanding: boolean | null
+          sort_order: number | null
+          state: Database["public"]["Enums"]["checklist_state"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_checklist_status_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_checklist_status_noted_by_fkey"
+            columns: ["noted_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_type_profitability: {
+        Row: {
+          case_count: number | null
+          case_type_id: string | null
+          closed_cases: number | null
+          expenses_reimbursed: number | null
+          expenses_total: number | null
+          expenses_unreimbursed: number | null
+          is_mixed: boolean | null
+          name_ar: string | null
+          name_en: string | null
+          net_received: number | null
+          open_cases: number | null
+          outstanding_total: number | null
+          paid_total: number | null
+          row_kind: string | null
+          scheduled_total: number | null
+          written_off_total: number | null
+        }
+        Relationships: []
+      }
       client_balances: {
         Row: {
           agreed_fixed_fee_total: number | null
@@ -2423,6 +3649,7 @@ export type Database = {
           percentage_engagement_count: number | null
           scheduled_outstanding: number | null
           scheduled_total: number | null
+          written_off_total: number | null
         }
         Relationships: [
           {
@@ -2438,6 +3665,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
           },
         ]
       }
@@ -2505,6 +3739,7 @@ export type Database = {
           scheduled_outstanding: number | null
           scheduled_total: number | null
           unscheduled_amount: number | null
+          written_off_total: number | null
         }
         Relationships: [
           {
@@ -2521,6 +3756,13 @@ export type Database = {
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "engagements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
         ]
       }
       expense_totals: {
@@ -2532,6 +3774,81 @@ export type Database = {
         }
         Relationships: []
       }
+      firm_hearing_schedule: {
+        Row: {
+          attended_by: string | null
+          case_id: string | null
+          case_number: string | null
+          case_title: string | null
+          case_type_ar: string | null
+          case_type_en: string | null
+          chamber: string | null
+          client_id: string | null
+          client_name: string | null
+          court_case_number: string | null
+          court_city_ar: string | null
+          court_city_en: string | null
+          court_id: string | null
+          court_name_ar: string | null
+          court_name_en: string | null
+          court_type: Database["public"]["Enums"]["court_type"] | null
+          decision: string | null
+          filing_id: string | null
+          hearing_id: string | null
+          judge_name: string | null
+          lead_lawyer_id: string | null
+          lead_lawyer_name: string | null
+          next_session_date: string | null
+          outcome: Database["public"]["Enums"]["hearing_outcome"] | null
+          session_date: string | null
+          session_time: string | null
+          what_happened: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_lawyers_staff_id_fkey"
+            columns: ["lead_lawyer_id"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "case_lawyers_staff_id_fkey"
+            columns: ["lead_lawyer_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_lawyers_staff_id_fkey"
+            columns: ["lead_lawyer_id"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hearings_attended_by_fkey"
+            columns: ["attended_by"]
+            isOneToOne: false
+            referencedRelation: "lawyer_workload"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "hearings_attended_by_fkey"
+            columns: ["attended_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hearings_attended_by_fkey"
+            columns: ["attended_by"]
+            isOneToOne: false
+            referencedRelation: "staff_directory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       installment_balances: {
         Row: {
           balance_due: number | null
@@ -2539,6 +3856,23 @@ export type Database = {
           installment_amount: number | null
           installment_id: string | null
           paid_amount: number | null
+          written_off_amount: number | null
+        }
+        Insert: {
+          balance_due?: never
+          engagement_id?: string | null
+          installment_amount?: number | null
+          installment_id?: string | null
+          paid_amount?: never
+          written_off_amount?: never
+        }
+        Update: {
+          balance_due?: never
+          engagement_id?: string | null
+          installment_amount?: number | null
+          installment_id?: string | null
+          paid_amount?: never
+          written_off_amount?: never
         }
         Relationships: [
           {
@@ -2613,7 +3947,47 @@ export type Database = {
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "engagements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "firm_hearing_schedule"
+            referencedColumns: ["client_id"]
+          },
         ]
+      }
+      pending_alerts: {
+        Row: {
+          case_id: string | null
+          case_number: string | null
+          case_title: string | null
+          days_away: number | null
+          detail_ar: string | null
+          detail_en: string | null
+          due_on: string | null
+          kind: Database["public"]["Enums"]["alert_kind"] | null
+          subject_id: string | null
+        }
+        Relationships: []
+      }
+      reminder_candidates: {
+        Row: {
+          amount: number | null
+          case_id: string | null
+          case_number: string | null
+          client_id: string | null
+          client_name: string | null
+          client_phone: string | null
+          detail_ar: string | null
+          detail_en: string | null
+          due_on: string | null
+          due_time: string | null
+          kind: Database["public"]["Enums"]["reminder_kind"] | null
+          last_reminded_at: string | null
+          reminded_recently: boolean | null
+          subject_id: string | null
+        }
+        Relationships: []
       }
       staff_directory: {
         Row: {
@@ -2638,15 +4012,32 @@ export type Database = {
       can_access_client_funds: { Args: never; Returns: boolean }
       can_access_enquiry: { Args: { p_enquiry_id: string }; Returns: boolean }
       can_assign_tasks: { Args: never; Returns: boolean }
+      can_change_case_status: { Args: { p_case_id: string }; Returns: boolean }
+      can_close_case: { Args: { p_case_id: string }; Returns: boolean }
+      can_edit_client_contact: {
+        Args: { c: Database["public"]["Tables"]["client_contacts"]["Row"] }
+        Returns: boolean
+      }
+      can_edit_enquiry_note: {
+        Args: { n: Database["public"]["Tables"]["enquiry_notes"]["Row"] }
+        Returns: boolean
+      }
+      can_manage_any_case_details: { Args: never; Returns: boolean }
       can_manage_case_details: { Args: { p_case_id: string }; Returns: boolean }
       can_manage_case_share_links: {
         Args: { p_case_id: string }
+        Returns: boolean
+      }
+      can_manage_details: {
+        Args: { c: Database["public"]["Tables"]["cases"]["Row"] }
         Returns: boolean
       }
       can_manage_power_of_attorney: {
         Args: { p_client_id: string }
         Returns: boolean
       }
+      can_manage_reference_data: { Args: never; Returns: boolean }
+      can_request_hourly_leave: { Args: never; Returns: boolean }
       can_view_client: { Args: { p_client_id: string }; Returns: boolean }
       can_withdraw: {
         Args: { lr: Database["public"]["Tables"]["leave_requests"]["Row"] }
@@ -2657,6 +4048,7 @@ export type Database = {
         Returns: boolean
       }
       can_write_case_notes: { Args: { p_case_id: string }; Returns: boolean }
+      case_covering_poa: { Args: { p_case_id: string }; Returns: string }
       case_id_for_filing: { Args: { p_filing_id: string }; Returns: string }
       case_timeline: {
         Args: { p_case_id: string }
@@ -2692,12 +4084,23 @@ export type Database = {
       is_active_staff: { Args: never; Returns: boolean }
       is_on_case: { Args: { p_case_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
+      last_reminded_at: {
+        Args: {
+          p_kind: Database["public"]["Enums"]["reminder_kind"]
+          p_subject_id: string
+        }
+        Returns: string
+      }
+      logged_tables: { Args: never; Returns: string[] }
+      mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       name_matches: {
         Args: { p_search: string; p_target: string }
         Returns: boolean
       }
+      normalise_phone: { Args: { p_raw: string }; Returns: string }
       normalize_name: { Args: { p_input: string }; Returns: string }
       password_change_pending: { Args: never; Returns: boolean }
+      request_password_reset: { Args: { p_email: string }; Returns: undefined }
       safe_uuid: { Args: { p: string }; Returns: string }
       search_clients: {
         Args: { p_query?: string }
@@ -2710,6 +4113,8 @@ export type Database = {
           national_id: string | null
           notes: string | null
           phone: string | null
+          referral_notes: string | null
+          referral_source_id: string | null
         }[]
         SetofOptions: {
           from: "*"
@@ -2728,8 +4133,10 @@ export type Database = {
     }
     Enums: {
       activity_action: "insert" | "update" | "delete"
+      alert_kind: "deadline_approaching" | "hearing_tomorrow"
       appointment_status: "scheduled" | "completed" | "cancelled" | "no_show"
       appointment_type: "consultation" | "court_date"
+      checklist_state: "provided" | "not_applicable"
       client_fund_direction: "in" | "out"
       client_fund_entry_type:
         | "deposit"
@@ -2737,6 +4144,14 @@ export type Database = {
         | "fee_transfer"
         | "refund"
         | "reversal"
+      contact_channel:
+        | "phone"
+        | "whatsapp"
+        | "email"
+        | "in_person"
+        | "letter"
+        | "other"
+      contact_direction: "incoming" | "outgoing"
       court_type:
         | "conciliation"
         | "first_instance"
@@ -2758,7 +4173,15 @@ export type Database = {
         | "withdrawn"
         | "struck_out"
         | "other"
+      leave_kind: "full_day" | "hourly"
       leave_status: "pending" | "approved" | "rejected"
+      notification_type:
+        | "case_assigned"
+        | "task_assigned"
+        | "enquiry_assigned"
+        | "payment_recorded"
+        | "password_reset_requested"
+      reminder_kind: "hearing" | "appointment" | "payment_due"
       task_priority: "low" | "normal" | "high"
       task_status: "open" | "in_progress" | "done" | "cancelled"
       user_type: "owner" | "staff"
@@ -2890,8 +4313,10 @@ export const Constants = {
   public: {
     Enums: {
       activity_action: ["insert", "update", "delete"],
+      alert_kind: ["deadline_approaching", "hearing_tomorrow"],
       appointment_status: ["scheduled", "completed", "cancelled", "no_show"],
       appointment_type: ["consultation", "court_date"],
+      checklist_state: ["provided", "not_applicable"],
       client_fund_direction: ["in", "out"],
       client_fund_entry_type: [
         "deposit",
@@ -2900,6 +4325,15 @@ export const Constants = {
         "refund",
         "reversal",
       ],
+      contact_channel: [
+        "phone",
+        "whatsapp",
+        "email",
+        "in_person",
+        "letter",
+        "other",
+      ],
+      contact_direction: ["incoming", "outgoing"],
       court_type: [
         "conciliation",
         "first_instance",
@@ -2923,7 +4357,16 @@ export const Constants = {
         "struck_out",
         "other",
       ],
+      leave_kind: ["full_day", "hourly"],
       leave_status: ["pending", "approved", "rejected"],
+      notification_type: [
+        "case_assigned",
+        "task_assigned",
+        "enquiry_assigned",
+        "payment_recorded",
+        "password_reset_requested",
+      ],
+      reminder_kind: ["hearing", "appointment", "payment_due"],
       task_priority: ["low", "normal", "high"],
       task_status: ["open", "in_progress", "done", "cancelled"],
       user_type: ["owner", "staff"],
