@@ -29,6 +29,24 @@ export async function setLocale(locale: 'en' | 'ar'): Promise<{ error?: 'saveFai
   const user = data?.claims
   if (!user) return { error: 'saveFailed' }
 
+  // The ONLY write to staff.locale in the app, reached only from an explicit
+  // click on the language toggle (components/dashboard/locale-toggle.tsx).
+  // Nothing in a render, layout, proxy or cookie sync writes it: the stored
+  // value wins and the cookie follows it (login copies DB -> cookie; this
+  // action writes DB then cookie). A request that would not change the
+  // stored value - a stale tab clicking a language already in force - is
+  // therefore not written at all, so it can't add a spurious audit row.
+  const { data: current } = await supabase
+    .from('staff')
+    .select('locale')
+    .eq('id', user.sub as string)
+    .maybeSingle()
+  if (current?.locale === locale) {
+    await setStaffLocaleCookie(locale)
+    revalidatePath('/dashboard', 'layout')
+    return {}
+  }
+
   const { data: updated, error } = await supabase
     .from('staff')
     .update({ locale })
