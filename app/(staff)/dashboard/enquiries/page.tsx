@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -51,6 +52,14 @@ export default async function EnquiriesListPage() {
               <li key={e.id}>
                 <Link
                   href={`/dashboard/enquiries/${e.id}`}
+                  aria-label={rowLabel(
+                    e.name,
+                    tStatus(e.status),
+                    e.phone,
+                    e.email,
+                    e.assigned_to ? (nameById.get(e.assigned_to) ?? t('unknownStaff')) : t('unassigned'),
+                    formatDateTime(e.created_at, locale)
+                  )}
                   className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                 >
                   <span className="flex items-center gap-2">

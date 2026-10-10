@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
@@ -92,6 +93,12 @@ export default async function OwnerDashboardPage() {
                 <li key={a.id}>
                   <Link
                     href={`/dashboard/appointments/${a.id}`}
+                    aria-label={rowLabel(
+                      formatTime(a.starts_at, locale),
+                      tType(a.type),
+                      a.clients?.full_name,
+                      a.staff_id ? (nameById.get(a.staff_id) ?? t('unassigned')) : t('unassigned')
+                    )}
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span className="font-medium text-fg">
@@ -132,6 +139,7 @@ export default async function OwnerDashboardPage() {
                     <li key={c.id}>
                       <Link
                         href={`/dashboard/cases/${c.id}`}
+                        aria-label={rowLabel(c.case_number, c.title)}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
                         <bdi>{c.case_number}</bdi> — <bdi>{c.title}</bdi>
@@ -162,6 +170,7 @@ export default async function OwnerDashboardPage() {
                     <li key={a.id}>
                       <Link
                         href={`/dashboard/appointments/${a.id}`}
+                        aria-label={rowLabel(formatDateTime(a.starts_at, locale), a.clients?.full_name ?? t('unknownClient'))}
                         className="text-sm text-fg-muted underline-offset-2 hover:text-fg hover:underline"
                       >
                         <bdi>{formatDateTime(a.starts_at, locale)}</bdi> · <bdi>{a.clients?.full_name ?? t('unknownClient')}</bdi>

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -159,6 +160,15 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
                 <li key={c.id}>
                   <Link
                     href={`/dashboard/cases/${c.id}`}
+                    aria-label={rowLabel(
+                      c.case_number,
+                      c.title,
+                      c.clients?.full_name,
+                      c.case_statuses ? localizedName(c.case_statuses, locale) : null,
+                      c.case_types
+                        ? localizedName({ name: c.case_types.name_en ?? '', name_ar: c.case_types.name_ar }, locale)
+                        : null
+                    )}
                     className="flex flex-wrap items-center justify-between gap-1 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span>

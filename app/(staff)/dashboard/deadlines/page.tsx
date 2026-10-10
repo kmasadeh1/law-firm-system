@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -66,6 +67,13 @@ export default async function DeadlinesListPage() {
                 <li key={d.id}>
                   <Link
                     href={`/dashboard/cases/${d.case_id}`}
+                    aria-label={rowLabel(
+                      d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : null,
+                      d.cases?.case_number,
+                      d.cases?.title,
+                      d.effective_due_date ? formatDate(d.effective_due_date, locale) : null,
+                      tUrgency(urgency)
+                    )}
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span>

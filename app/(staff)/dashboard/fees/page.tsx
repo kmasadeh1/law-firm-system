@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
@@ -58,6 +59,14 @@ export default async function FeesListPage() {
                 <li key={e.id}>
                   <Link
                     href={`/dashboard/fees/${e.id}`}
+                    aria-label={rowLabel(
+                      e.clients?.full_name,
+                      tType(e.fee_type),
+                      formatFeeType(e.fee_type, e.fixed_amount, e.percentage, locale),
+                      outstanding !== null && outstanding > 0
+                        ? formatAmount(outstanding, locale)
+                        : t('settled')
+                    )}
                     className="flex flex-wrap items-center justify-between gap-1 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span>

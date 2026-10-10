@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/dashboard/page-header'
@@ -61,6 +62,12 @@ export default async function StaffDashboardPage() {
                 <li key={a.id}>
                   <Link
                     href={`/dashboard/appointments/${a.id}`}
+                    aria-label={rowLabel(
+                      formatDateTime(a.starts_at, locale),
+                      tType(a.type),
+                      a.clients?.full_name,
+                      a.cases?.case_number
+                    )}
                     className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                   >
                     <span className="font-medium text-fg">
@@ -105,6 +112,12 @@ export default async function StaffDashboardPage() {
                   <li key={a.cases!.id}>
                     <Link
                       href={`/dashboard/cases/${a.cases!.id}`}
+                      aria-label={rowLabel(
+                        a.cases!.case_number,
+                        a.cases!.title,
+                        a.is_lead ? t('lead') : null,
+                        a.cases!.case_statuses ? localizedName(a.cases!.case_statuses, locale) : null
+                      )}
                       className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-sm transition-colors hover:bg-line/30"
                     >
                       <span>
