@@ -9,6 +9,7 @@ import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { formatDateTime } from '@/lib/format-date-time'
 import type { Database } from '@/lib/supabase/database.types'
+import { FreeText } from '@/components/free-text'
 
 type ChecklistState = Database['public']['Enums']['checklist_state']
 
@@ -153,7 +154,7 @@ function ChecklistRow({
                 : t('linkedDocumentUnavailable')}
             </p>
           )}
-          {item.note && <p className="whitespace-pre-wrap text-fg">{item.note}</p>}
+          {item.note && <FreeText as="p" className="whitespace-pre-wrap text-fg">{item.note}</FreeText>}
           {item.noted_at && (
             <p>
               {item.noted_by_name

@@ -188,6 +188,16 @@
     },
     "conflict": {
       "possibleMatch": "{count, plural, one {Possible match found} other {Possible matches found}} — review before continuing:",
+      "matchOn": {
+        "both": "Same person: name and national ID match",
+        "national_id": "National ID matches (different name)",
+        "name": "Name only: may be a different person"
+      },
+      "nationalId": "National ID",
+      "phone": "Phone",
+      "viewClient": "View client record",
+      "viewCase": "View case <bdi>{caseNumber}</bdi>",
+      "viewCaseNoNumber": "View case",
       "createAnyway": "Create anyway",
       "editDetailsInstead": "Edit details instead",
       "saving": "Saving…"

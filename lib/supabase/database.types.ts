@@ -1411,25 +1411,34 @@ export type Database = {
           description: string | null
           description_ar: string | null
           id: string
+          is_verified: boolean
           name: string
           name_ar: string | null
           period_days: number
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           description?: string | null
           description_ar?: string | null
           id?: string
+          is_verified?: boolean
           name: string
           name_ar?: string | null
           period_days: number
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           description?: string | null
           description_ar?: string | null
           id?: string
+          is_verified?: boolean
           name?: string
           name_ar?: string | null
           period_days?: number
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -4069,6 +4078,19 @@ export type Database = {
           case_id: string
           matched_id: string
           matched_name: string
+          source: string
+        }[]
+      }
+      check_conflict_detailed: {
+        Args: { p_name: string; p_national_id?: string }
+        Returns: {
+          case_id: string | null
+          case_number: string | null
+          match_on: string
+          matched_id: string
+          matched_name: string
+          matched_national_id: string | null
+          matched_phone: string | null
           source: string
         }[]
       }

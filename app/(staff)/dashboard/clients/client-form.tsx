@@ -8,6 +8,7 @@ import { Field, Label, FieldError, FieldSuccess, HelpText, controlClass } from '
 import type { ReferralSourceOption } from './referral-source-options'
 import { Button } from '@/components/dashboard/button'
 import { ConflictWarning } from '@/components/dashboard/conflict-warning'
+import { FreeText } from '@/components/free-text'
 
 type ClientRow = {
   id: string
@@ -95,7 +96,7 @@ export function ClientForm(props: Props) {
         </div>
         <div>
           <dt className="text-sm font-medium text-fg">{t('notesLabel')}</dt>
-          <dd className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.notes || '—'}</dd>
+          <FreeText as="dd" className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.notes || '—'}</FreeText>
         </div>
         <div>
           <dt className="text-sm font-medium text-fg">{t('referralSourceLabel')}</dt>
@@ -105,7 +106,7 @@ export function ClientForm(props: Props) {
         </div>
         <div>
           <dt className="text-sm font-medium text-fg">{t('referralNotesLabel')}</dt>
-          <dd className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.referral_notes || '—'}</dd>
+          <FreeText as="dd" className="mt-1 whitespace-pre-wrap text-sm text-fg">{initial.referral_notes || '—'}</FreeText>
         </div>
       </dl>
     )
@@ -218,7 +219,8 @@ export function ClientForm(props: Props) {
 
       {matches && matches.length > 0 && (
         <ConflictWarning
-          labels={matches.map((m) => matchLabel(m, t))}
+          matches={matches}
+          labelFor={(m) => matchLabel(m, t)}
           onConfirm={handleConfirmAnyway}
           onEdit={() => setMatches(null)}
           pending={isPending}

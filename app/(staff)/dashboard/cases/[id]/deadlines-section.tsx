@@ -11,6 +11,7 @@ import { Banner } from '@/components/dashboard/banner'
 import { Field, Label, HelpText, FieldError, controlClass } from '@/components/dashboard/form'
 import { localizedName } from '@/lib/localized-name'
 import { formatDate } from '@/lib/format-date-time'
+import { FreeText } from '@/components/free-text'
 
 export type Deadline = {
   id: string
@@ -120,7 +121,7 @@ function DeadlineRow({
         </p>
       )}
 
-      {deadline.description && <p className="text-fg-muted">{deadline.description}</p>}
+      {deadline.description && <FreeText as="p" className="text-fg-muted">{deadline.description}</FreeText>}
 
       {deadline.extended_due_date ? (
         <div className="rounded-md border border-accent-border/50 bg-accent-border/10 p-2 text-xs text-fg">

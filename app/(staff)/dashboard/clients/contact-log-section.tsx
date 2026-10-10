@@ -16,6 +16,7 @@ import { Field, FieldError, HelpText, Label, controlClass } from '@/components/d
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatDateTime, toFirmDateTimeInput } from '@/lib/format-date-time'
 import type { Database } from '@/lib/supabase/database.types'
+import { FreeText } from '@/components/free-text'
 
 type ContactDirection = Database['public']['Enums']['contact_direction']
 type ContactChannel = Database['public']['Enums']['contact_channel']
@@ -340,7 +341,7 @@ function ContactItem({
           </Badge>
         )}
       </div>
-      <p className="whitespace-pre-wrap text-fg">{contact.summary}</p>
+      <FreeText as="p" className="whitespace-pre-wrap text-fg">{contact.summary}</FreeText>
       {contact.edited_at && (
         <p className="text-xs text-fg-muted">
           {t.rich('editedLine', {

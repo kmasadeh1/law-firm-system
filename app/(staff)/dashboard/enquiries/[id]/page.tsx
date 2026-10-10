@@ -10,6 +10,7 @@ import { formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import type { Database } from '@/lib/supabase/database.types'
 import { dashboardTitle } from '@/lib/page-title'
+import { FreeText } from '@/components/free-text'
 
 type EnquiryNoteRow = Pick<
   Database['public']['Tables']['enquiry_notes']['Row'],
@@ -132,7 +133,7 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
             </>
           )}
         </dl>
-        <p className="whitespace-pre-wrap text-sm text-fg">{enquiry.message}</p>
+        <FreeText as="p" className="whitespace-pre-wrap text-sm text-fg">{enquiry.message}</FreeText>
       </Panel>
 
       <AssignSection

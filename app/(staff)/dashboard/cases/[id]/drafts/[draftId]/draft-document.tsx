@@ -1,4 +1,5 @@
 import { splitDraft } from '@/lib/draft-sections'
+import { isolateNumbers } from '@/lib/bidi'
 
 export type Letterhead = {
   nameEn: string
@@ -201,11 +202,11 @@ export function DraftDocument({ letterhead, title, body }: { letterhead: Letterh
               line.kind === 'pair' ? (
                 <div key={i} className="contents">
                   <span className="draft-reference-label">{line.label}</span>
-                  <span>{line.value}</span>
+                  <span>{isolateNumbers(line.value)}</span>
                 </div>
               ) : (
                 <p key={i} className="draft-reference-text">
-                  {line.text}
+                  {isolateNumbers(line.text)}
                 </p>
               )
             )}
@@ -216,14 +217,14 @@ export function DraftDocument({ letterhead, title, body }: { letterhead: Letterh
 
         <div className="draft-body" data-testid="draft-print-body">
           {sections.body.map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
+            <p key={i}>{isolateNumbers(paragraph)}</p>
           ))}
         </div>
 
         {sections.closing && (
           <div className="draft-closing" data-testid="draft-closing">
             {sections.closing.map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
+              <p key={i}>{isolateNumbers(paragraph)}</p>
             ))}
           </div>
         )}

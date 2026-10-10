@@ -20,6 +20,7 @@ import { Field, Label, FieldError, controlClass } from '@/components/dashboard/f
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
 import { formatAmount } from '@/lib/format-money'
 import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
+import { FreeText } from '@/components/free-text'
 
 type Payment = { id: string; amount: number; paid_at: string; method: string | null }
 
@@ -154,7 +155,7 @@ function WriteOffItem({
           })}
         </span>
       </div>
-      <p className="whitespace-pre-wrap text-fg">{writeOff.reason}</p>
+      <FreeText as="p" className="whitespace-pre-wrap text-fg">{writeOff.reason}</FreeText>
 
       {writeOff.reversal ? (
         <div className="ms-4 flex flex-col gap-0.5 border-s-2 border-line ps-3" data-testid="write-off-reversal">
@@ -166,7 +167,7 @@ function WriteOffItem({
               bdi: (chunks) => <bdi>{chunks}</bdi>,
             })}
           </span>
-          <p className="whitespace-pre-wrap text-fg">{writeOff.reversal.reason}</p>
+          <FreeText as="p" className="whitespace-pre-wrap text-fg">{writeOff.reversal.reason}</FreeText>
         </div>
       ) : (
         canWriteOff &&

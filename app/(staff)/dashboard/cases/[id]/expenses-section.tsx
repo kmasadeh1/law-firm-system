@@ -1,5 +1,6 @@
 'use client'
 
+import { FreeText } from '@/components/free-text'
 import { useRef, useState, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { addExpense, editExpense, setExpenseReimbursed, deleteExpense } from '../actions'
@@ -128,7 +129,7 @@ function ExpenseRow({ caseId, expense }: { caseId: string; expense: Expense }) {
     <li className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm">
       <div>
         <p className="font-medium text-fg">
-          {expense.description}{' '}
+          <FreeText>{expense.description}</FreeText>{' '}
           <span className="text-fg-muted">
             · <bdi>{formatAmount(expense.amount, locale)}</bdi>
           </span>

@@ -6,12 +6,9 @@ import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { isPhoneRefusal } from '@/lib/phone-error'
 
-export type ConflictMatch = {
-  source: string
-  matched_id: string
-  matched_name: string
-  case_id: string | null
-}
+import type { ConflictMatch } from '@/lib/conflict-match'
+
+export type { ConflictMatch }
 
 type ClientFields = {
   full_name: string
@@ -67,7 +64,7 @@ export async function createClientRecord(
   const supabase = await createClient()
 
   if (!confirmed) {
-    const { data: matches, error: conflictError } = await supabase.rpc('check_conflict', {
+    const { data: matches, error: conflictError } = await supabase.rpc('check_conflict_detailed', {
       p_name: fields.full_name,
       p_national_id: fields.national_id ?? undefined,
     })
@@ -76,7 +73,7 @@ export async function createClientRecord(
       return { error: t('conflictCheckFailed') }
     }
     if (matches && matches.length > 0) {
-      return { matches }
+      return { matches: matches as ConflictMatch[] }
     }
   }
 

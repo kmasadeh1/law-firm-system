@@ -8,6 +8,7 @@ import { Button } from './button'
 import { FieldError, controlClass } from './form'
 import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import { formatDateTime } from '@/lib/format-date-time'
+import { FreeText } from '@/components/free-text'
 
 // The identifying detail for the confirm dialog - the note's first line,
 // trimmed so a long note doesn't blow out the dialog.
@@ -86,7 +87,7 @@ function DeletedNote({
           })}
         </Badge>
       </div>
-      <p className="whitespace-pre-wrap text-fg">{note.note}</p>
+      <FreeText as="p" className="whitespace-pre-wrap text-fg">{note.note}</FreeText>
       <div>
         <Button type="button" variant="ghost" onClick={handleRestore} disabled={isPending}>
           {isPending ? t('restoring') : t('restore')}
@@ -185,7 +186,7 @@ function NoteItem({
           </span>
         )}
       </p>
-      <p className="whitespace-pre-wrap text-fg">{note.note}</p>
+      <FreeText as="p" className="whitespace-pre-wrap text-fg">{note.note}</FreeText>
       {canModify && (editNote || deleteNote) && (
         <div className="flex items-center gap-2">
           {editNote && (

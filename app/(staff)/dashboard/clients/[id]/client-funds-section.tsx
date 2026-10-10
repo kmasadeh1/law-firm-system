@@ -16,6 +16,7 @@ import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, controlClass } from '@/components/dashboard/form'
 import { formatAmount } from '@/lib/format-money'
 import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
+import { FreeText } from '@/components/free-text'
 
 export type CaseOption = { id: string; case_number: string; title: string }
 
@@ -133,7 +134,7 @@ function EntryRow({ clientId, entry, cases }: { clientId: string; entry: FundEnt
           )}
         </div>
       )}
-      {entry.description && <p className="text-fg-muted">{entry.description}</p>}
+      {entry.description && <FreeText as="p" className="text-fg-muted">{entry.description}</FreeText>}
 
       {entry.reverses && (
         <p className="text-xs text-fg-muted">

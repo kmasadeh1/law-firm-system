@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { addOpposingParty, setPrimaryOpposingParty, type ConflictMatch, type OpposingPartyErrorCode } from '../actions'
+import { isolateNumbers } from '@/lib/bidi'
 import { Panel } from '@/components/dashboard/panel'
 import { Button } from '@/components/dashboard/button'
 import { Badge } from '@/components/dashboard/badge'
@@ -136,7 +137,7 @@ export function OpposingPartiesSection({
         <ul className="flex flex-col divide-y divide-line rounded-md border border-line">
           {parties.map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-x-1 px-3 py-2 text-sm text-fg" data-testid="opposing-party-row" data-primary={p.is_primary}>
-              <bdi>{p.name}</bdi>
+              <bdi>{isolateNumbers(p.name)}</bdi>
               {p.is_primary && <Badge variant="accent">{t('primaryBadge')}</Badge>}
               {p.national_id && <span className="text-fg-muted"> · <bdi>{p.national_id}</bdi></span>}
               {p.counsel_name && (
@@ -205,7 +206,8 @@ export function OpposingPartiesSection({
 
       {canManage && matches && matches.length > 0 && (
         <ConflictWarning
-          labels={matches.map((m) => matchLabel(m, caseId, t))}
+          matches={matches}
+          labelFor={(m) => matchLabel(m, caseId, t)}
           onConfirm={handleConfirmAnyway}
           onEdit={() => setMatches(null)}
           pending={isPending}

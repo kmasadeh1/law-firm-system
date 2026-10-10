@@ -6,6 +6,7 @@ import { setTaskStatus, type TaskErrorCode, type TaskPriority, type TaskStatus }
 import { Badge } from '@/components/dashboard/badge'
 import { FieldError, controlClass } from '@/components/dashboard/form'
 import { formatDate, todayInFirmZone } from '@/lib/format-date-time'
+import { FreeText } from '@/components/free-text'
 
 export type Task = {
   id: string
@@ -117,7 +118,7 @@ function TaskRow({ task, showCaseLine }: { task: Task; showCaseLine: boolean }) 
         <StatusSelect taskId={task.id} status={task.status} />
       </div>
 
-      {task.details && <p className="text-fg-muted">{task.details}</p>}
+      {task.details && <FreeText as="p" className="text-fg-muted">{task.details}</FreeText>}
 
       <div className="flex flex-wrap gap-3 text-xs text-fg-muted">
         <span>{t.rich('assignedToLine', { name: task.assignee_name, bdi })}</span>

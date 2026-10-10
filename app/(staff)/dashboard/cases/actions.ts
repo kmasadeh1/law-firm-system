@@ -7,12 +7,9 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { todayInFirmZone } from '@/lib/format-date-time'
 import { isPhoneRefusal } from '@/lib/phone-error'
 
-export type ConflictMatch = {
-  source: string
-  matched_id: string
-  matched_name: string
-  case_id: string | null
-}
+import type { ConflictMatch } from '@/lib/conflict-match'
+
+export type { ConflictMatch }
 
 type ActionResult = { error?: string }
 
@@ -273,13 +270,13 @@ export async function addOpposingParty(
   const supabase = await createClient()
 
   if (!confirmed) {
-    const { data: matches, error: conflictError } = await supabase.rpc('check_conflict', {
+    const { data: matches, error: conflictError } = await supabase.rpc('check_conflict_detailed', {
       p_name: trimmedName,
       p_national_id: trimmedNationalId ?? undefined,
     })
 
     if (conflictError) {
-      // check_conflict refuses a caller who is not the owner and holds
+      // check_conflict_detailed refuses a caller who is not the owner and holds
       // neither clients_manage nor cases_manage - a permission answer, not
       // a failure, so it is told apart by its constraint name.
       if (conflictError.code === '42501' && conflictError.message.includes('check_conflict')) {
@@ -288,7 +285,7 @@ export async function addOpposingParty(
       return { error: 'conflict_check_failed' }
     }
     if (matches && matches.length > 0) {
-      return { matches }
+      return { matches: matches as ConflictMatch[] }
     }
   }
 
