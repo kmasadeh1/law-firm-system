@@ -57,13 +57,14 @@ export type PeriodTypeOption = {
   name_ar: string | null
   period_days: number
   description: string | null
+  is_verified: boolean
 }
 
 export async function listPeriodTypes(): Promise<PeriodTypeOption[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('deadline_period_types')
-    .select('id, name, name_ar, period_days, description')
+    .select('id, name, name_ar, period_days, description, is_verified')
     .order('name')
 
   return data ?? []

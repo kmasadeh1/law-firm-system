@@ -1,5 +1,6 @@
 'use client'
 
+import { UnverifiedBadge } from '@/components/dashboard/unverified-badge'
 import { useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -17,6 +18,7 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
   const locale = useLocale()
   const t = useTranslations('dashboard.deadlines.new')
   const tForm = useTranslations('dashboard.deadlines.form')
+  const tCommon = useTranslations('dashboard.common')
   const formRef = useRef<HTMLFormElement>(null)
   const [periodTypeId, setPeriodTypeId] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -122,9 +124,11 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
           {periodTypes.map((p) => (
             <option key={p.id} value={p.id}>
               {tForm('periodOptionLabel', { name: localizedName(p, locale), days: p.period_days })}
+              {p.is_verified ? '' : ` (${tCommon('unverified')})`}
             </option>
           ))}
         </select>
+        {selectedPeriod && !selectedPeriod.is_verified && <UnverifiedBadge label={tCommon('unverified')} />}
       </Field>
 
       {selectedPeriod?.description && (

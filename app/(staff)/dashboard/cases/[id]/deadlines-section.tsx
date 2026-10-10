@@ -1,5 +1,6 @@
 'use client'
 
+import { UnverifiedBadge } from '@/components/dashboard/unverified-badge'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
@@ -28,6 +29,7 @@ export type Deadline = {
   description: string | null
   period_type_name: string
   period_days: number
+  period_unverified: boolean
 }
 
 function DeadlineRow({
@@ -41,6 +43,7 @@ function DeadlineRow({
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.deadlines.section')
+  const tCommon = useTranslations('dashboard.common')
   const tUrgency = useTranslations('dashboard.deadlines.urgency')
   const tForm = useTranslations('dashboard.deadlines.form')
   const [extending, setExtending] = useState(false)
@@ -90,6 +93,12 @@ function DeadlineRow({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <span className={`font-medium ${met ? 'text-fg-muted' : 'text-fg'}`}>{deadline.period_type_name}</span>
+          {deadline.period_unverified && (
+            <>
+              {' '}
+              <UnverifiedBadge label={tCommon('unverified')} />
+            </>
+          )}
           <span className="text-fg-muted">
             {' '}
             {t.rich('periodDaysLine', {
@@ -262,6 +271,7 @@ export function DeadlinesSection({
 }) {
   const locale = useLocale()
   const t = useTranslations('dashboard.deadlines.section')
+  const tCommon = useTranslations('dashboard.common')
   const tForm = useTranslations('dashboard.deadlines.form')
   const addFormRef = useRef<HTMLFormElement>(null)
   const periodSelectRef = useRef<HTMLSelectElement>(null)
@@ -337,9 +347,11 @@ export function DeadlinesSection({
               {periodTypes.map((p) => (
                 <option key={p.id} value={p.id}>
                   {tForm('periodOptionLabel', { name: localizedName(p, locale), days: p.period_days })}
+                  {p.is_verified ? '' : ` (${tCommon('unverified')})`}
                 </option>
               ))}
             </select>
+            {selectedPeriod && !selectedPeriod.is_verified && <UnverifiedBadge label={tCommon('unverified')} />}
           </Field>
           <Field>
             <Label htmlFor="dl-trigger" required>

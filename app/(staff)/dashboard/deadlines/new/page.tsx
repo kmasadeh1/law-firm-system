@@ -14,7 +14,7 @@ export default async function NewDeadlinePage() {
     // is no case yet on this page, so it asks the case-less form of the same
     // question: could this person manage any case at all?
     supabase.rpc('can_manage_any_case_details'),
-    supabase.from('deadline_period_types').select('id, name, name_ar, period_days, description').order('name'),
+    supabase.from('deadline_period_types').select('id, name, name_ar, period_days, description, is_verified').order('name'),
   ])
 
   const locale = await getStaffLocale()

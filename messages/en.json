@@ -172,6 +172,7 @@
       "today": "Today's date"
     },
     "common": {
+      "unverified": "Unverified",
       "unknownStaff": "Unknown staff",
       "phoneInvalid": "Enter a Jordanian phone number, or include the country code for a number from abroad.",
       "pagination": {
@@ -1533,6 +1534,11 @@
         "noneYet": "No period types yet",
         "noneYetDescription": "Create one above to get started.",
         "card": {
+          "verifiedOn": "Verified on {date}",
+          "verified": "Verified",
+          "verifying": "Saving…",
+          "markVerified": "Mark as verified",
+          "markUnverified": "Mark as unverified",
           "nameArAriaLabel": "Name (Arabic)",
           "descriptionArAriaLabel": "Description (Arabic)",
           "saving": "Saving…",
@@ -1543,6 +1549,8 @@
           "deleteNote": "A period type referenced by any existing deadline can't be deleted until those deadlines use a different type."
         },
         "errors": {
+          "verifyNotAllowed": "Only the owner can mark a period as verified.",
+          "verifyFailed": "Could not update the verification. Please try again.",
           "nameRequired": "Name is required.",
           "invalidDays": "Enter a whole number of days.",
           "nameExists": "A period type with that name already exists.",

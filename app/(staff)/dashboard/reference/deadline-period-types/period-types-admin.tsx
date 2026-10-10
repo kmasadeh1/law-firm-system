@@ -1,8 +1,11 @@
 'use client'
 
 import { useRef, useState, useTransition } from 'react'
-import { useTranslations } from 'next-intl'
-import { createPeriodType, deletePeriodType, updatePeriodType } from './actions'
+import { useLocale, useTranslations } from 'next-intl'
+import { createPeriodType, deletePeriodType, setPeriodTypeVerified, updatePeriodType } from './actions'
+import { UnverifiedBadge } from '@/components/dashboard/unverified-badge'
+import { Badge } from '@/components/dashboard/badge'
+import { formatDate } from '@/lib/format-date-time'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { Button } from '@/components/dashboard/button'
@@ -16,9 +19,11 @@ type PeriodType = {
   period_days: number
   description: string | null
   description_ar: string | null
+  is_verified?: boolean
+  verified_at?: string | null
 }
 
-export function PeriodTypesAdmin({ periodTypes: initial }: { periodTypes: PeriodType[] }) {
+export function PeriodTypesAdmin({ periodTypes: initial, canVerify }: { periodTypes: PeriodType[]; canVerify: boolean }) {
   const t = useTranslations('dashboard.admin.periodTypes')
   const [periodTypes, setPeriodTypes] = useState(initial)
 
@@ -35,6 +40,7 @@ export function PeriodTypesAdmin({ periodTypes: initial }: { periodTypes: Period
           <PeriodTypeCard
             key={pt.id}
             periodType={pt}
+            canVerify={canVerify}
             onUpdated={(updated) =>
               setPeriodTypes((prev) =>
                 prev.map((p) => (p.id === updated.id ? updated : p)).sort((a, b) => a.name.localeCompare(b.name))
@@ -127,12 +133,16 @@ function PeriodTypeCard({
   periodType,
   onUpdated,
   onDeleted,
+  canVerify,
 }: {
   periodType: PeriodType
+  canVerify: boolean
   onUpdated: (pt: PeriodType) => void
   onDeleted: () => void
 }) {
   const t = useTranslations('dashboard.admin.periodTypes.card')
+  const tCommon = useTranslations('dashboard.common')
+  const locale = useLocale()
   const formRef = useRef<HTMLFormElement>(null)
   const [name, setName] = useState(periodType.name)
   const [nameAr, setNameAr] = useState(periodType.name_ar ?? '')
@@ -143,6 +153,8 @@ function PeriodTypeCard({
   const [error, setError] = useState<string | null>(null)
   const [isSaving, startSave] = useTransition()
 
+  const [verifyError, setVerifyError] = useState<string | null>(null)
+  const [isVerifying, startVerify] = useTransition()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isDeleting, startDelete] = useTransition()
@@ -166,6 +178,7 @@ function PeriodTypeCard({
         return
       }
       onUpdated({
+        ...periodType,
         id: periodType.id,
         name: name.trim(),
         name_ar: nameAr.trim() ? nameAr : null,
@@ -190,8 +203,47 @@ function PeriodTypeCard({
     })
   }
 
+  function handleVerify(verified: boolean) {
+    setVerifyError(null)
+    startVerify(async () => {
+      const result = await setPeriodTypeVerified(periodType.id, verified)
+      if (result.error) {
+        setVerifyError(result.error)
+        return
+      }
+      onUpdated({
+        ...periodType,
+        is_verified: verified,
+        verified_at: verified ? new Date().toISOString() : null,
+      })
+    })
+  }
+
   return (
     <Panel className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-3" data-testid="period-verification">
+        {periodType.is_verified ? (
+          <Badge variant="neutral">
+            {periodType.verified_at
+              ? t('verifiedOn', { date: formatDate(periodType.verified_at, locale) })
+              : t('verified')}
+          </Badge>
+        ) : (
+          <UnverifiedBadge label={tCommon('unverified')} />
+        )}
+        {canVerify && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => handleVerify(!periodType.is_verified)}
+            disabled={isVerifying}
+            data-testid="period-verify-toggle"
+          >
+            {isVerifying ? t('verifying') : periodType.is_verified ? t('markUnverified') : t('markVerified')}
+          </Button>
+        )}
+        {verifyError && <FieldError>{verifyError}</FieldError>}
+      </div>
       <form ref={formRef} onSubmit={handleSave} className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <input

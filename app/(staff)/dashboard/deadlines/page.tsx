@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { UnverifiedBadge } from '@/components/dashboard/unverified-badge'
 import { rowLabel } from '@/lib/row-label'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
@@ -16,6 +17,7 @@ export default async function DeadlinesListPage() {
   const supabase = await createClient()
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.deadlines.list' })
+  const tCommon = await getTranslations({ locale, namespace: 'dashboard.common' })
   const tUrgency = await getTranslations({ locale, namespace: 'dashboard.deadlines.urgency' })
 
   // RLS already scopes this to what the signed-in user can see (owner,
@@ -25,7 +27,7 @@ export default async function DeadlinesListPage() {
     supabase
       .from('deadlines')
       .select(
-        'id, case_id, trigger_date, effective_due_date, extended_due_date, completed_at, cases(case_number, title), deadline_period_types(name, name_ar)'
+        'id, case_id, trigger_date, effective_due_date, extended_due_date, completed_at, cases(case_number, title), deadline_period_types(name, name_ar, is_verified)'
       )
       .order('effective_due_date', { ascending: true, nullsFirst: false }),
     // "New deadline" is offered only to someone who could manage at least
@@ -80,6 +82,12 @@ export default async function DeadlinesListPage() {
                       <span className="font-medium text-fg">
                         {d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : '—'}
                       </span>
+                      {d.deadline_period_types && !d.deadline_period_types.is_verified && (
+                        <>
+                          {' '}
+                          <UnverifiedBadge label={tCommon('unverified')} />
+                        </>
+                      )}
                       <span className="text-fg-muted">
                         {' '}
                         — <bdi>{d.cases?.case_number}</bdi> · <bdi>{d.cases?.title}</bdi>

@@ -109,6 +109,39 @@ export async function updatePeriodType(id: string, formData: FormData): Promise<
   return {}
 }
 
+// Marks a period checked against the procedure law (or takes the mark back).
+// Owner only - asked on the caller's own session via is_owner(), not
+// inferred from the page guard, since a Server Action can be invoked
+// directly. Who and when are recorded with the change.
+export async function setPeriodTypeVerified(id: string, verified: boolean): Promise<ActionResult> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes.errors' })
+  const supabase = await createClient()
+
+  const { data: isOwner } = await supabase.rpc('is_owner')
+  if (isOwner !== true) return { error: t('verifyNotAllowed') }
+
+  const { data: claims } = await supabase.auth.getClaims()
+  const userId = claims?.claims?.sub
+  if (!userId) return { error: t('verifyFailed') }
+
+  const { data, error } = await supabase
+    .from('deadline_period_types')
+    .update(
+      verified
+        ? { is_verified: true, verified_at: new Date().toISOString(), verified_by: userId }
+        : { is_verified: false, verified_at: null, verified_by: null }
+    )
+    .eq('id', id)
+    .select('id')
+
+  // Zero rows: refused by RLS or the row is gone - not a success.
+  if (error || !data || data.length === 0) return { error: t('verifyFailed') }
+
+  revalidatePath(PATH)
+  return {}
+}
+
 export async function deletePeriodType(id: string): Promise<ActionResult> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes.errors' })

@@ -10,9 +10,10 @@ export default async function DeadlinePeriodTypesPage() {
   const supabase = await createClient()
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'dashboard.admin.periodTypes' })
+  const { data: isOwner } = await supabase.rpc('is_owner')
   const { data: periodTypes } = await supabase
     .from('deadline_period_types')
-    .select('id, name, name_ar, period_days, description, description_ar')
+    .select('id, name, name_ar, period_days, description, description_ar, is_verified, verified_at')
     .order('name')
 
   return (
@@ -24,7 +25,7 @@ export default async function DeadlinePeriodTypesPage() {
         <span className="mt-1 block font-medium">{t('unverifiedWarning')}</span>
       </Banner>
 
-      <PeriodTypesAdmin periodTypes={periodTypes ?? []} />
+      <PeriodTypesAdmin periodTypes={periodTypes ?? []} canVerify={isOwner === true} />
     </div>
   )
 }

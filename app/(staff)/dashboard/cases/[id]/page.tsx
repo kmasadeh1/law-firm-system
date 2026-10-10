@@ -138,11 +138,11 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     supabase
       .from('deadlines')
       .select(
-        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, completed_at, completed_by, description, deadline_period_types(name, name_ar, period_days)'
+        'id, trigger_date, due_date, unadjusted_due_date, effective_due_date, extended_due_date, extension_reason, extended_by, extended_at, completed_at, completed_by, description, deadline_period_types(name, name_ar, period_days, is_verified)'
       )
       .eq('case_id', id)
       .order('effective_due_date', { ascending: true, nullsFirst: false }),
-    supabase.from('deadline_period_types').select('id, name, name_ar, period_days, description').order('name'),
+    supabase.from('deadline_period_types').select('id, name, name_ar, period_days, description, is_verified').order('name'),
     supabase
       .from('case_share_links')
       .select('id, label, created_at, expires_at, revoked_at, last_accessed_at, access_count')
@@ -289,6 +289,7 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     description: d.description,
     period_type_name: d.deadline_period_types ? localizedName(d.deadline_period_types, locale) : t('unknownPeriod'),
     period_days: d.deadline_period_types?.period_days ?? 0,
+    period_unverified: d.deadline_period_types ? !d.deadline_period_types.is_verified : false,
   }))
 
   const allNameById = new Map(
