@@ -108,6 +108,11 @@
     "invalidMessage": "This link is no longer valid — please contact the office."
   },
   "dashboard": {
+    "notFound": {
+      "title": "Page not found",
+      "description": "There is nothing at this address, or it has moved.",
+      "backToDashboard": "Back to the dashboard"
+    },
     "pageTitles": {
       "appointmentsNew": "New appointment",
       "appointments": "Appointments",

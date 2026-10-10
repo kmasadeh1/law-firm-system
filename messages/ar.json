@@ -108,6 +108,11 @@
     "invalidMessage": "هذا الرابط لم يعد صالحاً - يرجى التواصل مع المكتب."
   },
   "dashboard": {
+    "notFound": {
+      "title": "الصفحة غير موجودة",
+      "description": "لا يوجد شيء في هذا العنوان، أو ربما نُقل.",
+      "backToDashboard": "العودة إلى لوحة التحكم"
+    },
     "pageTitles": {
       "appointmentsNew": "موعد جديد",
       "appointments": "المواعيد",
