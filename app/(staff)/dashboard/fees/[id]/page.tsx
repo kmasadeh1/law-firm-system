@@ -63,7 +63,7 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
       .order('case_number'),
     supabase
       .from('engagement_installments')
-      .select('id, description, due_date, amount, payer_name')
+      .select('id, description, description_ar, due_date, amount, payer_name')
       .eq('engagement_id', id)
       .order('due_date', { ascending: true, nullsFirst: false }),
     // Every per-instalment figure comes from this view - amount, paid,

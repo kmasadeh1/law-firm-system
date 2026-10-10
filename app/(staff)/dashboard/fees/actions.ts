@@ -269,6 +269,7 @@ export async function getSignedAgreementUrl(
 
 type InstallmentFields = {
   description: string
+  description_ar: string | null
   due_date: string | null
   amount: number
   payer_name: string | null
@@ -276,6 +277,7 @@ type InstallmentFields = {
 
 function readInstallmentFields(formData: FormData): InstallmentFields | { error: FeesErrorCode } {
   const description = formData.get('description')
+  const description_ar = formData.get('description_ar')
   const due_date = formData.get('due_date')
   const amount_raw = formData.get('amount')
   const payer_name = formData.get('payer_name')
@@ -290,6 +292,9 @@ function readInstallmentFields(formData: FormData): InstallmentFields | { error:
 
   return {
     description: description.trim(),
+    // Optional. Sent to clients in Arabic reminders; empty means the reminder
+    // view falls back to the English description.
+    description_ar: typeof description_ar === 'string' && description_ar.trim() ? description_ar.trim() : null,
     due_date: typeof due_date === 'string' && due_date.trim() ? due_date.trim() : null,
     amount,
     payer_name: typeof payer_name === 'string' && payer_name.trim() ? payer_name.trim() : null,

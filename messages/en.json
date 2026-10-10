@@ -1308,6 +1308,8 @@
           "recordPayment": "Record payment",
           "noPermissionRecordPayments": "You don't have permission to record payments.",
           "descriptionLabel": "Description",
+          "descriptionArPlaceholder": "Arabic description (optional)",
+          "descriptionArLabel": "Arabic description (optional)",
           "descriptionAddPlaceholder": "e.g. on signing",
           "dueDateLabel": "Due date",
           "payerLabel": "Payer",

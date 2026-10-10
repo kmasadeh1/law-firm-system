@@ -35,7 +35,7 @@ export default async function PaymentReceiptPage({ params }: PageProps<'/dashboa
     supabase
       .from('payments')
       .select(
-        'id, receipt_number, amount, paid_at, method, engagement_installments(description, due_date, engagement_id, engagements(clients(full_name)))'
+        'id, receipt_number, amount, paid_at, method, engagement_installments(description, description_ar, due_date, engagement_id, engagements(clients(full_name)))'
       )
       .eq('id', paymentId)
       .maybeSingle(),
@@ -115,7 +115,7 @@ export default async function PaymentReceiptPage({ params }: PageProps<'/dashboa
 
           <dt className="text-fg-muted">{t('for')}</dt>
           <dd data-testid="receipt-for">
-            {installment?.description ?? '—'}
+            {(locale === 'ar' ? installment?.description_ar || installment?.description : installment?.description) ?? '—'}
             {installment?.due_date && (
               <span className="block text-xs text-fg-muted">
                 {t.rich('dueDate', {

@@ -1257,6 +1257,8 @@
           "recordPayment": "تسجيل دفعة",
           "noPermissionRecordPayments": "ليس لديك صلاحية تسجيل المدفوعات.",
           "descriptionLabel": "الوصف",
+          "descriptionArPlaceholder": "الوصف بالعربية (اختياري)",
+          "descriptionArLabel": "الوصف بالعربية (اختياري)",
           "descriptionAddPlaceholder": "مثال: عند التوقيع",
           "dueDateLabel": "تاريخ الاستحقاق",
           "payerLabel": "الدافع",

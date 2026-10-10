@@ -52,6 +52,7 @@ type InstallmentBalance = {
 type Installment = {
   id: string
   description: string
+  description_ar: string | null
   due_date: string | null
   amount: number
   payer_name: string | null
@@ -372,6 +373,15 @@ function InstallmentRow({
               className={`flex-1 ${controlClass}`}
             />
             <input
+              name="description_ar"
+              defaultValue={installment.description_ar ?? ''}
+              dir="rtl"
+              lang="ar"
+              placeholder={t('descriptionArPlaceholder')}
+              aria-label={t('descriptionArLabel')}
+              className={`flex-1 ${controlClass}`}
+            />
+            <input
               name="due_date"
               type="date"
               defaultValue={installment.due_date ?? ''}
@@ -415,7 +425,9 @@ function InstallmentRow({
     <li className="flex flex-col gap-3 px-3 py-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-sm">
-          <span className="font-medium text-fg">{installment.description}</span>
+          <span className="font-medium text-fg">
+            {locale === 'ar' ? installment.description_ar || installment.description : installment.description}
+          </span>
           <span className="text-fg-muted">
             {t.rich('amountLine', { amount: money(balance?.installment_amount), bdi: (chunks) => <bdi>{chunks}</bdi> })}
             {installment.due_date &&
@@ -651,6 +663,17 @@ export function InstallmentsSection({
             name="description"
             required
             placeholder={t('descriptionAddPlaceholder')}
+            className={controlClass}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="new-description-ar">{t('descriptionArLabel')}</Label>
+          <input
+            id="new-description-ar"
+            name="description_ar"
+            dir="rtl"
+            lang="ar"
+            placeholder={t('descriptionArPlaceholder')}
             className={controlClass}
           />
         </Field>

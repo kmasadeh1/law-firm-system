@@ -2008,6 +2008,7 @@ export type Database = {
           amount: number
           created_at: string
           description: string
+          description_ar: string | null
           due_date: string | null
           engagement_id: string
           id: string
@@ -2017,6 +2018,7 @@ export type Database = {
           amount: number
           created_at?: string
           description: string
+          description_ar?: string | null
           due_date?: string | null
           engagement_id: string
           id?: string
@@ -2026,6 +2028,7 @@ export type Database = {
           amount?: number
           created_at?: string
           description?: string
+          description_ar?: string | null
           due_date?: string | null
           engagement_id?: string
           id?: string
