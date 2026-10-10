@@ -10,6 +10,7 @@ import { ClientFundsSection, type FundBalance, type FundEntry } from './client-f
 import { ContactLogSection } from '../contact-log-section'
 import { ACTIVE_REFERRAL_SOURCES_SELECT, referralSourceOptions } from '../referral-source-options'
 import { CONTACT_LOG_SELECT, toContactRow, type ContactQueryRow } from '../contact-log-query'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function EditClientPage({ params }: PageProps<'/dashboard/clients/[id]'>) {
   const { id } = await params
@@ -221,3 +222,5 @@ export default async function EditClientPage({ params }: PageProps<'/dashboard/c
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('client')

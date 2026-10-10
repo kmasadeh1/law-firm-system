@@ -212,7 +212,7 @@ function ItemRow({ item, isFirst, isLast }: { item: ChecklistItemRow; isFirst: b
         <Button type="submit" variant="secondary" disabled={isPending || !changed} data-testid="checklist-item-save">
           {isPending ? t('saving') : t('save')}
         </Button>
-        {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={saved && !changed}>{t('saved')}</FieldSuccess>
       </form>
 
       <div className="flex flex-wrap items-center gap-4 text-sm">

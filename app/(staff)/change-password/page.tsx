@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
@@ -5,6 +6,12 @@ import { getChangePasswordLocale } from '@/lib/get-staff-locale'
 import { Crest } from '@/components/crest'
 import { ChangePasswordLocaleSwitcher } from '@/components/change-password-locale-switcher'
 import { ChangePasswordForm } from './change-password-form'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getChangePasswordLocale()
+  const t = await getTranslations({ locale, namespace: 'staffAuth.changePassword' })
+  return { title: t('formHeading') }
+}
 
 export default async function ChangePasswordPage() {
   const supabase = await createClient()
@@ -27,6 +34,8 @@ export default async function ChangePasswordPage() {
   // case - proxy.ts only forces you TO this page, never away from it.
   const homeHref = staffRow?.user_type === 'owner' ? '/dashboard/owner' : '/dashboard/staff'
 
+  const forced = Boolean(staffRow?.must_change_password)
+
   const locale = await getChangePasswordLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth' })
 
@@ -45,9 +54,9 @@ export default async function ChangePasswordPage() {
         </div>
 
         <div className="max-w-sm">
-          <p className="font-heading text-3xl leading-snug sm:text-4xl">{t('changePassword.headline')}</p>
+          <p className="font-heading text-3xl leading-snug sm:text-4xl">{forced ? t('changePassword.headline') : t('changePassword.voluntaryHeadline')}</p>
           <p className="mt-4 text-sm leading-relaxed text-paper-dim">
-            {staffRow?.must_change_password ? t('changePassword.forcedBody') : t('changePassword.voluntaryBody')}
+            {forced ? t('changePassword.forcedBody') : t('changePassword.voluntaryBody')}
           </p>
         </div>
 
@@ -63,7 +72,7 @@ export default async function ChangePasswordPage() {
           <ChangePasswordLocaleSwitcher variant="mobile" />
         </div>
         <h1 className="mb-5 w-full max-w-sm font-heading text-2xl text-paper">{t('changePassword.formHeading')}</h1>
-        <ChangePasswordForm homeHref={homeHref} />
+        <ChangePasswordForm homeHref={homeHref} forced={forced} />
       </div>
     </div>
   )

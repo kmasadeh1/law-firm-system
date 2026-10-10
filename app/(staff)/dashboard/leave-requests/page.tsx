@@ -7,6 +7,7 @@ import { BlockDaysOffForm } from './block-days-off-form'
 import { MyRequestsList, type MyLeaveRequest } from './my-requests-list'
 import { TeamRequestsSection, type TeamLeaveRequest } from './team-requests-section'
 import type { Database } from '@/lib/supabase/database.types'
+import { dashboardTitle } from '@/lib/page-title'
 
 // can_withdraw is a real PostgREST computed column (it takes the table's
 // row type, not a uuid), so the query below genuinely returns it - but the
@@ -121,3 +122,5 @@ export default async function LeaveRequestsPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('leaveRequests')

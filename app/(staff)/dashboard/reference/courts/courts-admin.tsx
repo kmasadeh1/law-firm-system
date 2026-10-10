@@ -269,7 +269,7 @@ function CourtCard({ court }: { court: CourtRow }) {
           <Button type="submit" variant="secondary" disabled={isSaving || !changed}>
             {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved && !changed}>{t('saved')}</FieldSuccess>
           <div className="grow" />
           <Switch
             checked={checked}

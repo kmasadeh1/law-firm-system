@@ -35,15 +35,25 @@ export function FieldError({
   )
 }
 
+// Inline save confirmation. The slot is always rendered: when show is false
+// the same text is laid out but invisible, so it holds its size and nothing
+// around it moves when the confirmation appears. (A conditionally inserted
+// message reflowed everything below it and made controls jump mid-click.)
 export function FieldSuccess({
   children,
+  show = true,
   'data-testid': dataTestId,
 }: {
   children: React.ReactNode
+  show?: boolean
   'data-testid'?: string
 }) {
   return (
-    <p className="text-sm text-success-text" data-testid={dataTestId}>
+    <p
+      className={`text-sm text-success-text${show ? '' : ' invisible'}`}
+      aria-hidden={show ? undefined : true}
+      data-testid={show ? dataTestId : undefined}
+    >
       {children}
     </p>
   )

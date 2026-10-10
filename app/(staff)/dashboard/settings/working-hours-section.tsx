@@ -126,7 +126,7 @@ export function WorkingHoursSection({ rows }: { rows: WorkingHoursRow[] }) {
         <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending} className="self-start">
           {isPending ? t('saving') : t('save')}
         </Button>
-        {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
       </div>
       {error && <FieldError>{error}</FieldError>}
     </div>

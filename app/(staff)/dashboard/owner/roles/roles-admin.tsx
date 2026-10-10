@@ -316,7 +316,7 @@ function RoleCard({
         >
           {isRenaming ? t('saving') : t('saveName')}
         </Button>
-        {renameSaved && !nameChanged && <FieldSuccess>{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={renameSaved && !nameChanged}>{t('saved')}</FieldSuccess>
 
         <div className="grow" />
 

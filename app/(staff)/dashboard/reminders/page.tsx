@@ -9,6 +9,7 @@ import { localizedName } from '@/lib/localized-name'
 import { whatsappLink } from '@/lib/whatsapp'
 import type { Database } from '@/lib/supabase/database.types'
 import { ReminderGroup, type ReminderRow } from './reminder-list'
+import { dashboardTitle } from '@/lib/page-title'
 
 type ReminderKind = Database['public']['Enums']['reminder_kind']
 
@@ -124,3 +125,5 @@ export default async function RemindersPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('reminders')

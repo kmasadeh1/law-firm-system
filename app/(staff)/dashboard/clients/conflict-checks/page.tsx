@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/dashboard/empty-state'
 import { Badge } from '@/components/dashboard/badge'
 import { formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { dashboardTitle } from '@/lib/page-title'
 
 type ConflictMatch = {
   source: string
@@ -147,3 +148,5 @@ export default async function ConflictCheckHistoryPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('conflictChecks')

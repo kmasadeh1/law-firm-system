@@ -157,7 +157,7 @@ export function AppointmentForm({
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setError(null)} className="flex flex-col gap-4">
       <Field>
         <Label htmlFor="type" required>
           {t('typeLabel')}
@@ -257,7 +257,7 @@ export function AppointmentForm({
       )}
 
       {error && <FieldError>{error}</FieldError>}
-      {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+      <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
         {isPending ? t('saving') : mode === 'create' ? t('createAppointment') : t('saveChanges')}

@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { LinkButton } from '@/components/dashboard/button'
 import { FirmDetailsForm } from './firm-details-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function FirmDetailsPage() {
   const supabase = await createClient()
@@ -28,3 +29,5 @@ export default async function FirmDetailsPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('firmDetails')

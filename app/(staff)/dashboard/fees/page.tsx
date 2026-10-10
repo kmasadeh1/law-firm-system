@@ -9,6 +9,7 @@ import { LinkButton } from '@/components/dashboard/button'
 import { Badge } from '@/components/dashboard/badge'
 import { formatAmount } from '@/lib/format-money'
 import { formatFeeType } from './format'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function FeesListPage() {
   const supabase = await createClient()
@@ -90,3 +91,5 @@ export default async function FeesListPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('fees')

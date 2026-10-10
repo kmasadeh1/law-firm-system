@@ -8,6 +8,7 @@ import { localizedField } from '@/lib/localized-field'
 import { isPlaceholderEmail } from '@/lib/public-site'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PrintButton } from '@/components/dashboard/print-button'
+import { dashboardTitle } from '@/lib/page-title'
 
 // A payment receipt (سند قبض), printed from the browser - the same pattern
 // as the hearing calendar: Ctrl+P / the Print button gives an A4 page (and
@@ -161,3 +162,5 @@ export default async function PaymentReceiptPage({ params }: PageProps<'/dashboa
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('receipt')

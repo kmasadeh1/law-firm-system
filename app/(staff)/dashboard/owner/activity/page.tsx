@@ -11,6 +11,7 @@ import { activityEntityLabel } from '@/lib/activity-labels'
 import { firmDayBounds, formatFullDate } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ActivityRow, type ActivityLogRow } from './activity-row'
+import { dashboardTitle } from '@/lib/page-title'
 
 const PAGE_SIZE = 50
 
@@ -230,3 +231,5 @@ export default async function ActivityLogPage({ searchParams }: PageProps<'/dash
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('activityLog')

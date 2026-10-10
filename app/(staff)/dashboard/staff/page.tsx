@@ -8,6 +8,7 @@ import { Badge } from '@/components/dashboard/badge'
 import { LinkButton } from '@/components/dashboard/button'
 import { localizedName } from '@/lib/localized-name'
 import { formatDateTime } from '@/lib/format-date-time'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function StaffDashboardPage() {
   const supabase = await createClient()
@@ -132,3 +133,5 @@ export default async function StaffDashboardPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('staffOverview')

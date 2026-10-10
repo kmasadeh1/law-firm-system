@@ -142,7 +142,7 @@ export function FirmDetailsForm({ settings }: { settings: FirmSettings | null })
         <Button type="submit" variant="primary" disabled={isPending} className="self-start" data-testid="site-content-save">
           {isPending ? t('saving') : t('save')}
         </Button>
-        {saved && <FieldSuccess data-testid="site-content-saved">{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={saved} data-testid="site-content-saved">{t('saved')}</FieldSuccess>
       </div>
       {error && (
         <FieldError data-testid="site-content-error">

@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { CaseForm } from './case-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function NewCasePage() {
   const supabase = await createClient()
@@ -33,3 +34,5 @@ export default async function NewCasePage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('casesNew')

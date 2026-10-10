@@ -5,6 +5,7 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { AppointmentForm } from '../appointment-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function AppointmentDetailPage({
   params,
@@ -97,3 +98,5 @@ export default async function AppointmentDetailPage({
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('appointment')

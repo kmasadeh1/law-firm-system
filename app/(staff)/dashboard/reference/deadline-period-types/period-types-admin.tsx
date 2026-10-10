@@ -258,7 +258,7 @@ function PeriodTypeCard({
           <Button type="submit" variant="secondary" disabled={isSaving || !changed}>
             {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved && !changed}>{t('saved')}</FieldSuccess>
           <div className="grow" />
           <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={isDeleting}>
             {isDeleting ? t('deleting') : t('delete')}

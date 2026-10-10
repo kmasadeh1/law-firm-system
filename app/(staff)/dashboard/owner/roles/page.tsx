@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { RolesAdmin } from './roles-admin'
 import { PageHeader } from '@/components/dashboard/page-header'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function RolesPage() {
   const supabase = await createClient()
@@ -27,3 +28,5 @@ export default async function RolesPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('roles')

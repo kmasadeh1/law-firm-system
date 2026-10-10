@@ -203,7 +203,7 @@ function TemplateForm({
         <Button type="submit" variant={template ? 'secondary' : 'primary'} disabled={isPending} data-testid="template-save">
           {isPending ? t('saving') : template ? t('save') : t('create')}
         </Button>
-        {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
       </div>
     </form>
   )

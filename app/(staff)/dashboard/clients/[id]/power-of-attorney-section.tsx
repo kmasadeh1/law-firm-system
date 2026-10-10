@@ -305,7 +305,7 @@ function PoaRow({
           <Button type="submit" variant="secondary" disabled={isSaving}>
             {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
         </div>
       </form>
 

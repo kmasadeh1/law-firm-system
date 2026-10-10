@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { ChecklistsAdmin } from './checklists-admin'
+import { dashboardTitle } from '@/lib/page-title'
 
 // Document checklist templates, one list per case type. Reference data:
 // guarded by the /dashboard/reference layout (can_manage_reference_data),
@@ -41,3 +42,5 @@ export default async function ChecklistsPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('checklists')

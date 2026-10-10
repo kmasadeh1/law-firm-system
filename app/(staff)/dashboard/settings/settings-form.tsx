@@ -62,7 +62,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
         <Button type="submit" variant="secondary" disabled={isPending}>
           {isPending ? t('saving') : t('save')}
         </Button>
-        {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
       </div>
       {error && <FieldError>{error}</FieldError>}
     </form>

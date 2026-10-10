@@ -23,17 +23,35 @@ const CREATE_CASE_ERROR_CODES: CreateCaseErrorCode[] = [
   'createFailed',
 ]
 
+// Which input each server error refers to. Codes not listed (permission,
+// lookup and generic failures) aren't about any field and stay until resubmit.
+const ERROR_FIELDS: Partial<Record<CreateCaseErrorCode, string[]>> = {
+  titleRequired: ['title'],
+  caseNumberRequired: ['case_number'],
+  caseNumberInUse: ['case_number'],
+}
+
 export function CaseForm({ caseTypes }: { caseTypes: CaseTypeOption[] }) {
   const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('dashboard.cases.new')
   const tErrors = useTranslations('dashboard.cases.new.errors')
   const formRef = useRef<HTMLFormElement>(null)
-  const [error, setError] = useState<string | null>(null)
+  // errorFields: the inputs a server error is about. Editing one of them
+  // clears the message, so a corrected form doesn't keep looking rejected.
+  const [error, setError] = useState<{ message: string; fields: string[] } | null>(null)
   const [isPending, startTransition] = useTransition()
 
   function resolveError(code: CreateCaseErrorCode) {
-    return (CREATE_CASE_ERROR_CODES as string[]).includes(code) ? tErrors(code) : tErrors('createFailed')
+    const known = (CREATE_CASE_ERROR_CODES as string[]).includes(code)
+    return {
+      message: known ? tErrors(code) : tErrors('createFailed'),
+      fields: ERROR_FIELDS[code] ?? [],
+    }
+  }
+
+  function clearErrorFor(field: string) {
+    setError((current) => (current && current.fields.includes(field) ? null : current))
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -61,14 +79,20 @@ export function CaseForm({ caseTypes }: { caseTypes: CaseTypeOption[] }) {
         <Label htmlFor="title" required>
           {t('titleLabel')}
         </Label>
-        <input id="title" name="title" required className={controlClass} />
+        <input id="title" name="title" required onChange={() => clearErrorFor('title')} className={controlClass} />
       </Field>
 
       <Field>
         <Label htmlFor="case_number" required>
           {t('caseNumberLabel')}
         </Label>
-        <input id="case_number" name="case_number" required className={controlClass} />
+        <input
+          id="case_number"
+          name="case_number"
+          required
+          onChange={() => clearErrorFor('case_number')}
+          className={controlClass}
+        />
         <HelpText>{t('caseNumberHelp')}</HelpText>
       </Field>
 
@@ -84,7 +108,7 @@ export function CaseForm({ caseTypes }: { caseTypes: CaseTypeOption[] }) {
         </select>
       </Field>
 
-      {error && <FieldError>{error}</FieldError>}
+      {error && <FieldError>{error.message}</FieldError>}
 
       <Button type="submit" variant="primary" disabled={isPending} className="mt-2 self-start">
         {isPending ? t('creating') : t('submit')}

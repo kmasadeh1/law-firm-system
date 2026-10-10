@@ -83,7 +83,7 @@ export function StatusSection({
         <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending || !changed}>
           {isPending ? t('saving') : t('saveStatus')}
         </Button>
-        {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
+        <FieldSuccess show={saved && !changed}>{t('saved')}</FieldSuccess>
       </div>
       {error && <FieldError>{error}</FieldError>}
     </Panel>

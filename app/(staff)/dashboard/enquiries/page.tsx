@@ -8,6 +8,7 @@ import { Badge } from '@/components/dashboard/badge'
 import type { Database } from '@/lib/supabase/database.types'
 import { formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { dashboardTitle } from '@/lib/page-title'
 
 type EnquiryStatus = Database['public']['Enums']['enquiry_status']
 
@@ -80,3 +81,5 @@ export default async function EnquiriesListPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('enquiries')

@@ -5,6 +5,7 @@ import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { DeadlineForm } from './deadline-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function NewDeadlinePage() {
   const supabase = await createClient()
@@ -35,3 +36,5 @@ export default async function NewDeadlinePage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('deadlinesNew')

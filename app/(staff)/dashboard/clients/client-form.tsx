@@ -158,7 +158,7 @@ export function ClientForm(props: Props) {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setError(null)} className="flex flex-col gap-4">
       <Field>
         <Label htmlFor="full_name" required>
           {t('fullNameLabel')}
@@ -238,7 +238,7 @@ export function ClientForm(props: Props) {
                 ? t('createClient')
                 : t('saveChanges')}
           </Button>
-          {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
         </div>
       )}
     </form>

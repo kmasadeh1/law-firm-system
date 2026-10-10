@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { Badge } from '@/components/dashboard/badge'
 import { LinkButton } from '@/components/dashboard/button'
+import { dashboardTitle } from '@/lib/page-title'
 
 type Pair = [string | null, string | null]
 
@@ -131,3 +132,5 @@ export default async function SiteContentPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('siteContent')

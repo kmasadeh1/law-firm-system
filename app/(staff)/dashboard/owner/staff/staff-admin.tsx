@@ -50,10 +50,16 @@ const STAFF_ERROR_CODES: StaffErrorCode[] = [
 function resolveStaffError(
   code: StaffErrorCode,
   userId: string | undefined,
+  detail: string | undefined,
   tErrors: ReturnType<typeof useTranslations>
 ): string {
   if (!(STAFF_ERROR_CODES as string[]).includes(code)) return tErrors('couldNotCreateLogin')
   if (code === 'staffRecordFailedWithCleanup') return tErrors(code, { userId: userId ?? '' })
+  // Auth's own message, owner-only screen: shown so a refusal is diagnosable.
+  if (code === 'couldNotCreateLogin' && detail) {
+    // FSI/PDI isolate the English Auth message so it can't reorder an Arabic sentence.
+    return `${tErrors(code)} ${tErrors('reason', { detail: `\u2068${detail}\u2069` })}`
+  }
   return tErrors(code)
 }
 
@@ -111,7 +117,7 @@ function AddStaffForm({ roles, onCreated }: { roles: RoleOption[]; onCreated: (p
     startTransition(async () => {
       const result = await addStaff(formData)
       if (result.error) {
-        setError(resolveStaffError(result.error, result.userId, tErrors))
+        setError(resolveStaffError(result.error, result.userId, result.detail, tErrors))
         return
       }
       if (result.password) {
@@ -190,7 +196,7 @@ function RegenerateButton({ staffId, onDone }: { staffId: string; onDone: (passw
         onDone(result.password)
       }
       if (result.error) {
-        setError(resolveStaffError(result.error, result.userId, tErrors))
+        setError(resolveStaffError(result.error, result.userId, result.detail, tErrors))
       }
       setConfirming(false)
     })
@@ -227,7 +233,7 @@ function ActiveToggle({ staffId, fullName, isActive }: { staffId: string; fullNa
       const result = await setStaffActive(staffId, next)
       if (result.error) {
         setChecked(previous)
-        setError(resolveStaffError(result.error, result.userId, tErrors))
+        setError(resolveStaffError(result.error, result.userId, result.detail, tErrors))
       }
     })
   }

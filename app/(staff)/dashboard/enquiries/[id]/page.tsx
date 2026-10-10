@@ -9,6 +9,7 @@ import { NotesSection, type EnquiryNote } from './notes-section'
 import { formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import type { Database } from '@/lib/supabase/database.types'
+import { dashboardTitle } from '@/lib/page-title'
 
 type EnquiryNoteRow = Pick<
   Database['public']['Tables']['enquiry_notes']['Row'],
@@ -148,3 +149,5 @@ export default async function EnquiryDetailPage({ params }: PageProps<'/dashboar
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('enquiry')

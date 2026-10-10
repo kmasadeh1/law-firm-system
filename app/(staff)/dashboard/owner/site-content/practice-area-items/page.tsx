@@ -4,6 +4,7 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { LinkButton } from '@/components/dashboard/button'
 import { PracticeAreaItemsAdmin } from './practice-area-items-admin'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function PracticeAreaItemsPage() {
   const supabase = await createClient()
@@ -28,3 +29,5 @@ export default async function PracticeAreaItemsPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('practiceAreaItems')

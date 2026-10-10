@@ -330,7 +330,7 @@ function LawyerProfilePanel({
           <Button type="submit" variant="secondary" disabled={isSaving} data-testid={`lawyer-profile-${item.id}-save`}>
             {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && <FieldSuccess data-testid={`lawyer-profile-${item.id}-saved`}>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved} data-testid={`lawyer-profile-${item.id}-saved`}>{t('saved')}</FieldSuccess>
           <div className="grow" />
           <Button
             type="button"

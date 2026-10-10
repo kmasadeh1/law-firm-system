@@ -10,6 +10,7 @@ import { controlClass } from '@/components/dashboard/form'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
 import { PAGE_SIZE, parsePage, pageRange } from '@/lib/pagination'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function CasesListPage({ searchParams }: PageProps<'/dashboard/cases'>) {
   const { q, status, type, page: pageParam } = (await searchParams) as {
@@ -199,3 +200,5 @@ export default async function CasesListPage({ searchParams }: PageProps<'/dashbo
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('cases')

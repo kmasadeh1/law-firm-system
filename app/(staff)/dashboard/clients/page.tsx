@@ -9,6 +9,7 @@ import { Pagination } from '@/components/dashboard/pagination'
 import { LinkButton, Button } from '@/components/dashboard/button'
 import { controlClass } from '@/components/dashboard/form'
 import { PAGE_SIZE, parsePage, pageRange } from '@/lib/pagination'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function ClientsListPage({ searchParams }: PageProps<'/dashboard/clients'>) {
   const { q, page: pageParam } = (await searchParams) as { q?: string; page?: string }
@@ -131,3 +132,5 @@ export default async function ClientsListPage({ searchParams }: PageProps<'/dash
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('clients')

@@ -5,6 +5,7 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { AppointmentForm } from '../appointment-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 /**
  * No route gate here - everyone can create at least their own appointment
@@ -54,3 +55,5 @@ export default async function NewAppointmentPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('appointmentsNew')

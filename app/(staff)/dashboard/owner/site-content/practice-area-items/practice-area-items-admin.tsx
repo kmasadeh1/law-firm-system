@@ -309,7 +309,7 @@ function PracticeAreaItemPanel({
           <Button type="submit" variant="secondary" disabled={isSaving} data-testid={`practice-area-item-${item.id}-save`}>
             {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && <FieldSuccess data-testid={`practice-area-item-${item.id}-saved`}>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved} data-testid={`practice-area-item-${item.id}-saved`}>{t('saved')}</FieldSuccess>
           <div className="grow" />
           <Button
             type="button"

@@ -7,6 +7,7 @@ import { Panel } from '@/components/dashboard/panel'
 import { LinkButton } from '@/components/dashboard/button'
 import { isSectionTextSlug, SECTION_TEXT_KEY, type SectionTextSlug } from '../section-config'
 import { SectionTextForm } from './section-text-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 const CARD_KEY: Record<SectionTextSlug, string> = {
   'practice-areas': 'practiceAreas',
@@ -42,3 +43,5 @@ export default async function SectionTextPage({ params }: PageProps<'/dashboard/
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('siteContent')

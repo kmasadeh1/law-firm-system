@@ -23,6 +23,7 @@ export async function setChangePasswordLocale(locale: 'en' | 'ar') {
 export async function changePassword(formData: FormData): Promise<ActionResult> {
   const password = formData.get('password')
   const confirm = formData.get('confirm')
+  const currentPassword = formData.get('current_password')
 
   const locale = await getChangePasswordLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth.changePassword.errors' })
@@ -36,6 +37,41 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
 
   const supabase = await createClient()
 
+  // Whether this is the forced first-login flow is read from the database,
+  // never from the form - a client claiming "forced" must not be able to
+  // skip the current-password check.
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const claims = claimsData?.claims
+  if (!claims) {
+    return { error: t('updateFailed') }
+  }
+  const { data: staffRow } = await supabase
+    .from('staff')
+    .select('must_change_password')
+    .eq('id', claims.sub)
+    .maybeSingle()
+
+  if (!staffRow?.must_change_password) {
+    // Voluntary change: prove the person at the keyboard knows the current
+    // password (Supabase's own re-authentication pattern) before touching it.
+    // A forced change has no current password to give - theirs is the
+    // temporary one they were just handed.
+    if (typeof currentPassword !== 'string' || !currentPassword) {
+      return { error: t('currentRequired') }
+    }
+    const email = typeof claims.email === 'string' ? claims.email : null
+    if (!email) {
+      return { error: t('updateFailed') }
+    }
+    const { error: reauthError } = await supabase.auth.signInWithPassword({
+      email,
+      password: currentPassword,
+    })
+    if (reauthError) {
+      return { error: reauthError.code === 'invalid_credentials' ? t('currentWrong') : t('updateFailed') }
+    }
+  }
+
   const { error: updateError } = await supabase.auth.updateUser({ password })
   if (updateError) {
     // Supabase's own password-policy rejection is raw English text, not
@@ -45,6 +81,9 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
     // copy instead of ever passing error.message through.
     if (updateError.code === 'weak_password') {
       return { error: t('weakPassword') }
+    }
+    if (updateError.code === 'same_password') {
+      return { error: t('samePassword') }
     }
     return { error: t('updateFailed') }
   }

@@ -9,6 +9,7 @@ import { formatAmount } from '@/lib/format-money'
 import { formatDate as formatDateWithLocale } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ProfitabilityPanel } from './profitability-panel'
+import { dashboardTitle } from '@/lib/page-title'
 
 function formatPercent(value: number | null, notYetAvailable: string) {
   if (value === null) return notYetAvailable
@@ -195,3 +196,5 @@ export default async function ReportsPage({ searchParams }: PageProps<'/dashboar
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('reports')

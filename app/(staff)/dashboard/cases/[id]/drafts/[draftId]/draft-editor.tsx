@@ -123,7 +123,7 @@ export function DraftEditor({
           <Button type="submit" variant="primary" disabled={isPending || !changed} data-testid="draft-save">
             {isPending ? t('saving') : t('save')}
           </Button>
-          {saved && !changed && <FieldSuccess>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved && !changed}>{t('saved')}</FieldSuccess>
           {changed && <span className="text-xs text-fg-muted">{t('unsaved')}</span>}
         </div>
       </form>

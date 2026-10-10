@@ -103,7 +103,7 @@ export function DeadlineForm({ periodTypes }: { periodTypes: PeriodTypeOption[] 
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setError(null)} className="flex flex-col gap-4">
       <CasePicker />
 
       <Field>

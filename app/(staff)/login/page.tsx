@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { Crest } from '@/components/crest'
@@ -8,6 +9,12 @@ import { LoginLocaleSwitcher } from '@/components/login-locale-switcher'
 import { login, requestPasswordReset, type LoginErrorCode } from './actions'
 
 const ERROR_CODES: LoginErrorCode[] = ['missingFields', 'invalidCredentials', 'noStaffAccount', 'deactivated']
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getStaffLocale()
+  const t = await getTranslations({ locale, namespace: 'staffAuth' })
+  return { title: t('pageTitleSuffix') }
+}
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   const { error: errorCode, forgot } = (await searchParams) as { error?: string; forgot?: string }

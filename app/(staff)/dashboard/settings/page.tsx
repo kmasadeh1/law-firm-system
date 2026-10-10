@@ -9,6 +9,7 @@ import { ThemeToggle } from '@/components/dashboard/theme-toggle'
 import { LocaleToggle } from '@/components/dashboard/locale-toggle'
 import { SettingsForm } from './settings-form'
 import { WorkingHoursSection, type WorkingHoursRow } from './working-hours-section'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -92,3 +93,5 @@ export default async function SettingsPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('settings')

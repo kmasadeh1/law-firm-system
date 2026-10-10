@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { TaskForm } from './task-form'
 import { TaskList, type Task } from './task-list'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function TasksPage({ searchParams }: PageProps<'/dashboard/tasks'>) {
   const { show } = (await searchParams) as { show?: string }
@@ -85,3 +86,5 @@ export default async function TasksPage({ searchParams }: PageProps<'/dashboard/
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('tasks')

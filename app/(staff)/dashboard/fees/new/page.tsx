@@ -3,6 +3,7 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { EngagementForm } from './engagement-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function NewEngagementPage() {
   const locale = await getStaffLocale()
@@ -18,3 +19,5 @@ export default async function NewEngagementPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('feesNew')

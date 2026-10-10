@@ -9,6 +9,7 @@ import { controlClass } from '@/components/dashboard/form'
 import { Badge } from '@/components/dashboard/badge'
 import { firmDayBounds, formatDateTime } from '@/lib/format-date-time'
 import { getStaffLocale } from '@/lib/get-staff-locale'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function AppointmentsListPage({
   searchParams,
@@ -137,3 +138,5 @@ export default async function AppointmentsListPage({
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('appointments')

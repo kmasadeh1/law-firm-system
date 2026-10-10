@@ -33,7 +33,7 @@ export function BlockDaysOffForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setError(null)} className="flex flex-wrap items-end gap-3">
       <Field>
         <Label htmlFor="block_start_date" required>
           {t('startDateLabel')}

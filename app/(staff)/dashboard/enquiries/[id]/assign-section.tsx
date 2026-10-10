@@ -79,7 +79,7 @@ export function AssignSection({
         <Button type="button" variant="secondary" onClick={handleSave} disabled={isPending || !changed}>
           {isPending ? t('detail.assignment.saving') : t('detail.assignment.save')}
         </Button>
-        {saved && !changed && <FieldSuccess>{t('detail.assignment.saved')}</FieldSuccess>}
+        <FieldSuccess show={saved && !changed}>{t('detail.assignment.saved')}</FieldSuccess>
       </div>
       {error && <FieldError>{error}</FieldError>}
     </Panel>

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { ReferralSourcesAdmin } from './referral-sources-admin'
 import { PageHeader } from '@/components/dashboard/page-header'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function ReferralSourcesPage() {
   const supabase = await createClient()
@@ -26,3 +27,5 @@ export default async function ReferralSourcesPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('referralSources')

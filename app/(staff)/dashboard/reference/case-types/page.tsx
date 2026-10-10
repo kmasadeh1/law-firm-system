@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { CaseTypesAdmin } from './case-types-admin'
 import { PageHeader } from '@/components/dashboard/page-header'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function CaseTypesPage() {
   const supabase = await createClient()
@@ -25,3 +26,5 @@ export default async function CaseTypesPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('caseTypes')

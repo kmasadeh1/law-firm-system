@@ -10,6 +10,7 @@ import { formatFeeType } from '../format'
 import { CasesSection } from './cases-section'
 import { AgreementSection } from './agreement-section'
 import { InstallmentsSection, type WriteOff } from './installments-section'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function EngagementDetailPage({ params }: PageProps<'/dashboard/fees/[id]'>) {
   const { id } = await params
@@ -268,3 +269,5 @@ export default async function EngagementDetailPage({ params }: PageProps<'/dashb
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('feeEngagement')

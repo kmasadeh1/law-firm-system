@@ -32,7 +32,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getStaffLocale()
   const t = await getTranslations({ locale, namespace: 'staffAuth' })
   return {
-    title: `${t('firmName')} - ${t('pageTitleSuffix')}`,
+    // Pages supply the "%s" part (see lib/page-title.ts); a page with no title
+    // of its own falls back to the firm name alone, never the sign-in text.
+    title: { default: t('firmName'), template: `${t('firmName')} - %s` },
     description: t('pageTitleSuffix'),
   }
 }

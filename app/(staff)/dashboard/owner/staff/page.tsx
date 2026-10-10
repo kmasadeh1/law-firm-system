@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { StaffAdmin } from './staff-admin'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function StaffAdminPage({ searchParams }: PageProps<'/dashboard/owner/staff'>) {
   const { showInactive } = (await searchParams) as { showInactive?: string }
@@ -54,3 +55,5 @@ export default async function StaffAdminPage({ searchParams }: PageProps<'/dashb
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('staffAccounts')

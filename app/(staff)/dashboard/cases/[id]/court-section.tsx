@@ -240,7 +240,7 @@ function FilingRow({
           <Button type="submit" variant="secondary" disabled={isSaving}>
             {isSaving ? t('saving') : t('save')}
           </Button>
-          {saved && <FieldSuccess>{t('saved')}</FieldSuccess>}
+          <FieldSuccess show={saved}>{t('saved')}</FieldSuccess>
           <div className="grow" />
           <Button type="button" variant="danger" disabled={isRemoving} onClick={() => setConfirmingRemove(true)}>
             {isRemoving ? t('removing') : t('remove')}

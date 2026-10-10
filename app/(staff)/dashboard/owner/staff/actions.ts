@@ -1,9 +1,9 @@
 'use server'
 
-import { randomInt } from 'crypto'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { generateTempPassword } from '@/lib/temp-password'
 
 const STAFF_PATH = '/dashboard/owner/staff'
 const TEMP_PASSWORD_VALID_DAYS = 7
@@ -26,7 +26,11 @@ export type StaffErrorCode =
   | 'passwordResetButRecordFailed'
   | 'updateAccountFailed'
 
-type ActionResult = { error?: StaffErrorCode; userId?: string }
+// detail is the underlying Supabase Auth message, returned only for
+// couldNotCreateLogin so the owner (who passed the staff_manage check above)
+// can see why a create/reset was refused - it used to exist only in
+// Supabase's own auth log.
+type ActionResult = { error?: StaffErrorCode; userId?: string; detail?: string }
 
 // The service key bypasses RLS entirely, so this is asked first, on the
 // caller's own session, before the admin client is ever touched - never
@@ -36,18 +40,6 @@ async function callerCanManageStaff(): Promise<boolean> {
   const supabase = await createClient()
   const { data, error } = await supabase.rpc('has_permission', { p_key: 'staff_manage' })
   return !error && data === true
-}
-
-// Excludes visually ambiguous characters (0/O, 1/l/I) since this is read off
-// a screen and typed back in by someone else, not autofilled.
-const PASSWORD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*'
-
-function generateTempPassword(length = 16): string {
-  let out = ''
-  for (let i = 0; i < length; i++) {
-    out += PASSWORD_CHARS[randomInt(PASSWORD_CHARS.length)]
-  }
-  return out
 }
 
 function expiryFromNow(): { setAt: string; expiresAt: string } {
@@ -88,7 +80,12 @@ export async function addStaff(formData: FormData): Promise<ActionResult & { pas
     if (createError?.code === 'email_exists') {
       return { error: 'emailInUse' }
     }
-    return { error: 'couldNotCreateLogin' }
+    console.error('addStaff: auth.admin.createUser failed', {
+      code: createError?.code,
+      status: createError?.status,
+      message: createError?.message,
+    })
+    return { error: 'couldNotCreateLogin', detail: createError?.message }
   }
 
   const { setAt, expiresAt } = expiryFromNow()
@@ -131,7 +128,12 @@ export async function regenerateTempPassword(
 
   const { error: authError } = await admin.auth.admin.updateUserById(staffId, { password })
   if (authError) {
-    return { error: 'couldNotCreateLogin' }
+    console.error('regenerateTempPassword: auth.admin.updateUserById failed', {
+      code: authError.code,
+      status: authError.status,
+      message: authError.message,
+    })
+    return { error: 'couldNotCreateLogin', detail: authError.message }
   }
 
   const { setAt, expiresAt } = expiryFromNow()

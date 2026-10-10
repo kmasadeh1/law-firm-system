@@ -22,6 +22,7 @@ import { ExpensesSection, type Expense } from './expenses-section'
 import { TimelineSection, type TimelineRow } from './timeline-section'
 import { ContactLogSection } from '../../clients/contact-log-section'
 import { CONTACT_LOG_SELECT, toContactRow, type ContactQueryRow } from '../../clients/contact-log-query'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function CaseDetailPage({ params }: PageProps<'/dashboard/cases/[id]'>) {
   const { id } = await params
@@ -558,3 +559,5 @@ export default async function CaseDetailPage({ params }: PageProps<'/dashboard/c
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('case')

@@ -9,6 +9,7 @@ import { addDaysToDate, formatFullDate, formatTimeOfDay, todayInFirmZone } from 
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
 import { PrintButton } from '@/components/dashboard/print-button'
+import { dashboardTitle } from '@/lib/page-title'
 
 // Parses ?date= defensively: anything that isn't a real YYYY-MM-DD calendar
 // date (typo'd URL, 2026-02-30) falls back to today rather than erroring.
@@ -221,3 +222,5 @@ export default async function HearingCalendarPage({ searchParams }: PageProps<'/
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('hearings')

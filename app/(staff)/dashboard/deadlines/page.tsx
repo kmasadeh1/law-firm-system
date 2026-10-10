@@ -9,6 +9,7 @@ import { urgencyOf, urgencyClass } from './urgency'
 import { getStaffLocale } from '@/lib/get-staff-locale'
 import { localizedName } from '@/lib/localized-name'
 import { formatDate } from '@/lib/format-date-time'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function DeadlinesListPage() {
   const supabase = await createClient()
@@ -99,3 +100,5 @@ export default async function DeadlinesListPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('deadlines')

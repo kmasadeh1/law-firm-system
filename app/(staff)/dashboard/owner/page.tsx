@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { activityEventTitle } from '@/lib/activity-labels'
+import { dashboardTitle } from '@/lib/page-title'
 
 const OVERDUE_APPOINTMENTS_LIMIT = 5
 const ACTIVITY_LIMIT = 8
@@ -232,3 +233,5 @@ export default async function OwnerDashboardPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('ownerOverview')

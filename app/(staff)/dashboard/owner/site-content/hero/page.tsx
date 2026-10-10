@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/dashboard/page-header'
 import { Panel } from '@/components/dashboard/panel'
 import { LinkButton } from '@/components/dashboard/button'
 import { HeroForm } from './hero-form'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function HeroSectionPage() {
   const supabase = await createClient()
@@ -29,3 +30,5 @@ export default async function HeroSectionPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('hero')

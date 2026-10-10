@@ -29,7 +29,7 @@ export function RequestLeaveForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setError(null)} className="flex flex-wrap items-end gap-3">
       <Field>
         <Label htmlFor="start_date" required>
           {t('startDateLabel')}

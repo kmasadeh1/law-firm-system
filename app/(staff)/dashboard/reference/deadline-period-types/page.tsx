@@ -4,6 +4,7 @@ import { getStaffLocale } from '@/lib/get-staff-locale'
 import { PeriodTypesAdmin } from './period-types-admin'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { Banner } from '@/components/dashboard/banner'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function DeadlinePeriodTypesPage() {
   const supabase = await createClient()
@@ -27,3 +28,5 @@ export default async function DeadlinePeriodTypesPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('deadlinePeriodTypes')

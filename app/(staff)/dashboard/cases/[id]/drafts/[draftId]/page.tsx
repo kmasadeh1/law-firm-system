@@ -38,7 +38,9 @@ const loadDraft = cache(async (caseId: string, draftId: string) => {
 export async function generateMetadata({ params }: PageProps<'/dashboard/cases/[id]/drafts/[draftId]'>): Promise<Metadata> {
   const { id, draftId } = await params
   const { draft, caseNumber } = await loadDraft(id, draftId)
-  return draft ? { title: draftDocumentTitle(draft.title, caseNumber) } : {}
+  // absolute: skips the staff layout's "<firm> - %s" template, which would
+  // change the PDF file name.
+  return draft ? { title: { absolute: draftDocumentTitle(draft.title, caseNumber) } } : {}
 }
 
 export default async function DraftPage({ params }: PageProps<'/dashboard/cases/[id]/drafts/[draftId]'>) {

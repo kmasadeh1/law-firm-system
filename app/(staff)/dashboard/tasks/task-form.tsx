@@ -61,7 +61,7 @@ export function TaskForm({
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3" data-testid="task-form">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setError(null)} className="flex flex-col gap-3" data-testid="task-form">
       {fixedCaseId ? <input type="hidden" name="case_id" value={fixedCaseId} /> : <CasePicker />}
 
       <Field>

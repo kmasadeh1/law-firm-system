@@ -6,6 +6,7 @@ import { BackLink } from '@/components/dashboard/back-link'
 import { PageHeader } from '@/components/dashboard/page-header'
 import { EmptyState } from '@/components/dashboard/empty-state'
 import { ACTIVE_REFERRAL_SOURCES_SELECT, referralSourceOptions } from '../referral-source-options'
+import { dashboardTitle } from '@/lib/page-title'
 
 export default async function NewClientPage() {
   const supabase = await createClient()
@@ -37,3 +38,5 @@ export default async function NewClientPage() {
     </div>
   )
 }
+
+export const generateMetadata = () => dashboardTitle('clientsNew')
