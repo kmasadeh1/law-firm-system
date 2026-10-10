@@ -28,7 +28,14 @@ function present(value: string | null | undefined): string | null {
 // marker - "[Judge: not available]" - so the lawyer sees the gap before
 // printing. A placeholder the system doesn't know (a typo) becomes its own
 // marker. Nothing is ever replaced with an empty string or left raw.
-export async function resolvePlaceholders(caseId: string, body: string, language: DraftLanguage): Promise<string> {
+//
+// Returns the placeholders that could not be filled alongside the text:
+// `missing` keys known but without a value, `unknown` keys the system
+// doesn't have. The draft page shows the same gaps from the stored text
+// (lib/draft-markers.ts), since the list itself isn't stored.
+export type ResolvedDraft = { text: string; unresolved: { key: string; kind: 'missing' | 'unknown' }[] }
+
+export async function resolvePlaceholders(caseId: string, body: string, language: DraftLanguage): Promise<ResolvedDraft> {
   const supabase = await createClient()
   const tLabels = await getTranslations({ locale: language, namespace: 'dashboard.documentPlaceholders' })
   const tMarker = await getTranslations({ locale: language, namespace: 'dashboard.cases.detail.drafts.marker' })
@@ -83,14 +90,18 @@ export async function resolvePlaceholders(caseId: string, body: string, language
     today: formatFullDate(todayInFirmZone(), language),
   }
 
-  return body.replace(TOKEN, (_match, rawKey: string) => {
+  const unresolved: ResolvedDraft['unresolved'] = []
+  const text = body.replace(TOKEN, (_match, rawKey: string) => {
     const key = rawKey.toLowerCase()
     if (!(DOCUMENT_PLACEHOLDERS as readonly string[]).includes(key)) {
+      unresolved.push({ key: rawKey, kind: 'unknown' })
       return tMarker('unknown', { name: rawKey })
     }
     const value = values[key as DocumentPlaceholder]
+    if (value === null) unresolved.push({ key, kind: 'missing' })
     // Markers are not isolated: they are written in the draft's own
     // language, so they belong to the sentence around them.
     return value !== null ? `${FSI}${value}${PDI}` : tMarker('missing', { label: tLabels(key) })
   })
+  return { text, unresolved }
 }

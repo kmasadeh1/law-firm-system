@@ -58,6 +58,20 @@ const PRINT_CSS = `
   font-family: var(--font-source-serif-face, "Source Serif 4"), var(--font-amiri-face, "Amiri"), serif;
 }
 
+.draft-incomplete {
+  margin-bottom: 4mm;
+  padding: 2mm 3mm;
+  border: 1.5pt solid #000;
+  background: #eee;
+  font-family: var(--font-source-serif-face, serif), var(--font-amiri-face, "Amiri"), serif;
+  font-size: 10pt;
+  line-height: 1.4;
+  break-inside: avoid;
+}
+.draft-incomplete-heading {
+  font-weight: 700;
+}
+
 .draft-letterhead {
   padding-bottom: 2.5mm;
   border-bottom: 2.5pt double #000;
@@ -164,12 +178,31 @@ const PRINT_CSS = `
 }
 `
 
-export function DraftDocument({ letterhead, title, body }: { letterhead: Letterhead; title: string; body: string }) {
+export function DraftDocument({
+  letterhead,
+  title,
+  body,
+  incomplete,
+}: {
+  letterhead: Letterhead
+  title: string
+  body: string
+  // Set when the text still holds unfilled-placeholder markers. Printed at
+  // the top of the page so an incomplete document is obvious on paper.
+  incomplete: { heading: string; items: string[] } | null
+}) {
   const sections = splitDraft(body)
 
   return (
     <article className="draft-doc hidden print:flex" data-testid="draft-print-view">
       <style>{PRINT_CSS}</style>
+
+      {incomplete && (
+        <div className="draft-incomplete" data-testid="draft-print-incomplete">
+          <p className="draft-incomplete-heading">{incomplete.heading}</p>
+          <p>{incomplete.items.join(' | ')}</p>
+        </div>
+      )}
 
       <header dir="ltr" className="draft-letterhead" data-testid="draft-letterhead">
         <div className="draft-letterhead-names">

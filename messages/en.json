@@ -426,6 +426,12 @@
           "saved": "Saved",
           "unsaved": "Unsaved changes",
           "print": "Print",
+          "incomplete": {
+            "heading": "{count, plural, one {This draft has 1 detail still missing} other {This draft has # details still missing}}",
+            "body": "Fill them in the text above before filing. You can still print a partial draft; the printout will say it is incomplete.",
+            "unknownItem": "Unknown placeholder: {name}",
+            "printHeading": "{count, plural, one {INCOMPLETE DRAFT: 1 detail missing} other {INCOMPLETE DRAFT: # details missing}}"
+          },
           "marker": {
             "missing": "[{label}: not available]",
             "unknown": "[unknown placeholder: {name}]"

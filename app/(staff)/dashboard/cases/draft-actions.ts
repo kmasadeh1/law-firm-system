@@ -63,7 +63,7 @@ export async function generateDraft(
       case_id: caseId,
       template_id: templateId,
       title,
-      body: await resolvePlaceholders(caseId, body, language),
+      body: (await resolvePlaceholders(caseId, body, language)).text,
     })
     .select('id')
     .single()

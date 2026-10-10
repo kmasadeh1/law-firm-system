@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { deleteDraft, saveDraft } from '../../../draft-actions'
@@ -10,6 +10,7 @@ import { Button } from '@/components/dashboard/button'
 import { Field, Label, FieldError, FieldSuccess, controlClass } from '@/components/dashboard/form'
 import { PrintButton } from '@/components/dashboard/print-button'
 import { DeleteConfirmDialog } from '@/components/dashboard/delete-confirm-dialog'
+import { findUnresolvedMarkers } from '@/lib/draft-markers'
 import { draftDocumentTitle } from '@/lib/draft-sections'
 import { DraftDocument, type Letterhead } from './draft-document'
 
@@ -47,6 +48,11 @@ export function DraftEditor({
 
   const changed = title !== savedTitle || body !== savedBody
 
+  // Gaps the resolver marked in the text. Read from the body as it is in the
+  // editor right now, so the banner clears as a gap is filled in. Print
+  // stays available either way - a partial draft can be intentional.
+  const unresolved = useMemo(() => findUnresolvedMarkers(body), [body])
+
   // The server set <title> from the saved draft; keep it on what is in the
   // editor, so the PDF name and Chrome's print header match the printout.
   useEffect(() => {
@@ -81,6 +87,24 @@ export function DraftEditor({
           <PrintButton label={t('print')} testId="draft-print" />
         </div>
       </div>
+
+      {unresolved.length > 0 && (
+        <div
+          role="alert"
+          className="rounded-md border-2 border-danger bg-danger/10 p-4 text-sm print:hidden"
+          data-testid="draft-incomplete-banner"
+        >
+          <p className="font-medium text-fg">{t('incomplete.heading', { count: unresolved.length })}</p>
+          <ul className="mt-2 list-disc ps-5 text-fg">
+            {unresolved.map((u) => (
+              <li key={`${u.kind}:${u.label}`}>
+                <bdi>{u.kind === 'unknown' ? t('incomplete.unknownItem', { name: u.label }) : u.label}</bdi>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-fg-muted">{t('incomplete.body')}</p>
+        </div>
+      )}
 
       <form ref={formRef} onSubmit={handleSave} className="flex flex-col gap-3 print:hidden" data-testid="draft-form">
         <Field>
@@ -129,7 +153,19 @@ export function DraftEditor({
       </form>
 
       {/* Print only. Shows what is in the editor now, saved or not. */}
-      <DraftDocument letterhead={letterhead} title={title} body={body} />
+      <DraftDocument
+        letterhead={letterhead}
+        title={title}
+        body={body}
+        incomplete={
+          unresolved.length > 0
+            ? {
+                heading: t('incomplete.printHeading', { count: unresolved.length }),
+                items: unresolved.map((u) => (u.kind === 'unknown' ? t('incomplete.unknownItem', { name: u.label }) : u.label)),
+              }
+            : null
+        }
+      />
 
       <DeleteConfirmDialog
         open={confirmingDelete}
